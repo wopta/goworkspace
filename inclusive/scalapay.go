@@ -62,7 +62,7 @@ func BankAccountScalapayFx(resp http.ResponseWriter, r *http.Request) (string, i
 		refDay := time.Now()
 		res, _ := QueryRowsBigQuery[BankAccountMovement](dataset,
 			usersTable,
-			"select * from `"+dataset+"."+movementTable+"` where guaranteesCode ='"+obj.GuaranteesCode+"' and id ='"+obj.Id+"' and _PARTITIONTIME ='"+refDay.Format(layoutQuery)+"' and status ='insert'")
+			"select * from `"+dataset+"."+movementTable+"` where guaranteesCode ='"+obj.GuaranteesCode+"' and id ='"+obj.Id+"' and StartDate ='"+refDay.Format(layoutQuery)+"' and status ='insert'")
 		log.Println(len(res))
 
 		if len(res) == 0 {
@@ -72,7 +72,7 @@ func BankAccountScalapayFx(resp http.ResponseWriter, r *http.Request) (string, i
 			e = lib.UpdateRowBigQuery(dataset, usersTable, map[string]string{
 				"status":  obj.Status,
 				"endDate": obj.EndDate.Format(layout) + " 00:00:00",
-			}, "fiscalCode='"+obj.FiscalCode+"' and guaranteesCode='"+obj.GuaranteesCode+"'")
+			}, "id ='"+obj.Id+"' and guaranteesCode='"+obj.GuaranteesCode+"'")
 		} else {
 			return "", nil, GetErrorJson(400, "Bad request", "field Movement insert same day for "+obj.Id)
 		}
