@@ -16,7 +16,6 @@ type InputData struct {
 	LifeRisk      int    `json:"lifeRisk"`
 	FinancialRisk int    `json:"financialRisk"`
 	Age           int    `json:"age"`
-	Work          string `json:"work"`
 	WorkType      string `json:"workType"`
 	RiskClass     string `json:"riskClass"`
 }
@@ -44,7 +43,7 @@ type TestData struct {
 }
 
 func TestPersona(t *testing.T) {
-	os.Setenv("env", "local-test")
+	t.Setenv("env", "local-test")
 
 	fileReader, err := os.Open("../../function-data/dev/" + "data/test/quote/persona.json")
 	if err != nil {
@@ -62,40 +61,59 @@ func TestPersona(t *testing.T) {
 		if err := quote.Persona(&p, models.ECommerceChannel, nil, nil, models.ECommerceFlow); err != nil {
 			t.Fatalf("error quoting test %d: %s", idx+1, err)
 		}
+
+		var (
+			numOffersExpected int
+			numOffersGot      = len(p.OffersPrices)
+		)
+
 		for offerName, value := range data.Output {
+			numOffersExpected++
 			offerPrice := p.OffersPrices[offerName]["yearly"].Gross
 			if offerPrice != value.PriceGross {
-				t.Fatalf("mismatched offer price for %s. Expected %.2f - Got %.2f", offerName, value.PriceGross, offerPrice)
+				t.Errorf("quote test %d - mismatched offer price for %s. Expected %.2f - Got %.2f", idx+1, offerName, value.PriceGross, offerPrice)
 			}
 			if value.IPI != nil {
 				g, _ := p.ExtractGuarantee("IPI")
 				if g.Offer[offerName].SumInsuredLimitOfIndemnity != value.IPI.SumInsuredLimitOfIndemnity {
-					t.Fatalf("mismatched offer sum for %s. Expected %.2f - Got %.2f", offerName, g.Offer[offerName].SumInsuredLimitOfIndemnity, value.IPI.SumInsuredLimitOfIndemnity)
+					t.Errorf("quote test %d - mismatched offer IPI sum for %s. Expected %.2f - Got %.2f", idx+1, offerName, g.Offer[offerName].SumInsuredLimitOfIndemnity, value.IPI.SumInsuredLimitOfIndemnity)
+				}
+				if g.Offer[offerName].Deductible != value.IPI.Deductible {
+					t.Errorf("quote test %d - mismatched offer IPI deductible for %s. Expected %s - Got %s", idx+1, offerName, g.Offer[offerName].Deductible, value.IPI.Deductible)
+				}
+				if g.Offer[offerName].DeductibleType != value.IPI.DeductibleType {
+					t.Errorf("quote test %d - mismatched offer IPI deductibleType for %s. Expected %s - Got %s", idx+1, offerName, g.Offer[offerName].DeductibleType, value.IPI.DeductibleType)
 				}
 			}
 			if value.D != nil {
 				g, _ := p.ExtractGuarantee("D")
 				if g.Offer[offerName].SumInsuredLimitOfIndemnity != value.D.SumInsuredLimitOfIndemnity {
-					t.Fatalf("mismatched offer sum for %s. Expected %.2f - Got %.2f", offerName, g.Offer[offerName].SumInsuredLimitOfIndemnity, value.D.SumInsuredLimitOfIndemnity)
+					t.Errorf("quote test %d - mismatched offer D sum for %s. Expected %.2f - Got %.2f", idx+1, offerName, g.Offer[offerName].SumInsuredLimitOfIndemnity, value.D.SumInsuredLimitOfIndemnity)
 				}
 			}
 			if value.DRG != nil {
 				g, _ := p.ExtractGuarantee("DRG")
 				if g.Offer[offerName].SumInsuredLimitOfIndemnity != value.DRG.SumInsuredLimitOfIndemnity {
-					t.Fatalf("mismatched offer sum for %s. Expected %.2f - Got %.2f", offerName, g.Offer[offerName].SumInsuredLimitOfIndemnity, value.DRG.SumInsuredLimitOfIndemnity)
+					t.Errorf("quote test %d - mismatched offer DRG sum for %s. Expected %.2f - Got %.2f", idx+1, offerName, g.Offer[offerName].SumInsuredLimitOfIndemnity, value.DRG.SumInsuredLimitOfIndemnity)
 				}
 			}
 			if value.DC != nil {
 				g, _ := p.ExtractGuarantee("DC")
 				if g.Offer[offerName].SumInsuredLimitOfIndemnity != value.DC.SumInsuredLimitOfIndemnity {
-					t.Fatalf("mismatched offer sum for %s. Expected %.2f - Got %.2f", offerName, g.Offer[offerName].SumInsuredLimitOfIndemnity, value.DC.SumInsuredLimitOfIndemnity)
+					t.Errorf("quote test %d - mismatched offer DC sum for %s. Expected %.2f - Got %.2f", idx+1, offerName, g.Offer[offerName].SumInsuredLimitOfIndemnity, value.DC.SumInsuredLimitOfIndemnity)
 				}
 			}
 			if value.RSC != nil {
 				g, _ := p.ExtractGuarantee("RSC")
 				if g.Offer[offerName].SumInsuredLimitOfIndemnity != value.RSC.SumInsuredLimitOfIndemnity {
-					t.Fatalf("mismatched offer sum for %s. Expected %.2f - Got %.2f", offerName, g.Offer[offerName].SumInsuredLimitOfIndemnity, value.RSC.SumInsuredLimitOfIndemnity)
+					t.Errorf("quote test %d - mismatched offer RSC sum for %s. Expected %.2f - Got %.2f", idx+1, offerName, g.Offer[offerName].SumInsuredLimitOfIndemnity, value.RSC.SumInsuredLimitOfIndemnity)
 				}
+			}
+		}
+		if numOffersExpected != numOffersGot {
+			t.Errorf("mismatched number of offers. Expected %d - Got %d", numOffersExpected, numOffersGot)
+			for name, o := range p.OffersPrices {
+				t.Errorf("Policy Offer %s: %+v", name, o["yearly"])
 			}
 		}
 	}
@@ -118,8 +136,7 @@ func buildPolicy(in InputData) models.Policy {
 			"financialRisk": in.FinancialRisk,
 		},
 		Contractor: models.Contractor{
-			BirthDate: lib.AddMonths(time.Now(), in.Age*-12).Format(time.RFC3339),
-			Work:      in.Work,
+			BirthDate: lib.AddMonths(time.Now().UTC().Truncate(time.Hour*24), in.Age*-12).Format(time.RFC3339),
 			WorkType:  in.WorkType,
 			RiskClass: in.RiskClass,
 		},
