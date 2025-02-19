@@ -62,8 +62,11 @@ steps:
     --source=/workspace/${strarr[0]} \
     --entry-point=${name_camel} \
     --trigger-http \
+    --allow-unauthenticated \
+    --run-service-account=wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com \
     --runtime=go121 \
     --env-vars-file ${env}.yaml \
+    --gen2 \
     --project=${project}
 
     
