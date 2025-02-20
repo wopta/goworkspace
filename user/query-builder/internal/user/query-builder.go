@@ -17,17 +17,5 @@ func NewQueryBuilder() *UsersQueryBuilder {
 }
 
 func (qb *UsersQueryBuilder) Build(params map[string]string) (string, map[string]interface{}, error) {
-	//const (
-	//	deleteClause = "(**tableAlias**.isDeleted = false OR **tableAlias**." +
-	//		"isDeleted IS NULL)"
-	//	emitClause = "(**tableAlias**.companyEmit = true)"
-	//)
-	//qb.WhereClauses = []string{emitClause, deleteClause}
-	//if val, ok := params["status"]; ok {
-	//	if strings.Contains(val, "deleted") {
-	//		qb.WhereClauses = qb.WhereClauses[:1]
-	//	}
-	//}
-
 	return qb.UsersQueryBuilder.Build(params)
 }
