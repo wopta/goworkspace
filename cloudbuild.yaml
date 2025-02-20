@@ -70,7 +70,7 @@ steps:
     --env-vars-file ${env}.yaml \
     --${genFx} \ 
     --clear-labels \ 
-    --update-labels tag=$TAG_NAME \ 
+    --update-labels tag=test \ 
     --project=${project}
 
     
