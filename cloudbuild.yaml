@@ -74,7 +74,7 @@ steps:
     --update-labels tag=${tagVersion},baz=qux
    
     
-    gcloud run services update ${strarr[0]}  --update-labels KEY=VALUE
+    gcloud run services update ${strarr[0]}  --update-labels KEY=VALUE --region=europe-west1
     
      #gcloud functions add-iam-policy-binding ${strarr[0]} \
     # --region='europe-west1' \
