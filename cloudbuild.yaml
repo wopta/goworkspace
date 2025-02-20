@@ -74,7 +74,7 @@ steps:
     --update-labels tag=${tagVersion},baz=qux
    
     
-    gcloud run services update ${strarr[0]}  --update-labels KEY=VALUE --region=europe-west1
+    gcloud run services update ${strarr[0]}  --update-labels KEY=VALUE --region=europe-west1 --service-account=wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com 
     
      #gcloud functions add-iam-policy-binding ${strarr[0]} \
     # --region='europe-west1' \
