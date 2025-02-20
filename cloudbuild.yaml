@@ -70,7 +70,7 @@ steps:
     --runtime=go121 \
     --env-vars-file ${env}.yaml \
     --${genFx} \
-    --update-labels tag=${TAG_NAME},baz=qux
+    --update-labels tag=${strarr[1]},baz=qux
    
     
 
