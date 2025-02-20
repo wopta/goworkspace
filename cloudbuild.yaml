@@ -69,13 +69,8 @@ steps:
     --run-service-account=wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com \
     --runtime=go121 \
     --env-vars-file ${env}.yaml \
-    --${genFx} \ 
-    --clear-labels \ 
-    --format="yaml(labels)" \
-labels:
-  app: myapp
-  deployment-tool: cli-gcloud
-  env: dev
+    --${genFx} 
+   
     
 
     
