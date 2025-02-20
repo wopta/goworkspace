@@ -74,10 +74,10 @@ steps:
     --update-labels tag=${tagVersion},baz=qux
    
     
-gcloud resource-manager tags bindings create \
+    gcloud resource-manager tags bindings create \
     --tag-value=${strarr[1]} \
     --parent=//run.googleapis.com/projects/${project}/locations/europe-west1/jobs/${strarr[0]} \
-    --location=REGION
+    --location=europe-west1
     
      #gcloud functions add-iam-policy-binding ${strarr[0]} \
     # --region='europe-west1' \
