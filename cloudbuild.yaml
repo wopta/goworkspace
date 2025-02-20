@@ -24,6 +24,7 @@ steps:
     namefx=$strarr[0]
 
     name_camel=$(sed -r 's/(^|-)(\w)/\U\2/g' <<<"${strarr[0]}")
+    tagVersion=$(echo "${strarr[1]}" | sed 's/./_/')
     echo "namefx camel : ${name_camel}"
 
     if [[ "${strarr[1]}" == *"dev"* ]]; then
@@ -70,7 +71,7 @@ steps:
     --runtime=go121 \
     --env-vars-file ${env}.yaml \
     --${genFx} \
-    --update-labels tag=${strarr[1]},baz=qux
+    --update-labels tag=${tagVersion},baz=qux
    
     
 
