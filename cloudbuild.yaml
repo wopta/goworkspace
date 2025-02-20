@@ -24,7 +24,7 @@ steps:
     namefx=$strarr[0]
 
     name_camel=$(sed -r 's/(^|-)(\w)/\U\2/g' <<<"${strarr[0]}")
-    tagVersion=$(echo "${strarr[1]}" | sed -i 's/./_/g')
+    tagVersion=$(echo "${strarr[1]}" | sed -r 's/./_/g')
     echo "namefx camel : ${name_camel}"
     echo "tagVersion camel : ${tagVersion}"
     if [[ "${strarr[1]}" == *"dev"* ]]; then
@@ -74,7 +74,7 @@ steps:
     --update-labels tag=${tagVersion},baz=qux
    
     
-    gcloud run services update ${strarr[0]}  --update-labels KEY=VALUE --region=europe-west1 --service-account=wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com 
+    gcloud run services update ${strarr[0]}  --update-labels tagversion=${tagVersion} --region=europe-west1 --service-account=wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com 
     
      #gcloud functions add-iam-policy-binding ${strarr[0]} \
     # --region='europe-west1' \
