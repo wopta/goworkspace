@@ -25,7 +25,7 @@ steps:
     namefx=$strarr[0]
 
     name_camel=$(sed -r 's/(^|-)(\w)/\U\2/g' <<<"${strarr[0]}")
-    tagVersion=$(echo "${strarr[1]}" | sed -r 's/./_/g')
+    tagVersion=$(echo "${strarr[1]}" | sed -r 's/\./_/g')
     t=tr -s . _ <<< "${strarr[1]}"
     echo "namefx camel : ${name_camel}"
     echo "tagVersion camel : ${tagVersion}"
