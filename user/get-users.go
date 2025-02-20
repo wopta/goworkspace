@@ -2,6 +2,7 @@ package user
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -12,6 +13,7 @@ import (
 
 	lib "github.com/wopta/goworkspace/lib"
 	models "github.com/wopta/goworkspace/models"
+	qb "github.com/wopta/goworkspace/user/query-builder/pkg"
 )
 
 type GetUsersReq struct {
@@ -160,4 +162,76 @@ func GetAuthUserByMail(origin, mail string) (models.User, error) {
 	}
 
 	return GetUserByAuthId(origin, authId)
+}
+
+type getUserResp struct {
+	Users []userInfo `json:"users"`
+}
+
+type userInfo struct {
+	Uid        string `json:"uid" bigquery:"uid"`
+	Name       string `json:"name" bigquery:"name"`
+	Surname    string `json:"surname" bigquery:"surname"`
+	Mail       string `json:"mail" bigquery:"mail"`
+	Role       string `json:"role" bigquery:"role"`
+	FiscalCode string `json:"fiscalCode" bigquery:"fiscalCode"`
+}
+
+func GetUsersV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	var err error
+
+	log.SetPrefix("[GetUsersV2Fx] ")
+	defer func() {
+		if err != nil {
+			log.Printf("error: %s", err)
+		}
+		log.Println("Handler end ---------------------------------------------")
+		log.SetPrefix("")
+	}()
+	log.Println("Handler start -----------------------------------------------")
+
+	paramsMap := extractQueryParams(r)
+	if len(paramsMap) == 0 {
+		return "", nil, errors.New("no query params")
+	}
+
+	queryBuilder := qb.NewQueryBuilder("user")
+	if queryBuilder == nil {
+		return "", nil, errors.New("error initializing query builder")
+	}
+	query, queryParams, err := queryBuilder.Build(paramsMap)
+	if err != nil {
+		return "", nil, fmt.Errorf("error generating query: %v", err)
+	}
+
+	log.Println("paramsMap:")
+	log.Println(paramsMap)
+	log.Println("QUERY:")
+	log.Println(query)
+	log.Println("QUERY PARAMS:")
+	log.Println(queryParams)
+
+	users, err := lib.QueryParametrizedRowsBigQuery[userInfo](query, queryParams)
+	if err != nil {
+		log.Printf("error executing query: %s", err.Error())
+		return "", nil, err
+	}
+
+	resp := &getUserResp{
+		Users: users,
+	}
+
+	rawResp, err := json.Marshal(resp)
+
+	return string(rawResp), users, err
+}
+
+func extractQueryParams(r *http.Request) map[string]string {
+	inputParams := r.URL.Query()
+
+	paramsMap := make(map[string]string)
+	for key, values := range inputParams {
+		paramsMap[key] = values[0]
+	}
+	return paramsMap
 }

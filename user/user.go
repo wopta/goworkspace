@@ -72,6 +72,12 @@ var userRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAdmin},
 	},
+	{
+		Route:   "/v2",
+		Handler: lib.ResponseLoggerWrapper(GetUsersV2Fx),
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleAdmin},
+	},
 }
 
 func init() {
