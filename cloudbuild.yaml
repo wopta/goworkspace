@@ -26,7 +26,7 @@ steps:
     name_camel=$(sed -r 's/(^|-)(\w)/\U\2/g' <<<"${strarr[0]}")
     tagVersion=$(echo "${strarr[1]}" | sed -i 's/./_/g')
     echo "namefx camel : ${name_camel}"
-
+    echo "tagVersion camel : ${tagVersion}"
     if [[ "${strarr[1]}" == *"dev"* ]]; then
     echo "dev enviroment"
       project=positive-apex-350507
@@ -74,10 +74,7 @@ steps:
     --update-labels tag=${tagVersion},baz=qux
    
     
-    gcloud resource-manager tags bindings create \
-    --tag-value=test \
-    --parent=//run.googleapis.com/projects/${project}/locations/europe-west1/jobs/${strarr[0]} \
-    --location=europe-west1
+    gcloud run services update ${strarr[0]}  --update-labels KEY=VALUE
     
      #gcloud functions add-iam-policy-binding ${strarr[0]} \
     # --region='europe-west1' \
