@@ -23,24 +23,24 @@ type UsersQueryBuilder struct {
 	limit              uint64
 }
 
-func NewQueryBuilder(tableName, tableAlias string, randomGenerator func() string,
+func NewQueryBuilder(tableName, tableAlias string,
 	paramsHierarchy []map[string][]string, paramsWhereClause map[string]string) UsersQueryBuilder {
-	if randomGenerator == nil {
-		randomGenerator = func() string {
-			var (
-				letters  = []rune("abcdefghijklmnopqrstuvwxyz")
-				alphanum = []rune("123456789abcdefghijklmnopqrstuvwxyz")
-			)
-			rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
 
-			s := make([]rune, 12)
-			s[0] = letters[rnd.Intn(len(letters))]
-			for i := range s[1:] {
-				s[i+1] = alphanum[rnd.Intn(len(alphanum))]
-			}
-			return string(s)
+	var randomGenerator = func() string {
+		var (
+			letters  = []rune("abcdefghijklmnopqrstuvwxyz")
+			alphanum = []rune("123456789abcdefghijklmnopqrstuvwxyz")
+		)
+		rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+		s := make([]rune, 12)
+		s[0] = letters[rnd.Intn(len(letters))]
+		for i := range s[1:] {
+			s[i+1] = alphanum[rnd.Intn(len(alphanum))]
 		}
+		return string(s)
 	}
+
 	return UsersQueryBuilder{
 		tableName:          tableName,
 		tableAlias:         tableAlias,

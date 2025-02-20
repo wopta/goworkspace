@@ -9,9 +9,9 @@ type UsersQueryBuilder struct {
 	base.UsersQueryBuilder
 }
 
-func NewQueryBuilder(randomGenerator func() string) *UsersQueryBuilder {
+func NewQueryBuilder() *UsersQueryBuilder {
 	return &UsersQueryBuilder{
-		base.NewQueryBuilder(lib.UsersViewCollection, "u", randomGenerator,
+		base.NewQueryBuilder(lib.UsersViewCollection, "u",
 			paramsHierarchy, paramsWhereClause),
 	}
 }
