@@ -30,11 +30,13 @@ steps:
     echo "dev enviroment"
       project=positive-apex-350507
       env=dev
+      genFx=gen2
     fi
      if [[ "${strarr[1]}" == *"prod"* ]]; then
     echo "prod enviroment"
       project=core-350507
       env=prod
+      genFx=gen1
     fi
         #--ingress-settings internal-only \
     #--timeout=540 \
@@ -66,7 +68,7 @@ steps:
     --run-service-account=wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com \
     --runtime=go121 \
     --env-vars-file ${env}.yaml \
-    --gen2 \
+    --${genFx} \ 
     --project=${project}
 
     
