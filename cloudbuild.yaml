@@ -21,12 +21,15 @@ steps:
     read -a strarr <<< $TAG_NAME
     #Print the splitted words
     echo "namefx : ${strarr[0]}"
+    echo "tag : ${strarr[1]}"
     namefx=$strarr[0]
 
     name_camel=$(sed -r 's/(^|-)(\w)/\U\2/g' <<<"${strarr[0]}")
     tagVersion=$(echo "${strarr[1]}" | sed -r 's/./_/g')
+    t=tr -s . _ <<< "${strarr[1]}"
     echo "namefx camel : ${name_camel}"
     echo "tagVersion camel : ${tagVersion}"
+    echo "tagVersion camel : ${t}"
     if [[ "${strarr[1]}" == *"dev"* ]]; then
     echo "dev enviroment"
       project=positive-apex-350507
@@ -73,8 +76,11 @@ steps:
     --${genFx} \
     --update-labels tag=${tagVersion},baz=qux
    
-    
+      if [[ "${strarr[1]}" == *"dev"* ]]; then
+    echo "dev run services update"
     gcloud run services update ${strarr[0]}  --update-labels tagversion=${tagVersion} --region=europe-west1 --service-account=wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com 
+    fi
+   
     
      #gcloud functions add-iam-policy-binding ${strarr[0]} \
     # --region='europe-west1' \
