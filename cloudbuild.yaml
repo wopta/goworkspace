@@ -69,6 +69,8 @@ steps:
     --runtime=go121 \
     --env-vars-file ${env}.yaml \
     --${genFx} \ 
+    --clear-labels \ 
+    --update-labels tag=$TAG_NAME \ 
     --project=${project}
 
     
