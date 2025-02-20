@@ -60,6 +60,7 @@ steps:
     cp /workspace/.gcloudignore /workspace/${strarr[0]}/.gcloudignore 
     
     gcloud functions deploy ${strarr[0]} \
+    --project=${project} \
     --region=europe-west1 \
     --source=/workspace/${strarr[0]} \
     --entry-point=${name_camel} \
@@ -70,8 +71,12 @@ steps:
     --env-vars-file ${env}.yaml \
     --${genFx} \ 
     --clear-labels \ 
-    --update-labels tag=test \ 
-    --project=${project}
+    --format="yaml(labels)"
+labels:
+  app: myapp
+  deployment-tool: cli-gcloud
+  env: dev
+    
 
     
      #gcloud functions add-iam-policy-binding ${strarr[0]} \
