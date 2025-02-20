@@ -75,7 +75,7 @@ steps:
    
     
     gcloud resource-manager tags bindings create \
-    --tag-value=${strarr[1]} \
+    --tag-value=test \
     --parent=//run.googleapis.com/projects/${project}/locations/europe-west1/jobs/${strarr[0]} \
     --location=europe-west1
     
