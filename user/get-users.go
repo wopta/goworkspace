@@ -195,7 +195,7 @@ func GetUsersV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		return "", nil, errors.New("no query params")
 	}
 
-	queryBuilder := qb.NewQueryBuilder("user")
+	queryBuilder := qb.NewQueryBuilder()
 	if queryBuilder == nil {
 		return "", nil, errors.New("error initializing query builder")
 	}
