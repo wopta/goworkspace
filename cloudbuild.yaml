@@ -71,7 +71,7 @@ steps:
     --env-vars-file ${env}.yaml \
     --${genFx} \ 
     --clear-labels \ 
-    --format="yaml(labels)"
+    --format="yaml(labels)" \
 labels:
   app: myapp
   deployment-tool: cli-gcloud
