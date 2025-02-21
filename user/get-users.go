@@ -11,8 +11,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	lib "github.com/wopta/goworkspace/lib"
-	models "github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 	qb "github.com/wopta/goworkspace/user/query-builder/pkg"
 )
 
