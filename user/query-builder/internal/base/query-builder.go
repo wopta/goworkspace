@@ -92,16 +92,6 @@ func (qb *UsersQueryBuilder) processToBeTranslatedParam(paramValue string) (stri
 	return "(" + strings.Join(whereClauses, " OR ") + ")", nil
 }
 
-func (qb *UsersQueryBuilder) processProducerUidParam(paramValue string, queryParams map[string]interface{}) string {
-	tmp := make([]string, 0)
-	for _, uid := range strings.Split(paramValue, ",") {
-		randomIdentifier := qb.randomGenerator()
-		queryParams[randomIdentifier] = lib.TrimSpace(uid)
-		tmp = append(tmp, fmt.Sprintf("@%s", randomIdentifier))
-	}
-	return fmt.Sprintf(qb.paramsWhereClause["mail"], strings.Join(tmp, ", "))
-}
-
 func (qb *UsersQueryBuilder) processParams(allowedParams []string, filteredParams map[string]string) ([]string,
 	map[string]interface{}, error) {
 	whereClauses := make([]string, 0)
@@ -113,22 +103,9 @@ func (qb *UsersQueryBuilder) processParams(allowedParams []string, filteredParam
 			continue
 		}
 
-		if lib.SliceContains(qb.toBeTranslatedKeys, paramKey) {
-			whereClause, err := qb.processToBeTranslatedParam(filteredParams[paramKey])
-			if err != nil {
-				return nil, nil, err
-			}
-			whereClauses = append(whereClauses, whereClause)
-		} else if paramKey == "DO_NOT_EXIST" {
-			whereClause := qb.processProducerUidParam(paramValue, queryParams)
-			if whereClause != "" {
-				whereClauses = append(whereClauses, whereClause)
-			}
-		} else {
-			randomIdentifier := qb.randomGenerator()
-			whereClauses = append(whereClauses, fmt.Sprintf(qb.paramsWhereClause[paramKey], randomIdentifier))
-			queryParams[randomIdentifier] = paramValue
-		}
+		randomIdentifier := qb.randomGenerator()
+		whereClauses = append(whereClauses, fmt.Sprintf(qb.paramsWhereClause[paramKey], randomIdentifier))
+		queryParams[randomIdentifier] = paramValue
 
 	}
 	return whereClauses, queryParams, nil
