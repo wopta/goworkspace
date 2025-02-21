@@ -155,7 +155,8 @@ func (qb *UsersQueryBuilder) extractLimit(params map[string]string) error {
 }
 
 func (qb *UsersQueryBuilder) parseQuery() string {
-	const queryPrefix = "SELECT **tableAlias**.uid, **tableAlias**.name " +
+	const queryPrefix = "SELECT **tableAlias**.uid, **tableAlias**.name, " +
+		"**tableAlias**.surname, **tableAlias**.mail, **tableAlias**.role, **tableAlias**.fiscalCode " +
 		"FROM `wopta.**tableName**` **tableAlias** " +
 		"WHERE "
 	var (
