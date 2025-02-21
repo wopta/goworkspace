@@ -169,7 +169,7 @@ func (qb *UsersQueryBuilder) parseQuery() string {
 	} else if len(qb.WhereClauses) > 1 {
 		rawQuery.WriteString(strings.Join(qb.WhereClauses, " AND "))
 	}
-	rawQuery.WriteString(fmt.Sprintf(" ORDER BY **tableAlias**.updateDate DESC"))
+	rawQuery.WriteString(fmt.Sprintf(" ORDER BY **tableAlias**.updatedDate DESC"))
 	rawQuery.WriteString(fmt.Sprintf(" LIMIT %d", qb.limit))
 
 	query := strings.ReplaceAll(rawQuery.String(), "**tableName**", qb.tableName)
