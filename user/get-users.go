@@ -191,6 +191,7 @@ func GetUsersV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	log.Println("Handler start -----------------------------------------------")
 
 	paramsMap := extractQueryParams(r)
+	log.Printf("input params: %v", paramsMap)
 	if len(paramsMap) == 0 {
 		return "", nil, errors.New("no query params")
 	}
@@ -204,12 +205,7 @@ func GetUsersV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		return "", nil, fmt.Errorf("error generating query: %v", err)
 	}
 
-	log.Println("paramsMap:")
-	log.Println(paramsMap)
-	log.Println("QUERY:")
-	log.Println(query)
-	log.Println("QUERY PARAMS:")
-	log.Println(queryParams)
+	log.Printf("query: %s\nqueryParams: %+v", query, queryParams)
 
 	users, err := lib.QueryParametrizedRowsBigQuery[userInfo](query, queryParams)
 	if err != nil {
