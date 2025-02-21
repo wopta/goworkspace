@@ -77,21 +77,6 @@ func (qb *UsersQueryBuilder) filterParams(params map[string]string, allowedParam
 	return params, nil
 }
 
-func (qb *UsersQueryBuilder) processToBeTranslatedParam(paramValue string) (string, error) {
-	whereClauses := make([]string, 0)
-	paramsValueList := strings.Split(paramValue, ",")
-	for _, status := range paramsValueList {
-		if val, ok := qb.paramsWhereClause[lib.TrimSpace(status)]; ok && val != "" {
-			whereClauses = append(whereClauses, val)
-		}
-	}
-	if len(whereClauses) == 0 {
-		return "", errors.New("error processing params")
-	}
-
-	return "(" + strings.Join(whereClauses, " OR ") + ")", nil
-}
-
 func (qb *UsersQueryBuilder) processParams(allowedParams []string, filteredParams map[string]string) ([]string,
 	map[string]interface{}, error) {
 	whereClauses := make([]string, 0)
