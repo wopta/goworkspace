@@ -34,13 +34,16 @@ steps:
     echo "dev enviroment"
       project=positive-apex-350507
       env=dev
-      genFx=gen2
+      genFx=--gen2
+      sa=wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com
     fi
      if [[ "${strarr[1]}" == *"prod"* ]]; then
     echo "prod enviroment"
+    sa=
       project=core-350507
       env=prod
-      genFx=gen1
+      genFx=""
+      sa=wopta-prod-cloud-function@core-350507.iam.gserviceaccount.com
     fi
         #--ingress-settings internal-only \
     #--timeout=540 \
@@ -70,15 +73,15 @@ steps:
     --entry-point=${name_camel} \
     --trigger-http \
     --allow-unauthenticated \
-    --run-service-account=wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com \
+    --run-service-account=${sa} \
     --runtime=go121 \
     --env-vars-file ${env}.yaml \
-    --${genFx} 
+    ${genFx} 
    
    
       if [[ "${strarr[1]}" == *"dev"* ]]; then
     echo "dev run services update"
-    gcloud run services update ${strarr[0]}  --update-labels tagversion=${tagVersion} --region=europe-west1 --service-account=wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com 
+    gcloud run services update ${strarr[0]}  --update-labels tagversion=${tagVersion} --region=europe-west1 --service-account=${sa}
     fi
    
     
