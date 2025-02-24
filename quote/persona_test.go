@@ -33,6 +33,7 @@ type OutputOfferData struct {
 	DRG        *OutputGuaranteeData `json:"DRG,omitempty"`
 	DC         *OutputGuaranteeData `json:"DC,omitempty"`
 	RSC        *OutputGuaranteeData `json:"RSC,omitempty"`
+	ITI        *OutputGuaranteeData `json:"ITI,omitempty"`
 	PriceGross float64              `json:"priceGross"`
 }
 
@@ -75,14 +76,29 @@ func TestPersona(t *testing.T) {
 
 		for offerName, value := range data.Output {
 			numOffersExpected++
-			var mismatchedPrice = false
-			offerPrice := p.OffersPrices[offerName]["yearly"].Gross
+			var (
+				mismatchedPrice    = false
+				offerPrice         = 0.0
+				guaranteesExpected = make([]string, 0)
+				guaranteesGot      = make([]string, 0)
+			)
+
+			if a, ok := p.OffersPrices[offerName]; ok {
+				if v, ok := a["yearly"]; ok {
+					offerPrice = v.Gross
+				}
+			}
 			if offerPrice != value.PriceGross {
 				mismatchedPrice = true
 				t.Errorf("%s - mismatched offer price for %s. Expected %.2f - Got %.2f", data.Name, offerName, value.PriceGross, offerPrice)
 			}
 			if value.IPI != nil {
 				g, _ := p.ExtractGuarantee("IPI")
+				if _, ok := g.Offer[offerName]; !ok {
+					t.Errorf("%s - offer %s for IPI guarantee not found", data.Name, offerName)
+					continue
+				}
+				guaranteesExpected = append(guaranteesExpected, g.Slug)
 				if g.Offer[offerName].SumInsuredLimitOfIndemnity != value.IPI.SumInsuredLimitOfIndemnity {
 					t.Errorf("%s - mismatched offer %s - IPI sum. Expected %.2f - Got %.2f", data.Name, offerName, value.IPI.SumInsuredLimitOfIndemnity, g.Offer[offerName].SumInsuredLimitOfIndemnity)
 				}
@@ -98,6 +114,11 @@ func TestPersona(t *testing.T) {
 			}
 			if value.D != nil {
 				g, _ := p.ExtractGuarantee("D")
+				if _, ok := g.Offer[offerName]; !ok {
+					t.Errorf("%s - offer %s for D guarantee not found", data.Name, offerName)
+					continue
+				}
+				guaranteesExpected = append(guaranteesExpected, g.Slug)
 				if g.Offer[offerName].SumInsuredLimitOfIndemnity != value.D.SumInsuredLimitOfIndemnity {
 					t.Errorf("%s - mismatched offer %s - D sum. Expected %.2f - Got %.2f", data.Name, offerName, value.D.SumInsuredLimitOfIndemnity, g.Offer[offerName].SumInsuredLimitOfIndemnity)
 				}
@@ -107,6 +128,11 @@ func TestPersona(t *testing.T) {
 			}
 			if value.DRG != nil {
 				g, _ := p.ExtractGuarantee("DRG")
+				if _, ok := g.Offer[offerName]; !ok {
+					t.Errorf("%s - offer %s for DRG guarantee not found", data.Name, offerName)
+					continue
+				}
+				guaranteesExpected = append(guaranteesExpected, g.Slug)
 				if g.Offer[offerName].SumInsuredLimitOfIndemnity != value.DRG.SumInsuredLimitOfIndemnity {
 					t.Errorf("%s - mismatched offer %s - DRG sum. Expected %.2f - Got %.2f", data.Name, offerName, value.DRG.SumInsuredLimitOfIndemnity, g.Offer[offerName].SumInsuredLimitOfIndemnity)
 				}
@@ -116,6 +142,11 @@ func TestPersona(t *testing.T) {
 			}
 			if value.DC != nil {
 				g, _ := p.ExtractGuarantee("DC")
+				if _, ok := g.Offer[offerName]; !ok {
+					t.Errorf("%s - offer %s for DC guarantee not found", data.Name, offerName)
+					continue
+				}
+				guaranteesExpected = append(guaranteesExpected, g.Slug)
 				if g.Offer[offerName].SumInsuredLimitOfIndemnity != value.DC.SumInsuredLimitOfIndemnity {
 					t.Errorf("%s - mismatched offer %s - DC sum. Expected %.2f - Got %.2f", data.Name, offerName, value.DC.SumInsuredLimitOfIndemnity, g.Offer[offerName].SumInsuredLimitOfIndemnity)
 				}
@@ -125,6 +156,11 @@ func TestPersona(t *testing.T) {
 			}
 			if value.RSC != nil {
 				g, _ := p.ExtractGuarantee("RSC")
+				if _, ok := g.Offer[offerName]; !ok {
+					t.Errorf("%s - offer %s for RSC guarantee not found", data.Name, offerName)
+					continue
+				}
+				guaranteesExpected = append(guaranteesExpected, g.Slug)
 				if g.Offer[offerName].SumInsuredLimitOfIndemnity != value.RSC.SumInsuredLimitOfIndemnity {
 					t.Errorf("%s - mismatched offer %s - RSC sum. Expected %.2f - Got %.2f", data.Name, offerName, value.RSC.SumInsuredLimitOfIndemnity, g.Offer[offerName].SumInsuredLimitOfIndemnity)
 				}
@@ -132,11 +168,40 @@ func TestPersona(t *testing.T) {
 					t.Errorf("%s - mismatched offer %s - RSC price. Expected %.2f - Got %.2f", data.Name, offerName, value.RSC.PriceGross, g.Offer[offerName].PremiumGrossYearly)
 				}
 			}
+			if value.ITI != nil {
+				g, _ := p.ExtractGuarantee("ITI")
+				if _, ok := g.Offer[offerName]; !ok {
+					t.Errorf("%s - offer %s for ITI guarantee not found", data.Name, offerName)
+					continue
+				}
+				guaranteesExpected = append(guaranteesExpected, g.Slug)
+				if g.Offer[offerName].SumInsuredLimitOfIndemnity != value.ITI.SumInsuredLimitOfIndemnity {
+					t.Errorf("%s - mismatched offer %s - ITI sum. Expected %.2f - Got %.2f", data.Name, offerName, value.ITI.SumInsuredLimitOfIndemnity, g.Offer[offerName].SumInsuredLimitOfIndemnity)
+				}
+				if g.Offer[offerName].Deductible != value.ITI.Deductible {
+					t.Errorf("%s - mismatched offer %s - ITI deductible. Expected %s - Got %s", data.Name, offerName, value.ITI.Deductible, g.Offer[offerName].Deductible)
+				}
+				if mismatchedPrice && g.Offer[offerName].PremiumGrossYearly != value.ITI.PriceGross {
+					t.Errorf("%s - mismatched offer %s - ITI price. Expected %.2f - Got %.2f", data.Name, offerName, value.ITI.PriceGross, g.Offer[offerName].PremiumGrossYearly)
+				}
+			}
+
+			for _, g := range p.Assets[0].Guarantees {
+				for name := range g.Offer {
+					if name == offerName {
+						guaranteesGot = append(guaranteesGot, g.Slug)
+					}
+				}
+			}
+
+			if len(guaranteesExpected) != len(guaranteesGot) {
+				t.Errorf("%s - mismatched offer %s - number of guarantees. Expected %+v - Got %+v", data.Name, offerName, guaranteesExpected, guaranteesGot)
+			}
 		}
 		if numOffersExpected != numOffersGot {
-			t.Errorf("mismatched number of offers. Expected %d - Got %d", numOffersExpected, numOffersGot)
+			t.Errorf("%s - mismatched number of offers. Expected %d - Got %d", data.Name, numOffersExpected, numOffersGot)
 			for name, o := range p.OffersPrices {
-				t.Errorf("Policy Offer %s: %+v", name, o["yearly"])
+				t.Errorf("%s - Policy Offer %s: %+v", data.Name, name, o["yearly"])
 			}
 		}
 	}
