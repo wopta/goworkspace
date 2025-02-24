@@ -45,7 +45,7 @@ func BankAccountHypeFx(resp http.ResponseWriter, r *http.Request) (string, inter
 	e = lib.InsertRowsBigQuery("wopta", dataMovement, obj)
 	if obj.MovementType == "insert" {
 
-		e = lib.InsertRowsBigQuery("wopta", dataBanckAccount, obj)
+		//e = lib.InsertRowsBigQuery("wopta", dataBanckAccount, obj)
 	}
 	/*
 		layout := "2006-01-02"
