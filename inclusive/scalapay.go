@@ -62,7 +62,7 @@ func BankAccountScalapayFx(resp http.ResponseWriter, r *http.Request) (string, i
 		refDay := time.Now()
 		res, _ := QueryRowsBigQuery[BankAccountMovement](dataset,
 			usersTable,
-			"select * from `"+dataset+"."+movementTable+"` where guaranteesCode ='"+obj.GuaranteesCode+"' and id ='"+obj.Id+"' and StartDate ='"+refDay.Format(layoutQuery)+"' and status ='insert'")
+			"select * from `"+dataset+"."+movementTable+"` where guaranteesCode ='"+obj.GuaranteesCode+"' and id ='"+obj.Id+"' and StartDate ='"+refDay.Format(layoutQuery)+"' and movementType ='insert'")
 		log.Println(len(res))
 
 		if len(res) == 0 {
@@ -117,7 +117,7 @@ func CheckScalapayData(r *http.Request) (BankAccountMovement, error) {
 	if obj.MovementType == "delete" || obj.MovementType == "suspended" {
 		res, _ := QueryRowsBigQuery[BankAccountMovement](dataset,
 			usersTable,
-			"select * from `"+dataset+"."+movementTable+"` where guaranteesCode ='"+obj.GuaranteesCode+"' and id ='"+obj.Id+"' and status ='insert'")
+			"select * from `"+dataset+"."+movementTable+"` where guaranteesCode ='"+obj.GuaranteesCode+"' and id ='"+obj.Id+"' and movementType ='insert'")
 		log.Println(len(res))
 		if len(res) == 0 {
 			return obj, GetErrorJson(400, "Bad request", "insert movement miss")

@@ -73,8 +73,8 @@ steps:
     --run-service-account=wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com \
     --runtime=go121 \
     --env-vars-file ${env}.yaml \
-    --${genFx} \
-    --update-labels tag=${tagVersion},baz=qux
+    --${genFx} 
+   
    
       if [[ "${strarr[1]}" == *"dev"* ]]; then
     echo "dev run services update"
