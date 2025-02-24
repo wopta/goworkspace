@@ -52,7 +52,7 @@ func BankAccountScalapayFx(resp http.ResponseWriter, r *http.Request) (string, i
 			e = lib.UpdateRowBigQuery(dataset, usersTable, map[string]string{
 				"status":    obj.Status,
 				"startDate": obj.StartDate.Format(layout) + " 00:00:00",
-			}, "fiscalCode='"+obj.FiscalCode+"' and guaranteesCode='"+obj.GuaranteesCode+"'")
+			}, " id='"+obj.Id+"' and guaranteesCode='"+obj.GuaranteesCode+"'")
 		}
 
 	}
