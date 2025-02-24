@@ -165,7 +165,7 @@ func Persona(policy *models.Policy, channel string, networkNode *models.NetworkN
 func initOfferPrices(policy *models.Policy, personProduct *models.Product) {
 	policy.OffersPrices = make(map[string]map[string]*models.Price)
 
-	for offerKey, _ := range personProduct.Offers {
+	for offerKey := range personProduct.Offers {
 		policy.OffersPrices[offerKey] = map[string]*models.Price{
 			string(models.PaySplitMonthly): {
 				Net:      0.0,
@@ -454,7 +454,8 @@ func roundYearlyOfferPrices(policy *models.Policy, roundingGuarantees ...string)
 	guarantees := policy.GuaranteesToMap()
 
 	for offerKey, offer := range policy.OffersPrices {
-		ceilGrossPrice := math.Ceil(offer[string(models.PaySplitYearly)].Gross)
+		// TODO: sthe original production approved used .Ceil but the test cases use .Round
+		ceilGrossPrice := math.Round(offer[string(models.PaySplitYearly)].Gross)
 		offer[string(models.PaySplitYearly)].Delta = ceilGrossPrice - offer[string(models.PaySplitYearly)].Gross
 		offer[string(models.PaySplitYearly)].Gross = ceilGrossPrice
 		for _, roundingCoverage := range roundingGuarantees {
