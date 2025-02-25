@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/civil"
@@ -34,7 +35,8 @@ func ImportScalapay(w http.ResponseWriter, r *http.Request) (string, interface{}
 		var (
 			obj BankAccountMovement
 		)
-		startdate, e := time.Parse(layout, v[13])
+		stringdate := strings.Replace(v[13], "25", "2025", -1)
+		startdate, e := time.Parse(layout, stringdate)
 		log.Println(e)
 		obj.PolicyNumber = "051114"
 		obj.Uid = uuid.New().String()
