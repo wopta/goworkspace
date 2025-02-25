@@ -23,7 +23,7 @@ func ImportScalapay(w http.ResponseWriter, r *http.Request) (string, interface{}
 	log.SetPrefix("[ImportScalapay] ")
 	defer log.SetPrefix("")
 
-	log.Println(" start -----------------------------------------------")
+	log.Println(" ----start -----------------------------------------------")
 
 	rawdata := lib.GetFilesByEnv("data/import-scalapay.csv")
 
@@ -51,7 +51,7 @@ func ImportScalapay(w http.ResponseWriter, r *http.Request) (string, interface{}
 		obj.Surname = v[7]
 		obj.FiscalCode = v[6]
 		obj.Address = v[9]
-		obj.StartDate = startdate
+		obj.BigStartDate = civil.DateTimeOf(startdate)
 		obj.MovementType = "insert"
 		obj.City = v[11]
 		obj.CityCode = v[12]
@@ -63,9 +63,13 @@ func ImportScalapay(w http.ResponseWriter, r *http.Request) (string, interface{}
 		log.Println(e)
 		e = lib.InsertRowsBigQuery(dataset, movementTable, obj)
 		log.Println(e)
+		if e != nil {
+			log.Println(" ------ Error -----------------------------------------------")
+			return "", nil, e
+		}
 	}
 
-	log.Println(" end -----------------------------------------------")
+	log.Println(" -----end -----------------------------------------------")
 	return "", nil, e
 }
 
