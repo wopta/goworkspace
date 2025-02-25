@@ -53,7 +53,7 @@ func TestPersona(t *testing.T) {
 
 	if env == "ci" {
 		dir, _ := os.Getwd()
-		folder = dir + "../../function-data/dev/"
+		folder = dir + "/" + folder
 	}
 
 	t.Setenv("env", "local-test")
