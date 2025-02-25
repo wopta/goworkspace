@@ -52,7 +52,7 @@ func TestPersona(t *testing.T) {
 	folder := "../../function-data/dev/"
 
 	if env == "ci" {
-		folder = "./function-data/dev/"
+		folder = "../function-data/dev/"
 	}
 
 	t.Setenv("env", "local-test")
