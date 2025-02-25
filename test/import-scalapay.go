@@ -13,7 +13,7 @@ import (
 
 func ImportScalapay(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	const (
-		layout        = "2006-01-02"
+		layout        = "1/2/2006"
 		dataset       = "wopta_inclusive"
 		movementTable = "bank_account_movement_scalapay"
 		usersTable    = "bank_account_users_scalapay"
