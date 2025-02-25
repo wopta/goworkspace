@@ -2,6 +2,7 @@ package quote_test
 
 import (
 	"encoding/json"
+	"io/fs"
 	"os"
 	"testing"
 	"time"
@@ -52,15 +53,15 @@ func TestPersona(t *testing.T) {
 	folder := "../../function-data/dev/"
 
 	if env == "ci" {
-		folder = "../function-data/dev/"
+		dir, _ := os.Getwd()
+		folder = dir + "../../function-data/dev/"
 	}
 
 	t.Setenv("env", "local-test")
 
 	fileReader, err := os.Open(folder + filename)
 	if err != nil {
-		dir, _ := os.Getwd()
-		t.Fatalf("unable to load data from %s: %s", dir, err)
+		t.Fatalf("unable to load data from %s: %s", folder, err)
 	}
 
 	testData := make([]TestData, 0)
