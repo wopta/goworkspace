@@ -48,18 +48,11 @@ type TestData struct {
 const filename = "data/test/quote/persona.json"
 
 func TestPersona(t *testing.T) {
-	env := os.Getenv("ENV")
-	folder := "../../function-data/dev/"
-
-	if env == "ci" {
-		folder = "../function-data/dev/"
-	}
-
 	t.Setenv("env", "local-test")
 
-	fileReader, err := os.Open(folder + filename)
+	fileReader, err := os.Open("../../function-data/dev/" + filename)
 	if err != nil {
-		t.Fatalf("unable to load data from %s: %s", folder, err)
+		t.Fatalf("unable to load data: %s", err)
 	}
 
 	testData := make([]TestData, 0)
