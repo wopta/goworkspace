@@ -6,7 +6,7 @@ on:
       - '**/*.go'
 
 env:
-  ENV: 'local-test'
+  ENV: 'ci'
 
 jobs:
   run_test:
