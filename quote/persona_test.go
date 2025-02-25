@@ -2,7 +2,6 @@ package quote_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -49,22 +48,25 @@ type TestData struct {
 const filename = "data/test/quote/persona.json"
 
 func TestPersona(t *testing.T) {
-	env := "local-test"
+	env := os.Getenv("ENV")
+	folder := "../../function-data/dev/"
 
-	if runnerEnv := os.Getenv("ENV"); runnerEnv != "" {
-		env = fmt.Sprintf("%s-test", runnerEnv)
+	if env == "ci" {
+		dir, _ := os.Getwd()
+		folder = dir + "/" + folder
 	}
 
-	t.Setenv("env", env)
+	t.Setenv("env", "local-test")
 
-	fileBytes, err := lib.GetFilesByEnvV2(filename)
+	fileReader, err := os.Open(folder + filename)
 	if err != nil {
-		t.Fatalf("unable to load file: %s", err)
+		t.Fatalf("unable to load data from %s: %s", folder, err)
 	}
 
 	testData := make([]TestData, 0)
-	if err := json.Unmarshal(fileBytes, &testData); err != nil {
-		t.Fatalf("unable to unmarshal data: %s", err)
+
+	if err := json.NewDecoder(fileReader).Decode(&testData); err != nil {
+		t.Fatalf("unable to decode data: %s", err)
 	}
 
 	for idx, data := range testData {

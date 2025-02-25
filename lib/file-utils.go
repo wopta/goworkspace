@@ -284,7 +284,7 @@ func GetFilesByEnv(file string) []byte {
 		res1 = ErrorByte(os.ReadFile("../function-data/dev/" + file))
 	case "local-test":
 		res1 = ErrorByte(os.ReadFile("../../function-data/dev/" + file))
-	case "dev", "ci-test":
+	case "dev":
 		res1 = GetFromStorage("function-data", file, "")
 	case "prod":
 		res1 = GetFromStorage("core-350507-function-data", file, "")
@@ -304,7 +304,7 @@ func GetFilesByEnvV2(file string) ([]byte, error) {
 		res, err = os.ReadFile("../function-data/dev/" + file)
 	case "local-test":
 		res, err = os.ReadFile("../../function-data/dev/" + file)
-	case "dev", "ci-test":
+	case "dev":
 		res, err = GetFromStorageErr("function-data", file, "")
 	case "prod":
 		res, err = GetFromStorageErr("core-350507-function-data", file, "")
@@ -336,7 +336,7 @@ func GetByteByEnv(file string, isLocal bool) []byte {
 		res1 = ErrorByte(os.ReadFile("../function-data/dev/" + file))
 	case "local-test":
 		res1 = ErrorByte(os.ReadFile("../../function-data/dev/" + file))
-	case "dev", "ci-test":
+	case "dev":
 		if isLocal {
 			res1 = ErrorByte(os.ReadFile("./serverless_function_source_code/" + file))
 		} else {
