@@ -35,7 +35,9 @@ func ImportScalapay(w http.ResponseWriter, r *http.Request) (string, interface{}
 		var (
 			obj BankAccountMovement
 		)
-		stringdate := strings.Replace(v[13], "25", "2025", -1)
+		log.Println(v[13])
+		stringdate := strings.Replace(v[13], "/25", "/2025", -1)
+		log.Println(stringdate)
 		startdate, e := time.Parse(layout, stringdate)
 		log.Println(e)
 		obj.PolicyNumber = "051114"
