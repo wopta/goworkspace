@@ -48,11 +48,11 @@ type TestData struct {
 const filename = "data/test/quote/persona.json"
 
 func TestPersona(t *testing.T) {
-	env := os.Getenv("env")
+	env := os.Getenv("ENV")
 	folder := "../../function-data/dev/"
 
 	if env == "ci" {
-		folder = "../function-data/"
+		folder = "../function-data/dev/"
 	}
 
 	t.Setenv("env", "local-test")
