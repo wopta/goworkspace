@@ -2,7 +2,6 @@ package quote_test
 
 import (
 	"encoding/json"
-	"io/fs"
 	"os"
 	"testing"
 	"time"
