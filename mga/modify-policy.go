@@ -206,11 +206,35 @@ func modifyAssets(modifiedPolicy models.Policy, inputPolicy models.Policy) ([]mo
 					return nil, err
 				}
 			}
+
+			if asset.Guarantees != nil {
+				modifiedAsset.Guarantees = modifyBeneficiaryInfo(inputPolicy.Assets[0].Guarantees, modifiedPolicy.Assets[0].Guarantees)
+			}
 		}
 
 		assets = append(assets, modifiedAsset)
 	}
 	return assets, nil
+}
+
+func modifyBeneficiaryInfo(inputGuarantees, originalGuarantees []models.Guarante) []models.Guarante {
+	var (
+		modifiedGuarantees = new([]models.Guarante)
+	)
+
+	log.Println("modifying beneficiary info...")
+	modifiedGuarantees = &originalGuarantees
+
+	for i, g := range inputGuarantees {
+		if g.BeneficiaryReference != nil {
+			(*modifiedGuarantees)[i].BeneficiaryReference = g.BeneficiaryReference
+		}
+		if g.Beneficiaries != nil {
+			(*modifiedGuarantees)[i].Beneficiaries = g.Beneficiaries
+		}
+	}
+
+	return *modifiedGuarantees
 }
 
 func modifyInsuredInfo(inputInsured, originalInsured models.User) (*models.User, error) {
