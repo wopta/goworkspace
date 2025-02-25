@@ -52,14 +52,14 @@ func TestPersona(t *testing.T) {
 	folder := "../../function-data/dev/"
 
 	if env == "ci" {
-		folder = "../function-data/dev/"
+		folder = "../function-data/"
 	}
 
 	t.Setenv("env", "local-test")
 
 	fileReader, err := os.Open(folder + filename)
 	if err != nil {
-		t.Fatalf("unable to load data: %s", err)
+		t.Fatalf("unable to load data from %s%s: %s", folder, filename, err)
 	}
 
 	testData := make([]TestData, 0)
