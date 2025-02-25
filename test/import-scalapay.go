@@ -54,6 +54,7 @@ func ImportScalapay(w http.ResponseWriter, r *http.Request) (string, interface{}
 		obj.FiscalCode = v[6]
 		obj.Address = v[9]
 		obj.BigStartDate = civil.DateTimeOf(startdate)
+		obj.BigEndDate = civil.DateTimeOf(startdate)
 		obj.MovementType = "insert"
 		obj.City = v[11]
 		obj.CityCode = v[12]
