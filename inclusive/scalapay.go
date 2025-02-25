@@ -78,7 +78,10 @@ func BankAccountScalapayFx(resp http.ResponseWriter, r *http.Request) (string, i
 		}
 
 	}
-
+	log.Println("error: ", e)
+	if e != nil {
+		return "", nil, GetErrorJson(500, "internal server error", "")
+	}
 	return `{"woptaUid":"` + obj.Uid + `"}`, nil, e
 }
 func CheckScalapayApikey(r *http.Request) error {

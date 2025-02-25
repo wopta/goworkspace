@@ -26,7 +26,13 @@ var testRoutes []lib.Route = []lib.Route{
 		Handler: lib.ResponseLoggerWrapper(TestFabrickFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
+	},	{
+		Route:   "/scalapay/import",
+		Handler: lib.ResponseLoggerWrapper(ImportScalapay),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
 	},
+
 }
 
 func init() {
