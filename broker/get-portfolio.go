@@ -60,15 +60,12 @@ func GetPortfolioFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	log.Printf("input params: %v", paramsMap)
 
-	if paramsMap["producerUid"] == "" {
-		children, err := getNodeChildren(r)
-		if err != nil {
-			return "", nil, err
-		}
-		if len(children) != 0 {
-			paramsMap["producerUid"] = children
-		}
+	if err := populateProducerUidParam(r, paramsMap); err != nil {
+		log.Println("error populating producerUid param")
+		return "", nil, err
 	}
+
+	log.Printf("populated params: %v", paramsMap)
 
 	queryBuilder := qb.NewQueryBuilder(portfolioType)
 	if queryBuilder == nil {
@@ -107,22 +104,42 @@ func extractQueryParams(r *http.Request) map[string]string {
 	return paramsMap
 }
 
-func getNodeChildren(r *http.Request) (string, error) {
+func populateProducerUidParam(r *http.Request, paramsMap map[string]string) error {
 	token := r.Header.Get("Authorization")
 	authToken, err := lib.GetAuthTokenFromIdToken(token)
 	if err != nil {
+		return err
+	}
+
+	if authToken.Role == lib.UserRoleAdmin && paramsMap["producerUid"] == "" {
+		return nil
+	}
+
+	producerUid := paramsMap["producerUid"]
+	if authToken.IsNetworkNode && producerUid == "" {
+		producerUid = authToken.UserID
+	}
+	if authToken.IsNetworkNode && producerUid != "" && !network.IsParentOf(authToken.UserID, producerUid) {
+		return fmt.Errorf("cannot access policy from node %s", producerUid)
+	}
+
+	childrenUids, err := getNodeChildren(producerUid)
+	if err != nil {
+		return err
+	}
+	paramsMap["producerUid"] = childrenUids
+
+	return nil
+}
+
+func getNodeChildren(producerUid string) (string, error) {
+	childrenList := make([]string, 0)
+	children, err := network.GetNodeChildren(producerUid)
+	if err != nil {
 		return "", err
 	}
-	if authToken.IsNetworkNode {
-		childrenList := make([]string, 0)
-		children, err := network.GetNodeChildren(authToken.UserID)
-		if err != nil {
-			return "", err
-		}
-		for _, child := range children {
-			childrenList = append(childrenList, child.NodeUid)
-		}
-		return strings.Join(childrenList, ", "), nil
+	for _, child := range children {
+		childrenList = append(childrenList, child.NodeUid)
 	}
-	return "", nil
+	return strings.Join(childrenList, ", "), nil
 }
