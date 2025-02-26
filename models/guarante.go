@@ -128,6 +128,7 @@ type GuaranteFieldValue struct {
 	Max    float64   `firestore:"max,omitempty" json:"max,omitempty"`
 	Step   float64   `firestore:"step,omitempty" json:"step,omitempty"`
 	Values []float64 `firestore:"values,omitempty" json:"values,omitempty"`
+	Label  string    `firestore:"label,omitempty" json:"label,omitempty"`
 }
 type GuaranteFieldConfig struct {
 	Min            float64   `firestore:"min,omitempty" json:"min,omitempty"`
@@ -150,9 +151,10 @@ type DiscountConfig struct {
 	Description  string  `firestore:"description,omitempty" json:"description,omitempty"`
 }
 type DurationFieldValue struct {
-	Min  int `firestore:"min,omitempty" json:"min,omitempty"`
-	Max  int `firestore:"max,omitempty" json:"max,omitempty"`
-	Step int `firestore:"step,omitempty" json:"step,omitempty"`
+	Min   int    `firestore:"min,omitempty" json:"min,omitempty"`
+	Max   int    `firestore:"max,omitempty" json:"max,omitempty"`
+	Step  int    `firestore:"step,omitempty" json:"step,omitempty"`
+	Label string `firestore:"label,omitempty" json:"label,omitempty"`
 }
 
 type Tax struct {
