@@ -156,6 +156,11 @@ func SetHypeData(obj BankAccountMovement) BankAccountMovement {
 		obj.PolicyUid = ""
 		obj.AssetType = ""
 		obj.PolicyName = "Hype Premium"
+		obj.PostalCode = ""
+		obj.CityCode = ""
+		obj.Address = ""
+		obj.Tenant = "hype"
+		obj.City = ""
 	}
 	obj.CustomerId = obj.HypeId
 	if obj.MovementType == "insert" {

@@ -74,13 +74,17 @@ func BankAccountScalapayFx(resp http.ResponseWriter, r *http.Request) (string, i
 				"endDate": obj.EndDate.Format(layout) + " 00:00:00",
 			}, "id ='"+obj.Id+"' and guaranteesCode='"+obj.GuaranteesCode+"'")
 		} else {
+			log.Println("400, Bad request field Movement insert same day for")
 			return "", nil, GetErrorJson(400, "Bad request", "field Movement insert same day for "+obj.Id)
 		}
 
 	}
+
 	log.Println("error: ", e)
 	if e != nil {
 		return "", nil, GetErrorJson(500, "internal server error", "")
+	}else{
+		log.Println(`200 {"woptaUid":"` + obj.Uid + `"}`)
 	}
 	return `{"woptaUid":"` + obj.Uid + `"}`, nil, e
 }
