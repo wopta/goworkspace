@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"slices"
 	"sort"
 	"time"
 
@@ -219,14 +220,28 @@ func enrichConsens(consens SystemConsens, networkNode *models.NetworkNode) Syste
 	regexNodeRuiRegistrationDate := regexp.MustCompile("{{NODE_RUI_REGISTRATION_DATE}}")
 	regexNodeDesignation := regexp.MustCompile("{{NODE_DESIGNATION}}")
 
+	name := networkNode.GetName()
+	fiscalCode := networkNode.GetFiscalCode()
+	ruiSection := networkNode.GetRuiSection()
+	ruiCode := networkNode.GetRuiCode()
+	ruiRegistration := networkNode.GetRuiRegistration()
+	designation := networkNode.Designation
+	if slices.Contains([]string{models.AgencyNetworkNodeType, models.BrokerNetworkNodeType}, networkNode.Type) {
+		name = networkNode.GetManagerName()
+		fiscalCode = networkNode.GetManagerFiscalCode()
+		ruiSection = networkNode.GetManagerRuiSection()
+		ruiCode = networkNode.GetManagerRuiCode()
+		ruiRegistration = networkNode.GetManagerRuiResgistration()
+	}
+
 	for j, cont := range consens.Content {
 		text := cont.Text
-		text = regexNodeName.ReplaceAllString(text, networkNode.GetName())
-		text = regexNodeFiscalCode.ReplaceAllString(text, networkNode.GetFiscalCode())
-		text = regexNodeRuiSection.ReplaceAllString(text, networkNode.GetRuiSection())
-		text = regexNodeRuiCode.ReplaceAllString(text, networkNode.GetRuiCode())
-		text = regexNodeRuiRegistrationDate.ReplaceAllString(text, networkNode.GetRuiRegistration().Format("02/01/2006"))
-		text = regexNodeDesignation.ReplaceAllString(text, networkNode.Designation)
+		text = regexNodeName.ReplaceAllString(text, name)
+		text = regexNodeFiscalCode.ReplaceAllString(text, fiscalCode)
+		text = regexNodeRuiSection.ReplaceAllString(text, ruiSection)
+		text = regexNodeRuiCode.ReplaceAllString(text, ruiCode)
+		text = regexNodeRuiRegistrationDate.ReplaceAllString(text, ruiRegistration.Format("02/01/2006"))
+		text = regexNodeDesignation.ReplaceAllString(text, designation)
 		consens.Content[j].Text = text
 	}
 
