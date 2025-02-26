@@ -35,6 +35,7 @@ const (
 
 const (
 	UserCollection               string = "users"                  // firestore and bigquery
+	UsersViewCollection          string = "usersView"              // only for bigquery
 	PolicyCollection             string = "policy"                 // firestore and bigquery
 	TransactionsCollection       string = "transactions"           // firestore and bigquery
 	ClaimsCollection             string = "claims"                 // only for bigquery
