@@ -39,7 +39,7 @@ steps:
     fi
      if [[ "${strarr[1]}" == *"prod"* ]]; then
     echo "prod enviroment"
-    sa=
+
       project=core-350507
       env=prod
       genFx=""
