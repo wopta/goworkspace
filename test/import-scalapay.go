@@ -68,7 +68,7 @@ func ImportScalapay(w http.ResponseWriter, r *http.Request) (string, interface{}
 		obj.PostalCode = v[10]
 		obj.Status = "active"
 		obj.Id = v[4]
-		obj.Daystart = strconv.Itoa(obj.StartDate.Day())
+		obj.Daystart = strconv.Itoa(startdate.Day())
 		e = lib.InsertRowsBigQuery(dataset, usersTable, obj)
 		log.Println(e)
 		e = lib.InsertRowsBigQuery(dataset, movementTable, obj)
