@@ -30,20 +30,25 @@ steps:
     echo "namefx camel : ${name_camel}"
     echo "tagVersion camel : ${tagVersion}"
     echo "tagVersion camel : ${t}"
+
     if [[ "${strarr[1]}" == *"dev"* ]]; then
     echo "dev enviroment"
+      bucket=gs://function-data
       project=positive-apex-350507
       env=dev
       genFx=--gen2
       sa=wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com
+      timeout=60
     fi
-     if [[ "${strarr[1]}" == *"prod"* ]]; then
-    echo "prod enviroment"
 
+    if [[ "${strarr[1]}" == *"prod"* ]]; then
+    echo "prod enviroment"
+      bucket=gs://core-350507-function-data
       project=core-350507
       env=prod
       genFx=""
       sa=wopta-prod-cloud-function@core-350507.iam.gserviceaccount.com
+      timeout=520
     fi
         #--ingress-settings internal-only \
     #--timeout=540 \
@@ -56,6 +61,7 @@ steps:
     # Copy assets folder from Google Bucket to directory
     mkdir -p /workspace/${strarr[0]}/tmp/assets
     if [[ "${strarr[1]}" == *"dev"* ]]; then
+
     echo "dev enviroment"
       gsutil -m cp -r gs://function-data/assets/documents/** /workspace/${strarr[0]}/tmp/assets
     fi
@@ -76,6 +82,7 @@ steps:
     --run-service-account=${sa} \
     --runtime=go121 \
     --env-vars-file ${env}.yaml \
+    --timeout=${timeout
     ${genFx} 
    
    
