@@ -36,9 +36,9 @@ func ImportScalapay(w http.ResponseWriter, r *http.Request) (string, interface{}
 			obj BankAccountMovement
 		)
 		log.Println(v[13])
-
-		stringdate := strings.Replace(v[13], "/25", "/2025", -1)
-		stringdateslit:=strings.Split(v[13],"/")
+		cleandate := strings.Replace(v[13], "_0", "", -1)
+		stringdate := strings.Replace(cleandate, "/25", "/2025", -1)
+		stringdateslit := strings.Split(cleandate, "/")
 		log.Println(stringdate)
 		startdate, e := time.Parse(layout, stringdate)
 		y, e := strconv.Atoi(stringdateslit[2])
