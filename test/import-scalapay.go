@@ -28,7 +28,7 @@ func ImportScalapay(w http.ResponseWriter, r *http.Request) (string, interface{}
 	rawdata := lib.GetFilesByEnv("data/import-scalapay.csv")
 
 	df := lib.CsvToDataframe(rawdata)
-
+	location, e := time.LoadLocation("")
 	for k, v := range df.Records() {
 		log.Println(k)
 
@@ -36,9 +36,16 @@ func ImportScalapay(w http.ResponseWriter, r *http.Request) (string, interface{}
 			obj BankAccountMovement
 		)
 		log.Println(v[13])
+
 		stringdate := strings.Replace(v[13], "/25", "/2025", -1)
+		stringdateslit:=strings.Split(v[13],"/")
 		log.Println(stringdate)
 		startdate, e := time.Parse(layout, stringdate)
+		y, e := strconv.Atoi(stringdateslit[2])
+		m, e := strconv.Atoi(stringdateslit[1])
+		d, e := strconv.Atoi(stringdateslit[0])
+
+		startdate = time.Date(y, time.Month(m), d, 0, 0, 0, 0, location)
 		log.Println(e)
 		obj.PolicyNumber = "051114"
 		obj.Uid = uuid.New().String()
