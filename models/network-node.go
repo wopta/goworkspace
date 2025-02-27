@@ -49,6 +49,7 @@ type NetworkNode struct {
 	CallbackConfig      *CallbackConfig       `json:"callbackConfig,omitempty" firestore:"callbackConfig,omitempty" bigquery:"-"`
 	JwtConfig           lib.JwtConfig         `json:"jwtConfig,omitempty" firestore:"jwtConfig,omitempty" bigquery:"-"`
 	Consens             []NodeConsens         `json:"consens" firestore:"consens" bigquery:"-"`
+	EntitlementProfile  EntitlementProfile    `json:"entitlementProfile,omitempty" firestore:"entitlementProfile,omitempty" bigquery:"entitlementProfile"`
 }
 
 type NodeProduct struct {
@@ -414,6 +415,24 @@ func (nn *NetworkNode) GetManagerRuiResgistration() time.Time {
 	}
 
 	return ruiRegistration
+}
+
+func (nn *NetworkNode) LoadEntitlementBySlug(role string) error {
+	if len(nn.EntitlementProfile.Entitlements) > 0 {
+		return nil
+	}
+
+	ep := new(EntitlementProfile)
+	slug := role
+	if nn.EntitlementProfile.Slug != "" {
+		slug = nn.EntitlementProfile.Slug
+	}
+	if err := ep.GetFromFirestore(slug); err != nil {
+		return err
+	}
+
+	nn.EntitlementProfile.Entitlements = ep.Entitlements
+	return nil
 }
 
 func (nn *NetworkNode) IsJwtProtected() bool {

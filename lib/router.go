@@ -2,6 +2,7 @@ package lib
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -23,9 +24,21 @@ type Route struct {
 	Route       string
 	Method      string
 	Handler     http.HandlerFunc
-	Middlewares []func(http.Handler) http.Handler
+	Middlewares []RouteMiddleware
 	Roles       []string
+	Entitlement string
 }
+
+type RouteMiddleware = func(http.Handler) http.Handler
+
+type ctxkey string
+
+const (
+	roles = ctxkey("roles")
+	CtxEntitlement = ctxkey("entitlement")
+	CtxNetworkNode = ctxkey("networknode")
+	CtxAuthToken = ctxkey("authToken")
+)
 
 func ResponseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) (string, any, error)) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -66,9 +79,11 @@ func GetRouter(module string, routes []Route) *chi.Mux {
 	for _, route := range routes {
 		mw := make([]func(http.Handler) http.Handler, 0)
 		mw = append(mw,
-			middleware.WithValue("roles", route.Roles),
+			withAuthToken,
+			middleware.WithValue(roles, route.Roles),
+			middleware.WithValue(CtxEntitlement, route.Entitlement),
 			appCheckMiddleware,
-			checkEntitlement,
+			checkRoles,
 		)
 
 		if slices.Contains(route.Roles, UserRoleAdmin) {
@@ -144,6 +159,21 @@ func obfuscateFields(body []byte) []byte {
 	return bb
 }
 
+func withAuthToken(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		idToken := r.Header.Get("Authorization")
+		authToken, err := GetAuthTokenFromIdToken(idToken)
+		if err != nil {
+			log.Printf("error extracting authToken: %s", err.Error())
+			http.Error(w, "internal server error", http.StatusInternalServerError)
+			return
+		}
+		r = r.WithContext(context.WithValue(r.Context(), CtxAuthToken, authToken))
+
+		next.ServeHTTP(w, r)
+	})
+}
+
 type AuditLog struct {
 	Payload  string         `bigquery:"payload"`
 	Date     civil.DateTime `bigquery:"date"`
@@ -173,11 +203,7 @@ func createAuditLog(r *http.Request, payload string) {
 }
 
 func parseHttpRequest(r *http.Request, payload string) (AuditLog, error) {
-	idToken := r.Header.Get("Authorization")
-	authToken, err := GetAuthTokenFromIdToken(idToken)
-	if err != nil {
-		return AuditLog{}, fmt.Errorf("cannot retrieve the user's authorization token: %v", err)
-	}
+	authToken := r.Context().Value(CtxAuthToken).(AuthToken)
 
 	return AuditLog{
 		Payload:  payload,
@@ -217,7 +243,7 @@ func corsMiddleware(next http.Handler) http.Handler {
 func appCheckMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		roles := ctx.Value("roles").([]string)
+		roles := ctx.Value(roles).([]string)
 
 		if len(roles) == 0 || IsLocal() || slices.Contains(roles, UserRoleInternal) {
 			next.ServeHTTP(w, r)
@@ -256,11 +282,12 @@ func appCheckMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func checkEntitlement(next http.Handler) http.Handler {
+func checkRoles(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		roles := ctx.Value("roles").([]string)
+		roles := ctx.Value(roles).([]string)
 
+		// TODO review me - no useful role to check entitlement
 		if len(roles) == 0 || slices.Contains(roles, UserRoleInternal) || slices.Contains(roles, UserRoleAll) {
 			next.ServeHTTP(w, r)
 			return
@@ -273,20 +300,24 @@ func checkEntitlement(next http.Handler) http.Handler {
 			return
 		}
 
-		token, err := VerifyUserIdToken(idToken)
-		if err != nil {
-			log.Printf("verify id token error: %s", err.Error())
-			http.Error(w, "unauthorized", http.StatusUnauthorized)
-			return
-		}
+		token := ctx.Value(CtxAuthToken).(AuthToken)
 
-		userRole := UserRoleCustomer
-		if role, ok := token.Claims["role"].(string); ok {
-			userRole = role
-		}
+		// token, err := VerifyUserIdToken(idToken)
+		// if err != nil {
+		// 	log.Printf("verify id token error: %s", err.Error())
+		// 	http.Error(w, "unauthorized", http.StatusUnauthorized)
+		// 	return
+		// }
 
-		if !slices.Contains(roles, userRole) {
-			log.Printf("userRole '%s' not allowed", userRole)
+		// userRole := UserRoleCustomer
+		// if role, ok := token.Claims["role"].(string); ok {
+		// 	userRole = role
+		// }
+
+		// r = r.WithContext(context.WithValue(r.Context(), role, userRole))
+
+		if !slices.Contains(roles, token.Role) {
+			log.Printf("userRole '%s' not allowed", token.Role)
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}

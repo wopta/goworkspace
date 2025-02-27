@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"slices"
@@ -12,7 +11,6 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
 )
 
 func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -28,12 +26,15 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	log.Println("loading authToken from idToken...")
 
-	token := r.Header.Get("Authorization")
-	authToken, err := lib.GetAuthTokenFromIdToken(token)
-	if err != nil {
-		log.Printf("error getting authToken")
-		return "", nil, err
-	}
+	authToken := r.Context().Value(lib.CtxAuthToken).(lib.AuthToken)
+	nn := r.Context().Value(lib.CtxNetworkNode).(models.NetworkNode)
+	networkNode = &nn
+	// token := r.Header.Get("Authorization")
+	// authToken, err := lib.GetAuthTokenFromIdToken(token)
+	// if err != nil {
+	// 	log.Printf("error getting authToken")
+	// 	return "", nil, err
+	// }
 	log.Printf(
 		"authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
 		authToken.Type,
@@ -42,15 +43,19 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		authToken.Email,
 	)
 
-	origin = r.Header.Get("Origin")
-	body := lib.ErrorByte(io.ReadAll(r.Body))
-	defer r.Body.Close()
-
-	err = json.Unmarshal([]byte(body), &policy)
-	if err != nil {
-		log.Printf("error unmarshaling policy: %s", err.Error())
+	if err := json.NewDecoder(r.Body).Decode(&policy); err != nil {
+		log.Println("error decoding body")
 		return "", nil, err
 	}
+	// origin = r.Header.Get("Origin")
+	// body := lib.ErrorByte(io.ReadAll(r.Body))
+	// defer r.Body.Close()
+
+	// err = json.Unmarshal([]byte(body), &policy)
+	// if err != nil {
+	// 	log.Printf("error unmarshaling policy: %s", err.Error())
+	// 	return "", nil, err
+	// }
 
 	policy.Normalize()
 
@@ -89,7 +94,7 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 		log.Printf("[lead] setting policy channel to '%s'", policy.Channel)
 	}
 
-	networkNode = network.GetNetworkNodeByUid(authToken.UserID)
+	// networkNode = network.GetNetworkNodeByUid(authToken.UserID)
 	if networkNode != nil {
 		warrant = networkNode.GetWarrant()
 	}

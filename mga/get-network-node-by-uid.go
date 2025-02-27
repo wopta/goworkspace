@@ -48,6 +48,11 @@ func GetNetworkNodeByUidFx(w http.ResponseWriter, r *http.Request) (string, inte
 	networkNode.JwtConfig = lib.JwtConfig{}
 	networkNode.CallbackConfig = nil
 
+	if err = networkNode.LoadEntitlementBySlug(authToken.Role); err != nil {
+		log.Println("error loading entitlement")
+		return "", nil, err
+	}
+
 	rawResp, err := networkNode.Marshal()
 
 	return string(rawResp), networkNode, err
