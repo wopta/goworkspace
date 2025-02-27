@@ -1,14 +1,4 @@
-steps:
-
-- name: 'gcr.io/cloud-builders/gsutil'
-  args: ['cp', 'gs://function-data/env/dev.yaml', '.']
-- name: 'gcr.io/cloud-builders/gsutil'
-  args: ['cp', 'gs://core-350507-function-data/env/prod.yaml', '.']
-- name: 'gcr.io/cloud-builders/gcloud'
-  args:
-  - '-c'
-  - |
-    export namefx=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$TAG_NAME') )
+export namefx=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$TAG_NAME') )
     #Print current tag
     echo "current tag: ${TAG_NAME}"
   
@@ -82,7 +72,7 @@ steps:
     --run-service-account=${sa} \
     --runtime=go121 \
     --env-vars-file ${env}.yaml \
-    --timeout=${timeout} \
+    --timeout=${timeout
     ${genFx} 
    
    
@@ -96,12 +86,3 @@ steps:
     # --region='europe-west1' \
     # --member='serviceAccount:wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com' \
     # --role='roles/cloudfunctions.invoker'
-
-  entrypoint: bash
-
-- name: gcr.io/cloud-builders/gcloud:latest
-  entrypoint: "ls"
-  args: ["-lah","/workspace"]
-
-options:
-  logging: CLOUD_LOGGING_ONLY
