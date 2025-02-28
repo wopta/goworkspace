@@ -10,22 +10,25 @@ import (
 
 var formRoutes []lib.Route = []lib.Route{
 	{
-		Route:   "/axafleet",
-		Handler: lib.ResponseLoggerWrapper(AxaFleetTway),
-		Method:  http.MethodGet,
-		Roles:   []string{lib.UserRoleAll},
+		Route:       "/axafleet",
+		Fn:          AxaFleetTway,
+		Method:      http.MethodGet,
+		Roles:       []string{lib.UserRoleAll},
+		Entitlement: "form.axa.fleet",
 	},
 	{
-		Route:   "/v1/{uid}",
-		Handler: lib.ResponseLoggerWrapper(FleetAssistenceInclusiveMovement),
-		Method:  http.MethodGet,
-		Roles:   []string{lib.UserRoleAll},
+		Route:       "/v1/{uid}",
+		Fn:          FleetAssistenceInclusiveMovement,
+		Method:      http.MethodGet,
+		Roles:       []string{lib.UserRoleAll},
+		Entitlement: "form.fleet.assistance",
 	},
 	{
-		Route:   "fleet/assistance/v1",
-		Handler: lib.ResponseLoggerWrapper(FleetAssistenceInclusiveMovement),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
+		Route:       "fleet/assistance/v1",
+		Fn:          FleetAssistenceInclusiveMovement,
+		Method:      http.MethodPost,
+		Roles:       []string{lib.UserRoleAll},
+		Entitlement: "form.fleet.assistance",
 	},
 }
 

@@ -10,27 +10,27 @@ import (
 
 var testRoutes []lib.Route = []lib.Route{
 	{
-		Route:   "/{operation}",
-		Handler: lib.ResponseLoggerWrapper(TestPostFx),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAdmin},
+		Route:  "/{operation}",
+		Fn:     TestPostFx,
+		Method: http.MethodPost,
+		Roles:  []string{lib.UserRoleAdmin},
 	},
 	{
-		Route:   "/{operation}",
-		Handler: lib.ResponseLoggerWrapper(TestGetFx),
-		Method:  http.MethodGet,
-		Roles:   []string{lib.UserRoleAll},
+		Route:  "/{operation}",
+		Fn:     TestGetFx,
+		Method: http.MethodGet,
+		Roles:  []string{lib.UserRoleAll},
 	},
 	{
-		Route:   "/fabrick/{operation}",
-		Handler: lib.ResponseLoggerWrapper(TestFabrickFx),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
+		Route:  "/fabrick/{operation}",
+		Fn:     TestFabrickFx,
+		Method: http.MethodPost,
+		Roles:  []string{lib.UserRoleAll},
 	}, {
-		Route:   "/scalapay/import",
-		Handler: lib.ResponseLoggerWrapper(ImportScalapay),
-		Method:  http.MethodPost,
-		Roles:   []string{},
+		Route:  "/scalapay/import",
+		Fn:     ImportScalapay,
+		Method: http.MethodPost,
+		Roles:  []string{},
 	},
 }
 

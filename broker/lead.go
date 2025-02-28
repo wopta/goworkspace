@@ -27,7 +27,7 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	log.Println("loading authToken from idToken...")
 
 	authToken := r.Context().Value(lib.CtxAuthToken).(lib.AuthToken)
-	nn := r.Context().Value(lib.CtxNetworkNode).(models.NetworkNode)
+	nn := r.Context().Value(models.CtxRequesterNetworkNode).(models.NetworkNode)
 	networkNode = &nn
 	// token := r.Header.Get("Authorization")
 	// authToken, err := lib.GetAuthTokenFromIdToken(token)

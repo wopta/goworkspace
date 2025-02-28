@@ -8,44 +8,51 @@ import (
 	"github.com/johnfercher/maroto/pkg/color"
 	"github.com/johnfercher/maroto/pkg/props"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 var documentRoutes []lib.Route = []lib.Route{
 	{
-		Route:   "/v1/proposal",
-		Handler: lib.ResponseLoggerWrapper(ContractFx),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
+		Route:       "/v1/proposal",
+		Fn:          ContractFx,
+		Method:      http.MethodPost,
+		Roles:       []string{lib.UserRoleAll},
+		Entitlement: "document.proposal",
 	},
 	{
-		Route:   "/v1/contract",
-		Handler: lib.ResponseLoggerWrapper(ContractFx),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
+		Route:       "/v1/contract",
+		Fn:          ContractFx,
+		Method:      http.MethodPost,
+		Roles:       []string{lib.UserRoleAll},
+		Entitlement: "document.contract",
 	},
 	{
-		Route:   "/v1/proposal",
-		Handler: lib.ResponseLoggerWrapper(ProposalFx),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
+		Route:       "/v1/proposal",
+		Fn:          ProposalFx,
+		Method:      http.MethodPost,
+		Roles:       []string{lib.UserRoleAll},
+		Entitlement: "document.proposal",
 	},
 	{
-		Route:   "/v1/reserved",
-		Handler: lib.ResponseLoggerWrapper(ReservedFx),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
+		Route:       "/v1/reserved",
+		Fn:          ReservedFx,
+		Method:      http.MethodPost,
+		Roles:       []string{lib.UserRoleAll},
+		Entitlement: "document.reserved",
 	},
 	{
-		Route:   "/v1/sign",
-		Handler: lib.ResponseLoggerWrapper(SignNamirial),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
+		Route:       "/v1/sign",
+		Fn:          SignNamirial,
+		Method:      http.MethodPost,
+		Roles:       []string{lib.UserRoleAll},
+		Entitlement: "document.sign",
 	},
 	{
-		Route:   "/v2/sign",
-		Handler: lib.ResponseLoggerWrapper(SignNamirialV6),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
+		Route:       "/v2/sign",
+		Fn:          SignNamirialV6,
+		Method:      http.MethodPost,
+		Roles:       []string{lib.UserRoleAll},
+		Entitlement: "document.sign",
 	},
 }
 
@@ -56,7 +63,7 @@ func init() {
 
 func Document(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
-	router := lib.GetRouter("document", documentRoutes)
+	router := models.GetExtendedRouter("document", documentRoutes)
 	router.ServeHTTP(w, r)
 }
 

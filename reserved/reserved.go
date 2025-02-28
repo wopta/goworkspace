@@ -6,14 +6,16 @@ import (
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 var reservedRoutes []lib.Route = []lib.Route{
 	{
-		Route:   "/coverage/v1/{policyUid}",
-		Handler: lib.ResponseLoggerWrapper(SetCoverageReservedFx),
-		Method:  http.MethodPatch,
-		Roles:   []string{lib.UserRoleAll},
+		Route:       "/coverage/v1/{policyUid}",
+		Fn:          SetCoverageReservedFx,
+		Method:      http.MethodPatch,
+		Roles:       []string{lib.UserRoleAll},
+		Entitlement: "reserved.policy.coverage",
 	},
 }
 
@@ -25,6 +27,6 @@ func init() {
 func Reserved(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetRouter("reserved", reservedRoutes)
+	router := models.GetExtendedRouter("reserved", reservedRoutes)
 	router.ServeHTTP(w, r)
 }

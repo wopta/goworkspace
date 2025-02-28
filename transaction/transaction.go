@@ -14,32 +14,35 @@ import (
 
 var transactionRoutes []lib.Route = []lib.Route{
 	{
-		Route:   "/policy/v1/{policyUid}",
-		Handler: lib.ResponseLoggerWrapper(GetTransactionsByPolicyUidFx), // Broker.GetPolicyTransactions,
-		Method:  http.MethodGet,
+		Route:  "/policy/v1/{policyUid}",
+		Fn:     GetTransactionsByPolicyUidFx,
+		Method: http.MethodGet,
 		Roles: []string{
 			models.UserRoleAdmin,
 			models.UserRoleManager,
 			models.UserRoleAgency,
 			models.UserRoleAgent,
 		},
+		Entitlement: "transaction.get.transactions",
 	},
 	{
-		Route:   "/restore/v1/{transactionUid}",
-		Handler: lib.ResponseLoggerWrapper(RestoreTransactionFx),
-		Method:  http.MethodPost,
-		Roles:   []string{models.UserRoleAdmin},
+		Route:       "/restore/v1/{transactionUid}",
+		Fn:          RestoreTransactionFx,
+		Method:      http.MethodPost,
+		Roles:       []string{models.UserRoleAdmin},
+		Entitlement: "transaction.restore.transaction",
 	},
 	{
-		Route:   "/policy/renew/v1/{policyUid}",
-		Handler: lib.ResponseLoggerWrapper(renew.GetRenewTransactionsByPolicyUidFx),
-		Method:  http.MethodGet,
+		Route:  "/policy/renew/v1/{policyUid}",
+		Fn:     renew.GetRenewTransactionsByPolicyUidFx,
+		Method: http.MethodGet,
 		Roles: []string{
 			models.UserRoleAdmin,
 			models.UserRoleManager,
 			models.UserRoleAgency,
 			models.UserRoleAgent,
 		},
+		Entitlement: "transaction.get.transactions.renew",
 	},
 }
 
@@ -51,7 +54,7 @@ func init() {
 func Transaction(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetRouter("transaction", transactionRoutes)
+	router := models.GetExtendedRouter("transaction", transactionRoutes)
 	router.ServeHTTP(w, r)
 }
 

@@ -10,28 +10,32 @@ import (
 
 var inclusiveRoutes []lib.Route = []lib.Route{
 	{
-		Route:   "/bankaccount/v1/hype",
-		Handler: lib.ResponseLoggerWrapper(BankAccountHypeFx),
-		Method:  http.MethodPost,
-		Roles:   []string{},
+		Route:       "/bankaccount/v1/hype",
+		Fn:          BankAccountHypeFx,
+		Method:      http.MethodPost,
+		Roles:       []string{},
+		Entitlement: "inclusive.hype.bankaccount",
 	},
 	{
-		Route:   "/bankaccount/v1/scalapay",
-		Handler: lib.ResponseLoggerWrapper(BankAccountScalapayFx),
-		Method:  http.MethodPost,
-		Roles:   []string{},
+		Route:       "/bankaccount/v1/scalapay",
+		Fn:          BankAccountScalapayFx,
+		Method:      http.MethodPost,
+		Roles:       []string{},
+		Entitlement: "inclusive.scalapay.bankaccount",
 	},
 	{
-		Route:   "/bankaccount/v1/hype/count",
-		Handler: lib.ResponseLoggerWrapper(CountHypeFx),
-		Method:  http.MethodPost,
-		Roles:   []string{},
+		Route:       "/bankaccount/v1/hype/count",
+		Fn:          CountHypeFx,
+		Method:      http.MethodPost,
+		Roles:       []string{},
+		Entitlement: "inclusive.hype.bankaccount.count",
 	},
 	{
-		Route:   "/bankaccount/in/v1",
-		Handler: lib.ResponseLoggerWrapper(HypeImportMovementbankAccountFx),
-		Method:  http.MethodPost,
-		Roles:   []string{},
+		Route:       "/bankaccount/in/v1",
+		Fn:          HypeImportMovementbankAccountFx,
+		Method:      http.MethodPost,
+		Roles:       []string{},
+		Entitlement: "inclusive.hybe.bankaccount.import",
 	},
 }
 

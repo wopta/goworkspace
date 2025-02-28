@@ -10,10 +10,11 @@ import (
 
 var rulesRoutes []lib.Route = []lib.Route{
 	{
-		Route:   "/risk/pmi",
-		Handler: lib.ResponseLoggerWrapper(PmiAllriskHandler),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
+		Route:       "/risk/pmi",
+		Fn:          PmiAllriskHandler,
+		Method:      http.MethodPost,
+		Roles:       []string{lib.UserRoleAll},
+		Entitlement: "rules.risk.pmi",
 	},
 }
 

@@ -11,58 +11,67 @@ import (
 
 var companydataRoutes []lib.Route = []lib.Route{
 	{
-		Route:   "/v1/global/transactions",
-		Handler: lib.ResponseLoggerWrapper(GlobalTransaction),
-		Method:  http.MethodGet,
-		Roles:   []string{},
+		Route:       "/v1/global/transactions",
+		Fn:          GlobalTransaction,
+		Method:      http.MethodGet,
+		Roles:       []string{},
+		Entitlement: "companydata.global.transactions",
 	},
 	{
-		Route:   "/v1/global/pmi/emit",
-		Handler: lib.ResponseLoggerWrapper(PmiGlobalEmit),
-		Method:  http.MethodGet,
-		Roles:   []string{},
+		Route:       "/v1/global/pmi/emit",
+		Fn:          PmiGlobalEmit,
+		Method:      http.MethodGet,
+		Roles:       []string{},
+		Entitlement: "companydata.global.pmi.emit",
 	},
 	{
-		Route:   "/v1/global/person/emit",
-		Handler: lib.ResponseLoggerWrapper(PersonGlobalEmit),
-		Method:  http.MethodGet,
-		Roles:   []string{},
+		Route:       "/v1/global/person/emit",
+		Fn:          PersonGlobalEmit,
+		Method:      http.MethodGet,
+		Roles:       []string{},
+		Entitlement: "companydata.global.persona.emit",
 	},
 	{
-		Route:   "/v1/axa/life/emit",
-		Handler: lib.ResponseLoggerWrapper(LifeAxaEmit),
-		Method:  http.MethodPost,
-		Roles:   []string{},
+		Route:       "/v1/axa/life/emit",
+		Fn:          LifeAxaEmit,
+		Method:      http.MethodPost,
+		Roles:       []string{},
+		Entitlement: "companydata.axa.life.emit",
 	},
 	{
-		Route:   "/v1/sogessur/gap/emit",
-		Handler: lib.ResponseLoggerWrapper(GapSogessurEmit),
-		Method:  http.MethodPost,
-		Roles:   []string{},
+		Route:       "/v1/sogessur/gap/emit",
+		Fn:          GapSogessurEmit,
+		Method:      http.MethodPost,
+		Roles:       []string{},
+		Entitlement: "companydata.sogessur.gap.emit",
 	},
 	{
-		Route:   "/v1/axa/life/delete",
-		Handler: lib.ResponseLoggerWrapper(LifeAxaDelete),
-		Method:  http.MethodPost,
-		Roles:   []string{},
+		Route:       "/v1/axa/life/delete",
+		Fn:          LifeAxaDelete,
+		Method:      http.MethodPost,
+		Roles:       []string{},
+		Entitlement: "companydata.axa.life.delete",
 	},
 	{
-		Route:   "/v1/emit",
-		Handler: lib.ResponseLoggerWrapper(ProductTrackOutFx),
-		Method:  http.MethodPost,
-		Roles:   []string{},
+		Route:       "/v1/emit",
+		Fn:          ProductTrackOutFx,
+		Method:      http.MethodPost,
+		Roles:       []string{},
+		Entitlement: "companydata.emit",
 	},
 	{
-		Route:   "/v1/axa/inclusive/bankaccount",
-		Handler: lib.ResponseLoggerWrapper(BankAccountInclusive),
-		Method:  http.MethodPost,
-		Roles:   []string{},
+		Route:       "/v1/axa/inclusive/bankaccount",
+		Fn:          BankAccountInclusive,
+		Method:      http.MethodPost,
+		Roles:       []string{},
+		Entitlement: "companydata.axa.inclusive.bankaccount",
 	},
 	{
-		Route:   "/v1/in/life",
-		Handler: lib.ResponseLoggerWrapper(LifeInFx),
-		Method:  http.MethodPost,
-		Roles:   []string{models.UserRoleAdmin},
+		Route:       "/v1/in/life",
+		Fn:          LifeInFx,
+		Method:      http.MethodPost,
+		Roles:       []string{models.UserRoleAdmin},
+		Entitlement: "companydata.axa.life.import",
 	},
 }
 
@@ -74,6 +83,6 @@ func init() {
 func Callback(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetRouter("companydata", companydataRoutes)
+	router := models.GetExtendedRouter("companydata", companydataRoutes)
 	router.ServeHTTP(w, r)
 }

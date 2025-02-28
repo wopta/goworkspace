@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"os"
 
 	"cloud.google.com/go/firestore"
@@ -54,7 +55,7 @@ func (ep *EntitlementProfile) SaveAll() error {
 	return nil
 }
 
-func (ep* EntitlementProfile) GetFromFirestore(slug string) error {
+func (ep *EntitlementProfile) GetFromFirestore(slug string) error {
 	snap, err := lib.GetFirestoreErr(EntitlementProfileCollection, slug)
 	if err != nil {
 		return err
@@ -65,19 +66,19 @@ func (ep* EntitlementProfile) GetFromFirestore(slug string) error {
 	return nil
 }
 
-type EntitlementProfileGenerator struct{}
+type EntitlementProfileService struct{}
 
-func NewEntitlementProfileGenerator() *EntitlementProfileGenerator {
-	return &EntitlementProfileGenerator{}
+func NewEntitlementProfileService() *EntitlementProfileService {
+	return &EntitlementProfileService{}
 }
 
-func (epg *EntitlementProfileGenerator) GetAllFromFirestore(ctx context.Context) (map[string]EntitlementProfile, error) {
+func (eps *EntitlementProfileService) GetAllFromFirestore(ctx context.Context) (map[string]EntitlementProfile, error) {
 	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
 	if err != nil {
 		return nil, err
 	}
 
-	eps := make(map[string]EntitlementProfile)
+	profileMap := make(map[string]EntitlementProfile)
 
 	iter := client.Collection(EntitlementProfileCollection).Documents(ctx)
 	defer iter.Stop()
@@ -93,8 +94,25 @@ func (epg *EntitlementProfileGenerator) GetAllFromFirestore(ctx context.Context)
 		if err := doc.DataTo(&ep); err != nil {
 			return nil, err
 		}
-		eps[ep.Slug] = ep
+		profileMap[ep.Slug] = ep
 	}
 
-	return eps, nil
+	return profileMap, nil
+}
+
+func CreateProfiles() {
+	profileMap := map[string]EntitlementProfile{
+		lib.UserRoleAdmin: {
+			Slug: lib.UserRoleAdmin,
+			Entitlements: []Entitlement{
+				{},
+			},
+		},
+	}
+
+	for _, value := range profileMap {
+		if err := value.SaveAll(); err != nil {
+			log.Fatal(err)
+		}
+	}
 }

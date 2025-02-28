@@ -24,6 +24,7 @@ type Route struct {
 	Route       string
 	Method      string
 	Handler     http.HandlerFunc
+	Fn          func(http.ResponseWriter, *http.Request) (string, any, error)
 	Middlewares []RouteMiddleware
 	Roles       []string
 	Entitlement string
@@ -31,16 +32,15 @@ type Route struct {
 
 type RouteMiddleware = func(http.Handler) http.Handler
 
-type ctxkey string
+type Ctxkey string
 
 const (
-	roles = ctxkey("roles")
-	CtxEntitlement = ctxkey("entitlement")
-	CtxNetworkNode = ctxkey("networknode")
-	CtxAuthToken = ctxkey("authToken")
+	roles          = Ctxkey("roles")
+	CtxEntitlement = Ctxkey("entitlement")
+	CtxAuthToken   = Ctxkey("authToken")
 )
 
-func ResponseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) (string, any, error)) func(w http.ResponseWriter, r *http.Request) {
+func responseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) (string, any, error)) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		str, _, err := handler(w, r)
 		if err != nil {
@@ -76,7 +76,8 @@ func GetRouter(module string, routes []Route) *chi.Mux {
 	mux.Use(corsMiddleware)
 	mux.Use(logRequestMiddleware)
 
-	for _, route := range routes {
+	for idx, route := range routes {
+		routes[idx].Handler = responseLoggerWrapper(routes[idx].Fn)
 		mw := make([]func(http.Handler) http.Handler, 0)
 		mw = append(mw,
 			withAuthToken,

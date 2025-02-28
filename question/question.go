@@ -21,10 +21,11 @@ const (
 
 var questionRoutes []lib.Route = []lib.Route{
 	{
-		Route:   "/v1/{questionType}",
-		Handler: lib.ResponseLoggerWrapper(GetQuestionsFx),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
+		Route:       "/v1/{questionType}",
+		Fn:          GetQuestionsFx,
+		Method:      http.MethodPost,
+		Roles:       []string{lib.UserRoleAll},
+		Entitlement: "question.get.questions",
 	},
 }
 
@@ -36,7 +37,7 @@ func init() {
 func Question(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetRouter("question", questionRoutes)
+	router := models.GetExtendedRouter("question", questionRoutes)
 	router.ServeHTTP(w, r)
 }
 
