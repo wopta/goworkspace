@@ -55,4 +55,5 @@ const (
 	RenewTransactionCollection   string = "renewTransactions"      // firestore and bigquery
 	MailReportCollection         string = "mailReport"             // only for bigquery
 	NodeConsensAuditsCollencion  string = "nodeConsensAudits"      // firestore and bigquery
+	EntitlementProfileCollection string = "entitlementProfile"     // firestore and bigquery
 )

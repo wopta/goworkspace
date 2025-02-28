@@ -16,7 +16,7 @@ const (
 
 func GetExtendedRouter(module string, routes []lib.Route) *chi.Mux {
 	for idx := range routes {
-		routes[idx].Middlewares = append(routes[idx].Middlewares, withRequesterNetworkNode, middlewareCheckEntitlement)
+		routes[idx].Middlewares = append(routes[idx].Middlewares, withRequesterNetworkNode, withCheckEntitlement)
 	}
 
 	return lib.GetRouter(module, routes)
@@ -48,7 +48,7 @@ func withRequesterNetworkNode(next http.Handler) http.Handler {
 	})
 }
 
-func middlewareCheckEntitlement(next http.Handler) http.Handler {
+func withCheckEntitlement(next http.Handler) http.Handler {
 	eps := NewEntitlementProfileService()
 	entitlementMapping, err := eps.GetAllFromFirestore(context.Background())
 	if err != nil {
