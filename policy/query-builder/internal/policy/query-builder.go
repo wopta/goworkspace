@@ -19,5 +19,11 @@ func NewQueryBuilder(randomGenerator func() string) *QueryBuilder {
 func (qb *QueryBuilder) Build(params map[string]string) (string, map[string]interface{}, error) {
 	qb.WhereClauses = []string{"(**tableAlias**.companyEmit = true)"}
 
+	for key := range params {
+		if key == "status" {
+			qb.WhereClauses = append(qb.WhereClauses, "(**tableAlias**.isDeleted = false OR **tableAlias**.isDeleted IS NULL)")
+		}
+	}
+
 	return qb.QueryBuilder.Build(params)
 }
