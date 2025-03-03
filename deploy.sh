@@ -1,9 +1,9 @@
     echo "First arg: $1"
     TAG_NAME=$1
-    export namefx=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$TAG_NAME') )
+     #export namefx=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$TAG_NAME') )
     #Print current tag
     echo "current tag: ${TAG_NAME}"
-  
+   #-------------SPLIT Tag-------------------------------------------------------
     #Read the string value
     echo $namefx
     read text
@@ -14,15 +14,15 @@
     #Print the splitted words
     echo "namefx : ${strarr[0]}"
     echo "tag : ${strarr[1]}"
+   #-------------------------NAME FX Cammel case ad tag ver-------------------------------------------
     namefx=$strarr[0]
-
     name_camel=$(sed -r 's/(^|-)(\w)/\U\2/g' <<<"${strarr[0]}")
     tagVersion=$(echo "${strarr[1]}" | sed -r 's/\./_/g')
     t=$(tr -s . _ <<< "${strarr[1]}")
     echo "namefx camel : ${name_camel}"
     echo "tagVersion camel : ${tagVersion}"
     echo "tagVersion camel : ${t}"
-
+   #-----------------SET VAR DEV---------------------------------------------------
     if [[ "${strarr[1]}" == *"dev"* ]]; then
       echo "dev enviroment"
       bucket=gs://function-data
@@ -33,7 +33,7 @@
       timeout=60
       vpc=wopta-dev-custom-vpc
     fi
-
+   #---------------------SET VAR PROD-----------------------------------------------
     if [[ "${strarr[1]}" == *"prod"* ]]; then
     echo "prod enviroment"
       bucket=gs://core-350507-function-data
@@ -44,28 +44,13 @@
       timeout=520
       vpc=prod-custom-vpc
     fi
-        #--ingress-settings internal-only \
-    #--timeout=540 \
-    # Save a value to persistent volume mount: "/workspace"
-    echo $namefx > /workspace/namefx.txt &&
-    # Save another
-    echo $name_camel > /workspace/entrypoint.txt
-    #ls -la
-    
-    # Copy assets folder from Google Bucket to directory
-    mkdir -p /workspace/${strarr[0]}/tmp/assets
-    if [[ "${strarr[1]}" == *"dev"* ]]; then
 
-    echo "dev enviroment"
-      gsutil -m cp -r gs://function-data/assets/documents/** /workspace/${strarr[0]}/tmp/assets
-    fi
-     if [[ "${strarr[1]}" == *"prod"* ]]; then
-    echo "prod enviroment"
-      gsutil -m cp -r gs://core-350507-function-data/assets/documents/** /workspace/${strarr[0]}/tmp/assets
-    fi
-    
+    #--------- Copy assets folder from Google Bucket to directory----------------------------------
+    mkdir -p /workspace/${strarr[0]}/tmp/assets
+    gsutil -m cp -r ${bucket}/** /workspace/${strarr[0]}/tmp/assets
     cp /workspace/.gcloudignore /workspace/${strarr[0]}/.gcloudignore 
-    
+    #----------------------------------
+    #----------DEPLOY FX------------------------
     gcloud functions deploy ${strarr[0]} \
     --project=${project} \
     --region=europe-west1 \
@@ -78,10 +63,10 @@
     --env-vars-file ${env}.yaml \
     --timeout=${timeout} \
     --vpc-connector=${vpc} \
-
+    --egress-settings=all \
     ${genFx} 
    
-   
+      #----------------------------------
       if [[ "${strarr[1]}" == *"dev"* ]]; then
     echo "dev run services update"
     gcloud run services update ${strarr[0]}  --update-labels tagversion=${tagVersion} --region=europe-west1 --service-account=${sa}
