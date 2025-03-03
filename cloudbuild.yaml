@@ -7,7 +7,7 @@ steps:
   steps:
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'bash'
-  args: ['deploy.sh']
+  args: ['./deploy.sh']
 - name: gcr.io/cloud-builders/gcloud:latest
   entrypoint: "ls"
   args: ["-lah","/workspace"]
