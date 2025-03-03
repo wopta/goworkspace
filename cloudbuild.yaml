@@ -71,10 +71,10 @@ steps:
     --timeout=${timeout} \
     --vpc-connector=${vpc} \
     --egress-settings=all \
-    --memory=256Mb
+    --memory=256Mb \
     ${genFx} 
    
-      #----------------------------------
+      #-----------Set label version-----------------------
       if [[ "${strarr[1]}" == *"dev"* ]]; then
     echo "dev run services update"
     gcloud run services update ${strarr[0]}  --update-labels tagversion=${tagVersion} --region=europe-west1 --service-account=${sa}
