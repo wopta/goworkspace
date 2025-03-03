@@ -16,13 +16,13 @@
 
     name_camel=$(sed -r 's/(^|-)(\w)/\U\2/g' <<<"${strarr[0]}")
     tagVersion=$(echo "${strarr[1]}" | sed -r 's/\./_/g')
-    t=tr -s . _ <<< "${strarr[1]}"
+    t=$(tr -s . _ <<< "${strarr[1]}")
     echo "namefx camel : ${name_camel}"
     echo "tagVersion camel : ${tagVersion}"
     echo "tagVersion camel : ${t}"
 
     if [[ "${strarr[1]}" == *"dev"* ]]; then
-    echo "dev enviroment"
+      echo "dev enviroment"
       bucket=gs://function-data
       project=positive-apex-350507
       env=dev
@@ -76,7 +76,7 @@
     --env-vars-file ${env}.yaml \
     --timeout=${timeout} \
     --vpc-connector=${vpc} 
-    
+
     ${genFx} 
    
    
