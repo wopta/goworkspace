@@ -1,4 +1,4 @@
-export namefx=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$TAG_NAME') )
+ export namefx=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$TAG_NAME') )
     #Print current tag
     echo "current tag: ${TAG_NAME}"
   
@@ -29,6 +29,7 @@ export namefx=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$TAG_NAME') )
       genFx=--gen2
       sa=wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com
       timeout=60
+      vpc=wopta-dev-custom-vpc
     fi
 
     if [[ "${strarr[1]}" == *"prod"* ]]; then
@@ -39,6 +40,7 @@ export namefx=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$TAG_NAME') )
       genFx=""
       sa=wopta-prod-cloud-function@core-350507.iam.gserviceaccount.com
       timeout=520
+      vpc=prod-custom-vpc
     fi
         #--ingress-settings internal-only \
     #--timeout=540 \
@@ -72,7 +74,9 @@ export namefx=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$TAG_NAME') )
     --run-service-account=${sa} \
     --runtime=go121 \
     --env-vars-file ${env}.yaml \
-    --timeout=${timeout
+    --timeout=${timeout} \
+    --vpc-connector=${vpc} 
+    
     ${genFx} 
    
    
