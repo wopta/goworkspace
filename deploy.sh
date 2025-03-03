@@ -1,4 +1,6 @@
- export namefx=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$TAG_NAME') )
+    echo "First arg: $1"
+    TAG_NAME=$1
+    export namefx=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$TAG_NAME') )
     #Print current tag
     echo "current tag: ${TAG_NAME}"
   
@@ -75,7 +77,7 @@
     --runtime=go121 \
     --env-vars-file ${env}.yaml \
     --timeout=${timeout} \
-    --vpc-connector=${vpc} 
+    --vpc-connector=${vpc} \
 
     ${genFx} 
    
