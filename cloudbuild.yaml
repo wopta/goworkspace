@@ -5,7 +5,6 @@ steps:
 - name: 'gcr.io/cloud-builders/gsutil'
   args: ['cp', 'gs://core-350507-function-data/env/prod.yaml', '.']
 - name: 'gcr.io/cloud-builders/gcloud'
-  entrypoint: 'bash'
   args: ['./deploy.sh','${TAG_NAME}']
 - name: gcr.io/cloud-builders/gcloud:latest
   entrypoint: "ls"
