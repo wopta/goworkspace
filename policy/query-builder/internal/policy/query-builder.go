@@ -1,6 +1,8 @@
 package policy
 
 import (
+	"strings"
+
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/policy/query-builder/internal/base"
 )
@@ -18,6 +20,12 @@ func NewQueryBuilder(randomGenerator func() string) *QueryBuilder {
 
 func (qb *QueryBuilder) Build(params map[string]string) (string, map[string]interface{}, error) {
 	qb.WhereClauses = []string{"(**tableAlias**.companyEmit = true)"}
+
+	for key, value := range params {
+		if key == "status" && !strings.Contains(value, "deleted"){
+			qb.WhereClauses = append(qb.WhereClauses, "(**tableAlias**.isDeleted = false OR **tableAlias**.isDeleted IS NULL)")
+		}
+	}
 
 	return qb.QueryBuilder.Build(params)
 }
