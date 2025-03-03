@@ -69,8 +69,6 @@ steps:
     --runtime=go121 \
     --env-vars-file ${env}.yaml \
     --timeout=${timeout} \
-    --vpc-connector=${vpc} \
-    --egress-settings=all \
     ${genFx} 
    
       #----------------------------------
