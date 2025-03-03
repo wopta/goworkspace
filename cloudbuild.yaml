@@ -6,7 +6,7 @@ steps:
   args: ['cp', 'gs://core-350507-function-data/env/prod.yaml', '.']
 - name: gcr.io/cloud-builders/gcloud:latest
   entrypoint: "bash"
-   args:
+  args:
   - '-c'
   - | 
    echo "current tag: ${TAG_NAME}"
