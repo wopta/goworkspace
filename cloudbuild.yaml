@@ -29,6 +29,12 @@ steps:
     echo "namefx camel : ${name_camel}"
     echo "tagVersion camel : ${tagVersion}"
     echo "tagVersion camel : ${t}"
+    mem=256Mb
+     #-----------------SET By FX---------------------------------------------------
+    if [[ "${strarr[0]}" == *"test"* ]]; then
+      echo "fx: test"
+      mem=256Mb
+    fi
    #-----------------SET VAR DEV---------------------------------------------------
     if [[ "${strarr[1]}" == *"dev"* ]]; then
       echo "dev enviroment"
