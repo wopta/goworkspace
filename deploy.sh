@@ -25,7 +25,7 @@
    #-----------------SET VAR DEV---------------------------------------------------
     if [[ "${strarr[1]}" == *"dev"* ]]; then
       echo "dev enviroment"
-      bucket=gs://function-data
+      bucket=function-data
       project=positive-apex-350507
       env=dev
       genFx=--gen2
@@ -36,7 +36,7 @@
    #---------------------SET VAR PROD-----------------------------------------------
     if [[ "${strarr[1]}" == *"prod"* ]]; then
     echo "prod enviroment"
-      bucket=gs://core-350507-function-data
+      bucket=core-350507-function-data
       project=core-350507
       env=prod
       genFx=""
@@ -47,7 +47,7 @@
 
     #--------- Copy assets folder from Google Bucket to directory----------------------------------
     mkdir -p /workspace/${strarr[0]}/tmp/assets
-    gsutil -m cp -r ${bucket}/** /workspace/${strarr[0]}/tmp/assets
+    gsutil -m cp -r gs://${bucket}/** /workspace/${strarr[0]}/tmp/assets
     cp /workspace/.gcloudignore /workspace/${strarr[0]}/.gcloudignore 
     #----------------------------------
     #----------DEPLOY FX------------------------
