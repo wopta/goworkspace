@@ -3,7 +3,6 @@ package models
 import (
 	"context"
 	"encoding/json"
-	"log"
 	"os"
 
 	"cloud.google.com/go/firestore"
@@ -97,7 +96,7 @@ func (eps *EntitlementProfileService) GetAllFromFirestore(ctx context.Context) (
 	return profileMap, nil
 }
 
-func CreateProfiles() {
+func CreateProfiles() map[string]EntitlementProfile {
 	public := []Entitlement{
 		{"auth.authorize"},
 		{"auth.token"},
@@ -144,6 +143,36 @@ func CreateProfiles() {
 		{"mga.get.products"},
 		{"mga.get.product"},
 		{"mga.consume.networknode.invite"},
+		{"partnership.init.life"},
+		{"partnership.get.nodeproduct"},
+		{"payment.crypto"},
+		{"payment.fabrick.refresh.token"},
+		{"policy.get.policy.fiscalcode"},
+		{"policy.get.policy"},
+		{"policy.get.policy.attachments"},
+		{"product.get.product"},
+		{"product.update.product"},
+		{"question.get.questions"},
+		{"quote.pmi.munichre"},
+		{"quote.pmi.incident"},
+		{"quote.life"},
+		{"quote.person"},
+		{"quote.gap"},
+		{"quote.commercialcombined"},
+		{"renew.draft"},
+		{"renew.promote"},
+		{"renew.notice.ecommerce"},
+		{"reserved.policy.coverage"},
+		{"rules.risk.pmi"},
+		{"sellable.sales.life"},
+		{"sellable.risk.person"},
+		{"sellable.commercialcombined"},
+		{"user.get.user.fiscalcode"},
+		{"user.get.user.mail"},
+		{"user.get.user.authid"},
+		{"user.onboard"},
+		{"user.upload.user.document"},
+		{"user.calculate.user.fiscalcode"},
 	}
 	internal := []Entitlement{
 		{"auth.sso.jwt"},
@@ -159,6 +188,13 @@ func CreateProfiles() {
 		{"mga.give.consent"},
 		{"mga.get.warrants"},
 		{"mga.get.quoter.life"},
+		{"network.get.networknodes.subtree"},
+		{"payment.pay.manual.transacation"},
+		{"payment.pay.manual.renew.transacation"},
+		{"policy.get.policy.media"},
+		{"policy.get.policy.renew"},
+		{"transaction.get.transactions"},
+		{"transaction.get.transactions.renew"},
 	}
 	admin := []Entitlement{
 		{"broker.delete.renew"},
@@ -166,6 +202,13 @@ func CreateProfiles() {
 		{"broker.duplicate.policy"},
 		{"companydata.axa.life.import"},
 		{"mga.modify.policy"},
+		{"network.networknodes.import"},
+		{"payment.change.provider"},
+		{"payment.change.provider.renew"},
+		{"transaction.restore.transaction"},
+		{"user.invite.create"},
+		{"user.update.user.role"},
+		{"user.get.users"},
 	}
 	admin_manager := []Entitlement{
 		{"accounting.get.networktransactions"},
@@ -187,6 +230,17 @@ func CreateProfiles() {
 		{"mga.create.networknode.invite"},
 		{"mga.get.warrants"},
 		{"mga.create.warrant"},
+		{"network.get.networknodes.subtree"},
+		{"payment.fabrick.recreate.link"},
+		{"payment.delete.transaction"},
+		{"payment.pay.manual.transacation"},
+		{"payment.pay.manual.renew.transacation"},
+		{"policy.delete.policy"},
+		{"policy.upload.policy.media"},
+		{"policy.get.policy.media"},
+		{"policy.get.policy.renew"},
+		{"transaction.get.transactions"},
+		{"transaction.get.transactions.renew"},
 	}
 	customer := []Entitlement{
 		{"claim.create"},
@@ -201,17 +255,41 @@ func CreateProfiles() {
 	admin_manager = append(admin_manager, public...)
 	admin = append(admin, admin_manager...)
 
+	public = uniqueSliceElements(public)
+	customer = uniqueSliceElements(customer)
+	admin = uniqueSliceElements(admin)
+	manager = uniqueSliceElements(manager)
+	node = uniqueSliceElements(node)
+	internal = uniqueSliceElements(internal)
 
 	profileMap := map[string]EntitlementProfile{
-		lib.UserRoleAdmin: {
-			Slug: lib.UserRoleAdmin,
-			Entitlements: admin,
-		},
+		lib.UserRoleAll:         {Slug: lib.UserRoleAll, Entitlements: public},
+		lib.UserRoleCustomer:    {Slug: lib.UserRoleCustomer, Entitlements: customer},
+		lib.UserRoleAdmin:       {Slug: lib.UserRoleAdmin, Entitlements: admin},
+		lib.UserRoleManager:     {Slug: lib.UserRoleManager, Entitlements: manager},
+		lib.UserRoleAgent:       {Slug: lib.UserRoleAgent, Entitlements: node},
+		lib.UserRoleAgency:      {Slug: lib.UserRoleAgency, Entitlements: node},
+		lib.UserRoleAreaManager: {Slug: lib.UserRoleAreaManager, Entitlements: manager},
+		lib.UserRoleInternal:    {Slug: lib.UserRoleInternal, Entitlements: internal},
 	}
 
-	for _, value := range profileMap {
-		if err := value.SaveAll(); err != nil {
-			log.Fatal(err)
+	return profileMap
+
+	// for _, value := range profileMap {
+	// 	if err := value.SaveAll(); err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// }
+}
+
+func uniqueSliceElements[T comparable](inputSlice []T) []T {
+	uniqueSlice := make([]T, 0, len(inputSlice))
+	seen := make(map[T]bool, len(inputSlice))
+	for _, element := range inputSlice {
+		if !seen[element] {
+			uniqueSlice = append(uniqueSlice, element)
+			seen[element] = true
 		}
 	}
+	return uniqueSlice
 }

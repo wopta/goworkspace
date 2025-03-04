@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"net/http"
 	"slices"
@@ -49,11 +50,12 @@ func withRequesterNetworkNode(next http.Handler) http.Handler {
 }
 
 func withCheckEntitlement(next http.Handler) http.Handler {
-	eps := NewEntitlementProfileService()
-	entitlementMapping, err := eps.GetAllFromFirestore(context.Background())
-	if err != nil {
-		log.Printf("error retrieving entitlement profiles: %s", err.Error())
-	}
+	// eps := NewEntitlementProfileService()
+	// entitlementMapping, err := eps.GetAllFromFirestore(context.Background())
+	// if err != nil {
+	// 	log.Printf("error retrieving entitlement profiles: %s", err.Error())
+	// }
+	entitlementMapping := CreateProfiles()
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -84,6 +86,18 @@ func withCheckEntitlement(next http.Handler) http.Handler {
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
+
+		resp := struct{ Response string `json:"response"`}{
+			Response: "passed entitlement check!!",
+		}
+			
+		log.Println(resp.Response)
+		w.WriteHeader(200)
+		if err := json.NewEncoder(w).Encode(resp); err != nil {
+			http.Error(w, "something went wrong", http.StatusServiceUnavailable)
+			return
+		}
+		return
 
 		next.ServeHTTP(w, r)
 	})
