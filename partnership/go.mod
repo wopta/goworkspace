@@ -9,12 +9,12 @@ require (
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
-	github.com/wopta/goworkspace/lib v1.0.138
-	github.com/wopta/goworkspace/models v1.2.29
-	github.com/wopta/goworkspace/network v1.0.94
-	github.com/wopta/goworkspace/product v1.1.27
-	github.com/wopta/goworkspace/quote v1.0.117
-	github.com/wopta/goworkspace/user v1.0.129
+	github.com/wopta/goworkspace/lib v1.0.139
+	github.com/wopta/goworkspace/models v1.2.31
+	github.com/wopta/goworkspace/network v1.0.96
+	github.com/wopta/goworkspace/product v1.1.29
+	github.com/wopta/goworkspace/quote v1.0.119
+	github.com/wopta/goworkspace/user v1.0.131
 )
 
 require (
@@ -69,8 +69,8 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/mail v1.0.144 // indirect
-	github.com/wopta/goworkspace/sellable v1.0.126 // indirect
+	github.com/wopta/goworkspace/mail v1.0.146 // indirect
+	github.com/wopta/goworkspace/sellable v1.0.128 // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20230802181842-ad255f2331ca // indirect

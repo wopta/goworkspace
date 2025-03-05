@@ -23,9 +23,9 @@ var policyRoutes []lib.Route = []lib.Route{
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
-		Route:   "/v1/{uid}",
+		Route:   "/v1/annulment/{uid}",
 		Handler: lib.ResponseLoggerWrapper(DeletePolicyFx),
-		Method:  http.MethodDelete,
+		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager},
 	},
 	{

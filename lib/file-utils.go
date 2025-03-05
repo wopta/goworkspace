@@ -334,6 +334,8 @@ func GetByteByEnv(file string, isLocal bool) []byte {
 
 	case "local":
 		res1 = ErrorByte(os.ReadFile("../function-data/dev/" + file))
+	case "local-test":
+		res1 = ErrorByte(os.ReadFile("../../function-data/dev/" + file))
 	case "dev":
 		if isLocal {
 			res1 = ErrorByte(os.ReadFile("./serverless_function_source_code/" + file))

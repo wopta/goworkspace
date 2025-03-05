@@ -445,6 +445,10 @@ func (fx *Fx) RemoveOfferPrice(offerPrice map[string]map[string]*Price, offerKey
 	delete(offerPrice, offerKey)
 }
 
+func (fx *Fx) RemoveOffer(offers map[string]Offer, offerKey string) {
+	delete(offers, offerKey)
+}
+
 func (fx *Fx) HasAssetType(input map[string]interface{}, assetType string) bool {
 	j, err := json.Marshal(input)
 	lib.CheckError(err)

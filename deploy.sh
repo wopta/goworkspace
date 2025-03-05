@@ -1,15 +1,8 @@
-steps:
-
-- name: 'gcr.io/cloud-builders/gsutil'
-  args: ['cp', 'gs://function-data/env/dev.yaml', '.']
-- name: 'gcr.io/cloud-builders/gsutil'
-  args: ['cp', 'gs://core-350507-function-data/env/prod.yaml', '.']
-- name: gcr.io/cloud-builders/gcloud:latest
-  entrypoint: "bash"
-  args:
-  - '-c'
-  - | 
-   echo "current tag: ${TAG_NAME}"
+    echo "First arg: $1"
+    TAG_NAME=$1
+     #export namefx=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$TAG_NAME') )
+    #Print current tag
+    echo "current tag: ${TAG_NAME}"
    #-------------SPLIT Tag-------------------------------------------------------
     #Read the string value
     echo $namefx
@@ -29,12 +22,6 @@ steps:
     echo "namefx camel : ${name_camel}"
     echo "tagVersion camel : ${tagVersion}"
     echo "tagVersion camel : ${t}"
-    mem=256Mb
-     #-----------------SET By FX---------------------------------------------------
-    if [[ "${strarr[0]}" == *"test"* ]]; then
-      echo "fx: test"
-      mem=256Mb
-    fi
    #-----------------SET VAR DEV---------------------------------------------------
     if [[ "${strarr[1]}" == *"dev"* ]]; then
       echo "dev enviroment"
@@ -77,10 +64,9 @@ steps:
     --timeout=${timeout} \
     --vpc-connector=${vpc} \
     --egress-settings=all \
-    --memory=256Mb \
     ${genFx} 
    
-      #-----------Set label version-----------------------
+      #----------------------------------
       if [[ "${strarr[1]}" == *"dev"* ]]; then
     echo "dev run services update"
     gcloud run services update ${strarr[0]}  --update-labels tagversion=${tagVersion} --region=europe-west1 --service-account=${sa}
@@ -91,9 +77,3 @@ steps:
     # --region='europe-west1' \
     # --member='serviceAccount:wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com' \
     # --role='roles/cloudfunctions.invoker'
-- name: gcr.io/cloud-builders/gcloud:latest
-  entrypoint: "ls"
-  args: ["-lah","/workspace"]
-
-options:
-  logging: CLOUD_LOGGING_ONLY
