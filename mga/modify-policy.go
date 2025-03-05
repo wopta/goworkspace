@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	plc "github.com/wopta/goworkspace/policy"
@@ -73,6 +74,23 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		return "{}", nil, err
 	}
 	log.Printf("policy %s modified successfully", modifiedPolicy.Uid)
+	// Insert here
+	// Create a new policy with only the needed infos
+	// Create e pdf generator with that new policy
+	// Then move modifyController:
+	// err = writePolicyToDb(modifiedPolicy)
+	//	if err != nil {
+	//		return models.Policy{}, err
+	//	}
+	//
+	//	err = writeUserToDB(modifiedUser)
+	//	if err != nil {
+	//		return models.Policy{}, err
+	//	}
+	// here
+	diffPolicy := inputPolicy
+	p := <-document.AddendumObj("", diffPolicy, nil, nil)
+	log.Println(p.LinkGcs)
 
 	rawPolicy, err = json.Marshal(modifiedPolicy)
 

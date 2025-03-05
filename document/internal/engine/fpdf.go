@@ -3,6 +3,7 @@ package engine
 import (
 	"bytes"
 	"os"
+	"path"
 	"strings"
 	"time"
 
@@ -254,6 +255,23 @@ func (f *Fpdf) GetStringWidth(text string) float64 {
 }
 
 func (f *Fpdf) Save(rawDoc []byte, filename string) (string, error) {
-	gsLink := lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, rawDoc)
-	return gsLink, nil
+	// TODO REMOVE WHEN DONE
+	baseDir := path.Dir("../" + filename)
+	if _, err := os.Stat(baseDir); os.IsNotExist(err) {
+		err = os.MkdirAll(baseDir, 0755)
+		if err != nil {
+			return "", nil
+		}
+	}
+
+	file, err := os.Create(os.ExpandEnv("../" + filename))
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+	_, err = file.Write(rawDoc)
+	//dir, _ := os.Getwd()
+	return filename, err
+	//gsLink := lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, rawDoc)
+	//return gsLink, nil
 }
