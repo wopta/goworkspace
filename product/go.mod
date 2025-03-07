@@ -6,7 +6,7 @@ replace github.com/wopta/goworkspace/product => ./
 
 require (
 	github.com/wopta/goworkspace/lib v1.0.139
-	github.com/wopta/goworkspace/models v1.2.31
+	github.com/wopta/goworkspace/models v1.2.32
 )
 
 require (
