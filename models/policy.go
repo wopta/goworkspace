@@ -351,8 +351,8 @@ func (policy *Policy) GetFlow(networkNode *NetworkNode, warrant *Warrant) (strin
 
 	// Retrocompatibility with old emitted policies without channel when there was only e-commerce
 	if channel == "" {
-		channel = ECommerceChannel
 		policy.Channel = ECommerceChannel
+		channel = policy.Channel
 		log.Println("[Policy.GetFlow] overriding unset channel as e-commerce")
 	}
 

@@ -5,40 +5,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
 	"regexp"
 	"sort"
 	"strings"
 	"time"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
-// DEPRECATED
-func GetProduct(name, version, channel string) (*models.Product, error) {
-	var (
-		product  *models.Product
-		filePath = "products/"
-	)
-
-	log.Println("[GetProduct] function start ---------------------")
-
-	filePath += channel + "/" + name + "-" + version + ".json"
-
-	log.Printf("[GetProduct] product filePath: %s", filePath)
-
-	jsonFile := lib.GetFilesByEnv(filePath)
-	err := json.Unmarshal(jsonFile, &product)
-	lib.CheckError(err)
-
-	err = replaceDatesInProduct(product, channel)
-
-	log.Println("[GetProduct] function end ---------------------")
-
-	return product, err
-}
+const (
+	minAge         = "minAge"
+	minReservedAge = "minReservedAge"
+)
 
 /*
 Returns the requested product version for the specified channel based on the provided input parameters, including
@@ -81,7 +60,7 @@ func GetProductV2(productName, productVersion, channel string, networkNode *mode
 /*
 Returns the most recent active default product associated with the specified channel.
 */
-func GetDefaultProduct(productName, channel string) *models.Product {
+func getDefaultProduct(productName, channel string) *models.Product {
 	var (
 		result, product *models.Product
 	)
@@ -154,7 +133,7 @@ func GetLatestActiveProduct(productName, channel string, networkNode *models.Net
 
 	log.Printf("[GetLatestActiveProduct] product: %s", productName)
 
-	product = GetDefaultProduct(productName, channel)
+	product = getDefaultProduct(productName, channel)
 	if product == nil {
 		log.Printf("[GetLatestActiveProduct] no active product found")
 		return nil
@@ -307,17 +286,7 @@ func overrideProductInfo(product *models.Product, networkNode *models.NetworkNod
 			}
 
 			// TODO: this need to be removed in the future
-			if lib.SliceContains([]string{"facile_agent"}, warrant.Name) {
-				for index, paymentProvider := range paymentProviders {
-					configs := make([]models.PaymentConfig, 0)
-					for _, config := range paymentProvider.Configs {
-						if config.Rate != string(models.PaySplitMonthly) {
-							configs = append(configs, config)
-						}
-					}
-					paymentProviders[index].Configs = configs
-				}
-			}
+			paymentProviders = removeFacilePaymentRate(paymentProviders, warrant.Name)
 			product.PaymentProviders = paymentProviders
 		}
 
@@ -347,57 +316,17 @@ func loadProductSteps(product *models.Product) []models.Step {
 	return steps
 }
 
-// DEPRECATED
-func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	name := chi.URLParam(r, "name")
-	origin := r.Header.Get("origin")
-
-	log.Println(r.RequestURI)
-
-	product, err := GetName(origin, name, "v1")
-	if err != nil {
-
-		return "", nil, err
+func removeFacilePaymentRate(paymentProviders []models.PaymentProvider, warrantName string) []models.PaymentProvider {
+	if lib.SliceContains([]string{"facile_agent"}, warrantName) {
+		for index, paymentProvider := range paymentProviders {
+			configs := make([]models.PaymentConfig, 0)
+			for _, config := range paymentProvider.Configs {
+				if config.Rate != string(models.PaySplitMonthly) {
+					configs = append(configs, config)
+				}
+			}
+			paymentProviders[index].Configs = configs
+		}
 	}
-	jsonOut, err := product.Marshal()
-	if err != nil {
-		return "", nil, err
-	}
-
-	switch name {
-	case models.PersonaProduct:
-		err = replaceDatesInProduct(product, models.UserRoleAll)
-	case models.LifeProduct:
-		err = replaceDatesInProduct(product, models.UserRoleAll)
-	}
-
-	jsonOut, err = json.Marshal(product)
-
-	return string(jsonOut), product, err
-}
-
-// DEPRECATED
-func GetName(origin string, name string, version string) (*models.Product, error) {
-	q := lib.Firequeries{
-		Queries: []lib.Firequery{{
-			Field:      "name",
-			Operator:   "==",
-			QueryValue: name,
-		},
-			{
-				Field:      "version",
-				Operator:   "==",
-				QueryValue: version,
-			},
-		},
-	}
-
-	fireProduct := lib.GetDatasetByEnv(origin, "products")
-	query, _ := q.FirestoreWherefields(fireProduct)
-	products := models.ProductToListData(query)
-	if len(products) == 0 {
-		return &models.Product{}, fmt.Errorf("no product json file found for %s %s", name, version)
-	}
-
-	return &products[0], nil
+	return paymentProviders
 }
