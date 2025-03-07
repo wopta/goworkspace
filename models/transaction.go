@@ -64,8 +64,6 @@ func TransactionToListData(query *firestore.DocumentIterator) []Transaction {
 	for {
 		d, err := query.Next()
 		if err != nil {
-		}
-		if err != nil {
 			if err == iterator.Done {
 				break
 			}

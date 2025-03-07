@@ -14,12 +14,6 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-func UnmarshalPolicy(data []byte) (Policy, error) {
-	var r Policy
-	err := json.Unmarshal(data, &r)
-	return r, err
-}
-
 func (r *Policy) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
@@ -207,11 +201,11 @@ type Price struct {
 func (p *Policy) Normalize() {
 	p.Contractor.Normalize()
 	if p.Contractors != nil {
-		for index, _ := range *p.Contractors {
+		for index := range *p.Contractors {
 			(*p.Contractors)[index].Normalize()
 		}
 	}
-	for index, _ := range p.Assets {
+	for index := range p.Assets {
 		p.Assets[index].Normalize()
 	}
 }
@@ -344,21 +338,6 @@ func PolicyToListData(query *firestore.DocumentIterator) []Policy {
 	return result
 }
 
-func GetChannel(policy *Policy) string {
-	var channel string
-
-	switch policy.ProducerType {
-	case AgentNetworkNodeType:
-		channel = AgentChannel
-	case AgencyNetworkNodeType:
-		channel = AgencyChannel
-	default:
-		channel = ECommerceChannel
-	}
-
-	return channel
-}
-
 func (policy *Policy) GetFlow(networkNode *NetworkNode, warrant *Warrant) (string, *NodeSetting) {
 	var (
 		channel  = policy.Channel
@@ -400,17 +379,6 @@ func (policy *Policy) GetFlow(networkNode *NetworkNode, warrant *Warrant) (strin
 	}
 
 	return flowName, &flowFile
-}
-
-func (policy *Policy) GetNumberOfRates() int {
-	switch policy.PaymentSplit {
-	case string(PaySplitYear), string(PaySplitYearly), string(PaySplitSingleInstallment):
-		return 1
-	case string(PaySplitMonthly):
-		return 12
-	default:
-		return 0
-	}
 }
 
 func (policy *Policy) GetDurationInYears() int {
