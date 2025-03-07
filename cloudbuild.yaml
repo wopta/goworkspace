@@ -88,7 +88,7 @@ steps:
     # === APPLY TAG VERSION LABEL ==============================================
     if [[ "${env}" == "dev" ]]; then
       echo "DEV run services update..."
-      gcloud run services update ${fx_name} --update-labels tagversion=${tag_version} --vpc-connector=${vpc}
+      gcloud run services update ${fx_name} --update-labels tagversion=${tag_version} --vpc-connector=${vpc} --region=${region}
     fi
 - name: gcr.io/cloud-builders/gcloud:latest
   entrypoint: "ls"
