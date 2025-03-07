@@ -15,21 +15,22 @@ steps:
     # Read TAG_NAME splitting by the IFS separator into the needed variables
     # ex.: broker/1.0.0.dev => [fx_name=broker, tag=1.0.0.dev]
     IFS='/'
-    fx_name=$(echo $TAG_NAME | read v1 v2; echo $v1)
-    tag=$(echo $TAG_NAME | read v1 v2; echo $v2)
+    read -a strarr <<< $TAG_NAME
+    fx_name=$(echo ${strarr[0]})
     echo "fx_name: ${fx_name}"
-    echo "tag: ${tag}"
+    echo "fx_name: ${strarr[0]}"
+    echo "tag: ${strarr[1]}"
 
     # === FX ENTRYPOINT AND TAG VERSION ========================================
     # Camel case function entrypoint. Ex.: broker -> Broker 
-    fx_entrypoint=$(sed -r 's/(^|-)(\w)/\U\2/g' <<<"${fx_name}")
+    fx_entrypoint=$(sed -r 's/(^|-)(\w)/\U\2/g' <<<"${strarr[0]}")
     # Replace '.' with '_' for tag version. Ex.: 1.2.3.dev -> 1_2_3_dev 
-    tag_version=$(echo "${tag}" | sed -r 's/\./_/g')
+    tag_version=$(echo "${strarr[1]}" | sed -r 's/\./_/g')
     echo "fx_entrypoint: ${fx_entrypoint}"
     echo "tag_version: ${tag_version}"
 
     # === SET DEV ENV VARS =====================================================
-    if [[ "${tag}" == *"dev"* ]]; then
+    if [[ "${strarr[1]}" == *"dev"* ]]; then
       echo "setting DEV environment variables..."
 
       bucket=function-data
@@ -44,7 +45,7 @@ steps:
     fi
 
     # === SET PROD ENV VARS ====================================================
-    if [[ "${tag}" == *"prod"* ]]; then
+    if [[ "${strarr[1]}" == *"prod"* ]]; then
       echo "setting PROD environment variables..."
 
       bucket=core-350507-function-data
@@ -60,16 +61,16 @@ steps:
 
     # === COPY ASSETS FROM BUCKET ==============================================
     echo "copying assets..."
-    mkdir -p /workspace/${fx_name}/tmp/assets
-    gsutil -m cp -r gs://${bucket}/assets/documents/** /workspace/${fx_name}/tmp/assets
-    cp /workspace/.gcloudignore /workspace/${fx_name}/.gcloudignore 
+    mkdir -p /workspace/${strarr[0]}/tmp/assets
+    gsutil -m cp -r gs://${bucket}/assets/documents/** /workspace/${strarr[0]}/tmp/assets
+    cp /workspace/.gcloudignore /workspace/${strarr[0]}/.gcloudignore 
 
     # === DEPLOY ===============================================================
     echo "deploying function..."
-    gcloud functions deploy ${fx_name} \
+    gcloud functions deploy ${strarr[0]} \
       --project=${project} \
       --region=${region} \
-      --source=/workspace/${fx_name} \
+      --source=/workspace/${strarr[0]} \
       --entry-point=${fx_entrypoint} \
       --trigger-http \
       --allow-unauthenticated \
@@ -85,7 +86,7 @@ steps:
     # === APPLY TAG VERSION LABEL ==============================================
     if [[ "${env}" == "dev" ]]; then
       echo "DEV run services update..."
-      gcloud run services update ${fx_name} --update-labels tagversion=${tag_version}
+      gcloud run services update ${strarr[0]} --update-labels tagversion=${tag_version}
     fi
 - name: gcr.io/cloud-builders/gcloud:latest
   entrypoint: "ls"
