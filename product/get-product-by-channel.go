@@ -266,22 +266,19 @@ func overrideProductInfo(product *models.Product, networkNode *models.NetworkNod
 		return
 	}
 
-	if networkNode.HasAccessToProduct(product.Name, warrant) {
-		for _, nodeProduct := range networkNode.Products {
-			if nodeProduct.Name == product.Name && len(nodeProduct.Steps) > 0 {
-				log.Printf("[GetLatestActiveProduct] overriding steps for product %s", product.Name)
-				product.Steps = nodeProduct.Steps
-			}
-		}
+	var flow = channel
 
+	if networkNode.HasAccessToProduct(product.Name, warrant) {
 		if warrant != nil {
 			paymentProviders := make([]models.PaymentProvider, 0)
-			warrantProduct := warrant.GetProduct(product.Name)
-			if warrantProduct != nil {
+			if warrantProduct := warrant.GetProduct(product.Name); warrantProduct != nil {
 				for _, paymentProvider := range product.PaymentProviders {
 					if lib.SliceContains(paymentProvider.Flows, warrantProduct.Flow) {
 						paymentProviders = append(paymentProviders, paymentProvider)
 					}
+				}
+				if warrantProduct.ConsultancyConfig != nil {
+					product.ConsultancyConfig = warrantProduct.ConsultancyConfig
 				}
 			}
 
@@ -290,11 +287,22 @@ func overrideProductInfo(product *models.Product, networkNode *models.NetworkNod
 			product.PaymentProviders = paymentProviders
 		}
 
-		if networkNode.Type == models.PartnershipNetworkNodeType {
-			product.Steps = filterProductStepsByFlow(product.Steps, channel)
-		} else {
-			product.Steps = filterProductStepsByFlow(product.Steps, warrant.GetFlowName(product.Name))
+		for _, nodeProduct := range networkNode.Products {
+			if nodeProduct.Name != product.Name {
+				continue
+			}
+			if len(nodeProduct.Steps) > 0 {
+				product.Steps = nodeProduct.Steps
+			}
+			if nodeProduct.ConsultancyConfig != nil {
+				product.ConsultancyConfig = nodeProduct.ConsultancyConfig
+			}
 		}
+
+		if networkNode.Type != models.PartnershipNetworkNodeType {
+			flow = warrant.GetFlowName(product.Name)
+		}
+		product.Steps = filterProductStepsByFlow(product.Steps, flow)
 	}
 }
 
