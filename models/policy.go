@@ -14,12 +14,6 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-func UnmarshalPolicy(data []byte) (Policy, error) {
-	var r Policy
-	err := json.Unmarshal(data, &r)
-	return r, err
-}
-
 func (r *Policy) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
@@ -122,6 +116,8 @@ type Policy struct {
 	HasBond           bool                         `json:"hasBond,omitempty" firestore:"hasBond,omitempty" bigquery:"-"`
 	Bond              string                       `json:"bond,omitempty" firestore:"bond,omitempty" bigquery:"-"`
 	Clause            string                       `json:"clause,omitempty" firestore:"clause,omitempty" bigquery:"-"`
+	ConsultancyValue  ConsultancyValue             `json:"consultancyValue" firestore:"consultancyValue" bigquery:"-"`
+	PaymentComponents PaymentComponents            `json:"paymentComponents" firestore:"paymentComponents" bigquery:"-"`
 
 	// DEPRECATED FIELDS
 
@@ -207,11 +203,11 @@ type Price struct {
 func (p *Policy) Normalize() {
 	p.Contractor.Normalize()
 	if p.Contractors != nil {
-		for index, _ := range *p.Contractors {
+		for index := range *p.Contractors {
 			(*p.Contractors)[index].Normalize()
 		}
 	}
-	for index, _ := range p.Assets {
+	for index := range p.Assets {
 		p.Assets[index].Normalize()
 	}
 }
@@ -344,21 +340,6 @@ func PolicyToListData(query *firestore.DocumentIterator) []Policy {
 	return result
 }
 
-func GetChannel(policy *Policy) string {
-	var channel string
-
-	switch policy.ProducerType {
-	case AgentNetworkNodeType:
-		channel = AgentChannel
-	case AgencyNetworkNodeType:
-		channel = AgencyChannel
-	default:
-		channel = ECommerceChannel
-	}
-
-	return channel
-}
-
 func (policy *Policy) GetFlow(networkNode *NetworkNode, warrant *Warrant) (string, *NodeSetting) {
 	var (
 		channel  = policy.Channel
@@ -372,8 +353,8 @@ func (policy *Policy) GetFlow(networkNode *NetworkNode, warrant *Warrant) (strin
 
 	// Retrocompatibility with old emitted policies without channel when there was only e-commerce
 	if channel == "" {
-		channel = ECommerceChannel
 		policy.Channel = ECommerceChannel
+		channel = policy.Channel
 		log.Println("[Policy.GetFlow] overriding unset channel as e-commerce")
 	}
 
@@ -400,17 +381,6 @@ func (policy *Policy) GetFlow(networkNode *NetworkNode, warrant *Warrant) (strin
 	}
 
 	return flowName, &flowFile
-}
-
-func (policy *Policy) GetNumberOfRates() int {
-	switch policy.PaymentSplit {
-	case string(PaySplitYear), string(PaySplitYearly), string(PaySplitSingleInstallment):
-		return 1
-	case string(PaySplitMonthly):
-		return 12
-	default:
-		return 0
-	}
 }
 
 func (policy *Policy) GetDurationInYears() int {
@@ -462,4 +432,27 @@ func (policy *Policy) HasPrivacyConsens() bool {
 	}
 
 	return false
+}
+
+type ConsultancyValue struct {
+	Percentage float64 `json:"percentage" firestore:"percentage" bigquery:"-"`
+	Price      float64 `json:"price" firestore:"price" bigquery:"-"`
+}
+
+type PaymentComponents struct {
+	Split           PaySplit        `json:"split" firestore:"split" bigquery:"-"`
+	Rates           int             `json:"rates" firestore:"rates" bigquery:"-"`
+	Mode            string          `json:"mode" firestore:"mode" bigquery:"-"`
+	Provider        string          `json:"provider" firestore:"provider" bigquery:"-"`
+	PriceAnnuity    PriceComponents `json:"priceAnnuity" firestore:"priceAnnuity" bigquery:"-"`
+	PriceFirstSplit PriceComponents `json:"priceFirstSplit" firestore:"priceFirstSplit" bigquery:"-"`
+	PriceSplit      PriceComponents `json:"priceSplit" firestore:"priceSplit" bigquery:"-"`
+}
+
+type PriceComponents struct {
+	Gross       float64 `json:"gross" firestore:"gross" bigquery:"-"`
+	Nett        float64 `json:"nett" firestore:"nett" bigquery:"-"`
+	Tax         float64 `json:"tax" firestore:"tax" bigquery:"-"`
+	Consultancy float64 `json:"consultancy" firestore:"consultancy" bigquery:"-"`
+	Total       float64 `json:"total" firestore:"total" bigquery:"-"`
 }

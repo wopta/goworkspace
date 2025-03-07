@@ -57,14 +57,22 @@ type Transaction struct {
 	PayUrl             string                `json:"payUrl,omitempty" firestore:"payUrl,omitempty" bigquery:"payUrl"`
 	Annuity            int                   `json:"annuity" firestore:"annuity" bigquery:"annuity"`
 	Data               string                `json:"-" firestore:"-" bigquery:"data"`
+	Items              []Item                `json:"items" firestore:"items" bigquery:"-"`
+}
+
+type Item struct {
+	Type          string    `json:"type" firestore:"type" bigquery:"-"`
+	Uid           string    `json:"uid" firestore:"uid" bigquery:"-"`
+	EffectiveDate time.Time `json:"effectiveDate" firestore:"effectiveDate" bigquery:"-"`
+	AmountGross   float64   `json:"amountGross" firestore:"amountGross" bigquery:"-"`
+	AmountNett    float64   `json:"amountNett" firestore:"amountNett" bigquery:"-"`
+	AmountTax     float64   `json:"amountTax" firestore:"amountTax" bigquery:"-"`
 }
 
 func TransactionToListData(query *firestore.DocumentIterator) []Transaction {
 	result := make([]Transaction, 0)
 	for {
 		d, err := query.Next()
-		if err != nil {
-		}
 		if err != nil {
 			if err == iterator.Done {
 				break

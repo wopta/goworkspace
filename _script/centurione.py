@@ -99,11 +99,31 @@ updateable_modules = [
     RENEW,
     CALLBACK_OUT,
 ]
+# TODO: improve me
+updateable_functions = [
+    AUTH,
+    BROKER,
+    CALLBACK,
+    MAIL,
+    MGA,
+    NETWORK,
+    PARTNERSHIP,
+    PAYMENT,
+    POLICY,
+    QUESTION,
+    QUOTE,
+    RESERVED,
+    SELLABLE,
+    TRANSACTION,
+    USER,
+    RENEW,
+]
 
 increment_version_key = PATCH
 environment = DEV  # Replace with your desired environment
 dry_run = True
 google_repository = "google"
+gitlab_repository = "gitlab"
 github_repository = "origin"
 working_branch = "master"
 
@@ -123,10 +143,12 @@ print("""
 print("======== Initializing ========")
 print(f"Changed modules: {changed_modules}")
 print(f"Updateable modules: {updateable_modules}")
+print(f"Updateable functions: {updateable_functions}")
 print(f"Environment: {environment}")
 print(f"Dry run: {dry_run}")
 print(f"Google repository: {google_repository}")
 print(f"GitHub repository: {github_repository}")
+print(f"Gitlab repository: {gitlab_repository}")
 print()
 print()
 
@@ -311,7 +333,7 @@ def updateDependencies(dependency_map, updateable_modules, modules, updated_modu
         # TODO: update
         tag = f"{dependency_to_update.module}/v{incremented_version}"
         commands.append(Command(CommandType.TAG, dependency_to_update.module,
-                        f"git tag -a {tag} -m \"Updating {dependency_to_update.module}\" && git push {github_repository} {tag} && git push {google_repository} {tag}"))
+                        f"git tag -a {tag} -m \"Updating {dependency_to_update.module}\" && git push {github_repository} {tag} && git push {google_repository} {tag} && git push {gitlab_repository} {tag}"))
 
         # this should go at the end
         for dependant, dependencies in dependency_map.items():
@@ -324,7 +346,7 @@ def updateDependencies(dependency_map, updateable_modules, modules, updated_modu
                 else:
                     print("Dry run, not updating module")
                 commands.append(Command(CommandType.UPDATE_MODULE, dependant,
-                                f"git add {dependant}/go.mod && git commit -m \"Updating {dependency_to_update.module} in {dependant}\" && git push {github_repository} {working_branch} && git push {google_repository} {working_branch}"))
+                                f"git add {dependant}/go.mod && git commit -m \"Updating {dependency_to_update.module} in {dependant}\" && git push {github_repository} {working_branch} && git push {google_repository} {working_branch} && git push {gitlab_repository} {working_branch}"))
                 print()
 
             # clean module in other dependencies
@@ -355,7 +377,7 @@ def updateFunctions(modules, updateable_modules):
         # TODO: update
         tag = f"{dependency_to_update.module}/{incremented_version}.{environment}"
         commands.append(Command(CommandType.UPDATE_FUNCTION, dependency_to_update.module,
-                        f"git tag -a {tag} -m \"Updating {dependency_to_update.module}\" && git push {github_repository} {tag} && git push {google_repository} {tag}"))
+                        f"git tag -a {tag} -m \"Updating {dependency_to_update.module}\" && git push {github_repository} {tag} && git push {google_repository} {tag} && git push {gitlab_repository} {tag}"))
         print()
 
 
@@ -385,7 +407,7 @@ updateDependencies(deps, updateable_modules, dependencies_to_update)
 
 print()
 print("======== Creating update for functions ========")
-updateFunctions(dependencies_to_update, updateable_modules)
+updateFunctions(dependencies_to_update, updateable_functions)
 
 # sort the commands by command_type
 # the order should be TAG, UPDATE_MODULE, UPDATE_FUNCTION
