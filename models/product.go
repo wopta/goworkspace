@@ -39,6 +39,7 @@ type Product struct {
 	QuoteType          string            `json:"quoteType" firestore:"quoteType" bigquery:"-"`
 	EmitMaxElapsedDays uint              `json:"emitMaxElapsedDays" firestore:"-" bigquery:"-"`
 	Categories         []string          `json:"categories" firestore:"-" bigquery:"-"`
+	ConsultancyConfig  *ConsultancyConfig `json:"consultancyConfig" firestore:"consultancyConfig" bigquery:"-"`
 
 	// DEPRECATED FIELDS
 
@@ -144,6 +145,15 @@ type AnnulmentCode struct {
 	Code        string   `json:"code,omitempty" firestore:"code,omitempty" bigquery:"-"`
 	Description string   `json:"description,omitempty" firestore:"description,omitempty" bigquery:"-"`
 	RefundTypes []string `json:"refundTypes,omitempty" firestore:"refundTypes,omitempty" bigquery:"-"`
+}
+
+type ConsultancyConfig struct {
+	Min            float64 `json:"min" firestore:"min" bigquery:"-"`
+	Max            float64 `json:"max" firestore:"max" bigquery:"-"`
+	Step           float64 `json:"step" firestore:"step" bigquery:"-"`
+	DefaultValue   float64 `json:"defaultValue" firestore:"defaultValue" bigquery:"-"`
+	IsActive       bool    `json:"isActive" firestore:"isActive" bigquery:"-"`
+	IsConfigurable bool    `json:"isConfigurable" firestore:"isConfigurable" bigquery:"-"`
 }
 
 type ProductInfo struct {
