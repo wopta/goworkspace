@@ -15,7 +15,7 @@ steps:
     # Read TAG_NAME splitting by the IFS separator into the needed variables
     # ex.: broker/1.0.0.dev => [fx_name=broker, tag=1.0.0.dev]
     IFS='/'
-    echo $TAG_NAME | (read fx_name tag)
+    echo $TAG_NAME | read fx_name tag
     echo "fx_name: ${fx_name}"
     echo "tag: ${tag}"
 
