@@ -99,6 +99,25 @@ updateable_modules = [
     RENEW,
     CALLBACK_OUT,
 ]
+# TODO: improve me
+updateable_functions = [
+    AUTH,
+    BROKER,
+    CALLBACK,
+    MAIL,
+    MGA,
+    NETWORK,
+    PARTNERSHIP,
+    PAYMENT,
+    POLICY,
+    QUESTION,
+    QUOTE,
+    RESERVED,
+    SELLABLE,
+    TRANSACTION,
+    USER,
+    RENEW,
+]
 
 increment_version_key = PATCH
 environment = DEV  # Replace with your desired environment
@@ -124,6 +143,7 @@ print("""
 print("======== Initializing ========")
 print(f"Changed modules: {changed_modules}")
 print(f"Updateable modules: {updateable_modules}")
+print(f"Updateable functions: {updateable_functions}")
 print(f"Environment: {environment}")
 print(f"Dry run: {dry_run}")
 print(f"Google repository: {google_repository}")
@@ -387,7 +407,7 @@ updateDependencies(deps, updateable_modules, dependencies_to_update)
 
 print()
 print("======== Creating update for functions ========")
-updateFunctions(dependencies_to_update, updateable_modules)
+updateFunctions(dependencies_to_update, updateable_functions)
 
 # sort the commands by command_type
 # the order should be TAG, UPDATE_MODULE, UPDATE_FUNCTION
