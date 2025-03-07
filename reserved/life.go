@@ -6,7 +6,6 @@ import (
 	"log"
 	"strings"
 
-	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	prd "github.com/wopta/goworkspace/product"
@@ -177,25 +176,14 @@ func getReservedData(policy *models.Policy) []byte {
 	return ret
 }
 
-func setLifeReservedDocument(policy *models.Policy, product *models.Product) {
+func setLifeReservedDocument(policy *models.Policy) {
+	const rvmLinkFormat string = "gs://documents-public-dev/medical-report/%s/%s/rvm-life.pdf"
 	attachments := make([]models.Attachment, 0)
-
-	docInfo := document.Reserved(policy, product)
-
-	attachments = append(attachments, models.Attachment{
-		Name:        models.RvmInstructionsAttachmentName,
-		FileName:    strings.ReplaceAll(fmt.Sprintf(models.RvmInstructionsDocumentFormat, policy.ProposalNumber), " ", "_"),
-		Link:        docInfo.LinkGcs,
-		ContentType: "application/pdf",
-		Section:     models.DocumentSectionReserved,
-	})
-
-	rvmLink := "gs://documents-public-dev/medical-report/" + policy.Name + "/" + policy.ProductVersion + "/rvm-life.pdf"
 
 	attachments = append(attachments, models.Attachment{
 		Name:        models.RvmSurveyAttachmentName,
 		FileName:    strings.ReplaceAll(fmt.Sprintf(models.RvmSurveyDocumentFormat, policy.ProposalNumber), " ", "_"),
-		Link:        fmt.Sprintf("%s", rvmLink),
+		Link:        fmt.Sprintf(rvmLinkFormat, policy.Name, policy.ProductVersion),
 		ContentType: "application/pdf",
 		Section:     models.DocumentSectionReserved,
 	})
@@ -215,11 +203,11 @@ func setLifeContactsDetails(policy *models.Policy) {
 	}
 }
 
-func setLifeReservedInfo(policy *models.Policy, product *models.Product) {
+func setLifeReservedInfo(policy *models.Policy) {
 	switch policy.ProductVersion {
 	default:
 		// TODO: how to handle the contents dinamically?
 		setLifeContactsDetails(policy)
-		setLifeReservedDocument(policy, product)
+		setLifeReservedDocument(policy)
 	}
 }

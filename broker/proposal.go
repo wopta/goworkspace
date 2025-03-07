@@ -157,7 +157,7 @@ func setProposalData(policy *models.Policy) {
 		for _, reason := range policy.ReservedInfo.Reasons {
 			// TODO: add key/id for reasons so we do not have to cjeck string equallity
 			if !strings.HasPrefix(reason, "Cliente già assicurato") {
-				reserved.SetReservedInfo(policy, mgaProduct)
+				reserved.SetReservedInfo(policy)
 				break
 			}
 		}
