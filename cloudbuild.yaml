@@ -14,9 +14,10 @@ steps:
     # === EXTRACT FUNCTION NAME AND VERSION FROM TAG ===========================
     # Read the split words into an array based on comma delimiter
     # ex.: broker/1.0.0.dev => [broker, 1.0.0.dev]
+    read text
     IFS='/'
     read -a strarr <<< $TAG_NAME
-    fx_name = $strarr[0]
+    fx_name=$strarr[0]
     tag=$strarr[1]
     echo "fx_name : ${fx_name}"
     echo "tag : ${tag}"
@@ -25,7 +26,7 @@ steps:
     # Camel case function entrypoint. Ex.: broker -> Broker 
     fx_entrypoint=$(sed -r 's/(^|-)(\w)/\U\2/g' <<<"${fx_name}")
     # Replace '.' with '_' for tag version. Ex.: 1.2.3.dev -> 1_2_3_dev 
-    tag_version=$(echo "${tag]}" | sed -r 's/\./_/g')
+    tag_version=$(echo "${tag}" | sed -r 's/\./_/g')
     echo "fx_entrypoint: ${fx_entrypoint}"
     echo "tag_version: ${tag_version}"
 
