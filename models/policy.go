@@ -116,6 +116,8 @@ type Policy struct {
 	HasBond           bool                         `json:"hasBond,omitempty" firestore:"hasBond,omitempty" bigquery:"-"`
 	Bond              string                       `json:"bond,omitempty" firestore:"bond,omitempty" bigquery:"-"`
 	Clause            string                       `json:"clause,omitempty" firestore:"clause,omitempty" bigquery:"-"`
+	ConsultancyValue  ConsultancyValue             `json:"consultancyValue" firestore:"consultancyValue" bigquery:"-"`
+	PaymentComponents PaymentComponents            `json:"paymentComponents" firestore:"paymentComponents" bigquery:"-"`
 
 	// DEPRECATED FIELDS
 
@@ -430,4 +432,27 @@ func (policy *Policy) HasPrivacyConsens() bool {
 	}
 
 	return false
+}
+
+type ConsultancyValue struct {
+	Percentage float64 `json:"percentage" firestore:"percentage" bigquery:"-"`
+	Price      float64 `json:"price" firestore:"price" bigquery:"-"`
+}
+
+type PaymentComponents struct {
+	Split           PaySplit        `json:"split" firestore:"split" bigquery:"-"`
+	Rates           int             `json:"rates" firestore:"rates" bigquery:"-"`
+	Mode            string          `json:"mode" firestore:"mode" bigquery:"-"`
+	Provider        string          `json:"provider" firestore:"provider" bigquery:"-"`
+	PriceAnnuity    PriceComponents `json:"priceAnnuity" firestore:"priceAnnuity" bigquery:"-"`
+	PriceFirstSplit PriceComponents `json:"priceFirstSplit" firestore:"priceFirstSplit" bigquery:"-"`
+	PriceSplit      PriceComponents `json:"priceSplit" firestore:"priceSplit" bigquery:"-"`
+}
+
+type PriceComponents struct {
+	Gross       float64 `json:"gross" firestore:"gross" bigquery:"-"`
+	Nett        float64 `json:"nett" firestore:"nett" bigquery:"-"`
+	Tax         float64 `json:"tax" firestore:"tax" bigquery:"-"`
+	Consultancy float64 `json:"consultancy" firestore:"consultancy" bigquery:"-"`
+	Total       float64 `json:"total" firestore:"total" bigquery:"-"`
 }
