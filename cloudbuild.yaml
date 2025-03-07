@@ -17,20 +17,20 @@ steps:
     IFS='/'
     read -a strarr <<< $TAG_NAME
     fx_name=$(echo ${strarr[0]})
+    tag=$(echo ${strarr[1]})
     echo "fx_name: ${fx_name}"
-    echo "fx_name: ${strarr[0]}"
-    echo "tag: ${strarr[1]}"
+    echo "tag: ${tag}"
 
     # === FX ENTRYPOINT AND TAG VERSION ========================================
     # Camel case function entrypoint. Ex.: broker -> Broker 
-    fx_entrypoint=$(sed -r 's/(^|-)(\w)/\U\2/g' <<<"${strarr[0]}")
+    fx_entrypoint=$(sed -r 's/(^|-)(\w)/\U\2/g' <<<"${fx_name}")
     # Replace '.' with '_' for tag version. Ex.: 1.2.3.dev -> 1_2_3_dev 
-    tag_version=$(echo "${strarr[1]}" | sed -r 's/\./_/g')
+    tag_version=$(echo "${tag}" | sed -r 's/\./_/g')
     echo "fx_entrypoint: ${fx_entrypoint}"
     echo "tag_version: ${tag_version}"
 
     # === SET DEV ENV VARS =====================================================
-    if [[ "${strarr[1]}" == *"dev"* ]]; then
+    if [[ "${tag}" == *"dev"* ]]; then
       echo "setting DEV environment variables..."
 
       bucket=function-data
@@ -39,13 +39,14 @@ steps:
       project=positive-apex-350507
       env=dev
       genFx=--gen2
+      clearVpc=--clear-vpc-connector
       sa=wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com
       timeout=60
       vpc=wopta-dev-custom-vpc
     fi
 
     # === SET PROD ENV VARS ====================================================
-    if [[ "${strarr[1]}" == *"prod"* ]]; then
+    if [[ "${tag}" == *"prod"* ]]; then
       echo "setting PROD environment variables..."
 
       bucket=core-350507-function-data
@@ -54,6 +55,7 @@ steps:
       project=core-350507
       env=prod
       genFx=""
+      clearVpc=""
       sa=wopta-prod-cloud-function@core-350507.iam.gserviceaccount.com
       timeout=520
       vpc=prod-custom-vpc
@@ -61,16 +63,16 @@ steps:
 
     # === COPY ASSETS FROM BUCKET ==============================================
     echo "copying assets..."
-    mkdir -p /workspace/${strarr[0]}/tmp/assets
-    gsutil -m cp -r gs://${bucket}/assets/documents/** /workspace/${strarr[0]}/tmp/assets
-    cp /workspace/.gcloudignore /workspace/${strarr[0]}/.gcloudignore 
+    mkdir -p /workspace/${fx_name}/tmp/assets
+    gsutil -m cp -r gs://${bucket}/assets/documents/** /workspace/${fx_name}/tmp/assets
+    cp /workspace/.gcloudignore /workspace/${fx_name}/.gcloudignore 
 
     # === DEPLOY ===============================================================
     echo "deploying function..."
-    gcloud functions deploy ${strarr[0]} \
+    gcloud functions deploy ${fx_name} \
       --project=${project} \
       --region=${region} \
-      --source=/workspace/${strarr[0]} \
+      --source=/workspace/${fx_name} \
       --entry-point=${fx_entrypoint} \
       --trigger-http \
       --allow-unauthenticated \
@@ -78,15 +80,15 @@ steps:
       --runtime=go121 \
       --env-vars-file ${env}.yaml \
       --timeout=${timeout} \
-      --vpc-connector=${vpc} \
       --egress-settings=all \
-      --memory=256Mb \
+      --memory=${mem} \
+      ${clearVpc} \
       ${genFx} 
    
     # === APPLY TAG VERSION LABEL ==============================================
     if [[ "${env}" == "dev" ]]; then
       echo "DEV run services update..."
-      gcloud run services update ${strarr[0]} --update-labels tagversion=${tag_version}
+      gcloud run services update ${fx_name} --update-labels tagversion=${tag_version} --vpc-connector=${vpc}
     fi
 - name: gcr.io/cloud-builders/gcloud:latest
   entrypoint: "ls"
