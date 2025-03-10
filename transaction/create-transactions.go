@@ -73,6 +73,11 @@ func setDateInfo(index int, transaction models.Transaction, policy models.Policy
 	return transaction
 }
 
+const (
+	ItemRate = "rate"
+	ItemConsultancy = "consultancy"
+)
+
 func setPriceInfo(index int, transaction models.Transaction, policy models.Policy) models.Transaction {
 	priceComponent := policy.PaymentComponents.PriceSplit
 	if index == 0 {
@@ -85,7 +90,7 @@ func setPriceInfo(index int, transaction models.Transaction, policy models.Polic
 	if priceComponent.Consultancy > 0 {
 		transaction.Items = make([]models.Item, 0, 2)
 		transaction.Items = append(transaction.Items, models.Item{
-			Type:          "rate",
+			Type:          fmt.Sprintf("%s-%s", ItemRate, policy.Name),
 			Uid:           uuid.NewString(),
 			EffectiveDate: transaction.EffectiveDate,
 			AmountGross:   priceComponent.Gross,
@@ -93,7 +98,7 @@ func setPriceInfo(index int, transaction models.Transaction, policy models.Polic
 			AmountTax:     priceComponent.Tax,
 		})
 		transaction.Items = append(transaction.Items, models.Item{
-			Type:          "consultancy",
+			Type:          ItemConsultancy,
 			Uid:           uuid.NewString(),
 			EffectiveDate: transaction.EffectiveDate,
 			AmountGross:   priceComponent.Consultancy,
