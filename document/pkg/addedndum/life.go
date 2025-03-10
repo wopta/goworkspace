@@ -122,9 +122,9 @@ func (lag *LifeAddendumGenerator) mainHeader() {
 	table := parser(rows)
 
 	lag.engine.SetHeader(func() {
-		lag.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_vita.png", 20, 6.5, 12, 12)
+		lag.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_vita.png", 12, 6.5, 12, 12)
 		//lag.engine.DrawLine(102, 6.25, 102, 15, 0.25, constants.BlackColor)
-		lag.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_wopta.png", 150, 6.5, 35, 10)
+		lag.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_wopta.png", 160, 6.5, 35, 10)
 		lag.engine.NewLine(7)
 		lag.engine.DrawTable(table)
 
@@ -461,6 +461,9 @@ func (lag *LifeAddendumGenerator) beneficiaries() {
 		}
 		lag.engine.WriteText(cons)
 		lag.engine.DrawLine(10, lag.engine.GetY(), 200, lag.engine.GetY(), 0.25, constants.BlackColor)
+		if i == 0 {
+			lag.engine.NewLine(4)
+		}
 	}
 }
 

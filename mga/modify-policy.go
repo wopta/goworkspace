@@ -88,7 +88,10 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	//		return models.Policy{}, err
 	//	}
 	// here
-	diffPolicy := inputPolicy
+	diffPolicy, err := generateDiffPolicy(originalPolicy, inputPolicy)
+	if err != nil {
+		return "", models.Policy{}, err
+	}
 	p := <-document.AddendumObj("", diffPolicy, nil, nil)
 	log.Println(p.LinkGcs)
 
@@ -97,6 +100,28 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	log.Println("Handler end -------------------------------------------------")
 
 	return string(rawPolicy), modifiedPolicy, err
+}
+
+func generateDiffPolicy(originalPolicy, inputPolicy models.Policy) (models.Policy, error) {
+	var diff models.Policy
+	diff.Uid = inputPolicy.Uid
+	diff.Name = inputPolicy.Name
+	diff.NameDesc = inputPolicy.NameDesc
+	diff.ProposalNumber = originalPolicy.ProposalNumber
+	diff.StartDate = originalPolicy.StartDate
+	diff.EndDate = originalPolicy.EndDate
+	diff.Company = originalPolicy.Company
+
+	diff.Contractor = originalPolicy.Contractor
+	assets := make([]models.Asset, 0)
+	ass := models.Asset{}
+	gar := make([]models.Guarante, 0)
+	ass.Person = originalPolicy.Assets[0].Person
+	gar = inputPolicy.Assets[0].Guarantees
+	ass.Guarantees = gar
+	assets = append(assets, ass)
+	diff.Assets = assets
+	return diff, nil
 }
 
 func modifyController(originalPolicy, inputPolicy models.Policy) (models.Policy, error) {

@@ -160,12 +160,13 @@ func newBeneficiaryReferenceDTO() *BeneficiaryReferenceDTO {
 		City:         constants.EmptyField,
 		Mail:         constants.EmptyField,
 		Phone:        constants.EmptyField,
+		BirthDate:    constants.EmptyField,
 	}
 }
 
 func (l *lifeContractDTO) fromPolicy(policy models.Policy) {
 	l.CodeHeading = "Variazione dati Anagrafici soggetti Polizza:"
-	l.Code = strconv.Itoa(policy.ProposalNumber)
+	l.Code = strconv.Itoa(policy.Number)
 
 	if !policy.StartDate.IsZero() {
 		l.StartDate = policy.StartDate.Format(constants.DayMonthYearFormat)
@@ -203,43 +204,26 @@ func (li *lifeInsuredDTO) fromPolicy(ins *models.User) {
 	li.BirthDate = ins.BirthDate
 }
 
-//func (b *Beneficiaries) fromPolicy(gar []models.Guarante) {
-//	for _, v := range gar {
-//		bens := *v.Beneficiaries
-//		for _, ben := range bens {
-//			ben := lifeBeneficiaryDTO{
-//				Name:         ben.Name,
-//				Surname:      ben.Surname,
-//				FiscalCode:   ben.FiscalCode,
-//				StreetName:   ben.Residence.StreetName,
-//				StreetNumber: ben.Residence.StreetNumber,
-//				City:         ben.Residence.City,
-//				Contactable:  ben.IsContactable,
-//			}
-//			*b = append(*b, ben)
-//		}
-//	}
-//}
+func (b *Beneficiaries) fromPolicy(bens *[]models.Beneficiary) {
 
-func (b *Beneficiaries) fromPolicy(bens []models.Beneficiary) {
-	for _, v := range bens {
-		
+	for i, v := range *bens {
+		if i > 1 {
+			break
+		}
+		ben := lifeBeneficiaryDTO{
+			Name:         v.Name,
+			Surname:      v.Surname,
+			FiscalCode:   v.FiscalCode,
+			StreetName:   v.Residence.StreetName,
+			StreetNumber: v.Residence.StreetNumber,
+			City:         v.Residence.City,
+			Phone:        v.Phone,
+			Mail:         v.Mail,
+			BirthDate:    (*b)[i].BirthDate,
+			Contactable:  v.IsContactable,
+		}
+		(*b)[i] = ben
 	}
-	//for _, v := range gar {
-	//	bens := *v.Beneficiaries
-	//	for _, ben := range bens {
-	//		ben := lifeBeneficiaryDTO{
-	//			Name:         ben.Name,
-	//			Surname:      ben.Surname,
-	//			FiscalCode:   ben.FiscalCode,
-	//			StreetName:   ben.Residence.StreetName,
-	//			StreetNumber: ben.Residence.StreetNumber,
-	//			City:         ben.Residence.City,
-	//			Contactable:  ben.IsContactable,
-	//		}
-	//		*b = append(*b, ben)
-	//	}
-	//}
 }
 
 func (br *BeneficiaryReferenceDTO) fromPolicy(benRef *models.User) {
@@ -251,5 +235,4 @@ func (br *BeneficiaryReferenceDTO) fromPolicy(benRef *models.User) {
 	br.City = benRef.Residence.City
 	br.Mail = benRef.Mail
 	br.Phone = benRef.Phone
-	br.BirthDate = benRef.BirthDate
 }
