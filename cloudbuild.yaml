@@ -59,6 +59,12 @@ steps:
       vpc=functions-connector
     fi
 
+    # === SET INGRESS SETTINGS BY FUNCTION =====================================
+    ingress=internal-and-gclb
+    if [[ "${fx_name}" == "callback" ]]; then
+      ingress=all
+    fi
+
     # === COPY ASSETS FROM BUCKET ==============================================
     echo "copying assets..."
     mkdir -p /workspace/${fx_name}/tmp/assets
@@ -78,6 +84,7 @@ steps:
       --runtime=go121 \
       --env-vars-file ${env}.yaml \
       --timeout=${timeout} \
+      --ingress-settings=${ingress} \
       --egress-settings=all \
       --memory=${mem} \
       --vpc-connector=${vpc} \
