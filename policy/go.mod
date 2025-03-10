@@ -8,10 +8,10 @@ require (
 	cloud.google.com/go v0.113.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
-	github.com/wopta/goworkspace/document v1.1.124
+	github.com/wopta/goworkspace/document v1.1.125
 	github.com/wopta/goworkspace/lib v1.0.139
 	github.com/wopta/goworkspace/models v1.2.32
-	github.com/wopta/goworkspace/network v1.0.97
+	github.com/wopta/goworkspace/network v1.0.98
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
 )
 
