@@ -2,11 +2,11 @@ package common
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
+	tr "github.com/wopta/goworkspace/transaction"
 )
 
 func CheckPaymentModes(policy models.Policy) error {
@@ -29,25 +29,7 @@ func CheckPaymentModes(policy models.Policy) error {
 }
 
 func SaveTransactionsToDB(transactions []models.Transaction, collection string) error {
-	batch := make(map[string]map[string]models.Transaction)
-	batch[collection] = make(map[string]models.Transaction)
-
-	for idx := range transactions {
-		transactions[idx].BigQueryParse()
-		batch[collection][transactions[idx].Uid] = transactions[idx]
-	}
-
-	if err := lib.SetBatchFirestoreErr(batch); err != nil {
-		log.Printf("error saving transactions to firestore: %s", err.Error())
-		return err
-	}
-
-	if err := lib.InsertRowsBigQuery(lib.WoptaDataset, collection, transactions); err != nil {
-		log.Printf("error saving transactions to bigquery: %s", err.Error())
-		return err
-	}
-
-	return nil
+	return tr.SaveTransactionsToDB(transactions, collection)
 }
 
 func checkProviderCompatibility(provider, flow string) error {

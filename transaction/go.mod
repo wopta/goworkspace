@@ -13,6 +13,7 @@ require (
 	github.com/wopta/goworkspace/network v1.0.98
 	github.com/wopta/goworkspace/policy v1.0.169
 	github.com/wopta/goworkspace/product v1.1.30
+	google.golang.org/api v0.181.0
 )
 
 require (
@@ -102,7 +103,6 @@ require (
 	golang.org/x/tools v0.20.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	gonum.org/v1/gonum v0.12.0 // indirect
-	google.golang.org/api v0.181.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/appengine/v2 v2.0.2 // indirect
 	google.golang.org/genproto v0.0.0-20240515191416-fc5f0ca64291 // indirect

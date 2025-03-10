@@ -17,7 +17,7 @@ type dateInfo struct {
 }
 
 func getPolicy(paymentSplit string, startDate, endDate time.Time) models.Policy {
-	return models.Policy{
+	plc := models.Policy{
 		Uid:  "uuid",
 		Name: "productName",
 		Contractor: models.Contractor{
@@ -30,11 +30,50 @@ func getPolicy(paymentSplit string, startDate, endDate time.Time) models.Policy 
 		PaymentSplit:      paymentSplit,
 		PriceGross:        100,
 		PriceNett:         89.2,
+		TaxAmount:         lib.RoundFloat(100-89.2, 2),
 		PriceGrossMonthly: 8.33,
 		PriceNettMonthly:  7.43,
+		TaxAmountMonthly:  lib.RoundFloat(8.33-7.43, 2),
 		StartDate:         startDate,
 		EndDate:           endDate,
+		PaymentComponents: models.PaymentComponents{
+			Split:    models.PaySplit(paymentSplit),
+			Provider: "paymentProvider",
+		},
 	}
+
+	switch plc.PaymentComponents.Split {
+	case models.PaySplitSingleInstallment, models.PaySplitYear, models.PaySplitYearly:
+		pc := models.PriceComponents{
+			Gross:       plc.PriceGross,
+			Nett:        plc.PriceNett,
+			Tax:         plc.TaxAmount,
+			Consultancy: 0,
+			Total:       plc.PriceGross,
+		}
+		plc.PaymentComponents.PriceAnnuity = pc
+		plc.PaymentComponents.PriceFirstSplit = pc
+		plc.PaymentComponents.PriceSplit = pc
+	case models.PaySplitMonthly:
+		plc.PaymentComponents.PriceAnnuity = models.PriceComponents{
+			Gross:       plc.PriceGross,
+			Nett:        plc.PriceNett,
+			Tax:         plc.TaxAmount,
+			Consultancy: 0,
+			Total:       plc.PriceGross,
+		}
+		pc := models.PriceComponents{
+			Gross:       plc.PriceGrossMonthly,
+			Nett:        plc.PriceNettMonthly,
+			Tax:         plc.TaxAmountMonthly,
+			Consultancy: 0,
+			Total:       plc.PriceGrossMonthly,
+		}
+		plc.PaymentComponents.PriceFirstSplit = pc
+		plc.PaymentComponents.PriceSplit = pc
+	}
+
+	return plc
 }
 
 func outputGenerator(numOutput int, startDate time.Time) []dateInfo {
@@ -110,7 +149,7 @@ func TestCreateTransactionsMonthly(t *testing.T) {
 		}
 
 		if tr.AmountNet != policy.PriceNettMonthly {
-			t.Fatalf("expected: %.2f price net got: %.2f", policy.PriceGrossMonthly, tr.AmountNet)
+			t.Fatalf("expected: %.2f price net got: %.2f", policy.PriceNettMonthly, tr.AmountNet)
 		}
 
 		if tr.Annuity != policy.Annuity {
