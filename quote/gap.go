@@ -70,6 +70,10 @@ func Gap(policy *models.Policy, channel string, networkNode *models.NetworkNode,
 
 	calculateGapOfferPrices(policy, *product)
 
+	log.Println("[Gap] apply consultacy price")
+	
+	addConsultacyPrice(policy, product)
+
 	removeOfferRate(policy, availableRates)
 }
 

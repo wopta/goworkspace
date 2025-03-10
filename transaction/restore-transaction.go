@@ -11,7 +11,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/payment/common"
 	plc "github.com/wopta/goworkspace/policy"
 	plcRenew "github.com/wopta/goworkspace/policy/renew"
 	trxRenew "github.com/wopta/goworkspace/transaction/renew"
@@ -90,7 +89,7 @@ func RestoreTransactionFx(w http.ResponseWriter, r *http.Request) (string, inter
 		}
 	}
 
-	err = common.SaveTransactionsToDB([]models.Transaction{*transaction}, transactionCollection)
+	err = SaveTransactionsToDB([]models.Transaction{*transaction}, transactionCollection)
 	if err != nil {
 		log.Printf("error saving transaction: %s", err)
 		return "", nil, err

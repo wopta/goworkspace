@@ -3,6 +3,7 @@ package transaction
 import (
 	"encoding/json"
 	"log"
+	"slices"
 	"strings"
 	"time"
 
@@ -98,7 +99,13 @@ func createCompanyNetworkTransaction(
 	}
 
 	commissionMga := product.GetCommissionByProduct(policy, mgaProduct, false)
-	commissionCompany := lib.RoundFloat(transaction.Amount-commissionMga, 2)
+
+	// commissionCompany
+	trAmount := transaction.Amount
+	if idx := getRateItemIndex(transaction.Items); idx != -1 {
+		trAmount = transaction.Items[idx].AmountGross
+	}
+	commissionCompany := lib.RoundFloat(trAmount-commissionMga, 2)
 
 	if producerNode != nil {
 		code = producerNode.Code
@@ -200,4 +207,10 @@ func isGapCamper(policy *models.Policy) bool {
 		len(policy.Assets) > 0 &&
 		policy.Assets[0].Vehicle != nil &&
 		policy.Assets[0].Vehicle.VehicleType == "camper"
+}
+
+func getRateItemIndex(items []models.Item) int {
+	return slices.IndexFunc(items, func(i models.Item) bool {
+		return strings.HasPrefix(i.Type, ItemRate)
+	})
 }

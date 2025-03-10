@@ -11,7 +11,9 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
+	"github.com/wopta/goworkspace/product"
 	"github.com/wopta/goworkspace/sellable"
 )
 
@@ -20,6 +22,7 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		err        error
 		reqPolicy  *models.Policy
 		dbPolicy   models.Policy
+		warrant    *models.Warrant
 		inputCells []Cell
 	)
 
@@ -33,6 +36,19 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		log.SetPrefix("")
 	}()
 	log.Println("Handler start -----------------------------------------------")
+
+	authToken, err := lib.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
+	if err != nil {
+		log.Printf("error getting authToken")
+		return "", nil, err
+	}
+	log.Printf(
+		"authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
+		authToken.Type,
+		authToken.Role,
+		authToken.UserID,
+		authToken.Email,
+	)
 
 	if err = json.NewDecoder(r.Body).Decode(&reqPolicy); err != nil {
 		log.Println("error decoding request body")
@@ -52,6 +68,12 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		return "", nil, err
 	}
 
+	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+	}
+	baseProduct := product.GetProductV2(dbPolicy.Name, dbPolicy.ProductVersion, dbPolicy.Channel, networkNode, warrant)
+
 	inputCells = append(inputCells, setInputCell(&dbPolicy)...)
 	qs := QuoteSpreadsheet{
 		Id:                 "1tn0Jqce-r_JKdecExFOFVEJdGUaPYdGo31A9FOgvt-Y",
@@ -64,7 +86,7 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		ExportFilePrefix:   fmt.Sprintf("quote_%s_%s", dbPolicy.Name, dbPolicy.Uid),
 	}
 	outCells, gsLink := qs.Spreadsheets()
-	mapCellPolicy(&dbPolicy, outCells, gsLink)
+	mapCellPolicy(&dbPolicy, baseProduct, outCells, gsLink)
 
 	if err = lib.SetFirestoreErr(lib.PolicyCollection, dbPolicy.Uid, dbPolicy); err != nil {
 		log.Println("error saving quote in policy")
@@ -212,7 +234,7 @@ func mapCellsToPriceGroup(cells []Cell) []models.Price {
 	return priceGroup
 }
 
-func mapCellPolicy(policy *models.Policy, cells []Cell, gsLink string) {
+func mapCellPolicy(policy *models.Policy, baseProduct *models.Product, cells []Cell, gsLink string) {
 	var (
 		hasQuoteError bool
 		quoteAtt      = models.Attachment{
@@ -259,6 +281,10 @@ func mapCellPolicy(policy *models.Policy, cells []Cell, gsLink string) {
 			policy.PriceGross = parsedValue
 		}
 	}
+
+	log.Println("[Commercial Combined] apply consultacy price")
+
+	addConsultacyPrice(policy, baseProduct)
 
 	if hasQuoteError {
 		reserved := models.ReservedData{
