@@ -41,6 +41,7 @@ steps:
       genFx=--gen2
       sa=wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com
       timeout=60
+      vpc=functions-connector
     fi
 
     # === SET PROD ENV VARS ====================================================
@@ -55,6 +56,7 @@ steps:
       genFx=""
       sa=wopta-prod-cloud-function@core-350507.iam.gserviceaccount.com
       timeout=520
+      vpc=functions-connector
     fi
 
     # === COPY ASSETS FROM BUCKET ==============================================
@@ -78,6 +80,7 @@ steps:
       --timeout=${timeout} \
       --egress-settings=all \
       --memory=${mem} \
+      --vpc-connector=${vpc} \
       ${genFx} 
    
     # === APPLY TAG VERSION LABEL ==============================================
