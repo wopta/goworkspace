@@ -222,6 +222,16 @@ func brokerUpdatePolicy(policy *models.Policy, request BrokerBaseRequest) {
 		policy.PaymentMode = request.PaymentMode
 	}
 
+	if policy.TaxAmount == 0 {
+		log.Println("[brokerUpdatePolicy] calculate tax amount")
+		policy.TaxAmount = lib.RoundFloat(policy.PriceGross - policy.PriceNett, 2)
+	}
+
+	if policy.TaxAmountMonthly == 0 {
+		log.Println("[brokerUpdatePolicy] calculate tax amount monthly")
+		policy.TaxAmountMonthly = lib.RoundFloat(policy.PriceGrossMonthly - policy.PriceNettMonthly, 2)
+	}
+
 	calculatePaymentComponents(policy)
 
 	policy.SanitizePaymentData()
