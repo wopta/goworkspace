@@ -28,6 +28,10 @@ func UpdatePolicy(policy *models.Policy) (map[string]interface{}, error) {
 	if policy.OfferlName != "" {
 		input["offerName"] = policy.OfferlName
 	}
+	input["consultancyValue"] = map[string]any{
+		"percentage": policy.ConsultancyValue.Percentage,
+		"price":      lib.RoundFloat(policy.PriceGross*policy.ConsultancyValue.Percentage, 2),
+	}
 
 	switch policy.Name {
 	case models.PersonaProduct:
