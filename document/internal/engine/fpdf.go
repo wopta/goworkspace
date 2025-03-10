@@ -270,7 +270,6 @@ func (f *Fpdf) Save(rawDoc []byte, filename string) (string, error) {
 	}
 	defer file.Close()
 	_, err = file.Write(rawDoc)
-	//dir, _ := os.Getwd()
 	return filename, err
 	//gsLink := lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, rawDoc)
 	//return gsLink, nil

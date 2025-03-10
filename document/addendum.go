@@ -28,7 +28,8 @@ func AddendumObj(origin string, data models.Policy, networkNode *models.NetworkN
 		case models.PmiProduct:
 
 		case models.LifeProduct:
-			generator := addedndum.NewLifeAddendumGenerator(engine.NewFpdf(), &data, networkNode, *product)
+			prod := models.Product{}
+			generator := addedndum.NewLifeAddendumGenerator(engine.NewFpdf(), &data, networkNode, prod)
 			out, err = generator.Contract()
 			if err != nil {
 				log.Printf("error generating addendum: %v", err)
@@ -59,3 +60,33 @@ func AddendumObj(origin string, data models.Policy, networkNode *models.NetworkN
 
 	return r
 }
+
+/*func GetGenerator(origin string, data models.Policy, networkNode *models.NetworkNode, product *models.Product) {
+	log.Println("[GetGenerator] function start -------------------------------")
+
+	rawPolicy, _ := data.Marshal()
+	log.Printf("[GetGenerator] policy: %s", string(rawPolicy))
+
+	switch data.Name {
+	case models.PmiProduct:
+
+	case models.LifeProduct:
+		generator := addedndum.NewLifeAddendumGenerator(engine.NewFpdf(), &data, networkNode, *product)
+		out, err := generator.Contract()
+		if err != nil {
+			log.Printf("error generating addendum: %v", err)
+			return
+		}
+		filename, err := generator.Save(out)
+		if err != nil {
+			log.Printf("error saving addendum: %v", err)
+			return
+		}
+	case models.PersonaProduct:
+
+	case models.GapProduct:
+
+	case models.CommercialCombinedProduct:
+
+	}
+}*/
