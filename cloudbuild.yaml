@@ -39,10 +39,8 @@ steps:
       project=positive-apex-350507
       env=dev
       genFx=--gen2
-      clearVpc=--clear-vpc-connector
       sa=wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com
       timeout=60
-      vpc=wopta-dev-custom-vpc
     fi
 
     # === SET PROD ENV VARS ====================================================
@@ -55,10 +53,8 @@ steps:
       project=core-350507
       env=prod
       genFx=""
-      clearVpc=""
       sa=wopta-prod-cloud-function@core-350507.iam.gserviceaccount.com
       timeout=520
-      vpc=prod-custom-vpc
     fi
 
     # === COPY ASSETS FROM BUCKET ==============================================
@@ -68,7 +64,7 @@ steps:
     cp /workspace/.gcloudignore /workspace/${fx_name}/.gcloudignore 
 
     # === DEPLOY ===============================================================
-    echo "deploying function..."
+    echo "deploying function ${fx_name}..."
     gcloud functions deploy ${fx_name} \
       --project=${project} \
       --region=${region} \
@@ -82,13 +78,12 @@ steps:
       --timeout=${timeout} \
       --egress-settings=all \
       --memory=${mem} \
-      ${clearVpc} \
       ${genFx} 
    
     # === APPLY TAG VERSION LABEL ==============================================
     if [[ "${env}" == "dev" ]]; then
       echo "DEV run services update..."
-      gcloud run services update ${fx_name} --update-labels tagversion=${tag_version} --vpc-connector=${vpc} --region=${region}
+      gcloud run services update ${fx_name} --update-labels tagversion=${tag_version} --service-account=${sa} --region=${region}
     fi
 - name: gcr.io/cloud-builders/gcloud:latest
   entrypoint: "ls"
