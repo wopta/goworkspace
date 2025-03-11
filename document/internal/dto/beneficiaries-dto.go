@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"strconv"
+	"strings"
 
 	"github.com/wopta/goworkspace/document/internal/constants"
 	"github.com/wopta/goworkspace/models"
@@ -21,6 +21,7 @@ type lifeContractorDTO struct {
 	StreetName   string
 	StreetNumber string
 	City         string
+	Province     string
 	Mail         string
 	Phone        string
 	BirthDate    string
@@ -33,6 +34,7 @@ type lifeInsuredDTO struct {
 	StreetName   string
 	StreetNumber string
 	City         string
+	Province     string
 	Mail         string
 	Phone        string
 	BirthDate    string
@@ -45,11 +47,24 @@ type lifeBeneficiaryDTO struct {
 	StreetName   string
 	StreetNumber string
 	City         string
+	Province     string
 	Mail         string
 	Relation     string
 	Contactable  bool
 	BirthDate    string
 	Phone        string
+}
+type BeneficiaryReferenceDTO struct {
+	Name         string
+	Surname      string
+	FiscalCode   string
+	StreetName   string
+	StreetNumber string
+	City         string
+	Province     string
+	Mail         string
+	Phone        string
+	BirthDate    string
 }
 
 type Beneficiaries []lifeBeneficiaryDTO
@@ -60,18 +75,6 @@ type BeneficiariesDTO struct {
 	Insured              *lifeInsuredDTO
 	Beneficiaries        *Beneficiaries
 	BeneficiaryReference *BeneficiaryReferenceDTO
-}
-
-type BeneficiaryReferenceDTO struct {
-	Name         string
-	Surname      string
-	FiscalCode   string
-	StreetName   string
-	StreetNumber string
-	City         string
-	Mail         string
-	Phone        string
-	BirthDate    string
 }
 
 func NewBeneficiariesDto() *BeneficiariesDTO {
@@ -112,6 +115,7 @@ func newLifeContractorDTO() *lifeContractorDTO {
 		StreetName:   constants.EmptyField,
 		StreetNumber: constants.EmptyField,
 		City:         constants.EmptyField,
+		Province:     constants.EmptyField,
 		Mail:         constants.EmptyField,
 		Phone:        constants.EmptyField,
 	}
@@ -125,6 +129,7 @@ func newLifeInsuredDTO() *lifeInsuredDTO {
 		StreetName:   constants.EmptyField,
 		StreetNumber: constants.EmptyField,
 		City:         constants.EmptyField,
+		Province:     constants.EmptyField,
 		Mail:         constants.EmptyField,
 		Phone:        constants.EmptyField,
 	}
@@ -139,6 +144,7 @@ func newLifeBeneficiariesDTO() *Beneficiaries {
 		StreetName:   constants.EmptyField,
 		StreetNumber: constants.EmptyField,
 		City:         constants.EmptyField,
+		Province:     constants.EmptyField,
 		Mail:         constants.EmptyField,
 		Relation:     constants.EmptyField,
 		BirthDate:    constants.EmptyField,
@@ -158,6 +164,7 @@ func newBeneficiaryReferenceDTO() *BeneficiaryReferenceDTO {
 		StreetName:   constants.EmptyField,
 		StreetNumber: constants.EmptyField,
 		City:         constants.EmptyField,
+		Province:     constants.EmptyField,
 		Mail:         constants.EmptyField,
 		Phone:        constants.EmptyField,
 		BirthDate:    constants.EmptyField,
@@ -166,7 +173,7 @@ func newBeneficiaryReferenceDTO() *BeneficiaryReferenceDTO {
 
 func (l *lifeContractDTO) fromPolicy(policy models.Policy) {
 	l.CodeHeading = "Variazione dati Anagrafici soggetti Polizza:"
-	l.Code = strconv.Itoa(policy.Number)
+	l.Code = policy.CodeCompany
 
 	if !policy.StartDate.IsZero() {
 		l.StartDate = policy.StartDate.Format(constants.DayMonthYearFormat)
@@ -180,6 +187,11 @@ func (l *lifeContractDTO) fromPolicy(policy models.Policy) {
 
 }
 
+func splitBirthDate(bd string) string {
+	part := strings.Split(bd, "T")
+	return part[0]
+}
+
 func (lc *lifeContractorDTO) fromPolicy(contr models.Contractor) {
 	lc.Name = contr.Name
 	lc.Surname = contr.Surname
@@ -187,9 +199,10 @@ func (lc *lifeContractorDTO) fromPolicy(contr models.Contractor) {
 	lc.StreetName = contr.Residence.StreetName
 	lc.StreetNumber = contr.Residence.StreetNumber
 	lc.City = contr.Residence.City
+	lc.Province = contr.Residence.CityCode
 	lc.Mail = contr.Mail
 	lc.Phone = contr.Phone
-	lc.BirthDate = contr.BirthDate
+	lc.BirthDate = splitBirthDate(contr.BirthDate)
 }
 
 func (li *lifeInsuredDTO) fromPolicy(ins *models.User) {
@@ -199,9 +212,10 @@ func (li *lifeInsuredDTO) fromPolicy(ins *models.User) {
 	li.StreetName = ins.Residence.StreetName
 	li.StreetNumber = ins.Residence.StreetNumber
 	li.City = ins.Residence.City
+	li.Province = ins.Residence.CityCode
 	li.Mail = ins.Mail
 	li.Phone = ins.Phone
-	li.BirthDate = ins.BirthDate
+	li.BirthDate = splitBirthDate(ins.BirthDate)
 }
 
 func (b *Beneficiaries) fromPolicy(bens *[]models.Beneficiary) {
@@ -217,6 +231,7 @@ func (b *Beneficiaries) fromPolicy(bens *[]models.Beneficiary) {
 			StreetName:   v.Residence.StreetName,
 			StreetNumber: v.Residence.StreetNumber,
 			City:         v.Residence.City,
+			Province:     v.Residence.CityCode,
 			Phone:        v.Phone,
 			Mail:         v.Mail,
 			BirthDate:    (*b)[i].BirthDate,
@@ -233,6 +248,7 @@ func (br *BeneficiaryReferenceDTO) fromPolicy(benRef *models.User) {
 	br.StreetName = benRef.Residence.StreetName
 	br.StreetNumber = benRef.Residence.StreetNumber
 	br.City = benRef.Residence.City
+	br.Province = benRef.Residence.CityCode
 	br.Mail = benRef.Mail
 	br.Phone = benRef.Phone
 }

@@ -37,6 +37,12 @@ func (lag *LifeAddendumGenerator) Contract() ([]byte, error) {
 
 	lag.engine.NewPage()
 
+	//lag.temp()
+
+	//lag.engine.NewLine(6)
+
+	lag.contract()
+
 	lag.engine.NewLine(6)
 
 	lag.declarations()
@@ -65,6 +71,49 @@ func (lag *LifeAddendumGenerator) Contract() ([]byte, error) {
 }
 
 func (lag *LifeAddendumGenerator) mainHeader() {
+	lag.engine.SetHeader(func() {
+		lag.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_vita.png", 12, 6.5, 12, 12)
+		//lag.engine.DrawLine(102, 6.25, 102, 15, 0.25, constants.BlackColor)
+		lag.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_wopta.png", 160, 6.5, 35, 10)
+		lag.engine.NewLine(7)
+	})
+}
+
+func (lag *LifeAddendumGenerator) temp() {
+	first := domain.TableCell{
+		Text:      "Wopta per te",
+		Height:    40,
+		Width:     100,
+		FontStyle: constants.BoldFontStyle,
+		FontColor: constants.PinkColor,
+		FontSize:  20,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	}
+	second := domain.TableCell{
+		Text:      "Vita",
+		Height:    40,
+		Width:     60,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		FontSize:  20,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	}
+
+	lag.engine.SetX(40)
+	lag.engine.SetY(6.5)
+	lag.engine.WriteText(first)
+	lag.engine.SetX(40)
+	lag.engine.SetY(12)
+	lag.engine.WriteText(second)
+}
+
+func (lag *LifeAddendumGenerator) contract() {
 	const (
 		firstColumnWidth  = 140
 		secondColumnWidth = 50
@@ -72,63 +121,45 @@ func (lag *LifeAddendumGenerator) mainHeader() {
 
 	contractDTO := lag.dto.Contract
 
-	parser := func(rows [][]string) [][]domain.TableCell {
-		result := make([][]domain.TableCell, 0, len(rows))
+	dataParser := func(rows []string) []domain.TableCell {
+		result := make([]domain.TableCell, 0, len(rows))
 
 		for index, row := range rows {
 			fontStyle := constants.RegularFontStyle
 			if index == 0 {
 				fontStyle = constants.BoldFontStyle
 			}
-			result = append(result, []domain.TableCell{
-				{
-					Text:      row[0],
-					Height:    constants.CellHeight,
-					Width:     firstColumnWidth,
-					FontStyle: fontStyle,
-					FontColor: constants.BlackColor,
-					FontSize:  constants.RegularFontSize,
-					Fill:      false,
-					FillColor: domain.Color{},
-					Align:     constants.LeftAlign,
-					Border:    "",
-				},
-				{
-					Text:      row[1],
-					Height:    constants.CellHeight,
-					Width:     secondColumnWidth,
-					FontStyle: fontStyle,
-					FontColor: constants.BlackColor,
-					FontSize:  constants.RegularFontSize,
-					Fill:      false,
-					FillColor: domain.Color{},
-					Align:     constants.LeftAlign,
-					Border:    "",
-				},
+			result = append(result, domain.TableCell{
+
+				Text:      row,
+				Height:    constants.CellHeight,
+				Width:     firstColumnWidth,
+				FontStyle: fontStyle,
+				FontColor: constants.BlackColor,
+				FontSize:  constants.MediumFontSize,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "",
 			})
 		}
 		return result
 	}
 
-	rows := [][]string{
-		{contractDTO.CodeHeading, ""},
-		{"Numero: " + contractDTO.Code, ""},
-		{"Decorre dal: " + contractDTO.StartDate + " ore 24:00", ""},
-		{"Scade il: " + contractDTO.EndDate + " ore 24:00", ""},
-		{"Non si rinnova a scadenza", ""},
-		{"Produttore: " + contractDTO.Producer, ""},
+	data := []string{
+		contractDTO.CodeHeading,
+		"Numero: " + contractDTO.Code,
+		"Decorre dal: " + contractDTO.StartDate + " ore 24:00",
+		"Scade il: " + contractDTO.EndDate + " ore 24:00",
+		"Non si rinnova a scadenza",
+		"Produttore: " + contractDTO.Producer,
 	}
 
-	table := parser(rows)
-
-	lag.engine.SetHeader(func() {
-		lag.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_vita.png", 12, 6.5, 12, 12)
-		//lag.engine.DrawLine(102, 6.25, 102, 15, 0.25, constants.BlackColor)
-		lag.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_wopta.png", 160, 6.5, 35, 10)
-		lag.engine.NewLine(7)
-		lag.engine.DrawTable(table)
-
-	})
+	text := dataParser(data)
+	for _, v := range text {
+		lag.engine.WriteText(v)
+		//lag.engine.NewLine(2)
+	}
 }
 
 func (lag *LifeAddendumGenerator) declarations() {
@@ -178,10 +209,10 @@ func (lag *LifeAddendumGenerator) contractor() {
 	}
 
 	const (
-		firstColumnWidth  = 33
-		secondColumnWidth = 70
+		firstColumnWidth  = 35
+		secondColumnWidth = 95
 		thirdColumnWidth  = 25
-		fourthColumnWidth = 60
+		fourthColumnWidth = 35
 	)
 	parser := func(rows [][]string) [][]domain.TableCell {
 		result := make([][]domain.TableCell, 0, len(rows))
@@ -244,10 +275,53 @@ func (lag *LifeAddendumGenerator) contractor() {
 
 	rows := [][]string{
 		{"Cognome e Nome ", cDTO.Surname + " " + cDTO.Name, "Cod. Fisc: ", cDTO.FiscalCode},
-		{"Residente in ", cDTO.StreetName + " " + cDTO.StreetNumber + " " + cDTO.City, "Data nascita: ", cDTO.BirthDate},
+		{"Residente in ", cDTO.StreetName + " " + cDTO.StreetNumber + " " + cDTO.City + " (" + cDTO.Province + ")", "Data nascita: ", cDTO.BirthDate},
 		{"Mail ", cDTO.Mail, "Telefono: ", cDTO.Phone},
 	}
 	table := parser(rows)
+
+	//const (
+	//	domFirstColumnWidth  = 35
+	//	domSecondColumnWidth = 155
+	//)
+	//domParser := func(rows [][]string) [][]domain.TableCell {
+	//	result := make([][]domain.TableCell, 0, len(rows))
+	//
+	//	for _, row := range rows {
+	//
+	//		result = append(result, []domain.TableCell{
+	//			{
+	//				Text:      row[0],
+	//				Height:    constants.CellHeight,
+	//				Width:     firstColumnWidth,
+	//				FontStyle: constants.BoldFontStyle,
+	//				FontColor: constants.BlackColor,
+	//				FontSize:  constants.RegularFontSize,
+	//				Fill:      false,
+	//				FillColor: domain.Color{},
+	//				Align:     constants.LeftAlign,
+	//				Border:    "",
+	//			},
+	//			{
+	//				Text:      row[1],
+	//				Height:    constants.CellHeight,
+	//				Width:     secondColumnWidth,
+	//				FontStyle: constants.RegularFontStyle,
+	//				FontColor: constants.BlackColor,
+	//				FontSize:  constants.RegularFontSize,
+	//				Fill:      false,
+	//				FillColor: domain.Color{},
+	//				Align:     constants.LeftAlign,
+	//				Border:    "B",
+	//			},
+	//		})
+	//	}
+	//	return result
+	//}
+	//domTxt := [][]string{
+	//	{"Domicilio ", ""},
+	//}
+	//dom := domParser(domTxt)
 
 	lag.engine.WriteText(title)
 	lag.engine.NewLine(2)
@@ -272,10 +346,10 @@ func (lag *LifeAddendumGenerator) insured() {
 	}
 
 	const (
-		firstColumnWidth  = 33
-		secondColumnWidth = 70
+		firstColumnWidth  = 35
+		secondColumnWidth = 95
 		thirdColumnWidth  = 25
-		fourthColumnWidth = 60
+		fourthColumnWidth = 35
 	)
 	parser := func(rows [][]string) [][]domain.TableCell {
 		result := make([][]domain.TableCell, 0, len(rows))
@@ -338,7 +412,7 @@ func (lag *LifeAddendumGenerator) insured() {
 
 	rows := [][]string{
 		{"Cognome e Nome ", iDTO.Surname + " " + iDTO.Name, "Cod. Fisc: ", iDTO.FiscalCode},
-		{"Residente in ", iDTO.StreetName + " " + iDTO.StreetNumber + " " + iDTO.City, "Data nascita: ", iDTO.BirthDate},
+		{"Residente in ", iDTO.StreetName + " " + iDTO.StreetNumber + " " + iDTO.City + " (" + iDTO.Province + ")", "Data nascita: ", iDTO.BirthDate},
 		{"Mail ", iDTO.Mail, "Telefono: ", iDTO.Phone},
 	}
 	table := parser(rows)
@@ -366,10 +440,10 @@ func (lag *LifeAddendumGenerator) beneficiaries() {
 	}
 
 	const (
-		firstColumnWidth  = 33
-		secondColumnWidth = 70
+		firstColumnWidth  = 35
+		secondColumnWidth = 95
 		thirdColumnWidth  = 25
-		fourthColumnWidth = 60
+		fourthColumnWidth = 35
 	)
 	parser := func(rows [][]string) [][]domain.TableCell {
 		result := make([][]domain.TableCell, 0, len(rows))
@@ -437,7 +511,7 @@ func (lag *LifeAddendumGenerator) beneficiaries() {
 	for i := 0; i < 2; i++ {
 		rows := [][]string{
 			{"Cognome e Nome ", (*bDTO)[i].Surname + " " + (*bDTO)[i].Name, "Cod. Fisc: ", (*bDTO)[i].FiscalCode},
-			{"Residente in ", (*bDTO)[i].StreetName + " " + (*bDTO)[i].StreetNumber + " " + (*bDTO)[i].City, "Data nascita: ", (*bDTO)[i].BirthDate},
+			{"Residente in ", (*bDTO)[i].StreetName + " " + (*bDTO)[i].StreetNumber + " " + (*bDTO)[i].City + " (" + (*bDTO)[i].Province + ")", "Data nascita: ", (*bDTO)[i].BirthDate},
 			{"Mail ", (*bDTO)[i].Mail, "Telefono ", (*bDTO)[i].Phone},
 		}
 		table := parser(rows)
@@ -483,10 +557,10 @@ func (lag *LifeAddendumGenerator) beneficiaryReference() {
 	}
 
 	const (
-		firstColumnWidth  = 33
-		secondColumnWidth = 70
+		firstColumnWidth  = 35
+		secondColumnWidth = 95
 		thirdColumnWidth  = 25
-		fourthColumnWidth = 60
+		fourthColumnWidth = 35
 	)
 	parser := func(rows [][]string) [][]domain.TableCell {
 		result := make([][]domain.TableCell, 0, len(rows))
@@ -549,7 +623,7 @@ func (lag *LifeAddendumGenerator) beneficiaryReference() {
 
 	rows := [][]string{
 		{"Cognome e Nome ", brDTO.Surname + " " + brDTO.Name, "Cod. Fisc: ", brDTO.FiscalCode},
-		{"Residente in ", brDTO.StreetName + " " + brDTO.StreetNumber + " " + brDTO.City, "Data nascita: ", brDTO.BirthDate},
+		{"Residente in ", brDTO.StreetName + " " + brDTO.StreetNumber + " " + brDTO.City + " (" + brDTO.Province + ")", "Data nascita: ", brDTO.BirthDate},
 		{"Mail ", brDTO.Mail, "Telefono: ", brDTO.Phone},
 	}
 	table := parser(rows)
