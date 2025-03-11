@@ -15,29 +15,37 @@ type lifeContractDTO struct {
 	Producer    string
 }
 type lifeContractorDTO struct {
-	Name         string
-	Surname      string
-	FiscalCode   string
-	StreetName   string
-	StreetNumber string
-	City         string
-	Province     string
-	Mail         string
-	Phone        string
-	BirthDate    string
+	Name            string
+	Surname         string
+	FiscalCode      string
+	StreetName      string
+	StreetNumber    string
+	City            string
+	Province        string
+	DomStreetName   string
+	DomStreetNumber string
+	DomCity         string
+	DomProvince     string
+	Mail            string
+	Phone           string
+	BirthDate       string
 }
 
 type lifeInsuredDTO struct {
-	Name         string
-	Surname      string
-	FiscalCode   string
-	StreetName   string
-	StreetNumber string
-	City         string
-	Province     string
-	Mail         string
-	Phone        string
-	BirthDate    string
+	Name            string
+	Surname         string
+	FiscalCode      string
+	StreetName      string
+	StreetNumber    string
+	City            string
+	Province        string
+	DomStreetName   string
+	DomStreetNumber string
+	DomCity         string
+	DomProvince     string
+	Mail            string
+	Phone           string
+	BirthDate       string
 }
 
 type lifeBeneficiaryDTO struct {
@@ -109,29 +117,37 @@ func newLifeContractDTO() *lifeContractDTO {
 
 func newLifeContractorDTO() *lifeContractorDTO {
 	return &lifeContractorDTO{
-		Name:         constants.EmptyField,
-		Surname:      constants.EmptyField,
-		FiscalCode:   constants.EmptyField,
-		StreetName:   constants.EmptyField,
-		StreetNumber: constants.EmptyField,
-		City:         constants.EmptyField,
-		Province:     constants.EmptyField,
-		Mail:         constants.EmptyField,
-		Phone:        constants.EmptyField,
+		Name:            constants.EmptyField,
+		Surname:         constants.EmptyField,
+		FiscalCode:      constants.EmptyField,
+		StreetName:      constants.EmptyField,
+		StreetNumber:    constants.EmptyField,
+		City:            constants.EmptyField,
+		Province:        constants.EmptyField,
+		DomStreetName:   constants.EmptyField,
+		DomStreetNumber: constants.EmptyField,
+		DomCity:         constants.EmptyField,
+		DomProvince:     constants.EmptyField,
+		Mail:            constants.EmptyField,
+		Phone:           constants.EmptyField,
 	}
 }
 
 func newLifeInsuredDTO() *lifeInsuredDTO {
 	return &lifeInsuredDTO{
-		Name:         constants.EmptyField,
-		Surname:      constants.EmptyField,
-		FiscalCode:   constants.EmptyField,
-		StreetName:   constants.EmptyField,
-		StreetNumber: constants.EmptyField,
-		City:         constants.EmptyField,
-		Province:     constants.EmptyField,
-		Mail:         constants.EmptyField,
-		Phone:        constants.EmptyField,
+		Name:            constants.EmptyField,
+		Surname:         constants.EmptyField,
+		FiscalCode:      constants.EmptyField,
+		StreetName:      constants.EmptyField,
+		StreetNumber:    constants.EmptyField,
+		City:            constants.EmptyField,
+		Province:        constants.EmptyField,
+		DomStreetName:   constants.EmptyField,
+		DomStreetNumber: constants.EmptyField,
+		DomCity:         constants.EmptyField,
+		DomProvince:     constants.EmptyField,
+		Mail:            constants.EmptyField,
+		Phone:           constants.EmptyField,
 	}
 }
 
@@ -200,6 +216,12 @@ func (lc *lifeContractorDTO) fromPolicy(contr models.Contractor) {
 	lc.StreetNumber = contr.Residence.StreetNumber
 	lc.City = contr.Residence.City
 	lc.Province = contr.Residence.CityCode
+	if contr.Domicile != nil {
+		lc.DomStreetName = contr.Domicile.StreetName
+		lc.DomStreetNumber = contr.Domicile.StreetNumber
+		lc.DomCity = contr.Domicile.City
+		lc.DomProvince = contr.Domicile.CityCode
+	}
 	lc.Mail = contr.Mail
 	lc.Phone = contr.Phone
 	lc.BirthDate = splitBirthDate(contr.BirthDate)
@@ -213,6 +235,12 @@ func (li *lifeInsuredDTO) fromPolicy(ins *models.User) {
 	li.StreetNumber = ins.Residence.StreetNumber
 	li.City = ins.Residence.City
 	li.Province = ins.Residence.CityCode
+	if ins.Domicile != nil {
+		li.DomStreetName = ins.Domicile.StreetName
+		li.DomStreetNumber = ins.Domicile.StreetNumber
+		li.DomCity = ins.Domicile.City
+		li.DomProvince = ins.Domicile.CityCode
+	}
 	li.Mail = ins.Mail
 	li.Phone = ins.Phone
 	li.BirthDate = splitBirthDate(ins.BirthDate)
