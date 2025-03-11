@@ -1,6 +1,8 @@
 package dto
 
 import (
+	"bytes"
+	"fmt"
 	"time"
 
 	"github.com/wopta/goworkspace/document/internal/constants"
@@ -100,7 +102,7 @@ func (b *BeneficiariesDTO) FromPolicy(policy models.Policy, product models.Produ
 	b.Contractor.fromPolicy(policy.Contractor)
 	b.Insured.fromPolicy(policy.Assets[0].Person)
 	//b.Beneficiaries.fromPolicy(policy.Assets[0].Guarantees)
-	b.Beneficiaries.fromPolicy(policy.Assets[0].Guarantees[0].Beneficiaries)
+	b.Beneficiaries.fromPolicy(policy.Assets[0].Guarantees[0].Beneficiaries, policy.Assets[0].Guarantees[0].BeneficiaryOptions)
 	b.BeneficiaryReference.fromPolicy(policy.Assets[0].Guarantees[0].BeneficiaryReference)
 }
 
@@ -249,11 +251,15 @@ func (li *lifeInsuredDTO) fromPolicy(ins *models.User) {
 	li.BirthDate = parseBirthDate(ins.BirthDate)
 }
 
-func (b *Beneficiaries) fromPolicy(bens *[]models.Beneficiary) {
+func (b *Beneficiaries) fromPolicy(bens *[]models.Beneficiary, opt map[string]string) {
 
 	for i, v := range *bens {
 		if i > 1 {
 			break
+		}
+		buf := new(bytes.Buffer)
+		for _, value := range opt {
+			_, _ = fmt.Fprintf(buf, "%s ", value)
 		}
 		ben := lifeBeneficiaryDTO{
 			Name:         v.Name,
@@ -267,6 +273,7 @@ func (b *Beneficiaries) fromPolicy(bens *[]models.Beneficiary) {
 			Mail:         v.Mail,
 			BirthDate:    (*b)[i].BirthDate,
 			Contactable:  v.IsContactable,
+			Relation:     "\n" + buf.String(),
 		}
 		(*b)[i] = ben
 	}

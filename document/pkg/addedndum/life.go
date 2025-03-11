@@ -559,6 +559,45 @@ func (lag *LifeAddendumGenerator) beneficiaries() {
 		return result
 	}
 
+	const (
+		domFirstColumnWidth  = 35
+		domSecondColumnWidth = 155
+	)
+	relParser := func(rows [][]string) [][]domain.TableCell {
+		result := make([][]domain.TableCell, 0, len(rows))
+
+		for _, row := range rows {
+
+			result = append(result, []domain.TableCell{
+				{
+					Text:      row[0],
+					Height:    constants.CellHeight,
+					Width:     domFirstColumnWidth,
+					FontStyle: constants.BoldFontStyle,
+					FontColor: constants.BlackColor,
+					FontSize:  constants.RegularFontSize,
+					Fill:      false,
+					FillColor: domain.Color{},
+					Align:     constants.LeftAlign,
+					Border:    "",
+				},
+				{
+					Text:      row[1],
+					Height:    constants.CellHeight,
+					Width:     domSecondColumnWidth,
+					FontStyle: constants.RegularFontStyle,
+					FontColor: constants.BlackColor,
+					FontSize:  constants.RegularFontSize,
+					Fill:      false,
+					FillColor: domain.Color{},
+					Align:     constants.LeftAlign,
+					Border:    "B",
+				},
+			})
+		}
+		return result
+	}
+
 	lag.engine.WriteText(title)
 	lag.engine.NewLine(2)
 	lag.engine.DrawLine(10, lag.engine.GetY(), 200, lag.engine.GetY(), 0.25, constants.BlackColor)
@@ -569,8 +608,13 @@ func (lag *LifeAddendumGenerator) beneficiaries() {
 			{"Residente in ", (*bDTO)[i].StreetName + " " + (*bDTO)[i].StreetNumber + " " + (*bDTO)[i].City + " (" + (*bDTO)[i].Province + ")", "Data nascita: ", (*bDTO)[i].BirthDate},
 			{"Mail ", (*bDTO)[i].Mail, "Telefono ", (*bDTO)[i].Phone},
 		}
+		relTxt := [][]string{
+			{"Relazione con Assicurato ", (*bDTO)[i].Relation},
+		}
 		table := parser(rows)
+		rel := relParser(relTxt)
 		lag.engine.DrawTable(table)
+		lag.engine.DrawTable(rel)
 		lag.engine.NewLine(2)
 		conf := "No"
 		if (*bDTO)[i].Contactable {
