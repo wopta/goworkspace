@@ -68,26 +68,23 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	log.Printf("original policy: %s", string(rawPolicy))
 
 	log.Printf("modifying policy...")
-	modifiedPolicy, err = modifyController(originalPolicy, inputPolicy)
+	modifiedPolicy, modifiedUser, err := modifyController(originalPolicy, inputPolicy)
 	if err != nil {
 		log.Printf("error during policy modification: %s", err.Error())
 		return "{}", nil, err
 	}
 	log.Printf("policy %s modified successfully", modifiedPolicy.Uid)
-	// Insert here
-	// Create a new policy with only the needed infos
-	// Create e pdf generator with that new policy
-	// Then move modifyController:
-	// err = writePolicyToDb(modifiedPolicy)
-	//	if err != nil {
-	//		return models.Policy{}, err
-	//	}
-	//
-	//	err = writeUserToDB(modifiedUser)
-	//	if err != nil {
-	//		return models.Policy{}, err
-	//	}
-	// here
+	err = writePolicyToDb(modifiedPolicy)
+	if err != nil {
+		return "{}", nil, err
+	}
+	log.Printf("policy %s successfully saved", modifiedPolicy.Uid)
+	err = writeUserToDB(modifiedUser)
+	if err != nil {
+		return "{}", nil, err
+	}
+	log.Printf("user %s modified successfully", modifiedUser.Uid)
+
 	diffPolicy, err := generateDiffPolicy(originalPolicy, inputPolicy)
 	if err != nil {
 		return "", models.Policy{}, err
@@ -124,7 +121,7 @@ func generateDiffPolicy(originalPolicy, inputPolicy models.Policy) (models.Polic
 	return diff, nil
 }
 
-func modifyController(originalPolicy, inputPolicy models.Policy) (models.Policy, error) {
+func modifyController(originalPolicy, inputPolicy models.Policy) (models.Policy, models.User, error) {
 	var (
 		err            error
 		modifiedPolicy models.Policy
@@ -135,38 +132,28 @@ func modifyController(originalPolicy, inputPolicy models.Policy) (models.Policy,
 
 	err = checkEmailUniqueness(originalPolicy.Contractor, inputPolicy.Contractor)
 	if err != nil {
-		return models.Policy{}, err
+		return models.Policy{}, models.User{}, err
 	}
 
 	modifiedPolicy.Contractor, err = modifyContractorInfo(inputPolicy.Contractor, originalPolicy.Contractor)
 	if err != nil {
-		return models.Policy{}, err
+		return models.Policy{}, models.User{}, err
 	}
 
 	if modifiedPolicy.Contractor.Uid != "" {
 		tmpUser := modifiedPolicy.Contractor.ToUser()
 		modifiedUser, err = modifyUserInfo(*tmpUser)
 		if err != nil {
-			return models.Policy{}, err
+			return models.Policy{}, models.User{}, err
 		}
 	}
 
 	modifiedPolicy.Assets, err = modifyAssets(modifiedPolicy, inputPolicy)
 	if err != nil {
-		return models.Policy{}, err
+		return models.Policy{}, models.User{}, err
 	}
 
-	err = writePolicyToDb(modifiedPolicy)
-	if err != nil {
-		return models.Policy{}, err
-	}
-
-	err = writeUserToDB(modifiedUser)
-	if err != nil {
-		return models.Policy{}, err
-	}
-
-	return modifiedPolicy, err
+	return modifiedPolicy, modifiedUser, err
 }
 
 func checkEmailUniqueness(originalContractor, inputContractor models.Contractor) error {
