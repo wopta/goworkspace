@@ -195,18 +195,34 @@ func (lag *LifeAddendumGenerator) declarations() {
 func (lag *LifeAddendumGenerator) contractor() {
 	cDTO := lag.dto.Contractor
 
-	title := domain.TableCell{
-		Text:      "Dati Contraente",
-		Height:    3.5,
-		Width:     190,
-		FontStyle: constants.BoldFontStyle,
-		FontColor: constants.PinkColor,
-		FontSize:  constants.RegularFontSize,
-		Fill:      false,
-		FillColor: domain.Color{},
-		Align:     constants.LeftAlign,
-		Border:    "",
+	titleT := []domain.TableCell{
+		{
+			Text:      " ",
+			Height:    4.5,
+			Width:     4.5,
+			FontSize:  constants.LargeFontSize,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.CenterAlign,
+			Border:    "1",
+		},
+		{
+			Text:      "  Dati Contraente",
+			Height:    4.5,
+			Width:     190,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.PinkColor,
+			FontSize:  constants.RegularFontSize,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.LeftAlign,
+			Border:    "",
+		},
 	}
+	title := make([][]domain.TableCell, 0)
+	title = append(title, titleT)
 
 	const (
 		firstColumnWidth  = 35
@@ -327,7 +343,7 @@ func (lag *LifeAddendumGenerator) contractor() {
 	}
 	dom := domParser(domTxt)
 
-	lag.engine.WriteText(title)
+	lag.engine.DrawTable(title)
 	lag.engine.NewLine(2)
 	lag.engine.DrawLine(10, lag.engine.GetY(), 200, lag.engine.GetY(), 0.25, constants.BlackColor)
 	lag.engine.NewLine(2)
@@ -338,18 +354,35 @@ func (lag *LifeAddendumGenerator) contractor() {
 
 func (lag *LifeAddendumGenerator) insured() {
 	iDTO := lag.dto.Insured
-	title := domain.TableCell{
-		Text:      "Dati Assicurato",
-		Height:    3.5,
-		Width:     190,
-		FontStyle: constants.BoldFontStyle,
-		FontColor: constants.PinkColor,
-		FontSize:  constants.RegularFontSize,
-		Fill:      false,
-		FillColor: domain.Color{},
-		Align:     constants.LeftAlign,
-		Border:    "",
+
+	titleT := []domain.TableCell{
+		{
+			Text:      " ",
+			Height:    4.5,
+			Width:     4.5,
+			FontSize:  constants.LargeFontSize,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.CenterAlign,
+			Border:    "1",
+		},
+		{
+			Text:      "  Dati Assicurato",
+			Height:    4.5,
+			Width:     190,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.PinkColor,
+			FontSize:  constants.RegularFontSize,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.LeftAlign,
+			Border:    "",
+		},
 	}
+	title := make([][]domain.TableCell, 0)
+	title = append(title, titleT)
 
 	const (
 		firstColumnWidth  = 35
@@ -470,7 +503,7 @@ func (lag *LifeAddendumGenerator) insured() {
 	}
 	dom := domParser(domTxt)
 
-	lag.engine.WriteText(title)
+	lag.engine.DrawTable(title)
 	lag.engine.NewLine(2)
 	lag.engine.DrawLine(10, lag.engine.GetY(), 200, lag.engine.GetY(), 0.25, constants.BlackColor)
 	lag.engine.NewLine(2)
@@ -481,18 +514,35 @@ func (lag *LifeAddendumGenerator) insured() {
 
 func (lag *LifeAddendumGenerator) beneficiaries() {
 	bDTO := lag.dto.Beneficiaries
-	title := domain.TableCell{
-		Text:      "Dati Beneficiari",
-		Height:    3.5,
-		Width:     190,
-		FontStyle: constants.BoldFontStyle,
-		FontColor: constants.PinkColor,
-		FontSize:  constants.RegularFontSize,
-		Fill:      false,
-		FillColor: domain.Color{},
-		Align:     constants.LeftAlign,
-		Border:    "",
+
+	titleT := []domain.TableCell{
+		{
+			Text:      " ",
+			Height:    4.5,
+			Width:     4.5,
+			FontSize:  constants.LargeFontSize,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.CenterAlign,
+			Border:    "1",
+		},
+		{
+			Text:      "  Dati Beneficiari",
+			Height:    4.5,
+			Width:     190,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.PinkColor,
+			FontSize:  constants.RegularFontSize,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.LeftAlign,
+			Border:    "",
+		},
 	}
+	title := make([][]domain.TableCell, 0)
+	title = append(title, titleT)
 
 	const (
 		firstColumnWidth  = 35
@@ -598,7 +648,7 @@ func (lag *LifeAddendumGenerator) beneficiaries() {
 		return result
 	}
 
-	lag.engine.WriteText(title)
+	lag.engine.DrawTable(title)
 	lag.engine.NewLine(2)
 	lag.engine.DrawLine(10, lag.engine.GetY(), 200, lag.engine.GetY(), 0.25, constants.BlackColor)
 	lag.engine.NewLine(2)
@@ -642,18 +692,35 @@ func (lag *LifeAddendumGenerator) beneficiaries() {
 
 func (lag *LifeAddendumGenerator) beneficiaryReference() {
 	brDTO := lag.dto.BeneficiaryReference
-	title := domain.TableCell{
-		Text:      "Referente terzo",
-		Height:    3.5,
-		Width:     190,
-		FontStyle: constants.BoldFontStyle,
-		FontColor: constants.PinkColor,
-		FontSize:  constants.RegularFontSize,
-		Fill:      false,
-		FillColor: domain.Color{},
-		Align:     constants.LeftAlign,
-		Border:    "",
+
+	titleT := []domain.TableCell{
+		{
+			Text:      " ",
+			Height:    4.5,
+			Width:     4.5,
+			FontSize:  constants.LargeFontSize,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.CenterAlign,
+			Border:    "1",
+		},
+		{
+			Text:      "  Referente terzo",
+			Height:    4.5,
+			Width:     190,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.PinkColor,
+			FontSize:  constants.RegularFontSize,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.LeftAlign,
+			Border:    "",
+		},
 	}
+	title := make([][]domain.TableCell, 0)
+	title = append(title, titleT)
 
 	const (
 		firstColumnWidth  = 35
@@ -727,7 +794,7 @@ func (lag *LifeAddendumGenerator) beneficiaryReference() {
 	}
 	table := parser(rows)
 
-	lag.engine.WriteText(title)
+	lag.engine.DrawTable(title)
 	lag.engine.NewLine(2)
 	lag.engine.DrawLine(10, lag.engine.GetY(), 200, lag.engine.GetY(), 0.25, constants.BlackColor)
 	lag.engine.NewLine(2)
