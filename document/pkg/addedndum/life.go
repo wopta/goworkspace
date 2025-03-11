@@ -37,7 +37,7 @@ func (lag *LifeAddendumGenerator) Contract() ([]byte, error) {
 
 	lag.engine.NewPage()
 
-	//lag.temp()
+	lag.WoptaPerTe()
 
 	//lag.engine.NewLine(6)
 
@@ -79,38 +79,38 @@ func (lag *LifeAddendumGenerator) mainHeader() {
 	})
 }
 
-func (lag *LifeAddendumGenerator) temp() {
+func (lag *LifeAddendumGenerator) WoptaPerTe() {
 	first := domain.TableCell{
 		Text:      "Wopta per te",
-		Height:    40,
-		Width:     100,
+		Height:    7,
+		Width:     57,
 		FontStyle: constants.BoldFontStyle,
 		FontColor: constants.PinkColor,
-		FontSize:  20,
+		FontSize:  17,
 		Fill:      false,
 		FillColor: domain.Color{},
-		Align:     constants.LeftAlign,
+		Align:     constants.RightAlign,
 		Border:    "",
 	}
 	second := domain.TableCell{
 		Text:      "Vita",
-		Height:    40,
-		Width:     60,
+		Height:    7,
+		Width:     28,
 		FontStyle: constants.RegularFontStyle,
 		FontColor: constants.BlackColor,
-		FontSize:  20,
+		FontSize:  15,
 		Fill:      false,
 		FillColor: domain.Color{},
-		Align:     constants.LeftAlign,
+		Align:     constants.RightAlign,
 		Border:    "",
 	}
 
-	lag.engine.SetX(40)
-	lag.engine.SetY(6.5)
+	origY := lag.engine.GetY()
+	lag.engine.SetY(origY - 20)
 	lag.engine.WriteText(first)
-	lag.engine.SetX(40)
-	lag.engine.SetY(12)
+	lag.engine.SetY(lag.engine.GetY() - 1)
 	lag.engine.WriteText(second)
+	lag.engine.SetY(origY)
 }
 
 func (lag *LifeAddendumGenerator) contract() {
