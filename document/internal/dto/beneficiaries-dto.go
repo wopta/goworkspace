@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"strings"
+	"time"
 
 	"github.com/wopta/goworkspace/document/internal/constants"
 	"github.com/wopta/goworkspace/models"
@@ -203,9 +203,12 @@ func (l *lifeContractDTO) fromPolicy(policy models.Policy) {
 
 }
 
-func splitBirthDate(bd string) string {
-	part := strings.Split(bd, "T")
-	return part[0]
+func parseBirthDate(dateString string) string {
+	date, err := time.Parse(time.RFC3339, dateString)
+	if err != nil {
+		return ""
+	}
+	return date.Format("01/02/2006")
 }
 
 func (lc *lifeContractorDTO) fromPolicy(contr models.Contractor) {
@@ -224,7 +227,7 @@ func (lc *lifeContractorDTO) fromPolicy(contr models.Contractor) {
 	}
 	lc.Mail = contr.Mail
 	lc.Phone = contr.Phone
-	lc.BirthDate = splitBirthDate(contr.BirthDate)
+	lc.BirthDate = parseBirthDate(contr.BirthDate)
 }
 
 func (li *lifeInsuredDTO) fromPolicy(ins *models.User) {
@@ -243,7 +246,7 @@ func (li *lifeInsuredDTO) fromPolicy(ins *models.User) {
 	}
 	li.Mail = ins.Mail
 	li.Phone = ins.Phone
-	li.BirthDate = splitBirthDate(ins.BirthDate)
+	li.BirthDate = parseBirthDate(ins.BirthDate)
 }
 
 func (b *Beneficiaries) fromPolicy(bens *[]models.Beneficiary) {
