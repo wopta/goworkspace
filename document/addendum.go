@@ -1,7 +1,6 @@
 package document
 
 import (
-	"encoding/base64"
 	"log"
 
 	"github.com/wopta/goworkspace/document/internal/engine"
@@ -9,8 +8,13 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-func AddendumObj(origin string, data models.Policy, networkNode *models.NetworkNode, product *models.Product) <-chan DocumentResponse {
-	r := make(chan DocumentResponse)
+type AddendumResponse struct {
+	LinkGcs  string `json:"linkGcs"`
+	Filename string `json:"fileName"`
+}
+
+func AddendumObj(origin string, data models.Policy, networkNode *models.NetworkNode, product *models.Product) <-chan AddendumResponse {
+	r := make(chan AddendumResponse)
 
 	log.Println("[AddendumObj] function start -------------------------------")
 
@@ -50,9 +54,9 @@ func AddendumObj(origin string, data models.Policy, networkNode *models.NetworkN
 
 		data.DocumentName = filename
 		log.Println(data.Uid + " AddendumObj end")
-		r <- DocumentResponse{
-			LinkGcs: filename,
-			Bytes:   base64.StdEncoding.EncodeToString(out),
+		r <- AddendumResponse{
+			LinkGcs:  filename,
+			Filename: filename,
 		}
 	}()
 

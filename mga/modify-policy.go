@@ -86,12 +86,21 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	}
 	log.Printf("user %s modified successfully", modifiedUser.Uid)
 
-	diffPolicy, err := generateDiffPolicy(originalPolicy, inputPolicy)
+	diffPolicy, err := generateDiffPolicy(originalPolicy, modifiedPolicy)
 	if err != nil {
 		return "", models.Policy{}, err
 	}
 	p := <-document.AddendumObj("", diffPolicy, nil, nil)
-	log.Println(p.LinkGcs)
+	addendumAtt := models.Attachment{
+		Name:      "Appendice",
+		FileName:  p.Filename,
+		MimeType:  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+		Link:      p.LinkGcs,
+		IsPrivate: false,
+		Section:   "",
+		Note:      "",
+	}
+	*modifiedPolicy.Attachments = append(*modifiedPolicy.Attachments, addendumAtt)
 
 	rawPolicy, err = json.Marshal(modifiedPolicy)
 
