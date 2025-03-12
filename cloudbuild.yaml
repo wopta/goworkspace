@@ -41,7 +41,7 @@ steps:
       timeout=60
       vpc=functions-connector
     fi
-  # === SET DEV UAT VARS =====================================================
+    # === SET DEV UAT VARS =====================================================
     if [[ "${tag}" == *"uat"* ]]; then
       echo "setting UAT environment variables..."
       bucket=function-data
