@@ -32,7 +32,6 @@ steps:
     # === SET DEV ENV VARS =====================================================
     if [[ "${tag}" == *"dev"* ]]; then
       echo "setting DEV environment variables..."
-
       bucket=function-data
       region=europe-west1
       mem=256Mb
@@ -43,11 +42,22 @@ steps:
       timeout=60
       vpc=functions-connector
     fi
-
+  # === SET DEV UAT VARS =====================================================
+    if [[ "${tag}" == *"uat"* ]]; then
+      echo "setting UAT environment variables..."
+      bucket=function-data
+      region=europe-west1
+      mem=256Mb
+      project=core-452909
+      env=uat
+      genFx=--gen2
+      sa=wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com
+      timeout=60
+      vpc=functions-connector
+    fi
     # === SET PROD ENV VARS ====================================================
     if [[ "${tag}" == *"prod"* ]]; then
       echo "setting PROD environment variables..."
-
       bucket=core-350507-function-data
       region=europe-west1
       mem=256Mb
