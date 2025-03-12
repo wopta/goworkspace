@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"reflect"
 	"strings"
 	"time"
 
@@ -101,24 +102,149 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 func generateDiffPolicy(originalPolicy, inputPolicy models.Policy) (models.Policy, error) {
 	var diff models.Policy
-	diff.Uid = inputPolicy.Uid
-	diff.Name = inputPolicy.Name
-	diff.NameDesc = inputPolicy.NameDesc
+	diff.Uid = originalPolicy.Uid
+	diff.Name = originalPolicy.Name
+	diff.NameDesc = originalPolicy.NameDesc
 	diff.ProposalNumber = originalPolicy.ProposalNumber
 	diff.StartDate = originalPolicy.StartDate
 	diff.EndDate = originalPolicy.EndDate
 	diff.Company = originalPolicy.Company
 
-	diff.Contractor = originalPolicy.Contractor
+	diff.Contractor = diffForContractor(originalPolicy.Contractor, inputPolicy.Contractor)
 	assets := make([]models.Asset, 0)
 	ass := models.Asset{}
-	gar := make([]models.Guarante, 0)
-	ass.Person = originalPolicy.Assets[0].Person
-	gar = inputPolicy.Assets[0].Guarantees
-	ass.Guarantees = gar
+
+	gar := models.Guarante{}
+	if inputPolicy.Assets[0].Person != nil {
+		ass.Person = diffForUser(originalPolicy.Assets[0].Person, inputPolicy.Assets[0].Person)
+	}
+
+	if inputPolicy.Assets[0].Guarantees[0].Beneficiary != nil {
+		gar.Beneficiary = diffForUser(originalPolicy.Assets[0].Guarantees[0].Beneficiary, inputPolicy.Assets[0].Guarantees[0].Beneficiary)
+	}
+	if inputPolicy.Assets[0].Guarantees[0].BeneficiaryReference != nil {
+		gar.BeneficiaryReference = diffForUser(originalPolicy.Assets[0].Guarantees[0].BeneficiaryReference, inputPolicy.Assets[0].Guarantees[0].BeneficiaryReference)
+	}
+	if inputPolicy.Assets[0].Guarantees[0].Beneficiaries != nil {
+		if originalPolicy.Assets[0].Guarantees[0].Beneficiaries != nil {
+			gar.Beneficiaries = diffForBeneficiaries(*(originalPolicy.Assets[0].Guarantees[0]).Beneficiaries, *(inputPolicy.Assets[0].Guarantees[0]).Beneficiaries)
+		} else {
+			gar.Beneficiaries = inputPolicy.Assets[0].Guarantees[0].Beneficiaries
+		}
+	} else {
+		gar.Beneficiaries = nil
+	}
+	garS := make([]models.Guarante, 0)
+	garS = append(garS, gar)
+	ass.Guarantees = garS
 	assets = append(assets, ass)
 	diff.Assets = assets
 	return diff, nil
+}
+
+func diffForContractor(orig, input models.Contractor) models.Contractor {
+	c := false
+	if orig.FiscalCode != input.FiscalCode {
+		return input
+	}
+
+	if input.Residence != nil && orig.Residence != nil {
+		if orig.Residence.StreetName != input.Residence.StreetName {
+			c = true
+		}
+		if orig.Residence.StreetNumber != input.Residence.StreetNumber {
+			c = true
+		}
+		if orig.Residence.City != input.Residence.City {
+			c = true
+		}
+		if orig.Residence.CityCode != input.Residence.CityCode {
+			c = true
+		}
+	}
+	if input.Domicile != nil && orig.Domicile != nil {
+		if orig.Domicile.StreetName != input.Domicile.StreetName {
+			c = true
+		}
+		if orig.Domicile.StreetNumber != input.Domicile.StreetNumber {
+			c = true
+		}
+		if orig.Domicile.City != input.Domicile.City {
+			c = true
+		}
+		if orig.Domicile.CityCode != input.Domicile.CityCode {
+			c = true
+		}
+	}
+	if orig.Mail != input.Mail {
+		c = true
+	}
+	if orig.Phone != input.Phone {
+		c = true
+	}
+
+	if c {
+		return input
+	}
+	return models.Contractor{}
+}
+
+func diffForBeneficiaries(orig, input []models.Beneficiary) *[]models.Beneficiary {
+	if len(input) != len(orig) {
+		return &input
+	}
+	if reflect.DeepEqual(orig, input) {
+		diffS := make([]models.Beneficiary, 0)
+		return &diffS
+	}
+	return &input
+}
+
+func diffForUser(orig, input *models.User) *models.User {
+	c := false
+	if orig.FiscalCode != input.FiscalCode {
+		return input
+	}
+
+	if input.Residence != nil && orig.Residence != nil {
+		if orig.Residence.StreetName != input.Residence.StreetName {
+			c = true
+		}
+		if orig.Residence.StreetNumber != input.Residence.StreetNumber {
+			c = true
+		}
+		if orig.Residence.City != input.Residence.City {
+			c = true
+		}
+		if orig.Residence.CityCode != input.Residence.CityCode {
+			c = true
+		}
+	}
+	if input.Domicile != nil && orig.Domicile != nil {
+		if orig.Domicile.StreetName != input.Domicile.StreetName {
+			c = true
+		}
+		if orig.Domicile.StreetNumber != input.Domicile.StreetNumber {
+			c = true
+		}
+		if orig.Domicile.City != input.Domicile.City {
+			c = true
+		}
+		if orig.Domicile.CityCode != input.Domicile.CityCode {
+			c = true
+		}
+	}
+	if orig.Mail != input.Mail {
+		c = true
+	}
+	if orig.Phone != input.Phone {
+		c = true
+	}
+
+	if c {
+		return input
+	}
+	return &models.User{}
 }
 
 func modifyController(originalPolicy, inputPolicy models.Policy) (models.Policy, models.User, error) {

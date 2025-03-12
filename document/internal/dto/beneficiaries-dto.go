@@ -214,45 +214,64 @@ func parseBirthDate(dateString string) string {
 }
 
 func (lc *lifeContractorDTO) fromPolicy(contr models.Contractor) {
-	lc.Name = contr.Name
-	lc.Surname = contr.Surname
-	lc.FiscalCode = contr.FiscalCode
-	lc.StreetName = contr.Residence.StreetName
-	lc.StreetNumber = contr.Residence.StreetNumber
-	lc.City = contr.Residence.City
-	lc.Province = contr.Residence.CityCode
+	if contr.FiscalCode != "" {
+		lc.Name = contr.Name
+		lc.Surname = contr.Surname
+		lc.FiscalCode = contr.FiscalCode
+		lc.BirthDate = parseBirthDate(contr.BirthDate)
+	}
+	if contr.Residence != nil {
+		lc.StreetName = contr.Residence.StreetName
+		lc.StreetNumber = contr.Residence.StreetNumber
+		lc.City = contr.Residence.City
+		lc.Province = contr.Residence.CityCode
+	}
 	if contr.Domicile != nil {
 		lc.DomStreetName = contr.Domicile.StreetName
 		lc.DomStreetNumber = contr.Domicile.StreetNumber
 		lc.DomCity = contr.Domicile.City
 		lc.DomProvince = contr.Domicile.CityCode
 	}
-	lc.Mail = contr.Mail
-	lc.Phone = contr.Phone
-	lc.BirthDate = parseBirthDate(contr.BirthDate)
+	if contr.Mail != "" {
+		lc.Mail = contr.Mail
+	}
+	if contr.Phone != "" {
+		lc.Phone = contr.Phone
+	}
 }
 
 func (li *lifeInsuredDTO) fromPolicy(ins *models.User) {
-	li.Name = ins.Name
-	li.Surname = ins.Surname
-	li.FiscalCode = ins.FiscalCode
-	li.StreetName = ins.Residence.StreetName
-	li.StreetNumber = ins.Residence.StreetNumber
-	li.City = ins.Residence.City
-	li.Province = ins.Residence.CityCode
+	if ins.FiscalCode != "" {
+		li.Name = ins.Name
+		li.Surname = ins.Surname
+		li.FiscalCode = ins.FiscalCode
+		li.BirthDate = parseBirthDate(ins.BirthDate)
+	}
+	if ins.Residence != nil {
+		li.StreetName = ins.Residence.StreetName
+		li.StreetNumber = ins.Residence.StreetNumber
+		li.City = ins.Residence.City
+		li.Province = ins.Residence.CityCode
+	}
+
 	if ins.Domicile != nil {
 		li.DomStreetName = ins.Domicile.StreetName
 		li.DomStreetNumber = ins.Domicile.StreetNumber
 		li.DomCity = ins.Domicile.City
 		li.DomProvince = ins.Domicile.CityCode
 	}
-	li.Mail = ins.Mail
-	li.Phone = ins.Phone
-	li.BirthDate = parseBirthDate(ins.BirthDate)
+	if ins.Mail != "" {
+		li.Mail = ins.Mail
+	}
+	if ins.Phone != "" {
+		li.Phone = ins.Phone
+	}
 }
 
 func (b *Beneficiaries) fromPolicy(bens *[]models.Beneficiary, opt map[string]string) {
-
+	if bens == nil {
+		return
+	}
 	for i, v := range *bens {
 		if i > 1 {
 			break
@@ -280,13 +299,21 @@ func (b *Beneficiaries) fromPolicy(bens *[]models.Beneficiary, opt map[string]st
 }
 
 func (br *BeneficiaryReferenceDTO) fromPolicy(benRef *models.User) {
-	br.Name = benRef.Name
-	br.Surname = benRef.Surname
-	br.FiscalCode = benRef.FiscalCode
-	br.StreetName = benRef.Residence.StreetName
-	br.StreetNumber = benRef.Residence.StreetNumber
-	br.City = benRef.Residence.City
-	br.Province = benRef.Residence.CityCode
-	br.Mail = benRef.Mail
-	br.Phone = benRef.Phone
+	if benRef.FiscalCode != "" {
+		br.Name = benRef.Name
+		br.Surname = benRef.Surname
+		br.FiscalCode = benRef.FiscalCode
+	}
+	if benRef.Residence != nil {
+		br.StreetName = benRef.Residence.StreetName
+		br.StreetNumber = benRef.Residence.StreetNumber
+		br.City = benRef.Residence.City
+		br.Province = benRef.Residence.CityCode
+	}
+	if benRef.Mail != "" {
+		br.Mail = benRef.Mail
+	}
+	if benRef.Phone != "" {
+		br.Phone = benRef.Phone
+	}
 }

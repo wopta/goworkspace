@@ -194,10 +194,38 @@ func (lag *LifeAddendumGenerator) declarations() {
 
 func (lag *LifeAddendumGenerator) contractor() {
 	cDTO := lag.dto.Contractor
+	checked := " "
+	var rows1 [][]string
+	var rows2 [][]string
+	var domTxt [][]string
+	if cDTO.FiscalCode != constants.EmptyField {
+		checked = "X"
+		rows1 = [][]string{
+			{"Cognome e Nome ", cDTO.Surname + " " + cDTO.Name, "Cod. Fisc: ", cDTO.FiscalCode},
+			{"Residente in ", cDTO.StreetName + " " + cDTO.StreetNumber + " " + cDTO.City + " (" + cDTO.Province + ")", "Data nascita: ", cDTO.BirthDate},
+		}
+		rows2 = [][]string{
+			{"Mail ", cDTO.Mail, "Telefono: ", cDTO.Phone},
+		}
+		domTxt = [][]string{
+			{"Domicilio ", cDTO.DomStreetName + " " + cDTO.DomStreetNumber + " " + cDTO.DomCity + " (" + cDTO.DomProvince + ")"},
+		}
+	} else {
+		rows1 = [][]string{
+			{"Cognome e Nome ", " ", "Cod. Fisc: ", " "},
+			{"Residente in ", " ", "Data nascita: ", " "},
+		}
+		rows2 = [][]string{
+			{"Mail ", " ", "Telefono: ", " "},
+		}
+		domTxt = [][]string{
+			{"Domicilio ", " "},
+		}
+	}
 
 	titleT := []domain.TableCell{
 		{
-			Text:      " ",
+			Text:      checked,
 			Height:    4.5,
 			Width:     4.5,
 			FontSize:  constants.LargeFontSize,
@@ -289,15 +317,7 @@ func (lag *LifeAddendumGenerator) contractor() {
 		return result
 	}
 
-	rows1 := [][]string{
-		{"Cognome e Nome ", cDTO.Surname + " " + cDTO.Name, "Cod. Fisc: ", cDTO.FiscalCode},
-		{"Residente in ", cDTO.StreetName + " " + cDTO.StreetNumber + " " + cDTO.City + " (" + cDTO.Province + ")", "Data nascita: ", cDTO.BirthDate},
-	}
 	table1 := parser(rows1)
-
-	rows2 := [][]string{
-		{"Mail ", cDTO.Mail, "Telefono: ", cDTO.Phone},
-	}
 	table2 := parser(rows2)
 
 	const (
@@ -338,9 +358,7 @@ func (lag *LifeAddendumGenerator) contractor() {
 		}
 		return result
 	}
-	domTxt := [][]string{
-		{"Domicilio ", cDTO.DomStreetName + " " + cDTO.DomStreetNumber + " " + cDTO.DomCity + " (" + cDTO.DomProvince + ")"},
-	}
+
 	dom := domParser(domTxt)
 
 	lag.engine.DrawTable(title)
@@ -355,9 +373,38 @@ func (lag *LifeAddendumGenerator) contractor() {
 func (lag *LifeAddendumGenerator) insured() {
 	iDTO := lag.dto.Insured
 
+	checked := " "
+	var rows1 [][]string
+	var rows2 [][]string
+	var domTxt [][]string
+	if iDTO.FiscalCode != constants.EmptyField {
+		checked = "X"
+		rows1 = [][]string{
+			{"Cognome e Nome ", iDTO.Surname + " " + iDTO.Name, "Cod. Fisc: ", iDTO.FiscalCode},
+			{"Residente in ", iDTO.StreetName + " " + iDTO.StreetNumber + " " + iDTO.City + " (" + iDTO.Province + ")", "Data nascita: ", iDTO.BirthDate},
+		}
+		rows2 = [][]string{
+			{"Mail ", iDTO.Mail, "Telefono: ", iDTO.Phone},
+		}
+		domTxt = [][]string{
+			{"Domicilio ", iDTO.DomStreetName + " " + iDTO.DomStreetNumber + " " + iDTO.DomCity + " (" + iDTO.DomProvince + ")"},
+		}
+	} else {
+		rows1 = [][]string{
+			{"Cognome e Nome ", " ", "Cod. Fisc: ", " "},
+			{"Residente in ", " ", "Data nascita: ", " "},
+		}
+		rows2 = [][]string{
+			{"Mail ", " ", "Telefono: ", " "},
+		}
+		domTxt = [][]string{
+			{"Domicilio ", " "},
+		}
+	}
+
 	titleT := []domain.TableCell{
 		{
-			Text:      " ",
+			Text:      checked,
 			Height:    4.5,
 			Width:     4.5,
 			FontSize:  constants.LargeFontSize,
@@ -449,15 +496,8 @@ func (lag *LifeAddendumGenerator) insured() {
 		return result
 	}
 
-	rows1 := [][]string{
-		{"Cognome e Nome ", iDTO.Surname + " " + iDTO.Name, "Cod. Fisc: ", iDTO.FiscalCode},
-		{"Residente in ", iDTO.StreetName + " " + iDTO.StreetNumber + " " + iDTO.City + " (" + iDTO.Province + ")", "Data nascita: ", iDTO.BirthDate},
-	}
 	table1 := parser(rows1)
 
-	rows2 := [][]string{
-		{"Mail ", iDTO.Mail, "Telefono: ", iDTO.Phone},
-	}
 	table2 := parser(rows2)
 
 	const (
@@ -498,9 +538,7 @@ func (lag *LifeAddendumGenerator) insured() {
 		}
 		return result
 	}
-	domTxt := [][]string{
-		{"Domicilio ", iDTO.DomStreetName + " " + iDTO.DomStreetNumber + " " + iDTO.DomCity + " (" + iDTO.DomProvince + ")"},
-	}
+
 	dom := domParser(domTxt)
 
 	lag.engine.DrawTable(title)
@@ -515,9 +553,21 @@ func (lag *LifeAddendumGenerator) insured() {
 func (lag *LifeAddendumGenerator) beneficiaries() {
 	bDTO := lag.dto.Beneficiaries
 
+	checked := " "
+	var rows [][]string
+	var relTxt [][]string
+	if bDTO != nil && len(*bDTO) != 0 {
+		for _, v := range *bDTO {
+			if v.FiscalCode != constants.EmptyField {
+				checked = "X"
+			}
+		}
+
+	}
+
 	titleT := []domain.TableCell{
 		{
-			Text:      " ",
+			Text:      checked,
 			Height:    4.5,
 			Width:     4.5,
 			FontSize:  constants.LargeFontSize,
@@ -653,23 +703,39 @@ func (lag *LifeAddendumGenerator) beneficiaries() {
 	lag.engine.DrawLine(10, lag.engine.GetY(), 200, lag.engine.GetY(), 0.25, constants.BlackColor)
 	lag.engine.NewLine(2)
 	for i := 0; i < 2; i++ {
-		rows := [][]string{
-			{"Cognome e Nome ", (*bDTO)[i].Surname + " " + (*bDTO)[i].Name, "Cod. Fisc: ", (*bDTO)[i].FiscalCode},
-			{"Residente in ", (*bDTO)[i].StreetName + " " + (*bDTO)[i].StreetNumber + " " + (*bDTO)[i].City + " (" + (*bDTO)[i].Province + ")", "Data nascita: ", (*bDTO)[i].BirthDate},
-			{"Mail ", (*bDTO)[i].Mail, "Telefono ", (*bDTO)[i].Phone},
+		if checked == "X" {
+			rows = [][]string{
+				{"Cognome e Nome ", (*bDTO)[i].Surname + " " + (*bDTO)[i].Name, "Cod. Fisc: ", (*bDTO)[i].FiscalCode},
+				{"Residente in ", (*bDTO)[i].StreetName + " " + (*bDTO)[i].StreetNumber + " " + (*bDTO)[i].City + " (" + (*bDTO)[i].Province + ")", "Data nascita: ", (*bDTO)[i].BirthDate},
+				{"Mail ", (*bDTO)[i].Mail, "Telefono ", (*bDTO)[i].Phone},
+			}
+			relTxt = [][]string{
+				{"Relazione con Assicurato ", (*bDTO)[i].Relation},
+			}
+		} else {
+			rows = [][]string{
+				{"Cognome e Nome ", " ", "Cod. Fisc: ", " "},
+				{"Residente in ", " ", "Data nascita: ", " "},
+				{"Mail ", " ", "Telefono ", " "},
+			}
+			relTxt = [][]string{
+				{"Relazione con Assicurato ", " "},
+			}
 		}
-		relTxt := [][]string{
-			{"Relazione con Assicurato ", (*bDTO)[i].Relation},
-		}
+
 		table := parser(rows)
 		rel := relParser(relTxt)
 		lag.engine.DrawTable(table)
 		lag.engine.DrawTable(rel)
 		lag.engine.NewLine(2)
-		conf := "No"
-		if (*bDTO)[i].Contactable {
-			conf = "Sì"
+		conf := " "
+		if checked == "X" {
+			conf = "No"
+			if (*bDTO)[i].Contactable {
+				conf = "Sì"
+			}
 		}
+
 		cons := domain.TableCell{
 			Text:      "Consenso ad invio comunicazioni da parte della compagnia ai beneficiari, prima dell'evento decesso: " + conf,
 			Height:    3.5,
@@ -692,10 +758,25 @@ func (lag *LifeAddendumGenerator) beneficiaries() {
 
 func (lag *LifeAddendumGenerator) beneficiaryReference() {
 	brDTO := lag.dto.BeneficiaryReference
-
+	checked := " "
+	var rows [][]string
+	if brDTO.FiscalCode != constants.EmptyField {
+		checked = "X"
+		rows = [][]string{
+			{"Cognome e Nome ", brDTO.Surname + " " + brDTO.Name, "Cod. Fisc: ", brDTO.FiscalCode},
+			{"Residente in ", brDTO.StreetName + " " + brDTO.StreetNumber + " " + brDTO.City + " (" + brDTO.Province + ")", "Data nascita: ", brDTO.BirthDate},
+			{"Mail ", brDTO.Mail, "Telefono: ", brDTO.Phone},
+		}
+	} else {
+		rows = [][]string{
+			{"Cognome e Nome ", " ", "Cod. Fisc: ", " "},
+			{"Residente in ", " ", "Data nascita: ", " "},
+			{"Mail ", " ", "Telefono: ", " "},
+		}
+	}
 	titleT := []domain.TableCell{
 		{
-			Text:      " ",
+			Text:      checked,
 			Height:    4.5,
 			Width:     4.5,
 			FontSize:  constants.LargeFontSize,
@@ -787,11 +868,6 @@ func (lag *LifeAddendumGenerator) beneficiaryReference() {
 		return result
 	}
 
-	rows := [][]string{
-		{"Cognome e Nome ", brDTO.Surname + " " + brDTO.Name, "Cod. Fisc: ", brDTO.FiscalCode},
-		{"Residente in ", brDTO.StreetName + " " + brDTO.StreetNumber + " " + brDTO.City + " (" + brDTO.Province + ")", "Data nascita: ", brDTO.BirthDate},
-		{"Mail ", brDTO.Mail, "Telefono: ", brDTO.Phone},
-	}
 	table := parser(rows)
 
 	lag.engine.DrawTable(title)
