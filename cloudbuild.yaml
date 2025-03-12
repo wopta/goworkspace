@@ -34,7 +34,6 @@ steps:
       echo "setting DEV environment variables..."
       bucket=function-data
       region=europe-west1
-      mem=256Mb
       project=positive-apex-350507
       env=dev
       genFx=--gen2
@@ -60,13 +59,24 @@ steps:
       echo "setting PROD environment variables..."
       bucket=core-350507-function-data
       region=europe-west1
-      mem=256Mb
       project=core-350507
       env=prod
       genFx=""
       sa=wopta-prod-cloud-function@core-350507.iam.gserviceaccount.com
       timeout=520
       vpc=functions-connector
+    fi
+
+    # === SET INGRESS SETTINGS BY FUNCTION =====================================
+    ingress=internal-and-gclb
+    if [[ "${fx_name}" == "callback" ]]; then
+      ingress=all
+    fi
+
+    # === SET MEMORY BY FUNCTION ===============================================
+    mem=256Mb
+    if [[ "${fx_name}" == "broker" ]]; then
+      mem=1Gb
     fi
 
     # === COPY ASSETS FROM BUCKET ==============================================
@@ -88,6 +98,7 @@ steps:
       --runtime=go121 \
       --env-vars-file ${env}.yaml \
       --timeout=${timeout} \
+      --ingress-settings=${ingress} \
       --egress-settings=all \
       --memory=${mem} \
       --vpc-connector=${vpc} \

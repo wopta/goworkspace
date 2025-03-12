@@ -178,6 +178,10 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 
 	}
 
+	log.Println("[Life] apply consultacy price")
+	
+	addConsultacyPrice(&data, ruleProduct)
+
 	log.Println("[Life] check monthly limit")
 
 	monthlyToBeRemoved := !ruleProduct.Companies[0].IsMonthlyPaymentAvailable ||

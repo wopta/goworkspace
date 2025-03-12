@@ -57,6 +57,14 @@ const (
 	PaySplitSingleInstallment PaySplit = "singleInstallment"
 )
 
+var PaySplitRateMap = map[PaySplit]int{
+	PaySplitMonthly:           12,
+	PaySplitYear:              1,
+	PaySplitYearly:            1,
+	PaySplitSemestral:         2,
+	PaySplitSingleInstallment: 1,
+}
+
 type PayType string
 
 const (

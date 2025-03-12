@@ -31,3 +31,17 @@ func getAvailableRates(product *models.Product, flow string) []string {
 	}
 	return availableRates
 }
+
+func addConsultacyPrice(policy *models.Policy, product *models.Product) {
+	if product.ConsultancyConfig == nil || !product.ConsultancyConfig.IsActive {
+		policy.ConsultancyValue.Percentage = 0
+		policy.ConsultancyValue.Price = 0
+		return
+	}
+
+	if !product.ConsultancyConfig.IsConfigurable {
+		policy.ConsultancyValue.Percentage = product.ConsultancyConfig.DefaultValue
+	}
+	
+	policy.ConsultancyValue.Price = lib.RoundFloat(policy.PriceGross * policy.ConsultancyValue.Percentage, 2)
+}

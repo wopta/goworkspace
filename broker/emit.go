@@ -103,12 +103,12 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	policyJsonLog, _ := policy.Marshal()
 	log.Printf("Policy %s JSON: %s", uid, string(policyJsonLog))
-	
+
 	if policy.IsPay || policy.IsSign || policy.CompanyEmit || policy.CompanyEmitted || policy.IsDeleted {
 		log.Printf("cannot emit policy %s because state is not correct", policy.Uid)
 		return "", nil, errors.New("operation not allowed")
 	}
-	
+
 	if request.SendEmail == nil {
 		sendEmail = true
 	} else {
@@ -222,6 +222,18 @@ func brokerUpdatePolicy(policy *models.Policy, request BrokerBaseRequest) {
 		policy.PaymentMode = request.PaymentMode
 	}
 
+	if policy.TaxAmount == 0 {
+		log.Println("[brokerUpdatePolicy] calculate tax amount")
+		policy.TaxAmount = lib.RoundFloat(policy.PriceGross - policy.PriceNett, 2)
+	}
+
+	if policy.TaxAmountMonthly == 0 {
+		log.Println("[brokerUpdatePolicy] calculate tax amount monthly")
+		policy.TaxAmountMonthly = lib.RoundFloat(policy.PriceGrossMonthly - policy.PriceNettMonthly, 2)
+	}
+
+	calculatePaymentComponents(policy)
+
 	policy.SanitizePaymentData()
 
 	log.Println("[brokerUpdatePolicy] end --------------------------------------")
@@ -321,4 +333,43 @@ func createPolicyTransactions(policy *models.Policy) (string, error) {
 		}
 	}
 	return payUrl, err
+}
+
+func calculatePaymentComponents(policy *models.Policy) {
+	policy.PaymentComponents = models.PaymentComponents{
+		Split:    models.PaySplit(policy.PaymentSplit),
+		Rates:    models.PaySplitRateMap[models.PaySplit(policy.PaymentSplit)],
+		Mode:     policy.PaymentMode,
+		Provider: policy.Payment,
+		PriceAnnuity: models.PriceComponents{
+			Gross:       policy.PriceGross,
+			Nett:        policy.PriceNett,
+			Tax:         policy.TaxAmount,
+			Consultancy: policy.ConsultancyValue.Price,
+			Total:       lib.RoundFloat(policy.PriceGross+policy.ConsultancyValue.Price, 2),
+		},
+	}
+
+	var priceSplit, priceFirstSplit models.PriceComponents
+	switch policy.PaymentComponents.Split {
+	case models.PaySplitSingleInstallment, models.PaySplitYearly, models.PaySplitYear:
+		priceSplit = policy.PaymentComponents.PriceAnnuity
+		priceFirstSplit = priceSplit
+	case models.PaySplitSemestral:
+	// TODO: unimplemented
+	case models.PaySplitMonthly:
+		priceSplit = models.PriceComponents{
+			Gross:       policy.PriceGrossMonthly,
+			Nett:        policy.PriceNettMonthly,
+			Tax:         policy.TaxAmountMonthly,
+			Consultancy: 0,
+			Total:       policy.PriceGrossMonthly,
+		}
+		priceFirstSplit = priceSplit
+		priceFirstSplit.Consultancy = policy.ConsultancyValue.Price
+		priceFirstSplit.Total = lib.RoundFloat(priceFirstSplit.Gross+priceFirstSplit.Consultancy, 2)
+	}
+
+	policy.PaymentComponents.PriceSplit = priceSplit
+	policy.PaymentComponents.PriceFirstSplit = priceFirstSplit
 }
