@@ -715,9 +715,9 @@ func (bg *baseGenerator) annexSections() {
 	producerInfo := bg.productInfo()
 	proponetInfo := bg.proponentInfo()
 	designationInfo := bg.designationInfo()
-	annex4Section1Info := bg.annex4Section1Info()
+	annex4Section1Info, annex4Section3Info := bg.annex4Info()
 
-	log.Println(producerInfo, proponetInfo, designationInfo, annex4Section1Info)
+	log.Println(producerInfo, proponetInfo, designationInfo, annex4Section1Info, annex4Section3Info)
 
 	bg.engine.NewPage()
 
@@ -725,7 +725,7 @@ func (bg *baseGenerator) annexSections() {
 
 	bg.engine.NewPage()
 
-	bg.annex4(producerInfo, proponetInfo, designationInfo, annex4Section1Info)
+	bg.annex4(producerInfo, proponetInfo, designationInfo, annex4Section1Info, annex4Section3Info)
 
 	bg.engine.NewPage()
 
@@ -868,9 +868,8 @@ func (bg *baseGenerator) designationInfo() string {
 	return designation
 }
 
-func (bg *baseGenerator) annex4Section1Info() string {
-	var (
-		section1Info       string
+func (bg *baseGenerator) annex4Info() (section1Info, section3Info string) {
+	const (
 		mgaProponentFormat = "Secondo quanto indicato nel modulo di proposta/polizza e documentazione " +
 			"precontrattuale ricevuta, la distribuzione  relativamente a questa proposta/contratto è svolta per " +
 			"conto della seguente impresa di assicurazione: %s"
@@ -878,6 +877,12 @@ func (bg *baseGenerator) annex4Section1Info() string {
 			"virtù della collaborazione con Wopta Assicurazioni Srl (intermediario emittente dell'Impresa di " +
 			"Assicurazione %s, iscritto al RUI sezione A nr A000701923 dal 14.02.2022, ai sensi dell’articolo 22, " +
 			"comma 10, del decreto legge 18 ottobre 2012, n. 179, convertito nella legge 17 dicembre 2012, n. 221"
+		withoutConsultacy    = "Per il prodotto intermediato, è corrisposto all’intermediario, da parte "+
+			"dell’impresa di assicurazione, un compenso sotto forma di commissione inclusa nel premio "+
+			"assicurativo."
+		withConsultacyFormat = "Per il prodotto intermediato, è corrisposto all’intermediario, da parte "+
+			"dell’impresa di assicurazione, sotto forma di commissione inclusa nel premio assicurativo "+
+			"e un contributo per servizi di intermediazione, a carico del cliente, pari ad %s."
 	)
 
 	companyName := constants.CompanyMap[bg.policy.Company]
@@ -899,9 +904,15 @@ func (bg *baseGenerator) annex4Section1Info() string {
 		)
 	}
 
-	log.Printf("annex 4 section 1 info: %s", section1Info)
+	section3Info = withoutConsultacy
+	if bg.policy.ConsultancyValue.Price > 0 {
+		section3Info = fmt.Sprintf(
+			withConsultacyFormat,
+			lib.HumanaizePriceEuro(bg.policy.ConsultancyValue.Price),
+		)
+	}
 
-	return section1Info
+	return section1Info, section3Info
 }
 
 func (bg *baseGenerator) woptaTable(producerInfo, proponentInfo map[string]string, designation string) {
@@ -1244,7 +1255,7 @@ func (bg *baseGenerator) annex3(producerInfo, proponentInfo map[string]string, d
 	}
 }
 
-func (bg *baseGenerator) annex4(producerInfo, proponentInfo map[string]string, designation, annex4Section1Info string) {
+func (bg *baseGenerator) annex4(producerInfo, proponentInfo map[string]string, designation, annex4Section1Info, annex4Section3Info string) {
 	type section struct {
 		title string
 		body  []string
@@ -1333,9 +1344,7 @@ func (bg *baseGenerator) annex4(producerInfo, proponentInfo map[string]string, d
 		{
 			title: "SEZIONE III - Informazioni relative alle remunerazioni",
 			body: []string{
-				"Per il prodotto intermediato, è corrisposto all’intermediario, da parte " +
-					"dell’impresa di assicurazione, un compenso sotto forma di commissione inclusa nel premio " +
-					"assicurativo.",
+				annex4Section3Info,
 				"L’informazione sopra resa riguarda i compensi complessivamente percepiti da tutti " +
 					"gli intermediari coinvolti nella distribuzione del prodotto.",
 			},

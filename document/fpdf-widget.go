@@ -1173,7 +1173,7 @@ func allegato3Section(pdf *fpdf.Fpdf, producerInfo, proponentInfo map[string]str
 		"", "", false)
 }
 
-func allegato4Section(pdf *fpdf.Fpdf, producerInfo, proponentInfo map[string]string, designation, section1Info string) {
+func allegato4Section(pdf *fpdf.Fpdf, producerInfo, proponentInfo map[string]string, designation, section1Info string, consultacyPrice float64) {
 	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "ALLEGATO 4 - INFORMAZIONI SULLA DISTRIBUZIONE\nDEL PRODOTTO ASSICURATIVO NON IBIP",
 		"", "CM", false)
@@ -1213,9 +1213,16 @@ func allegato4Section(pdf *fpdf.Fpdf, producerInfo, proponentInfo map[string]str
 	pdf.MultiCell(0, 3, "SEZIONE III - Informazioni relative alle remunerazioni", "", "", false)
 	pdf.Ln(1)
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Per il prodotto intermediato, è corrisposto all’intermediario, da parte "+
+	commisionText := "Per il prodotto intermediato, è corrisposto all’intermediario, da parte "+
 		"dell’impresa di assicurazione, un compenso sotto forma di commissione inclusa nel premio "+
-		"assicurativo.", "", "", false)
+		"assicurativo."
+	if consultacyPrice > 0 {
+		commisionText = "Per il prodotto intermediato, è corrisposto all’intermediario, da parte "+
+			"dell’impresa di assicurazione, sotto forma di commissione inclusa nel premio assicurativo "+
+			"e un contributo per servizi di intermediazione, a carico del cliente, pari ad € "+
+			humanize.FormatFloat("#.###,##", consultacyPrice)+"."
+	}
+	pdf.MultiCell(0, 3, commisionText, "", "", false)
 	pdf.Ln(1)
 	pdf.MultiCell(0, 3, "L’informazione sopra resa riguarda i compensi complessivamente percepiti da tutti "+
 		"gli intermediari coinvolti nella distribuzione del prodotto.", "", "", false)
@@ -1302,7 +1309,7 @@ func generatePolicyAnnex(pdf *fpdf.Fpdf, origin string, networkNode *models.Netw
 
 		pdf.AddPage()
 
-		allegato4Section(pdf, producerInfo, proponentInfo, designation, annex4Section1Info)
+		allegato4Section(pdf, producerInfo, proponentInfo, designation, annex4Section1Info, policy.ConsultancyValue.Price)
 
 		pdf.AddPage()
 
