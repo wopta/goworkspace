@@ -9,6 +9,7 @@ steps:
   args:
   - '-c'
   - | 
+    chmod +x ./deploy.sh
     ./deploy.sh ${TAG_NAME}
     
 - name: gcr.io/cloud-builders/gcloud:latest
