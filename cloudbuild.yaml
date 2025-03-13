@@ -9,8 +9,42 @@ steps:
   args:
   - '-c'
   - | 
+    # === EXTRACT FUNCTION NAME AND VERSION FROM TAG ===========================
+    # Read TAG_NAME splitting by the IFS separator into the needed variables
+    IFS='/'
+    read -a strarr <<< $TAG_NAME
+    fx_name=$(echo ${strarr[0]})
+    tag=$(echo ${strarr[1]})
+    echo "fx_name: ${fx_name}"
+    echo "tag: ${tag}"
+
+    # === FX ENTRYPOINT AND TAG VERSION ========================================
+    # Camel case function entrypoint. Ex.: broker -> Broker 
+    fx_entrypoint=$(sed -r 's/(^|-)(\w)/\U\2/g' <<<"${fx_name}")
+    # Replace '.' with '_' for tag version. Ex.: 1.2.3.dev -> 1_2_3_dev 
+    tag_version=$(echo "${tag}" | sed -r 's/\./_/g')
+    echo "fx_entrypoint: ${fx_entrypoint}"
+    echo "tag_version: ${tag_version}"
+   # === COPY ASSETS FROM BUCKET ==============================================
+    echo "copying assets..."
+    mkdir -p /workspace/${fx_name}/tmp/assets
+    gsutil -m cp -r gs://${bucket}/assets/documents/** /workspace/${fx_name}/tmp/assets
+    cp /workspace/.gcloudignore /workspace/${fx_name}/.gcloudignore 
+    # === RUN DEV =====================================================
+    if [[ "${tag}" == *"dev"* ]]; then
+       chmod +x ./deploy-dev.sh
+       ./deploy-dev.sh ${TAG_NAME} ${fx_name} ${fx_entrypoint}
+    fi
+    # === RUN UAT =====================================================
+    if [[ "${tag}" == *"uat"* ]]; then
+       chmod +x ./deploy.sh
+       ./deploy.sh ${TAG_NAME} ${fx_name} ${fx_entrypoint}
+    fi
+    # === RUN PROD ENV VARS ====================================================
+    if [[ "${tag}" == *"prod"* ]]; then
     chmod +x ./deploy.sh
-    ./deploy.sh ${TAG_NAME}
+       ./deploy.sh ${TAG_NAME} ${fx_name} ${fx_entrypoint}
+    fi
     
 - name: gcr.io/cloud-builders/gcloud:latest
   entrypoint: "ls"
