@@ -25,7 +25,7 @@ steps:
     tag_version=$(echo "${tag}" | sed -r 's/\./_/g')
     echo "fx_entrypoint: ${fx_entrypoint}"
     echo "tag_version: ${tag_version}"
-   # === COPY ASSETS FROM BUCKET ==============================================
+    # === COPY ASSETS FROM BUCKET ==============================================
     echo "copying assets..."
     mkdir -p /workspace/${fx_name}/tmp/assets
     gsutil -m cp -r gs://${bucket}/assets/documents/** /workspace/${fx_name}/tmp/assets
