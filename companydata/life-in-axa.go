@@ -1324,12 +1324,7 @@ func policyBigquerySave(policy models.Policy, collectionPrefix string) {
 func transactionBigQuerySave(transaction models.Transaction, collectionPrefix string) {
 	fireTransactions := lib.GetDatasetByEnv("", fmt.Sprintf("%s%s", collectionPrefix, lib.TransactionsCollection))
 
-	transaction.BigPayDate = lib.GetBigQueryNullDateTime(transaction.PayDate)
-	transaction.BigTransactionDate = lib.GetBigQueryNullDateTime(transaction.TransactionDate)
-	transaction.BigCreationDate = civil.DateTimeOf(transaction.CreationDate)
-	transaction.BigStatusHistory = strings.Join(transaction.StatusHistory, ",")
-	transaction.BigUpdateDate = lib.GetBigQueryNullDateTime(transaction.UpdateDate)
-	log.Println("Transaction save BigQuery: " + transaction.Uid)
+	transaction.BigQueryParse()
 
 	err := lib.InsertRowsBigQuery(models.WoptaDataset, fireTransactions, transaction)
 	if err != nil {
