@@ -47,6 +47,12 @@ var documentRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
+	{
+		Route:   "/v1/proforma",
+		Handler: lib.ResponseLoggerWrapper(ProformaFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
 }
 
 func init() {
