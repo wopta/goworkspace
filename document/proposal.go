@@ -122,7 +122,7 @@ func lifeProposal(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkN
 		log.Println("[lifeProposal] life v2")
 		pdf:=engine.NewFpdf()
 		gen:=contract.NewLifeGenerator(pdf,policy,networkNode,*product,true)
-		gen.ContractProva()
+		gen.Generate()
 		filename, rawDoc = lifeAxaProposalV2(pdf.GetPdf(), origin, policy, networkNode, product)
 	}
 

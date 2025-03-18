@@ -28,9 +28,16 @@ func NewLifeGenerator(engine *engine.Fpdf, policy *models.Policy, node *models.N
 	}
 }
 
-func (el *LifeGenerator) ContractProva() ([]byte, error) {
+func (el *LifeGenerator) Generate() ([]byte, error) {
 	el.addMainHeader()
-	el.addInformation()
+	el.engine.NewPage()
+	el.engine.WriteText(getTableCell("\n\nIl tuo Preventivo: cosa fare adesso?\n",constants.BoldFontStyle,constants.PinkColor,constants.LargeFontSize))
+	el.addWelcomeSection()
+	el.addEmailSection()
+	el.addSignSection()
+	el.addPolicyInformationSection()
+	el.addSupportInformationSection()
+	el.addGreatingsSection()
 	return el.engine.RawDoc()
 }
 
@@ -163,17 +170,6 @@ func (el *LifeGenerator) addMainHeader() {
 			el.engine.DrawWatermark(constants.Proposal)
 		}
 	})
-}
-
-func (el *LifeGenerator) addInformation() {
-	el.engine.NewPage()
-	el.engine.WriteText(getTableCell("\n\nIl tuo Preventivo: cosa fare adesso?\n",constants.BoldFontStyle,constants.PinkColor,constants.LargeFontSize))
-	el.addWelcomeSection()
-	el.addEmailSection()
-	el.addSignSection()
-	el.addPolicyInformationSection()
-	el.addSupportInformationSection()
-	el.addGreatingsSection()
 }
 
 func (el *LifeGenerator) addWelcomeSection(){
