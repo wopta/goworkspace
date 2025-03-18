@@ -31,7 +31,7 @@ func NewLifeGenerator(engine *engine.Fpdf, policy *models.Policy, node *models.N
 func (el *LifeGenerator) Generate() ([]byte, error) {
 	el.addMainHeader()
 	el.engine.NewPage()
-	el.engine.WriteText(getTableCell("\n\nIl tuo Preventivo: cosa fare adesso?\n",constants.BoldFontStyle,constants.PinkColor,constants.LargeFontSize))
+	el.engine.WriteText(getTableCell("\n\nIl tuo Preventivo: cosa fare adesso?\n", constants.BoldFontStyle, constants.PinkColor, constants.LargeFontSize))
 	el.addWelcomeSection()
 	el.addEmailSection()
 	el.addSignSection()
@@ -147,14 +147,14 @@ func (el *LifeGenerator) addMainHeader() {
 		return time.In(location).Format("02/01/2006")
 	}
 
-	addressFirstPart:=policy.Contractor.Residence.StreetName + ", " + policy.Contractor.Residence.StreetNumber
-	addressSecondPart:=policy.Contractor.Residence.PostalCode + " " + policy.Contractor.Residence.City + " (" + policy.Contractor.Residence.CityCode + ")"
+	addressFirstPart := policy.Contractor.Residence.StreetName + ", " + policy.Contractor.Residence.StreetNumber
+	addressSecondPart := policy.Contractor.Residence.PostalCode + " " + policy.Contractor.Residence.City + " (" + policy.Contractor.Residence.CityCode + ")"
 	rowsData := [][]string{
 		{"I dati del tuo Preventivo", "I tuoi dati"},
 		{fmt.Sprintf("Numero: %d", policy.Number), "Contraente: " + policy.Name + " " + policy.Contractor.Surname},
-		{"Decore dal: " + formatDate(policy.EmitDate), "C.F./P.IVA: " + policy.Contractor.FiscalCode}, 
+		{"Decore dal: " + formatDate(policy.EmitDate), "C.F./P.IVA: " + policy.Contractor.FiscalCode},
 		{"Scade il: " + formatDate(policy.EndDate), "Indirizzo: " + addressFirstPart},
-		{"Prima scadenza Annuale il: " + formatDate(policy.EndDate),addressSecondPart},
+		{"Prima scadenza Annuale il: " + formatDate(policy.EndDate), addressSecondPart},
 		{"Non si rinnova a scadenza.", "Mail: " + policy.Contractor.Mail},
 		{fmt.Sprintf("Produttore: %s %s", policy.Contractor.Name, policy.Contractor.Surname), "Telefono: " + policy.Contractor.Phone},
 	}
@@ -172,14 +172,14 @@ func (el *LifeGenerator) addMainHeader() {
 	})
 }
 
-func (el *LifeGenerator) addWelcomeSection(){
+func (el *LifeGenerator) addWelcomeSection() {
 	el.writeTexts(
 		getTableCell(fmt.Sprintf("\n\nBuongiorno %v %v,\n", el.policy.Contractor.Name, el.policy.Contractor.Surname), constants.BlackColor),
 		getTableCell("\nGrazie per aver fatto un preventivo per una polizza Vita, dimostrando volontà e interesse a tutelarti e/o proteggere le persone per te più importanti.\n", constants.BlackColor),
 	)
 }
 
-func (el *LifeGenerator) addEmailSection(){
+func (el *LifeGenerator) addEmailSection() {
 	el.engine.WriteText(getTableCell(
 		"\nIn allegato trovi:\n"+
 		"- modulo di Polizza\n"+
@@ -192,25 +192,26 @@ func (el *LifeGenerator) addEmailSection(){
 	el.engine.WriteText(getTableCell("Verifica la correttezza di tutti i dati inseriti (anagrafici, indirizzi, codice fiscale, contatti) e delle prestazioni scelte (durata, importi, eventuali opzioni).\n", constants.BlackColor))
 
 	if el.policy.Channel == models.ECommerceChannel {
+		el.engine.NewLine(constants.CellHeight)
 		el.writeTexts(
 			getTableCell("Riceverai anche due mail per procedere con la ", constants.BlackColor),
-			getTableCell("firma ", constants.PinkColor,constants.BoldFontStyle),
+			getTableCell("firma ", constants.PinkColor, constants.BoldFontStyle),
 			getTableCell("ed il ", constants.BlackColor),
-			getTableCell("pagamento\n", constants.PinkColor,constants.BoldFontStyle),
+			getTableCell("pagamento\n\n", constants.PinkColor, constants.BoldFontStyle),
 		)
 	}
 }
 
-func (el *LifeGenerator) addSignSection(){
+func (el *LifeGenerator) addSignSection() {
 	el.writeTexts(
-		getTableCell("ATTENZIONE", constants.PinkColor,constants.BoldFontStyle),
+		getTableCell("ATTENZIONE", constants.PinkColor, constants.BoldFontStyle),
 		getTableCell(" :Solo una volta firmati i documenti ed effettuato il pagamento, la copertura assicurativa sarà attiva e così ti invieremo i documenti contrattuali da te firmati, che poi potrai visualizzare nell’area riservata ai clienti della nostra app e/o sito.", constants.BlackColor),
 	)
 }
 
-func (el *LifeGenerator) addPolicyInformationSection(){
-	getSplitLabel:=func (paymentSplit string)string{
-		switch paymentSplit{
+func (el *LifeGenerator) addPolicyInformationSection() {
+	getSplitLabel := func(paymentSplit string) string {
+		switch paymentSplit {
 		case string(models.PaySplitMonthly):
 			return "mensile"
 		case string(models.PaySplitYearly):
@@ -221,27 +222,27 @@ func (el *LifeGenerator) addPolicyInformationSection(){
 		return ""
 	}
 
-	if el.policy.ConsultancyValue.Price==0  {
+	if el.policy.ConsultancyValue.Price == 0 {
 		return
 	}
-	el.engine.NewLine(constants.CellHeight*2)
-	text:=
-		"Infine, ti ricordiamo la presente polizza prevede il pagamento dei seguenti costi:\n"+
-		fmt.Sprintf("Premio di polizza: euro %v con frazionamento %v\n", lib.HumanaizePriceEuro(el.policy.PriceGross),getSplitLabel(el.policy.PaymentSplit))+
-		fmt.Sprintf("- Contributo per servizi di intermediazione: euro %v vorrisposti con il pagamento della prima rata di polizza. Il documento contabile è scaricabile dall’app o nella tua area riservata\n", lib.HumanaizePriceEuro(el.policy.ConsultancyValue.Price))+
-		fmt.Sprintf("- Per un totale annuo di euro %v", el.policy.PaymentComponents.PriceAnnuity.Total)
+	el.engine.NewLine(constants.CellHeight * 2)
+	text :=
+	"Infine, ti ricordiamo la presente polizza prevede il pagamento dei seguenti costi:\n" +
+	fmt.Sprintf("- Premio di polizza: euro %v con frazionamento %v\n", lib.HumanaizePriceEuro(el.policy.PriceGross), getSplitLabel(el.policy.PaymentSplit)) +
+	fmt.Sprintf("- Contributo per servizi di intermediazione: euro %v vorrisposti con il pagamento della prima rata di polizza. Il documento contabile è scaricabile dall’app o nella tua area riservata\n", lib.HumanaizePriceEuro(el.policy.ConsultancyValue.Price)) +
+	fmt.Sprintf("- Per un totale annuo di euro %v", el.policy.PaymentComponents.PriceAnnuity.Total)
 
-	el.engine.WriteText(getTableCell(text,constants.BlackColor))
+	el.engine.WriteText(getTableCell(text, constants.BlackColor))
 }
 
-func (el *LifeGenerator) addSupportInformationSection(){
-	if el.policy.Channel == models.ECommerceChannel{
+func (el *LifeGenerator) addSupportInformationSection() {
+	if el.policy.Channel == models.ECommerceChannel {
 		text := "\nRestiamo a disposizione per ogni ulteriore informazione anche attraverso i canali di contatto che trovi a questo "
 		el.writeTexts(
 			getTableCell(text, constants.BlackColor),
 			getTableCell("link", constants.PinkColor),
 		)
-		widthLink:=el.engine.GetStringWidth("link")
+		widthLink := el.engine.GetStringWidth("link")
 		el.engine.GetPdf().LinkString(1+el.engine.GetX()-widthLink, el.engine.GetY(), widthLink, constants.CellHeight, "https://www.wopta.it/it/vita/#contact-us")
 		return
 	}
@@ -251,33 +252,33 @@ func (el *LifeGenerator) addSupportInformationSection(){
 	}
 }
 
-func (el *LifeGenerator) addGreatingsSection(){
+func (el *LifeGenerator) addGreatingsSection() {
 	el.engine.NewLine(constants.CellHeight)
 	el.engine.WriteText(getTableCell("Cordiali saluti.", constants.BlackColor))
-	el.engine.NewLine(constants.CellHeight*2)
+	el.engine.NewLine(constants.CellHeight * 2)
 	el.writeTexts(
 		getTableCell("Anna di Wopta Assicurazioni\n", constants.BlackColor),
 		getTableCell("Proteggiamo chi sei", constants.BlackColor),
 	)
 }
 
-//get a tablecell personalized based on passed opts
-func getTableCell(text string, opts ...any)domain.TableCell{
-	tableCell:=domain.TableCell{}
-	tableCell.Text=text
-	tableCell.Height=constants.CellHeight
-	tableCell.Align=constants.LeftAlign
-	tableCell.FontStyle=constants.RegularFontStyle
-	tableCell.FontSize=constants.RegularFontSize
+// get a tablecell personalized based on passed opts
+func getTableCell(text string, opts ...any) domain.TableCell {
+	tableCell := domain.TableCell{}
+	tableCell.Text = text
+	tableCell.Height = constants.CellHeight
+	tableCell.Align = constants.LeftAlign
+	tableCell.FontStyle = constants.RegularFontStyle
+	tableCell.FontSize = constants.RegularFontSize
 
-	for _,opt := range opts{
-		switch opt:=opt.(type){
+	for _, opt := range opts {
+		switch opt := opt.(type) {
 		case domain.FontSize:
-			tableCell.FontSize=opt
+			tableCell.FontSize = opt
 		case domain.FontStyle:
-			tableCell.FontStyle=opt
+			tableCell.FontStyle = opt
 		case domain.Color:
-			tableCell.FontColor=opt
+			tableCell.FontColor = opt
 		}
 	}
 	return tableCell
