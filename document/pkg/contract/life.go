@@ -256,7 +256,7 @@ func (el *LifeGenerator) addGreatingsSection(){
 	el.engine.WriteText(getTableCell("Cordiali saluti.", constants.BlackColor))
 	el.engine.NewLine(constants.CellHeight*2)
 	el.writeTexts(
-		getTableCell("Anna di Wopta Assicurazioni", constants.BlackColor),
+		getTableCell("Anna di Wopta Assicurazioni\n", constants.BlackColor),
 		getTableCell("Proteggiamo chi sei", constants.BlackColor),
 	)
 }
