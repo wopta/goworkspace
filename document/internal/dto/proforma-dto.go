@@ -91,7 +91,7 @@ func (c *ContractorDTO) fromPolicy(contr models.Contractor) {
 }
 
 func (b *BodyDTO) fromPolicy(value models.ConsultancyValue) {
-	b.Gross = strconv.FormatFloat(value.Price, 'f', -1, 64)
+	b.Gross = strconv.FormatFloat(value.Price, 'f', 2, 64)
 	b.Net = b.Gross
 	b.Vat = "0,00"
 	b.Date = time.Now().Format("02/01/2006")
