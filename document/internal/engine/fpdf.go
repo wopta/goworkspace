@@ -55,6 +55,10 @@ func NewFpdf() *Fpdf {
 	}
 }
 
+func (f *Fpdf) GetPdf()*fpdf.Fpdf{
+	return f.pdf
+}
+
 func (f *Fpdf) NewPage() {
 	f.pdf.AddPage()
 	f.NewLine(5)
@@ -156,6 +160,25 @@ func (f *Fpdf) WriteText(cell domain.TableCell) {
 
 	f.SetFillColor(oldFillColor)
 	f.SetFontStyle(oldFontStyle)
+}
+
+func (f *Fpdf) RawWriteText(cell domain.TableCell) {
+    oldFontStyle := f.style
+    oldFillColor := f.fillColor
+ 
+    if cell.Fill {
+        f.SetFillColor(cell.FillColor)
+    }
+ 
+    f.SetFontStyle(cell.FontStyle)
+    f.SetFontColor(cell.FontColor)
+    f.SetFontSize(cell.FontSize)
+    f.SetFontFamily(constants.MontserratFont)
+ 
+    f.pdf.Write(cell.Height, cell.Text)
+ 
+    f.SetFillColor(oldFillColor)
+    f.SetFontStyle(oldFontStyle)
 }
 
 func (f *Fpdf) DrawTable(table [][]domain.TableCell) {
