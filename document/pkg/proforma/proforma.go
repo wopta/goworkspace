@@ -77,8 +77,8 @@ func (pg *ProformaGenerator) mainHeader() {
 func (pg *ProformaGenerator) contractor() {
 	contr := pg.dto.Contractor
 	const (
-		firstColumnWidth  = 130
-		secondColumnWidth = 60
+		firstColumnWidth  = 110
+		secondColumnWidth = 80
 	)
 	parser := func(rows []string) [][]domain.TableCell {
 		result := make([][]domain.TableCell, 0, len(rows))
@@ -121,9 +121,9 @@ func (pg *ProformaGenerator) contractor() {
 	data := []string{
 		"I tuoi dati",
 		"Contraente: " + contr.Name + " " + contr.Surname,
-		"CF/P.IVA: " + contr.FiscalCode,
+		"CF/P.IVA: " + contr.FiscalOrVatCode,
 		"Indirizzo: " + contr.StreetName + " " + contr.StreetNumber,
-		contr.PostalCode + " " + contr.City + "(" + contr.Province + ")",
+		contr.PostalCode + " " + contr.City + " (" + contr.Province + ")",
 		"Mail: " + contr.Mail,
 		"Telefono: " + contr.Phone,
 	}
@@ -233,7 +233,7 @@ func (pg *ProformaGenerator) body() {
 	data := [][]string{
 		{"Contributo per servizi di intermediazione:", body.Gross + " Euro"},
 		{"Imponibile:", body.Net + " Euro"},
-		{"IVA (esente ex art. 10 c9 D.P.R. n. 633 del 1972:", "0,00 Euro"},
+		{"IVA (esente ex art. 10 c9 D.P.R. n. 633 del 1972:", body.Vat + " Euro"},
 		{"Totale lordo da pagare:", body.Gross + " Euro"},
 	}
 
@@ -381,10 +381,10 @@ func (lag *LifeAddendumGenerator) contractor() {
 	var rows1 [][]string
 	var rows2 [][]string
 	var domTxt [][]string
-	if cDTO.FiscalCode != constants.EmptyField {
+	if cDTO.FiscalOrVatCode != constants.EmptyField {
 		checked = "X"
 		rows1 = [][]string{
-			{"Cognome e Nome ", cDTO.Surname + " " + cDTO.Name, "Cod. Fisc: ", cDTO.FiscalCode},
+			{"Cognome e Nome ", cDTO.Surname + " " + cDTO.Name, "Cod. Fisc: ", cDTO.FiscalOrVatCode},
 			{"Residente in ", cDTO.StreetName + " " + cDTO.StreetNumber + " " + cDTO.City + " (" + cDTO.Province + ")", "Data nascita: ", cDTO.BirthDate},
 		}
 		rows2 = [][]string{
@@ -560,10 +560,10 @@ func (lag *LifeAddendumGenerator) insured() {
 	var rows1 [][]string
 	var rows2 [][]string
 	var domTxt [][]string
-	if iDTO.FiscalCode != constants.EmptyField {
+	if iDTO.FiscalOrVatCode != constants.EmptyField {
 		checked = "X"
 		rows1 = [][]string{
-			{"Cognome e Nome ", iDTO.Surname + " " + iDTO.Name, "Cod. Fisc: ", iDTO.FiscalCode},
+			{"Cognome e Nome ", iDTO.Surname + " " + iDTO.Name, "Cod. Fisc: ", iDTO.FiscalOrVatCode},
 			{"Residente in ", iDTO.StreetName + " " + iDTO.StreetNumber + " " + iDTO.City + " (" + iDTO.Province + ")", "Data nascita: ", iDTO.BirthDate},
 		}
 		rows2 = [][]string{
@@ -741,7 +741,7 @@ func (lag *LifeAddendumGenerator) beneficiaries() {
 	var relTxt [][]string
 	if bDTO != nil && len(*bDTO) != 0 {
 		for _, v := range *bDTO {
-			if v.FiscalCode != constants.EmptyField {
+			if v.FiscalOrVatCode != constants.EmptyField {
 				checked = "X"
 			}
 		}
@@ -888,7 +888,7 @@ func (lag *LifeAddendumGenerator) beneficiaries() {
 	for i := 0; i < 2; i++ {
 		if checked == "X" {
 			rows = [][]string{
-				{"Cognome e Nome ", (*bDTO)[i].Surname + " " + (*bDTO)[i].Name, "Cod. Fisc: ", (*bDTO)[i].FiscalCode},
+				{"Cognome e Nome ", (*bDTO)[i].Surname + " " + (*bDTO)[i].Name, "Cod. Fisc: ", (*bDTO)[i].FiscalOrVatCode},
 				{"Residente in ", (*bDTO)[i].StreetName + " " + (*bDTO)[i].StreetNumber + " " + (*bDTO)[i].City + " (" + (*bDTO)[i].Province + ")", "Data nascita: ", (*bDTO)[i].BirthDate},
 				{"Mail ", (*bDTO)[i].Mail, "Telefono ", (*bDTO)[i].Phone},
 			}
@@ -943,10 +943,10 @@ func (lag *LifeAddendumGenerator) beneficiaryReference() {
 	brDTO := lag.dto.BeneficiaryReference
 	checked := " "
 	var rows [][]string
-	if brDTO.FiscalCode != constants.EmptyField {
+	if brDTO.FiscalOrVatCode != constants.EmptyField {
 		checked = "X"
 		rows = [][]string{
-			{"Cognome e Nome ", brDTO.Surname + " " + brDTO.Name, "Cod. Fisc: ", brDTO.FiscalCode},
+			{"Cognome e Nome ", brDTO.Surname + " " + brDTO.Name, "Cod. Fisc: ", brDTO.FiscalOrVatCode},
 			{"Residente in ", brDTO.StreetName + " " + brDTO.StreetNumber + " " + brDTO.City + " (" + brDTO.Province + ")", "Data nascita: ", brDTO.BirthDate},
 			{"Mail ", brDTO.Mail, "Telefono: ", brDTO.Phone},
 		}
