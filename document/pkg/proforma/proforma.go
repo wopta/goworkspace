@@ -41,26 +41,8 @@ func (pg *ProformaGenerator) Contract() ([]byte, error) {
 	pg.contractor()
 
 	pg.engine.NewLine(6)
-	//
+
 	pg.body()
-	//
-	//lag.engine.NewLine(6)
-	//
-	//lag.contractor()
-	//
-	//lag.engine.NewLine(6)
-	//
-	//lag.insured()
-	//
-	//lag.engine.NewLine(6)
-	//
-	//lag.beneficiaries()
-	//
-	//lag.engine.NewLine(6)
-	//
-	//lag.beneficiaryReference()
-	//
-	//lag.engine.NewLine(6)
 
 	pg.woptaFooter()
 
