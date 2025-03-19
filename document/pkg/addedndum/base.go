@@ -23,10 +23,8 @@ type baseGenerator struct {
 }
 
 func (bg *baseGenerator) Save(rawDoc []byte) (string, error) {
-	//filename := strings.ReplaceAll(fmt.Sprintf("%s/%s/"+models.AddendumDocumentFormat, "temp", bg.policy.Uid,
-	//	bg.policy.NameDesc, bg.policy.ProposalNumber), " ", "_")
-	filename := strings.ReplaceAll(fmt.Sprintf("%s/%s/"+"%s_TEST_ADDENDUM_%d__%s.pdf", "temp", bg.policy.Uid,
-		bg.policy.NameDesc, bg.policy.ProposalNumber, time.Now().Format("2006-1-2_15:04:05")), " ", "_")
+	filename := strings.ReplaceAll(fmt.Sprintf("%s/%s/"+models.AddendumDocumentFormat, "temp", bg.policy.Uid,
+		bg.policy.NameDesc, bg.policy.ProposalNumber, time.Now().Format("2006-01-02_15:04:05")), " ", "_")
 	return bg.engine.Save(rawDoc, filename)
 }
 
