@@ -24,7 +24,6 @@ func NewLifeAddendumGenerator(engine *engine.Fpdf, policy *models.Policy, node *
 		baseGenerator: &baseGenerator{
 			engine:      engine,
 			now:         time.Now(),
-			signatureID: 0,
 			networkNode: node,
 			policy:      policy,
 		},
