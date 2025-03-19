@@ -72,45 +72,45 @@ func (lag *LifeAddendumGenerator) Contract() ([]byte, error) {
 
 func (lag *LifeAddendumGenerator) mainHeader() {
 	lag.engine.SetHeader(func() {
+		first := domain.TableCell{
+			Text:      "Wopta per te",
+			Height:    7,
+			Width:     57,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.PinkColor,
+			FontSize:  17,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.RightAlign,
+			Border:    "",
+		}
+		second := domain.TableCell{
+			Text:      "Vita",
+			Height:    7,
+			Width:     28,
+			FontStyle: constants.RegularFontStyle,
+			FontColor: constants.BlackColor,
+			FontSize:  15,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.RightAlign,
+			Border:    "",
+		}
+
 		lag.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_vita.png", 12, 6.5, 12, 12)
-		//lag.engine.DrawLine(102, 6.25, 102, 15, 0.25, constants.BlackColor)
 		lag.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_wopta.png", 160, 6.5, 35, 10)
 		lag.engine.NewLine(7)
+		origY := lag.engine.GetY()
+		lag.engine.SetY(origY - 15)
+		lag.engine.WriteText(first)
+		lag.engine.SetY(lag.engine.GetY() - 1)
+		lag.engine.WriteText(second)
+		lag.engine.SetY(origY)
 	})
 }
 
 func (lag *LifeAddendumGenerator) WoptaPerTe() {
-	first := domain.TableCell{
-		Text:      "Wopta per te",
-		Height:    7,
-		Width:     57,
-		FontStyle: constants.BoldFontStyle,
-		FontColor: constants.PinkColor,
-		FontSize:  17,
-		Fill:      false,
-		FillColor: domain.Color{},
-		Align:     constants.RightAlign,
-		Border:    "",
-	}
-	second := domain.TableCell{
-		Text:      "Vita",
-		Height:    7,
-		Width:     28,
-		FontStyle: constants.RegularFontStyle,
-		FontColor: constants.BlackColor,
-		FontSize:  15,
-		Fill:      false,
-		FillColor: domain.Color{},
-		Align:     constants.RightAlign,
-		Border:    "",
-	}
 
-	origY := lag.engine.GetY()
-	lag.engine.SetY(origY - 20)
-	lag.engine.WriteText(first)
-	lag.engine.SetY(lag.engine.GetY() - 1)
-	lag.engine.WriteText(second)
-	lag.engine.SetY(origY)
 }
 
 func (lag *LifeAddendumGenerator) contract() {
