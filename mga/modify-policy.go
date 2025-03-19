@@ -75,16 +75,6 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		return "{}", nil, err
 	}
 	log.Printf("policy %s modified successfully", modifiedPolicy.Uid)
-	err = writePolicyToDb(modifiedPolicy)
-	if err != nil {
-		return "{}", nil, err
-	}
-	log.Printf("policy %s successfully saved", modifiedPolicy.Uid)
-	err = writeUserToDB(modifiedUser)
-	if err != nil {
-		return "{}", nil, err
-	}
-	log.Printf("user %s modified successfully", modifiedUser.Uid)
 
 	diffPolicy, err := generateDiffPolicy(originalPolicy, modifiedPolicy)
 	if err != nil {
@@ -101,6 +91,17 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		Note:      "",
 	}
 	*modifiedPolicy.Attachments = append(*modifiedPolicy.Attachments, addendumAtt)
+
+	err = writePolicyToDb(modifiedPolicy)
+	if err != nil {
+		return "{}", nil, err
+	}
+	log.Printf("policy %s successfully saved", modifiedPolicy.Uid)
+	err = writeUserToDB(modifiedUser)
+	if err != nil {
+		return "{}", nil, err
+	}
+	log.Printf("user %s modified successfully", modifiedUser.Uid)
 
 	rawPolicy, err = json.Marshal(modifiedPolicy)
 
