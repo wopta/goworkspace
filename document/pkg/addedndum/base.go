@@ -18,7 +18,6 @@ const (
 type baseGenerator struct {
 	engine      *engine.Fpdf
 	now         time.Time
-	signatureID uint32
 	networkNode *models.NetworkNode
 	policy      *models.Policy
 }
