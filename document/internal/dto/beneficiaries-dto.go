@@ -241,30 +241,32 @@ func (lc *lifeContractorDTO) fromPolicy(contr models.Contractor) {
 }
 
 func (li *lifeInsuredDTO) fromPolicy(ins *models.User) {
-	if ins.FiscalCode != "" {
-		li.Name = ins.Name
-		li.Surname = ins.Surname
-		li.FiscalCode = ins.FiscalCode
-		li.BirthDate = parseBirthDate(ins.BirthDate)
-	}
-	if ins.Residence != nil {
-		li.StreetName = ins.Residence.StreetName
-		li.StreetNumber = ins.Residence.StreetNumber
-		li.City = ins.Residence.City
-		li.Province = ins.Residence.CityCode
-	}
+	if ins != nil {
+		if ins.FiscalCode != "" {
+			li.Name = ins.Name
+			li.Surname = ins.Surname
+			li.FiscalCode = ins.FiscalCode
+			li.BirthDate = parseBirthDate(ins.BirthDate)
+		}
+		if ins.Residence != nil {
+			li.StreetName = ins.Residence.StreetName
+			li.StreetNumber = ins.Residence.StreetNumber
+			li.City = ins.Residence.City
+			li.Province = ins.Residence.CityCode
+		}
 
-	if ins.Domicile != nil {
-		li.DomStreetName = ins.Domicile.StreetName
-		li.DomStreetNumber = ins.Domicile.StreetNumber
-		li.DomCity = ins.Domicile.City
-		li.DomProvince = ins.Domicile.CityCode
-	}
-	if ins.Mail != "" {
-		li.Mail = ins.Mail
-	}
-	if ins.Phone != "" {
-		li.Phone = ins.Phone
+		if ins.Domicile != nil {
+			li.DomStreetName = ins.Domicile.StreetName
+			li.DomStreetNumber = ins.Domicile.StreetNumber
+			li.DomCity = ins.Domicile.City
+			li.DomProvince = ins.Domicile.CityCode
+		}
+		if ins.Mail != "" {
+			li.Mail = ins.Mail
+		}
+		if ins.Phone != "" {
+			li.Phone = ins.Phone
+		}
 	}
 }
 
@@ -299,21 +301,23 @@ func (b *Beneficiaries) fromPolicy(bens *[]models.Beneficiary, opt map[string]st
 }
 
 func (br *BeneficiaryReferenceDTO) fromPolicy(benRef *models.User) {
-	if benRef.FiscalCode != "" {
-		br.Name = benRef.Name
-		br.Surname = benRef.Surname
-		br.FiscalCode = benRef.FiscalCode
-	}
-	if benRef.Residence != nil {
-		br.StreetName = benRef.Residence.StreetName
-		br.StreetNumber = benRef.Residence.StreetNumber
-		br.City = benRef.Residence.City
-		br.Province = benRef.Residence.CityCode
-	}
-	if benRef.Mail != "" {
-		br.Mail = benRef.Mail
-	}
-	if benRef.Phone != "" {
-		br.Phone = benRef.Phone
+	if benRef != nil {
+		if benRef.FiscalCode != "" {
+			br.Name = benRef.Name
+			br.Surname = benRef.Surname
+			br.FiscalCode = benRef.FiscalCode
+		}
+		if benRef.Residence != nil {
+			br.StreetName = benRef.Residence.StreetName
+			br.StreetNumber = benRef.Residence.StreetNumber
+			br.City = benRef.Residence.City
+			br.Province = benRef.Residence.CityCode
+		}
+		if benRef.Mail != "" {
+			br.Mail = benRef.Mail
+		}
+		if benRef.Phone != "" {
+			br.Phone = benRef.Phone
+		}
 	}
 }
