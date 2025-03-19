@@ -181,6 +181,25 @@ func (f *Fpdf) RawWriteText(cell domain.TableCell) {
     f.SetFontStyle(oldFontStyle)
 }
 
+func (f *Fpdf) WriteLink(url string,cell domain.TableCell){
+    oldFontStyle := f.style
+    oldFillColor := f.fillColor
+ 
+    if cell.Fill {
+        f.SetFillColor(cell.FillColor)
+    }
+ 
+    f.SetFontStyle(cell.FontStyle)
+    f.SetFontColor(cell.FontColor)
+    f.SetFontSize(cell.FontSize)
+    f.SetFontFamily(constants.MontserratFont)
+ 
+	 f.pdf.WriteLinkString(cell.Height,cell.Text,url)
+ 
+    f.SetFillColor(oldFillColor)
+    f.SetFontStyle(oldFontStyle)
+}
+
 func (f *Fpdf) DrawTable(table [][]domain.TableCell) {
 	for _, row := range table {
 		maxNumLines := 1

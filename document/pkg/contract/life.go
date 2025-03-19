@@ -240,10 +240,8 @@ func (el *LifeGenerator) addSupportInformationSection() {
 		text := "\nRestiamo a disposizione per ogni ulteriore informazione anche attraverso i canali di contatto che trovi a questo "
 		el.writeTexts(
 			getTableCell(text, constants.BlackColor),
-			getTableCell("link", constants.PinkColor),
 		)
-		widthLink := el.engine.GetStringWidth("link")
-		el.engine.GetPdf().LinkString(1+el.engine.GetX()-widthLink, el.engine.GetY(), widthLink, constants.CellHeight, "https://www.wopta.it/it/vita/#contact-us")
+		el.engine.WriteLink("https://www.wopta.it/it/vita/#contact-us",getTableCell("link",constants.PinkColor))
 		return
 	}
 
