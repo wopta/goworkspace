@@ -154,7 +154,7 @@ func newLifeInsuredDTO() *lifeInsuredDTO {
 }
 
 func newLifeBeneficiariesDTO() *Beneficiaries {
-	lb := make([]lifeBeneficiaryDTO, 0)
+	lb := make(Beneficiaries, 0)
 	l := lifeBeneficiaryDTO{
 		Name:         constants.EmptyField,
 		Surname:      constants.EmptyField,
@@ -170,8 +170,7 @@ func newLifeBeneficiariesDTO() *Beneficiaries {
 	}
 	lb = append(lb, l)
 	lb = append(lb, l)
-	var b Beneficiaries = lb
-	return &b
+	return &lb
 }
 
 func newBeneficiaryReferenceDTO() *BeneficiaryReferenceDTO {
