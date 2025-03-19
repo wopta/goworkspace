@@ -40,9 +40,6 @@ func (bg *baseGenerator) woptaFooter() {
 	bg.engine.SetFooter(func() {
 		bg.engine.SetY(-30)
 
-		//currentY := bg.engine.GetY()
-
-		//bg.engine.DrawLine(11, currentY, 200, currentY, constants.RegularThickness, constants.PinkColor)
 		bg.engine.NewLine(3)
 
 		entries := [][]string{
