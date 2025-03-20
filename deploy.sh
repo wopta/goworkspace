@@ -60,6 +60,12 @@
       vpc=functions-connector
     fi
 
+    # === COPY ASSETS FROM BUCKET ==============================================
+    echo "copying assets..."
+    mkdir -p /workspace/${fx_name}/tmp/assets
+    gsutil -m cp -r gs://${bucket}/assets/documents/** /workspace/${fx_name}/tmp/assets
+    cp /workspace/.gcloudignore /workspace/${fx_name}/.gcloudignore
+
     # === SET INGRESS SETTINGS BY FUNCTION =====================================
     ingress=internal-and-gclb
     if [[ "${fx_name}" == "callback" ]]; then
