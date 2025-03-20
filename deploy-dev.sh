@@ -19,9 +19,9 @@
 
     # === COPY ASSETS FROM BUCKET ==============================================
     echo "copying assets..."
-    mkdir -p /workspace/${fx_name}/tmp/assets
-    gsutil -m cp -r gs://${bucket}/assets/documents/** /workspace/${fx_name}/tmp/assets
-    cp /workspace/.gcloudignore /workspace/${fx_name}/.gcloudignore
+    mkdir -p /workspace/${FX_NAME}/tmp/assets
+    gsutil -m cp -r gs://${bucket}/assets/documents/** /workspace/${FX_NAME}/tmp/assets
+    cp /workspace/.gcloudignore /workspace/${FX_NAME}/.gcloudignore
 
     # === SET INGRESS SETTINGS BY FUNCTION =====================================
     ingress=internal-and-gclb
