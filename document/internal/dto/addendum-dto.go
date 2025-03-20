@@ -9,14 +9,14 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-type lifeContractDTO struct {
+type addendumContractDTO struct {
 	CodeHeading string
 	Code        string
 	StartDate   string
 	EndDate     string
 	Producer    string
 }
-type lifeContractorDTO struct {
+type addendumContractorDTO struct {
 	Name            string
 	Surname         string
 	FiscalCode      string
@@ -33,7 +33,7 @@ type lifeContractorDTO struct {
 	BirthDate       string
 }
 
-type lifeInsuredDTO struct {
+type addendumInsuredDTO struct {
 	Name            string
 	Surname         string
 	FiscalCode      string
@@ -50,7 +50,7 @@ type lifeInsuredDTO struct {
 	BirthDate       string
 }
 
-type lifeBeneficiaryDTO struct {
+type addendumBeneficiaryDTO struct {
 	Name         string
 	Surname      string
 	FiscalCode   string
@@ -64,7 +64,7 @@ type lifeBeneficiaryDTO struct {
 	BirthDate    string
 	Phone        string
 }
-type BeneficiaryReferenceDTO struct {
+type addendumBeneficiaryReferenceDTO struct {
 	Name         string
 	Surname      string
 	FiscalCode   string
@@ -77,18 +77,18 @@ type BeneficiaryReferenceDTO struct {
 	BirthDate    string
 }
 
-type Beneficiaries []lifeBeneficiaryDTO
+type addendumBeneficiaries []addendumBeneficiaryDTO
 
-type BeneficiariesDTO struct {
-	Contract             *lifeContractDTO
-	Contractor           *lifeContractorDTO
-	Insured              *lifeInsuredDTO
-	Beneficiaries        *Beneficiaries
-	BeneficiaryReference *BeneficiaryReferenceDTO
+type AddendumBeneficiariesDTO struct {
+	Contract             *addendumContractDTO
+	Contractor           *addendumContractorDTO
+	Insured              *addendumInsuredDTO
+	Beneficiaries        *addendumBeneficiaries
+	BeneficiaryReference *addendumBeneficiaryReferenceDTO
 }
 
-func NewBeneficiariesDto() *BeneficiariesDTO {
-	return &BeneficiariesDTO{
+func NewBeneficiariesDto() *AddendumBeneficiariesDTO {
+	return &AddendumBeneficiariesDTO{
 		Contract:             newLifeContractDTO(),
 		Contractor:           newLifeContractorDTO(),
 		Insured:              newLifeInsuredDTO(),
@@ -97,17 +97,17 @@ func NewBeneficiariesDto() *BeneficiariesDTO {
 	}
 }
 
-func (b *BeneficiariesDTO) FromPolicy(policy models.Policy, product models.Product) {
+func (b *AddendumBeneficiariesDTO) FromPolicy(policy models.Policy, product models.Product) {
 	b.Contract.fromPolicy(policy)
 	b.Contractor.fromPolicy(policy.Contractor)
 	b.Insured.fromPolicy(policy.Assets[0].Person)
-	//b.Beneficiaries.fromPolicy(policy.Assets[0].Guarantees)
+	//b.addendumBeneficiaries.fromPolicy(policy.Assets[0].Guarantees)
 	b.Beneficiaries.fromPolicy(policy.Assets[0].Guarantees[0].Beneficiaries, policy.Assets[0].Guarantees[0].BeneficiaryOptions)
 	b.BeneficiaryReference.fromPolicy(policy.Assets[0].Guarantees[0].BeneficiaryReference)
 }
 
-func newLifeContractDTO() *lifeContractDTO {
-	return &lifeContractDTO{
+func newLifeContractDTO() *addendumContractDTO {
+	return &addendumContractDTO{
 		CodeHeading: constants.EmptyField,
 		Code:        constants.EmptyField,
 		StartDate:   constants.EmptyField,
@@ -117,8 +117,8 @@ func newLifeContractDTO() *lifeContractDTO {
 
 }
 
-func newLifeContractorDTO() *lifeContractorDTO {
-	return &lifeContractorDTO{
+func newLifeContractorDTO() *addendumContractorDTO {
+	return &addendumContractorDTO{
 		Name:            constants.EmptyField,
 		Surname:         constants.EmptyField,
 		FiscalCode:      constants.EmptyField,
@@ -135,8 +135,8 @@ func newLifeContractorDTO() *lifeContractorDTO {
 	}
 }
 
-func newLifeInsuredDTO() *lifeInsuredDTO {
-	return &lifeInsuredDTO{
+func newLifeInsuredDTO() *addendumInsuredDTO {
+	return &addendumInsuredDTO{
 		Name:            constants.EmptyField,
 		Surname:         constants.EmptyField,
 		FiscalCode:      constants.EmptyField,
@@ -153,9 +153,9 @@ func newLifeInsuredDTO() *lifeInsuredDTO {
 	}
 }
 
-func newLifeBeneficiariesDTO() *Beneficiaries {
-	lb := make(Beneficiaries, 0)
-	l := lifeBeneficiaryDTO{
+func newLifeBeneficiariesDTO() *addendumBeneficiaries {
+	lb := make(addendumBeneficiaries, 0)
+	l := addendumBeneficiaryDTO{
 		Name:         constants.EmptyField,
 		Surname:      constants.EmptyField,
 		FiscalCode:   constants.EmptyField,
@@ -173,8 +173,8 @@ func newLifeBeneficiariesDTO() *Beneficiaries {
 	return &lb
 }
 
-func newBeneficiaryReferenceDTO() *BeneficiaryReferenceDTO {
-	return &BeneficiaryReferenceDTO{
+func newBeneficiaryReferenceDTO() *addendumBeneficiaryReferenceDTO {
+	return &addendumBeneficiaryReferenceDTO{
 		Name:         constants.EmptyField,
 		Surname:      constants.EmptyField,
 		FiscalCode:   constants.EmptyField,
@@ -188,7 +188,7 @@ func newBeneficiaryReferenceDTO() *BeneficiaryReferenceDTO {
 	}
 }
 
-func (l *lifeContractDTO) fromPolicy(policy models.Policy) {
+func (l *addendumContractDTO) fromPolicy(policy models.Policy) {
 	l.CodeHeading = "Variazione dati Anagrafici soggetti Polizza:"
 	l.Code = policy.CodeCompany
 
@@ -212,7 +212,7 @@ func parseBirthDate(dateString string) string {
 	return date.Format("01/02/2006")
 }
 
-func (lc *lifeContractorDTO) fromPolicy(contr models.Contractor) {
+func (lc *addendumContractorDTO) fromPolicy(contr models.Contractor) {
 	if contr.FiscalCode != "" {
 		lc.Name = contr.Name
 		lc.Surname = contr.Surname
@@ -239,7 +239,7 @@ func (lc *lifeContractorDTO) fromPolicy(contr models.Contractor) {
 	}
 }
 
-func (li *lifeInsuredDTO) fromPolicy(ins *models.User) {
+func (li *addendumInsuredDTO) fromPolicy(ins *models.User) {
 	if ins != nil {
 		if ins.FiscalCode != "" {
 			li.Name = ins.Name
@@ -269,7 +269,7 @@ func (li *lifeInsuredDTO) fromPolicy(ins *models.User) {
 	}
 }
 
-func (b *Beneficiaries) fromPolicy(bens *[]models.Beneficiary, opt map[string]string) {
+func (b *addendumBeneficiaries) fromPolicy(bens *[]models.Beneficiary, opt map[string]string) {
 	if bens == nil {
 		return
 	}
@@ -281,7 +281,7 @@ func (b *Beneficiaries) fromPolicy(bens *[]models.Beneficiary, opt map[string]st
 		for _, value := range opt {
 			_, _ = fmt.Fprintf(buf, "%s ", value)
 		}
-		ben := lifeBeneficiaryDTO{
+		ben := addendumBeneficiaryDTO{
 			Name:         v.Name,
 			Surname:      v.Surname,
 			FiscalCode:   v.FiscalCode,
@@ -299,7 +299,7 @@ func (b *Beneficiaries) fromPolicy(bens *[]models.Beneficiary, opt map[string]st
 	}
 }
 
-func (br *BeneficiaryReferenceDTO) fromPolicy(benRef *models.User) {
+func (br *addendumBeneficiaryReferenceDTO) fromPolicy(benRef *models.User) {
 	if benRef != nil {
 		if benRef.FiscalCode != "" {
 			br.Name = benRef.Name

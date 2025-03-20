@@ -13,7 +13,7 @@ import (
 
 type LifeAddendumGenerator struct {
 	*baseGenerator
-	dto *dto.BeneficiariesDTO
+	dto *dto.AddendumBeneficiariesDTO
 }
 
 func NewLifeAddendumGenerator(engine *engine.Fpdf, policy *models.Policy, node *models.NetworkNode,
@@ -35,7 +35,7 @@ func (lag *LifeAddendumGenerator) Generate() ([]byte, error) {
 	lag.mainHeader()
 
 	lag.engine.NewPage()
-	
+
 	lag.contract()
 
 	lag.engine.NewLine(6)
