@@ -92,8 +92,16 @@ func saveProposal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 	)
 
 	if os.Getenv("env") == "local" {
-		err := pdf.OutputFileAndClose("./document/proposal.pdf")
+		err := pdf.Output(&out)
+		defer pdf.Close()
+
+		pdfFile, err := os.Create("./document/proposal.pdf")
 		lib.CheckError(err)
+		defer pdfFile.Close()
+
+		pdf.Output(pdfFile)
+
+		return "./document/proposal.pdf", out.Bytes()
 	} else {
 		err := pdf.Output(&out)
 		lib.CheckError(err)
