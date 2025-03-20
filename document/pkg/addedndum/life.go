@@ -31,15 +31,11 @@ func NewLifeAddendumGenerator(engine *engine.Fpdf, policy *models.Policy, node *
 	}
 }
 
-func (lag *LifeAddendumGenerator) Contract() ([]byte, error) {
+func (lag *LifeAddendumGenerator) Generate() ([]byte, error) {
 	lag.mainHeader()
 
 	lag.engine.NewPage()
-
-	lag.WoptaPerTe()
-
-	//lag.engine.NewLine(6)
-
+	
 	lag.contract()
 
 	lag.engine.NewLine(6)
@@ -106,10 +102,6 @@ func (lag *LifeAddendumGenerator) mainHeader() {
 		lag.engine.WriteText(second)
 		lag.engine.SetY(origY)
 	})
-}
-
-func (lag *LifeAddendumGenerator) WoptaPerTe() {
-
 }
 
 func (lag *LifeAddendumGenerator) contract() {

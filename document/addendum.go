@@ -30,7 +30,7 @@ func AddendumObj(origin string, data models.Policy, networkNode *models.NetworkN
 	case models.LifeProduct:
 		prod := models.Product{}
 		generator := addedndum.NewLifeAddendumGenerator(engine.NewFpdf(), &data, networkNode, prod)
-		out, err = generator.Contract()
+		out, err = generator.Generate()
 		if err != nil {
 			log.Printf("error generating addendum: %v", err)
 			return AddendumResponse{}, err
