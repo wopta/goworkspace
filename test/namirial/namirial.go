@@ -76,7 +76,7 @@ func NewNamirial(origin string, uids ...string) (*Namirial, error) {
 // upload the files for each policy passed throught NewNamirial
 func (n *Namirial) UploadFiles() error {
 	if n.status != Idle {
-		return fmt.Errorf("Error: cant upload file, status has to be Idle instead is %v", n.status)
+		return fmt.Errorf("Error: cant upload file, status has to be Idle, instead is %v", n.status)
 	}
 	var buffer bytes.Buffer
 	log.SetPrefix("[UploadFiles]")
@@ -155,7 +155,7 @@ func (n *Namirial) UploadFiles() error {
 // prepare and set the documents uploaded, fix the sign,set the position ecc
 func (n *Namirial) PrepareDocument() error {
 	if n.status != Upload {
-		return fmt.Errorf("Error: cant prepare files, status has to be upload instead is %v", n.status)
+		return fmt.Errorf("Error: cant prepare files, status has to be upload, instead is %v", n.status)
 	}
 	log.SetPrefix("[PrepareFiles]")
 	defer log.SetPrefix("")
@@ -221,7 +221,7 @@ func (n *Namirial) PrepareDocument() error {
 // send each documents, previusly prepared,return an envelope id
 func (n *Namirial) SendDocuments() (string, error) {
 	if n.status != Prepared {
-		return "", fmt.Errorf("Error: cant send files, status has to be preparared instead is %v", n.status)
+		return "", fmt.Errorf("Error: cant send files, status has to be preparared, instead is %v", n.status)
 	}
 	log.SetPrefix("[SendEnvelop]")
 	defer log.SetPrefix("")
@@ -301,7 +301,7 @@ func (n *Namirial) adjectSendBody(d *sendNamirialRequest) {
 func (n *Namirial) GetEnvelope() (ResponeGetEvelop, error) {
 	var resp ResponeGetEvelop
 	if n.status != Sended {
-		return resp, fmt.Errorf("Error: cant open the envelope, status has to be sended instead is %v", n.status)
+		return resp, fmt.Errorf("Error: cant open the envelope, status has to be sended, instead is %v", n.status)
 	}
 	log.SetPrefix("[GetEnvelope]")
 	defer log.SetPrefix("")
@@ -345,6 +345,10 @@ func (n *Namirial) GetIdsFiles() (FilesIdsResponse, error) {
 	var resp FilesIdsResponse
 	log.SetPrefix("[GetIdsFiles]")
 	defer log.SetPrefix("")
+
+	if n.status != GetEnvelope {
+		return resp, fmt.Errorf("Error: cant have the id files if at least you have status Open Envelope, instead is %v", n.status)
+	}
 
 	log.Println("Start Getting IdsFiles")
 
