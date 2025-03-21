@@ -100,10 +100,19 @@ func NewBeneficiariesDto() *AddendumBeneficiariesDTO {
 func (b *AddendumBeneficiariesDTO) FromPolicy(policy models.Policy, product models.Product) {
 	b.Contract.fromPolicy(policy)
 	b.Contractor.fromPolicy(policy.Contractor)
-	b.Insured.fromPolicy(policy.Assets[0].Person)
-	//b.addendumBeneficiaries.fromPolicy(policy.Assets[0].Guarantees)
-	b.Beneficiaries.fromPolicy(policy.Assets[0].Guarantees[0].Beneficiaries, policy.Assets[0].Guarantees[0].BeneficiaryOptions)
-	b.BeneficiaryReference.fromPolicy(policy.Assets[0].Guarantees[0].BeneficiaryReference)
+	for _, a := range policy.Assets {
+		if a.Person != nil {
+			b.Insured.fromPolicy(a.Person)
+		}
+		for _, g := range a.Guarantees {
+			if g.Beneficiaries != nil {
+				b.Beneficiaries.fromPolicy(g.Beneficiaries, g.BeneficiaryOptions)
+			}
+			if g.BeneficiaryReference != nil {
+				b.BeneficiaryReference.fromPolicy(g.BeneficiaryReference)
+			}
+		}
+	}
 }
 
 func newLifeContractDTO() *addendumContractDTO {
