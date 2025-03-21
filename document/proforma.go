@@ -36,48 +36,48 @@ func ProformaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	product := prd.GetProductV2(data.Name, data.ProductVersion, models.MgaChannel, networkNode, warrant)
 
-	respObj := <-ProformaObj(origin, data, networkNode, product) // TODO review product nil
-	resp, err := json.Marshal(respObj)
+	prof, err := ProformaObj(origin, data, networkNode, product) // TODO review product nil
+	if err != nil {
+		log.Printf("unable to generate proforma: %s", err.Error())
+		return "", nil, err
+	}
+	resp, err := json.Marshal(prof)
 
 	lib.CheckError(err)
-	return string(resp), respObj, nil
+	return string(resp), prof, nil
 }
 
-func ProformaObj(origin string, data models.Policy, networkNode *models.NetworkNode, product *models.Product) <-chan ProformaResponse {
-	r := make(chan ProformaResponse)
+func ProformaObj(origin string, data models.Policy, networkNode *models.NetworkNode, product *models.Product) (ProformaResponse, error) {
+	var (
+		err      error
+		filename string
+		out      []byte
+	)
 
 	log.Println("[ProformaObj] function start -------------------------------")
 
 	rawPolicy, _ := data.Marshal()
 	log.Printf("[ProformaObj] policy: %s", string(rawPolicy))
 
-	go func() {
-		var (
-			err      error
-			filename string
-			out      []byte
-		)
+	generator := proforma.NewProformaGenerator(engine.NewFpdf(), &data, networkNode, *product)
+	out, err = generator.Contract()
+	if err != nil {
+		log.Printf("error generating proforma: %v", err)
+		return ProformaResponse{}, err
+	}
+	filename, err = generator.Save(out)
+	if err != nil {
+		log.Printf("error saving proforma: %v", err)
+		return ProformaResponse{}, err
+	}
 
-		generator := proforma.NewProformaGenerator(engine.NewFpdf(), &data, networkNode, *product)
-		out, err = generator.Contract()
-		if err != nil {
-			log.Printf("error generating proforma: %v", err)
-			return
-		}
-		filename, err = generator.Save(out)
-		if err != nil {
-			log.Printf("error saving contract: %v", err)
-			return
-		}
-
-		log.Println(data.Uid + " ContractObj end")
-		r <- ProformaResponse{
-			LinkGcs:  filename,
-			FileName: filename,
-		}
-	}()
+	log.Println(data.Uid + " ProformaObj end")
+	res := ProformaResponse{
+		LinkGcs:  filename,
+		FileName: filename,
+	}
 
 	log.Println("[ProformaObj] function end -------------------------------..")
 
-	return r
+	return res, nil
 }
