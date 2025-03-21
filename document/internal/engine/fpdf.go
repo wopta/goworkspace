@@ -55,7 +55,7 @@ func NewFpdf() *Fpdf {
 	}
 }
 
-func (f *Fpdf) GetPdf()*fpdf.Fpdf{
+func (f *Fpdf) GetPdf() *fpdf.Fpdf {
 	return f.pdf
 }
 
@@ -163,41 +163,41 @@ func (f *Fpdf) WriteText(cell domain.TableCell) {
 }
 
 func (f *Fpdf) RawWriteText(cell domain.TableCell) {
-    oldFontStyle := f.style
-    oldFillColor := f.fillColor
- 
-    if cell.Fill {
-        f.SetFillColor(cell.FillColor)
-    }
- 
-    f.SetFontStyle(cell.FontStyle)
-    f.SetFontColor(cell.FontColor)
-    f.SetFontSize(cell.FontSize)
-    f.SetFontFamily(constants.MontserratFont)
- 
-    f.pdf.Write(cell.Height, cell.Text)
- 
-    f.SetFillColor(oldFillColor)
-    f.SetFontStyle(oldFontStyle)
+	oldFontStyle := f.style
+	oldFillColor := f.fillColor
+
+	if cell.Fill {
+		f.SetFillColor(cell.FillColor)
+	}
+
+	f.SetFontStyle(cell.FontStyle)
+	f.SetFontColor(cell.FontColor)
+	f.SetFontSize(cell.FontSize)
+	f.SetFontFamily(constants.MontserratFont)
+
+	f.pdf.Write(cell.Height, cell.Text)
+
+	f.SetFillColor(oldFillColor)
+	f.SetFontStyle(oldFontStyle)
 }
 
-func (f *Fpdf) WriteLink(url string,cell domain.TableCell){
-    oldFontStyle := f.style
-    oldFillColor := f.fillColor
- 
-    if cell.Fill {
-        f.SetFillColor(cell.FillColor)
-    }
- 
-    f.SetFontStyle(cell.FontStyle)
-    f.SetFontColor(cell.FontColor)
-    f.SetFontSize(cell.FontSize)
-    f.SetFontFamily(constants.MontserratFont)
- 
-	 f.pdf.WriteLinkString(cell.Height,cell.Text,url)
- 
-    f.SetFillColor(oldFillColor)
-    f.SetFontStyle(oldFontStyle)
+func (f *Fpdf) WriteLink(url string, cell domain.TableCell) {
+	oldFontStyle := f.style
+	oldFillColor := f.fillColor
+
+	if cell.Fill {
+		f.SetFillColor(cell.FillColor)
+	}
+
+	f.SetFontStyle(cell.FontStyle)
+	f.SetFontColor(cell.FontColor)
+	f.SetFontSize(cell.FontSize)
+	f.SetFontFamily(constants.MontserratFont)
+
+	f.pdf.WriteLinkString(cell.Height, cell.Text, url)
+
+	f.SetFillColor(oldFillColor)
+	f.SetFontStyle(oldFontStyle)
 }
 
 func (f *Fpdf) DrawTable(table [][]domain.TableCell) {
