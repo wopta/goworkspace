@@ -39,6 +39,9 @@ func (e *enterpriseDTO) fromPolicy(enterprise models.Enterprise, guarantees []mo
 	}
 
 	for _, guarantee := range guarantees {
-		e.Guarantees[guarantee.Slug].fromPolicy(guarantee)
+		if val, ok := e.Guarantees[guarantee.Slug]; ok {
+			val.fromPolicy(guarantee)
+		}
+
 	}
 }
