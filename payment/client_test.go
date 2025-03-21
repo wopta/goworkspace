@@ -584,6 +584,7 @@ func getTransactions(numTransactions int, providerName string, annuity int, star
 
 	amount := lib.RoundFloat(float64(100/numTransactions), 2)
 	amountNet := lib.RoundFloat(float64(80/numTransactions), 2)
+	now := time.Now().UTC()
 
 	for i := 0; i < numTransactions; i++ {
 		transactions = append(transactions, models.Transaction{
@@ -594,14 +595,14 @@ func getTransactions(numTransactions int, providerName string, annuity int, star
 			PolicyName:     "local",
 			Name:           "Test Test",
 			ScheduleDate:   startDate.AddDate(0, i, 0).Format(time.DateOnly),
-			ExpirationDate: startDate.AddDate(10, i, 0).Format(time.DateOnly),
+			ExpirationDate: lib.AddMonths(now, 18).Format(time.DateOnly),
 			Uid:            fmt.Sprintf("local-%02d", i),
 			PolicyUid:      "fjn32onw",
 			Company:        "local",
 			NumberCompany:  "11111",
 			StatusHistory:  []string{models.TransactionStatusToPay},
 			ProviderName:   providerName,
-			EffectiveDate:  startDate.AddDate(0, i, 0),
+			EffectiveDate:  lib.AddMonths(startDate, i),
 			CreationDate:   startDate,
 			UpdateDate:     startDate,
 			Annuity:        annuity,
