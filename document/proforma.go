@@ -21,7 +21,6 @@ type ProformaResponse struct {
 
 func ProformaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("[Proforma]")
-	origin := r.Header.Get("Origin")
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 	var data models.Policy
 	defer r.Body.Close()
@@ -36,7 +35,7 @@ func ProformaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	product := prd.GetProductV2(data.Name, data.ProductVersion, models.MgaChannel, networkNode, warrant)
 
-	prof, err := ProformaObj(origin, data, networkNode, product) // TODO review product nil
+	prof, err := Proforma(data, networkNode, product) // TODO review product nil
 	if err != nil {
 		log.Printf("unable to generate proforma: %s", err.Error())
 		return "", nil, err
@@ -47,7 +46,7 @@ func ProformaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	return string(resp), prof, nil
 }
 
-func ProformaObj(origin string, data models.Policy, networkNode *models.NetworkNode, product *models.Product) (ProformaResponse, error) {
+func Proforma(policy models.Policy, networkNode *models.NetworkNode, product *models.Product) (ProformaResponse, error) {
 	var (
 		err      error
 		filename string
@@ -56,7 +55,7 @@ func ProformaObj(origin string, data models.Policy, networkNode *models.NetworkN
 
 	log.Println("[ProformaObj] function start -------------------------------")
 
-	generator := proforma.NewProformaGenerator(engine.NewFpdf(), &data, networkNode, *product)
+	generator := proforma.NewProformaGenerator(engine.NewFpdf(), &policy, networkNode, *product)
 	out, err = generator.Generate()
 	if err != nil {
 		log.Printf("error generating proforma: %v", err)
@@ -68,7 +67,7 @@ func ProformaObj(origin string, data models.Policy, networkNode *models.NetworkN
 		return ProformaResponse{}, err
 	}
 
-	log.Println(data.Uid + " ProformaObj end")
+	log.Println(policy.Uid + " ProformaObj end")
 	res := ProformaResponse{
 		LinkGcs:  filename,
 		FileName: filename,
