@@ -6,6 +6,7 @@ import (
 
 	"github.com/wopta/goworkspace/document/internal/constants"
 	"github.com/wopta/goworkspace/document/internal/domain"
+	"github.com/wopta/goworkspace/document/internal/dto"
 	"github.com/wopta/goworkspace/document/internal/engine"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -13,6 +14,7 @@ import (
 
 type LifeGenerator struct {
 	*baseGenerator
+	dtoLife dto.LifeDTO
 }
 
 func NewLifeGenerator(engine *engine.Fpdf, policy *models.Policy, node *models.NetworkNode, product models.Product, isProposal bool) *LifeGenerator {
@@ -25,27 +27,25 @@ func NewLifeGenerator(engine *engine.Fpdf, policy *models.Policy, node *models.N
 			networkNode: node,
 			policy:      policy,
 		},
+		dtoLife: dto.NewLifeDto(policy),
 	}
 }
 
-func (el *LifeGenerator) Generate() ([]byte, error) {
+func (el *LifeGenerator) Generate() {
 	el.addMainHeader()
-	el.engine.NewPage()
-	el.engine.WriteText(getTableCell("\n\nIl tuo Preventivo: cosa fare adesso?\n", constants.BoldFontStyle, constants.PinkColor, constants.LargeFontSize))
+	el.addHeading()
 	el.addWelcomeSection()
 	el.addEmailSection()
 	el.addSignSection()
 	el.addPolicyInformationSection()
 	el.addSupportInformationSection()
 	el.addGreatingsSection()
-	return el.engine.RawDoc()
 }
 
 func (el *LifeGenerator) addMainHeader() {
-	policy := el.policy
 	const (
 		firstColumnWidth  = 115
-		secondColumnWidth = 75
+		secondColumnWidth = constants.FullPageWidth - firstColumnWidth
 	)
 	parseData := func(rows [][]string) [][]domain.TableCell {
 		result := make([][]domain.TableCell, 0, len(rows))
@@ -72,6 +72,7 @@ func (el *LifeGenerator) addMainHeader() {
 					Text:      row[1],
 					Height:    constants.CellHeight,
 					FontStyle: fontStyle,
+					Width:     secondColumnWidth,
 					FontColor: constants.BlackColor,
 					FontSize:  constants.MediumFontSize,
 					Fill:      false,
@@ -141,22 +142,14 @@ func (el *LifeGenerator) addMainHeader() {
 		return result
 	}
 
-	formatDate := func(t time.Time) string {
-		location, _ := time.LoadLocation("Europe/Rome")
-		time := t.In(location)
-		return time.In(location).Format("02/01/2006")
-	}
-
-	addressFirstPart := policy.Contractor.Residence.StreetName + ", " + policy.Contractor.Residence.StreetNumber
-	addressSecondPart := policy.Contractor.Residence.PostalCode + " " + policy.Contractor.Residence.City + " (" + policy.Contractor.Residence.CityCode + ")"
 	rowsData := [][]string{
 		{"I dati del tuo Preventivo", "I tuoi dati"},
-		{fmt.Sprintf("Numero: %d", policy.Number), "Contraente: " + policy.Name + " " + policy.Contractor.Surname},
-		{"Decore dal: " + formatDate(policy.EmitDate), "C.F./P.IVA: " + policy.Contractor.FiscalCode},
-		{"Scade il: " + formatDate(policy.EndDate), "Indirizzo: " + addressFirstPart},
-		{"Prima scadenza Annuale il: " + formatDate(policy.EndDate), addressSecondPart},
-		{"Non si rinnova a scadenza.", "Mail: " + policy.Contractor.Mail},
-		{fmt.Sprintf("Produttore: %s %s", policy.Contractor.Name, policy.Contractor.Surname), "Telefono: " + policy.Contractor.Phone},
+		{"Numero: " + el.dtoLife.Contractor.Phone, "Contraente: " + el.dtoLife.GetFullNameContractor()},
+		{"Decore dal: " + el.dtoLife.ValidityDate.StartDate, "C.F./P.IVA: " + el.dtoLife.Contractor.FiscalCode},
+		{"Scade il: " + el.dtoLife.ValidityDate.EndDate, "Indirizzo: " + el.dtoLife.GetAddressFirstPart()},
+		{"Prima scadenza Annuale il: " + el.dtoLife.ValidityDate.FirstAnnuityExpiry, el.dtoLife.GetAddressSecondPart()},
+		{"Non si rinnova a scadenza.", "Mail: " + el.dtoLife.Contractor.Mail},
+		{"Produttore: " + el.dtoLife.ProductorName, "Telefono: " + el.dtoLife.Contractor.Phone},
 	}
 
 	el.engine.SetHeader(func() {
@@ -164,126 +157,88 @@ func (el *LifeGenerator) addMainHeader() {
 		el.baseGenerator.engine.NewLine(3)
 		el.engine.DrawTable(parseLogos([]string{"Wopta per te", "Vita"}))
 		el.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_vita.png", 180, 15, 13, 13)
-		el.engine.DrawTable(parseData(rowsData))
 
-		if el.isProposal {
-			el.engine.DrawWatermark(constants.Proposal)
-		}
+		el.engine.DrawTable(parseData(rowsData))
 	})
 }
 
+func (el *LifeGenerator) addHeading() {
+	el.engine.NewPage()
+	el.engine.WriteText(el.GetTableCell("\n\nIl tuo Preventivo: cosa fare adesso?\n", constants.BoldFontStyle, constants.PinkColor, constants.LargeFontSize))
+}
 func (el *LifeGenerator) addWelcomeSection() {
-	el.writeTexts(
-		getTableCell(fmt.Sprintf("\n\nBuongiorno %v %v,\n", el.policy.Contractor.Name, el.policy.Contractor.Surname), constants.BlackColor),
-		getTableCell("\nGrazie per aver fatto un preventivo per una polizza Vita, dimostrando volontà e interesse a tutelarti e/o proteggere le persone per te più importanti.\n", constants.BlackColor),
+	el.WriteTexts(
+		el.GetTableCell(fmt.Sprintf("\n\nBuongiorno %v %v,\n", el.dtoLife.Contractor.Name, el.dtoLife.Contractor.Surname), constants.BlackColor),
+		el.GetTableCell("\nGrazie per aver fatto un preventivo per una polizza Vita, dimostrando volontà e interesse a tutelarti e/o proteggere le persone per te più importanti.\n", constants.BlackColor),
 	)
 }
 
 func (el *LifeGenerator) addEmailSection() {
-	el.engine.WriteText(getTableCell(
+	el.engine.WriteText(el.GetTableCell(
 		"\nIn allegato trovi:\n"+
-		"- modulo di Polizza\n"+
-		"- informativa precontrattuale di Wopta, prevista per legge\n"+
-		"- modulistica antiriciclaggio\n\n"+
-		"- informativa e dichiarazioni privacy per l’Assicuratore\n"+
-		"- informativa e dichiarazioni privacy per l’Intermediario\n", constants.BlackColor,
+			"- modulo di Polizza\n"+
+			"- informativa precontrattuale di Wopta, prevista per legge\n"+
+			"- modulistica antiriciclaggio\n\n"+
+			"- informativa e dichiarazioni privacy per l’Assicuratore\n"+
+			"- informativa e dichiarazioni privacy per l’Intermediario\n", constants.BlackColor,
 	))
 
-	el.engine.WriteText(getTableCell("Verifica la correttezza di tutti i dati inseriti (anagrafici, indirizzi, codice fiscale, contatti) e delle prestazioni scelte (durata, importi, eventuali opzioni).\n", constants.BlackColor))
+	el.engine.WriteText(el.GetTableCell("Verifica la correttezza di tutti i dati inseriti (anagrafici, indirizzi, codice fiscale, contatti) e delle prestazioni scelte (durata, importi, eventuali opzioni).\n", constants.BlackColor))
 
-	if el.policy.Channel == models.ECommerceChannel {
+	if el.dtoLife.Channel == models.NetworkChannel {
 		el.engine.NewLine(constants.CellHeight)
-		el.writeTexts(
-			getTableCell("Riceverai anche due mail per procedere con la ", constants.BlackColor),
-			getTableCell("firma ", constants.PinkColor, constants.BoldFontStyle),
-			getTableCell("ed il ", constants.BlackColor),
-			getTableCell("pagamento\n\n", constants.PinkColor, constants.BoldFontStyle),
+		el.WriteTexts(
+			el.GetTableCell("Riceverai anche due mail per procedere con la ", constants.BlackColor),
+			el.GetTableCell("firma ", constants.PinkColor, constants.BoldFontStyle),
+			el.GetTableCell("ed il ", constants.BlackColor),
+			el.GetTableCell("pagamento\n\n", constants.PinkColor, constants.BoldFontStyle),
 		)
 	}
 }
 
 func (el *LifeGenerator) addSignSection() {
-	el.writeTexts(
-		getTableCell("ATTENZIONE", constants.PinkColor, constants.BoldFontStyle),
-		getTableCell(" :Solo una volta firmati i documenti ed effettuato il pagamento, la copertura assicurativa sarà attiva e così ti invieremo i documenti contrattuali da te firmati, che poi potrai visualizzare nell’area riservata ai clienti della nostra app e/o sito.", constants.BlackColor),
+	el.WriteTexts(
+		el.GetTableCell("ATTENZIONE", constants.PinkColor, constants.BoldFontStyle),
+		el.GetTableCell(" :Solo una volta firmati i documenti ed effettuato il pagamento, la copertura assicurativa sarà attiva e così ti invieremo i documenti contrattuali da te firmati, che poi potrai visualizzare nell’area riservata ai clienti della nostra app e/o sito.", constants.BlackColor),
 	)
 }
 
 func (el *LifeGenerator) addPolicyInformationSection() {
-	getSplitLabel := func(paymentSplit string) string {
-		switch paymentSplit {
-		case string(models.PaySplitMonthly):
-			return "mensile"
-		case string(models.PaySplitYearly):
-			return "annuale"
-		case string(models.PaySplitSingleInstallment):
-			return "singolo"
-		}
-		return ""
-	}
 
-	if el.policy.ConsultancyValue.Price == 0 {
+	if el.dtoLife.ConsultancyValue.Price == "0" {
 		return
 	}
 	el.engine.NewLine(constants.CellHeight * 2)
 	text :=
-	"Infine, ti ricordiamo la presente polizza prevede il pagamento dei seguenti costi:\n" +
-	fmt.Sprintf("- Premio di polizza: euro %v con frazionamento %v\n", lib.HumanaizePriceEuro(el.policy.PriceGross), getSplitLabel(el.policy.PaymentSplit)) +
-	fmt.Sprintf("- Contributo per servizi di intermediazione: euro %v vorrisposti con il pagamento della prima rata di polizza. Il documento contabile è scaricabile dall’app o nella tua area riservata\n", lib.HumanaizePriceEuro(el.policy.ConsultancyValue.Price)) +
-	fmt.Sprintf("- Per un totale annuo di euro %v", el.policy.PaymentComponents.PriceAnnuity.Total)
+		"Infine, ti ricordiamo la presente polizza prevede il pagamento dei seguenti costi:\n" +
+			fmt.Sprintf("- Premio di polizza: euro %v con frazionamento %v\n", el.dtoLife.Prizes.Gross, el.dtoLife.Prizes.Split) +
+			fmt.Sprintf("- Contributo per servizi di intermediazione: euro %v vorrisposti con il pagamento della prima rata di polizza. Il documento contabile è scaricabile dall’app o nella tua area riservata\n", el.dtoLife.ConsultancyValue.Price) +
+			fmt.Sprintf("- Per un totale annuo di euro %v", el.dtoLife.PriceAnnuity)
 
-	el.engine.WriteText(getTableCell(text, constants.BlackColor))
+	el.engine.WriteText(el.GetTableCell(text, constants.BlackColor))
 }
 
 func (el *LifeGenerator) addSupportInformationSection() {
-	if el.policy.Channel == models.ECommerceChannel {
+	if el.dtoLife.Channel == models.NetworkChannel {
 		text := "\nRestiamo a disposizione per ogni ulteriore informazione anche attraverso i canali di contatto che trovi a questo "
-		el.writeTexts(
-			getTableCell(text, constants.BlackColor),
+		el.WriteTexts(
+			el.GetTableCell(text, constants.BlackColor),
 		)
-		el.engine.WriteLink("https://www.wopta.it/it/vita/#contact-us",getTableCell("link",constants.PinkColor))
+		el.engine.WriteLink("https://www.wopta.it/it/vita/#contact-us", el.GetTableCell("link", constants.PinkColor))
 		return
 	}
 
-	if el.policy.Channel == models.AgencyChannel {
-		el.engine.WriteText(getTableCell("Se hai necessità di ulteriori informazioni e supporto, rivolgiti al tuo intermediario, che trovi in copia conoscenza alla mail accompagnatoria di questa comunicazione.", constants.BlackColor))
+	if el.dtoLife.Channel == models.AgencyChannel {
+		el.engine.WriteText(el.GetTableCell("Se hai necessità di ulteriori informazioni e supporto, rivolgiti al tuo intermediario, che trovi in copia conoscenza alla mail accompagnatoria di questa comunicazione.", constants.BlackColor))
 	}
 }
 
 func (el *LifeGenerator) addGreatingsSection() {
 	el.engine.NewLine(constants.CellHeight)
-	el.engine.WriteText(getTableCell("Cordiali saluti.", constants.BlackColor))
+	el.engine.WriteText(el.GetTableCell("Cordiali saluti.", constants.BlackColor))
 	el.engine.NewLine(constants.CellHeight * 2)
-	el.writeTexts(
-		getTableCell("Anna di Wopta Assicurazioni\n", constants.BlackColor),
-		getTableCell("Proteggiamo chi sei", constants.BlackColor),
+	el.WriteTexts(
+		el.GetTableCell("Anna di Wopta Assicurazioni\n", constants.BlackColor),
+		el.GetTableCell("Proteggiamo chi sei", constants.BlackColor),
 	)
-}
-
-// get a tablecell personalized based on passed opts
-func getTableCell(text string, opts ...any) domain.TableCell {
-	tableCell := domain.TableCell{}
-	tableCell.Text = text
-	tableCell.Height = constants.CellHeight
-	tableCell.Align = constants.LeftAlign
-	tableCell.FontStyle = constants.RegularFontStyle
-	tableCell.FontSize = constants.RegularFontSize
-
-	for _, opt := range opts {
-		switch opt := opt.(type) {
-		case domain.FontSize:
-			tableCell.FontSize = opt
-		case domain.FontStyle:
-			tableCell.FontStyle = opt
-		case domain.Color:
-			tableCell.FontColor = opt
-		}
-	}
-	return tableCell
-}
-
-func (el *LifeGenerator) writeTexts(tables ...domain.TableCell) {
-	for _, text := range tables {
-		el.engine.RawWriteText(text)
-	}
 }

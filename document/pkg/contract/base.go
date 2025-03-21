@@ -1971,3 +1971,31 @@ func (bg *baseGenerator) Save(rawDoc []byte) (string, error) {
 	}
 	return bg.engine.Save(rawDoc, filename)
 }
+
+// get a tablecell personalized based on passed opts
+func (el *baseGenerator) GetTableCell(text string, opts ...any) domain.TableCell {
+	tableCell := domain.TableCell{}
+	tableCell.Text = text
+	tableCell.Height = constants.CellHeight
+	tableCell.Align = constants.LeftAlign
+	tableCell.FontStyle = constants.RegularFontStyle
+	tableCell.FontSize = constants.RegularFontSize
+
+	for _, opt := range opts {
+		switch opt := opt.(type) {
+		case domain.FontSize:
+			tableCell.FontSize = opt
+		case domain.FontStyle:
+			tableCell.FontStyle = opt
+		case domain.Color:
+			tableCell.FontColor = opt
+		}
+	}
+	return tableCell
+}
+
+func (el *baseGenerator) WriteTexts(tables ...domain.TableCell) {
+	for _, text := range tables {
+		el.engine.RawWriteText(text)
+	}
+}
