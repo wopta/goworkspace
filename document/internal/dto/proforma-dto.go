@@ -14,8 +14,7 @@ type ProformaDTO struct {
 }
 
 type proformaContractorDTO struct {
-	Name                string
-	Surname             string
+	NameAndSurname      string
 	FiscalOrVatCode     string
 	StreetNameAndNumber string
 	PostalCodeAndCity   string
@@ -40,8 +39,7 @@ func NewProformaDTO() *ProformaDTO {
 
 func newProformaContractorDTO() *proformaContractorDTO {
 	return &proformaContractorDTO{
-		Name:                constants.EmptyField,
-		Surname:             constants.EmptyField,
+		NameAndSurname:      constants.EmptyField,
 		FiscalOrVatCode:     constants.EmptyField,
 		StreetNameAndNumber: constants.EmptyField,
 		PostalCodeAndCity:   constants.EmptyField,
@@ -66,8 +64,7 @@ func (pf *ProformaDTO) FromPolicy(policy models.Policy, product models.Product) 
 }
 
 func (c *proformaContractorDTO) fromPolicy(contr models.Contractor) {
-	c.Name = contr.Name
-	c.Surname = contr.Surname
+	c.NameAndSurname = lib.TrimSpace(contr.Name + " " + contr.Surname)
 	if contr.Type == "legalEntity" {
 		c.FiscalOrVatCode = contr.VatCode
 	} else {

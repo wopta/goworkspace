@@ -120,7 +120,7 @@ func (pg *ProformaGenerator) contractor() {
 
 	data := []string{
 		"I tuoi dati",
-		"Contraente: " + contr.Name + " " + contr.Surname,
+		"Contraente: " + contr.NameAndSurname,
 		"CF/P.IVA: " + contr.FiscalOrVatCode,
 		"Indirizzo: " + contr.StreetNameAndNumber,
 		contr.PostalCodeAndCity,
