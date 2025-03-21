@@ -137,7 +137,7 @@ func (pg *ProformaGenerator) body() {
 
 	const (
 		emptyColumnWidth  = 10
-		oneLineWidth      = 180
+		oneLineWidth      = constants.FullPageWidth - emptyColumnWidth
 		firstColumnWidth  = 100
 		secondColumnWidth = 40
 	)
