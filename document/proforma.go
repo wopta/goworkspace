@@ -56,9 +56,6 @@ func ProformaObj(origin string, data models.Policy, networkNode *models.NetworkN
 
 	log.Println("[ProformaObj] function start -------------------------------")
 
-	rawPolicy, _ := data.Marshal()
-	log.Printf("[ProformaObj] policy: %s", string(rawPolicy))
-
 	generator := proforma.NewProformaGenerator(engine.NewFpdf(), &data, networkNode, *product)
 	out, err = generator.Contract()
 	if err != nil {
