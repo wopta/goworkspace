@@ -1,10 +1,10 @@
 package dto
 
 import (
-	"strconv"
 	"time"
 
 	"github.com/wopta/goworkspace/document/internal/constants"
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -91,8 +91,8 @@ func (c *ContractorDTO) fromPolicy(contr models.Contractor) {
 }
 
 func (b *BodyDTO) fromPolicy(value models.ConsultancyValue) {
-	b.Gross = strconv.FormatFloat(value.Price, 'f', 2, 64)
+	b.Gross = lib.HumanaizePriceEuro(value.Price)
 	b.Net = b.Gross
-	b.Vat = "0,00"
-	b.Date = time.Now().Format("02/01/2006")
+	b.Vat = lib.HumanaizePriceEuro(0.00)
+	b.Date = time.Now().Format(constants.DayMonthYearFormat)
 }
