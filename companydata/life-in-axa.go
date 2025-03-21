@@ -1114,7 +1114,8 @@ func createTransaction(policy models.Policy, mgaProduct *models.Product, custome
 		paymentMethod = models.PayMethodTransfer
 	}
 
-	expireDate := scheduleDate.AddDate(10, 0, 0)
+	now := time.Now().UTC()
+	expireDate := lib.AddMonths(now, 18)
 
 	return models.Transaction{
 		Amount:          priceGross,
@@ -1123,9 +1124,10 @@ func createTransaction(policy models.Policy, mgaProduct *models.Product, custome
 		PolicyName:      policy.Name,
 		PolicyUid:       policy.Uid,
 		CreationDate:    policy.EmitDate,
-		UpdateDate:      time.Now().UTC(),
+		UpdateDate:      now,
 		Status:          status,
 		StatusHistory:   statusHistory,
+		EffectiveDate:   scheduleDate,
 		ScheduleDate:    scheduleDate.Format(models.TimeDateOnly),
 		ExpirationDate:  expireDate.Format(models.TimeDateOnly),
 		NumberCompany:   policy.CodeCompany,

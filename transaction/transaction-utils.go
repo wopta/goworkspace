@@ -29,13 +29,20 @@ func ReinitializePaymentInfo(tr *models.Transaction, providerName string) error 
 	tr.PayDate = time.Time{}
 	tr.PayUrl = ""
 	tr.TransactionDate = time.Time{}
-	if !tr.EffectiveDate.IsZero() {
-		tr.ScheduleDate = tr.EffectiveDate.Format(time.DateOnly)
-		tr.ExpirationDate = lib.AddMonths(now, 18).Format(time.DateOnly)
-	}
 	tr.Status = models.TransactionStatusToPay
 	tr.StatusHistory = append(tr.StatusHistory, transactionStatusReinitialized, models.TransactionStatusToPay)
 	tr.UpdateDate = now
+
+	if tr.EffectiveDate.IsZero() {
+		tmp, err := time.Parse(time.DateOnly, tr.ScheduleDate)
+		if err != nil {
+			return err
+		}
+		tr.EffectiveDate = tmp
+	}
+	tr.ScheduleDate = tr.EffectiveDate.Format(time.DateOnly)
+	tr.ExpirationDate = lib.AddMonths(now, 18).Format(time.DateOnly)
+
 	return nil
 }
 
