@@ -17,12 +17,15 @@ type requestEnvelop struct {
 
 func HandlerEnvelop(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	req, _ := getBodyRequest[requestEnvelop](r)
-	nav,_:=namirial.NewNamirial("",req.Uids...)
+	var err error
+	nav,err:=namirial.NewNamirial("",req.Uids...)
+	if err!=nil{
+		return "","",err
+	}
 	//is it neccessary use the channel?
 	var envelopId string
 	var envInfo namirial.ResponeGetEvelop
 	var filesIds namirial.FilesIdsResponse
-	var err error
 
 	if err:=nav.UploadFiles();err!=nil{
 		return "","",err

@@ -3,8 +3,8 @@ package namirial
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
+	"fmt"
 	"log"
 	"mime/multipart"
 	"net/http"
@@ -51,6 +51,10 @@ func NewNamirial(origin string, uids ...string) (*Namirial, error) {
 		warrant      *models.Warrant
 		err          error
 	)
+	if len(uids)==0{
+		return nil,fmt.Errorf("it is necessary have atleast 1 uid")
+	}
+
 	for i, uid := range uids {
 		policyModel, err = policy.GetPolicy(uid, origin)
 		if err != nil {
