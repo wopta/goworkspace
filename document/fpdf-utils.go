@@ -68,10 +68,21 @@ func loadCustomFonts(pdf *fpdf.Fpdf) {
 }
 
 func saveContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
-	var filename string
+	var (
+		filename string
+		out      bytes.Buffer
+	)
 	if os.Getenv("env") == "local" {
-		err := pdf.OutputFileAndClose("./document/contract.pdf")
+		err := pdf.Output(&out)
+		defer pdf.Close()
+
+		pdfFile, err := os.Create("./document/proposal.pdf")
 		lib.CheckError(err)
+		defer pdfFile.Close()
+
+		pdf.Output(pdfFile)
+		return filename, out.Bytes()
+
 	} else {
 		var out bytes.Buffer
 		err := pdf.Output(&out)
@@ -82,7 +93,6 @@ func saveContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 		lib.CheckError(err)
 		return filename, out.Bytes()
 	}
-	return filename, nil
 }
 
 func saveProposal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
