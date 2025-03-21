@@ -185,15 +185,16 @@ func (el *LifeGenerator) addEmailSection() {
 
 	el.engine.WriteText(el.GetTableCell("Verifica la correttezza di tutti i dati inseriti (anagrafici, indirizzi, codice fiscale, contatti) e delle prestazioni scelte (durata, importi, eventuali opzioni).\n", constants.BlackColor))
 
-	if el.dtoLife.Channel == models.NetworkChannel {
-		el.engine.NewLine(constants.CellHeight)
-		el.WriteTexts(
-			el.GetTableCell("Riceverai anche due mail per procedere con la ", constants.BlackColor),
-			el.GetTableCell("firma ", constants.PinkColor, constants.BoldFontStyle),
-			el.GetTableCell("ed il ", constants.BlackColor),
-			el.GetTableCell("pagamento\n\n", constants.PinkColor, constants.BoldFontStyle),
-		)
+	if el.dtoLife.Channel != models.NetworkChannel {
+		return
 	}
+	el.engine.NewLine(constants.CellHeight)
+	el.WriteTexts(
+		el.GetTableCell("Riceverai anche due mail per procedere con la ", constants.BlackColor),
+		el.GetTableCell("firma ", constants.PinkColor, constants.BoldFontStyle),
+		el.GetTableCell("ed il ", constants.BlackColor),
+		el.GetTableCell("pagamento\n\n", constants.PinkColor, constants.BoldFontStyle),
+	)
 }
 
 func (el *LifeGenerator) addSignSection() {
