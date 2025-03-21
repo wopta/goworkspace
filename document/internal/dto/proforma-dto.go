@@ -74,7 +74,7 @@ func (pf *ProformaDTO) FromPolicy(policy models.Policy, product models.Product) 
 func (c *proformaContractorDTO) fromPolicy(contr models.Contractor) {
 	c.Name = contr.Name
 	c.Surname = contr.Surname
-	if contr.VatCode != "" {
+	if contr.Type == "legalEntity" {
 		c.FiscalOrVatCode = contr.VatCode
 	} else {
 		c.FiscalOrVatCode = contr.FiscalCode
