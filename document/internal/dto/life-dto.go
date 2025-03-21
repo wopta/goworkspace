@@ -3,75 +3,75 @@ package dto
 import (
 	"time"
 
+	"github.com/wopta/goworkspace/document/internal/constants"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
 )
+
+var splitPayment map[string]string = map[string]string{
+	string(models.PaySplitMonthly):           "mensile",
+	string(models.PaySplitYearly):            "annuale",
+	string(models.PaySplitSingleInstallment): "singolo",
+}
 
 type LifeDTO struct {
 	Contractor       contractorDTO
 	Channel          string
-	Prizes           prizeDTO
+	Prizes           priceDTO
 	PriceAnnuity     string
-	ConsultancyValue consultancyDto
-	ValidityDate     validitydate
+	ConsultancyValue consultancyDTO
+	ValidityDate     validityDateDTO
 	ProductorName    string
+	CodeCompany      string
 }
 
-type validitydate struct {
+type validityDateDTO struct {
 	StartDate          string
 	EndDate            string
 	FirstAnnuityExpiry string
 }
 
-type prizeDTO struct {
-	Gross float64
-	Split string
-}
-
 func formatDate(t time.Time) string {
 	location, _ := time.LoadLocation("Europe/Rome")
 	time := t.In(location)
-	return time.In(location).Format("02/01/2006")
+	return time.In(location).Format(constants.DayMonthYearFormat)
 }
 
 func getSplit(split string) string {
-	switch split {
-	case string(models.PaySplitMonthly):
-		return "mensile"
-	case string(models.PaySplitYearly):
-		return "annuale"
-	case string(models.PaySplitSingleInstallment):
-		return "singolo"
+	if split, ok := splitPayment[split]; ok {
+		return split
 	}
 	return ""
 }
 
-func NewLifeDto(policy *models.Policy) LifeDTO {
-	dto := LifeDTO{}
-	dto.Channel = policy.Channel
-	(&dto.Contractor).fromPolicy(policy.Contractor)
-	dto.Prizes = prizeDTO{
+func NewLifeDto() LifeDTO {
+	return LifeDTO{}
+}
+
+func (n *LifeDTO) FromPolicy(policy *models.Policy, network *models.NetworkNode) {
+	n.Channel = policy.Channel
+	n.CodeCompany = policy.CodeCompany
+	(&n.Contractor).fromPolicy(policy.Contractor)
+
+	n.Prizes = priceDTO{
 		Split: getSplit(policy.PaymentSplit),
 		Gross: policy.PriceGross,
 	}
-	dto.ConsultancyValue.Price = lib.HumanaizePriceEuro(policy.ConsultancyValue.Price)
-	dto.PriceAnnuity = lib.HumanaizePriceEuro(policy.PaymentComponents.PriceAnnuity.Total)
+	n.ConsultancyValue.Price = lib.HumanaizePriceEuro(policy.ConsultancyValue.Price)
+	n.PriceAnnuity = lib.HumanaizePriceEuro(policy.PaymentComponents.PriceAnnuity.Total)
 
-	dto.ValidityDate = validitydate{
+	n.ValidityDate = validityDateDTO{
 		StartDate:          formatDate(policy.StartDate),
 		EndDate:            formatDate(policy.EndDate),
 		FirstAnnuityExpiry: formatDate(policy.StartDate.AddDate(1, 0, 0)),
 	}
 
-	networkModel := network.GetNetworkNodeByUid(policy.ProducerUid)
 	if policy.Channel == models.ECommerceChannel {
-		dto.ProductorName = "Michele Lomazzi"
+		n.ProductorName = "Michele Lomazzi"
 	}
 	if policy.Channel == models.NetworkChannel {
-		dto.ProductorName = networkModel.GetName()
+		n.ProductorName = network.GetName()
 	}
-	return dto
 }
 
 func (l *LifeDTO) GetAddressFirstPart() string {

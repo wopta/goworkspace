@@ -11,6 +11,7 @@ type priceDTO struct {
 	NetText   string
 	Taxes     float64
 	TaxesText string
+	Split string
 }
 
 func newPriceDTO() *priceDTO {

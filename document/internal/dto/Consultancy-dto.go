@@ -1,6 +1,6 @@
 package dto
 
-type consultancyDto struct {
+type consultancyDTO struct {
 	Percentage string
 	Price      string
 }

@@ -299,3 +299,31 @@ func (f *Fpdf) Save(rawDoc []byte, filename string) (string, error) {
 	gsLink := lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, rawDoc)
 	return gsLink, nil
 }
+
+// get a tablecell personalized based on passed opts
+func (e *Fpdf) GetTableCell(text string, opts ...any) domain.TableCell {
+	tableCell := domain.TableCell{}
+	tableCell.Text = text
+	tableCell.Height = constants.CellHeight
+	tableCell.Align = constants.LeftAlign
+	tableCell.FontStyle = constants.RegularFontStyle
+	tableCell.FontSize = constants.RegularFontSize
+
+	for _, opt := range opts {
+		switch opt := opt.(type) {
+		case domain.FontSize:
+			tableCell.FontSize = opt
+		case domain.FontStyle:
+			tableCell.FontStyle = opt
+		case domain.Color:
+			tableCell.FontColor = opt
+		}
+	}
+	return tableCell
+}
+
+func (e *Fpdf) WriteTexts(tables ...domain.TableCell) {
+	for _, text := range tables {
+		e.RawWriteText(text)
+	}
+}
