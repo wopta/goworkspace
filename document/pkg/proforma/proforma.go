@@ -104,8 +104,8 @@ func (pg *ProformaGenerator) contractor() {
 		"I tuoi dati",
 		"Contraente: " + contr.Name + " " + contr.Surname,
 		"CF/P.IVA: " + contr.FiscalOrVatCode,
-		"Indirizzo: " + contr.StreetName + " " + contr.StreetNumber,
-		contr.PostalCode + " " + contr.City + " (" + contr.Province + ")",
+		"Indirizzo: " + contr.StreetNameAndNumber,
+		contr.PostalCodeAndCity,
 		"Mail: " + contr.Mail,
 		"Telefono: " + contr.Phone,
 	}

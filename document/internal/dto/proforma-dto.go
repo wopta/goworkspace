@@ -14,16 +14,13 @@ type ProformaDTO struct {
 }
 
 type proformaContractorDTO struct {
-	Name            string
-	Surname         string
-	FiscalOrVatCode string
-	StreetName      string
-	StreetNumber    string
-	City            string
-	Province        string
-	PostalCode      string
-	Mail            string
-	Phone           string
+	Name                string
+	Surname             string
+	FiscalOrVatCode     string
+	StreetNameAndNumber string
+	PostalCodeAndCity   string
+	Mail                string
+	Phone               string
 }
 
 type proformaBodyDTO struct {
@@ -43,16 +40,13 @@ func NewProformaDTO() *ProformaDTO {
 
 func newProformaContractorDTO() *proformaContractorDTO {
 	return &proformaContractorDTO{
-		Name:            constants.EmptyField,
-		Surname:         constants.EmptyField,
-		FiscalOrVatCode: constants.EmptyField,
-		StreetName:      constants.EmptyField,
-		StreetNumber:    constants.EmptyField,
-		City:            constants.EmptyField,
-		Province:        constants.EmptyField,
-		PostalCode:      constants.EmptyField,
-		Mail:            constants.EmptyField,
-		Phone:           constants.EmptyField,
+		Name:                constants.EmptyField,
+		Surname:             constants.EmptyField,
+		FiscalOrVatCode:     constants.EmptyField,
+		StreetNameAndNumber: constants.EmptyField,
+		PostalCodeAndCity:   constants.EmptyField,
+		Mail:                constants.EmptyField,
+		Phone:               constants.EmptyField,
 	}
 }
 
@@ -80,11 +74,8 @@ func (c *proformaContractorDTO) fromPolicy(contr models.Contractor) {
 		c.FiscalOrVatCode = contr.FiscalCode
 	}
 	if contr.Residence != nil {
-		c.StreetName = contr.Residence.StreetName
-		c.StreetNumber = contr.Residence.StreetNumber
-		c.City = contr.Residence.Locality
-		c.Province = contr.Residence.CityCode
-		c.PostalCode = contr.Residence.PostalCode
+		c.StreetNameAndNumber = contr.Residence.StreetName + " " + contr.Residence.StreetNumber
+		c.PostalCodeAndCity = contr.Residence.PostalCode + " " + contr.Residence.Locality + " (" + contr.Residence.CityCode + ")"
 	}
 	c.Mail = contr.Mail
 	c.Phone = contr.Phone
