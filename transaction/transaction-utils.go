@@ -16,6 +16,9 @@ func ReinitializePaymentInfo(tr *models.Transaction, providerName string) error 
 	if tr.IsPay && !tr.IsDelete {
 		return errors.New("cannot reinitialize paid transaction")
 	}
+
+	now := time.Now().UTC()
+
 	tr.ProviderName = providerName
 	tr.IsPay = false
 	tr.IsDelete = false
@@ -26,11 +29,11 @@ func ReinitializePaymentInfo(tr *models.Transaction, providerName string) error 
 	tr.TransactionDate = time.Time{}
 	if !tr.EffectiveDate.IsZero() {
 		tr.ScheduleDate = tr.EffectiveDate.Format(time.DateOnly)
-		tr.ExpirationDate = tr.EffectiveDate.AddDate(10, 0, 0).Format(time.DateOnly)
+		tr.ExpirationDate = lib.AddMonths(now, 18).Format(time.DateOnly)
 	}
 	tr.Status = models.TransactionStatusToPay
 	tr.StatusHistory = append(tr.StatusHistory, transactionStatusReinitialized, models.TransactionStatusToPay)
-	tr.UpdateDate = time.Now().UTC()
+	tr.UpdateDate = now
 	return nil
 }
 
