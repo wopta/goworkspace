@@ -57,7 +57,7 @@ func ProformaObj(origin string, data models.Policy, networkNode *models.NetworkN
 	log.Println("[ProformaObj] function start -------------------------------")
 
 	generator := proforma.NewProformaGenerator(engine.NewFpdf(), &data, networkNode, *product)
-	out, err = generator.Contract()
+	out, err = generator.Generate()
 	if err != nil {
 		log.Printf("error generating proforma: %v", err)
 		return ProformaResponse{}, err

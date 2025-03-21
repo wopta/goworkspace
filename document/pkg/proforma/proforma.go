@@ -49,7 +49,7 @@ func NewProformaGenerator(engine *engine.Fpdf, policy *models.Policy, node *mode
 	}
 }
 
-func (pg *ProformaGenerator) Contract() ([]byte, error) {
+func (pg *ProformaGenerator) Generate() ([]byte, error) {
 	pg.mainHeader()
 
 	pg.engine.NewPage()
