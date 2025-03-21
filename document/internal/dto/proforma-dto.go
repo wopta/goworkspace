@@ -9,11 +9,11 @@ import (
 )
 
 type ProformaDTO struct {
-	Contractor *ContractorDTO
-	Body       *BodyDTO
+	Contractor *proformaContractorDTO
+	Body       *proformaBodyDTO
 }
 
-type ContractorDTO struct {
+type proformaContractorDTO struct {
 	Name            string
 	Surname         string
 	FiscalOrVatCode string
@@ -26,7 +26,7 @@ type ContractorDTO struct {
 	Phone           string
 }
 
-type BodyDTO struct {
+type proformaBodyDTO struct {
 	Date    string
 	Net     string
 	Vat     string
@@ -36,13 +36,13 @@ type BodyDTO struct {
 
 func NewProformaDTO() *ProformaDTO {
 	return &ProformaDTO{
-		Contractor: NewContractorDTO(),
-		Body:       NewBodyDTO(),
+		Contractor: newProformaContractorDTO(),
+		Body:       newProformaBodyDTO(),
 	}
 }
 
-func NewContractorDTO() *ContractorDTO {
-	return &ContractorDTO{
+func newProformaContractorDTO() *proformaContractorDTO {
+	return &proformaContractorDTO{
 		Name:            constants.EmptyField,
 		Surname:         constants.EmptyField,
 		FiscalOrVatCode: constants.EmptyField,
@@ -56,8 +56,8 @@ func NewContractorDTO() *ContractorDTO {
 	}
 }
 
-func NewBodyDTO() *BodyDTO {
-	return &BodyDTO{
+func newProformaBodyDTO() *proformaBodyDTO {
+	return &proformaBodyDTO{
 		Date:    constants.EmptyField,
 		Net:     constants.EmptyField,
 		Vat:     constants.EmptyField,
@@ -71,7 +71,7 @@ func (pf *ProformaDTO) FromPolicy(policy models.Policy, product models.Product) 
 	pf.Body.fromPolicy(policy.ConsultancyValue)
 }
 
-func (c *ContractorDTO) fromPolicy(contr models.Contractor) {
+func (c *proformaContractorDTO) fromPolicy(contr models.Contractor) {
 	c.Name = contr.Name
 	c.Surname = contr.Surname
 	if contr.VatCode != "" {
@@ -90,7 +90,7 @@ func (c *ContractorDTO) fromPolicy(contr models.Contractor) {
 	c.Phone = contr.Phone
 }
 
-func (b *BodyDTO) fromPolicy(value models.ConsultancyValue) {
+func (b *proformaBodyDTO) fromPolicy(value models.ConsultancyValue) {
 	b.Gross = lib.HumanaizePriceEuro(value.Price)
 	b.Net = b.Gross
 	b.Vat = lib.HumanaizePriceEuro(0.00)
