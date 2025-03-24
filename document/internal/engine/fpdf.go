@@ -35,7 +35,7 @@ type Fpdf struct {
 func NewFpdf() *Fpdf {
 	pdf := fpdf.New(fpdf.OrientationPortrait, fpdf.UnitMillimeter, fpdf.PageSizeA4, "")
 
-	pdf.SetMargins(10, 15, 10)
+	pdf.SetMargins(10, 15, -1)
 	pdf.SetAuthor("Wopta Assicurazioni s.r.l", true)
 	pdf.SetCreationDate(time.Now().UTC())
 	pdf.SetAutoPageBreak(true, 18)
@@ -256,4 +256,43 @@ func (f *Fpdf) GetStringWidth(text string) float64 {
 func (f *Fpdf) Save(rawDoc []byte, filename string) (string, error) {
 	gsLink := lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, rawDoc)
 	return gsLink, nil
+}
+
+func (f *Fpdf) RawWriteText(cell domain.TableCell) {
+	oldFontStyle := f.style
+	oldFillColor := f.fillColor
+
+	if cell.Fill {
+		f.SetFillColor(cell.FillColor)
+	}
+
+	f.SetFontStyle(cell.FontStyle)
+	f.SetFontColor(cell.FontColor)
+	f.SetFontSize(cell.FontSize)
+	f.SetFontFamily(constants.MontserratFont)
+
+	f.pdf.Write(cell.Height, cell.Text)
+
+	f.SetFillColor(oldFillColor)
+	f.SetFontStyle(oldFontStyle)
+}
+
+func (f *Fpdf) CrossRemainingSpace() {
+	var (
+		minimumAreaHeight     = float64(5)
+		currentX, currentY    = f.pdf.GetXY()
+		_, _, _, bottomMargin = f.pdf.GetMargins()
+		_, pageHeight         = f.GetPageSize()
+		maximumY              = pageHeight - bottomMargin - minimumAreaHeight
+	)
+
+	if currentY > maximumY {
+		return
+	}
+
+	f.DrawLine(currentX, currentY, constants.FullPageWidth, maximumY, 0.25, constants.BlackColor)
+}
+
+func (f *Fpdf) SetMargins(left, top, right float64) {
+	f.pdf.SetMargins(left, top, right)
 }

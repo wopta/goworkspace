@@ -55,7 +55,8 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		return "", nil, err
 	}
 
-	flow := authToken.GetChannelByRoleV2()
+	channel := authToken.GetChannelByRoleV2()
+	flow := channel
 
 	log.Println("loading network node")
 	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
@@ -68,7 +69,7 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	log.Println("start quoting")
 
-	result, err := Life(data, authToken.GetChannelByRoleV2(), networkNode, warrant, flow)
+	result, err := Life(data, channel, networkNode, warrant, flow)
 	jsonOut, err := json.Marshal(result)
 
 	log.Println("Handler end -------------------------------------------------")
@@ -82,7 +83,12 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 
 	log.Println("[Life] function start --------------------------------------")
 
+	data.Channel = channel
 	contractorAge, err := data.CalculateContractorAge()
+	if err != nil {
+		log.Printf("[Life] error calculating contractor age: %s", err.Error())
+		return models.Policy{}, err
+	}
 
 	log.Printf("[Life] contractor age: %d", contractorAge)
 
@@ -178,10 +184,6 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 
 	}
 
-	log.Println("[Life] apply consultacy price")
-	
-	addConsultacyPrice(&data, ruleProduct)
-
 	log.Println("[Life] check monthly limit")
 
 	monthlyToBeRemoved := !ruleProduct.Companies[0].IsMonthlyPaymentAvailable ||
@@ -198,6 +200,14 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 	log.Println("[Life] round offers prices")
 
 	roundOfferPrices(data.OffersPrices)
+
+	log.Println("[Life] set default offer price into policy")
+
+	setPricesByOffer(&data, "default")
+
+	log.Println("[Life] apply consultacy price")
+	
+	addConsultacyPrice(&data, ruleProduct)
 
 	log.Println("[Life] sort guarantees list")
 
@@ -431,4 +441,14 @@ func roundOfferPrices(offersPrices map[string]map[string]*models.Price) {
 			offersPrices[offerKey][paymentKey].Gross = lib.RoundFloat(offersPrices[offerKey][paymentKey].Gross, 2)
 		}
 	}
+}
+
+func setPricesByOffer(policy *models.Policy, offerName string) {
+	policy.OfferlName = offerName
+	policy.PriceGross = policy.OffersPrices[policy.OfferlName][string(models.PaySplitYearly)].Gross
+	policy.PriceNett = policy.OffersPrices[policy.OfferlName][string(models.PaySplitYearly)].Net
+	policy.TaxAmount = policy.OffersPrices[policy.OfferlName][string(models.PaySplitYearly)].Tax
+	policy.PriceGrossMonthly = policy.OffersPrices[policy.OfferlName][string(models.PaySplitMonthly)].Gross
+	policy.PriceNettMonthly = policy.OffersPrices[policy.OfferlName][string(models.PaySplitMonthly)].Net
+	policy.TaxAmountMonthly = policy.OffersPrices[policy.OfferlName][string(models.PaySplitMonthly)].Tax
 }

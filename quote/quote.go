@@ -45,6 +45,12 @@ var quoteRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodPost,
 		Roles:   []string{},
 	},
+	{
+		Route:   "/v1/generate/document",
+		Handler: lib.ResponseLoggerWrapper(GenerateDocumentFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
 }
 
 func init() {
