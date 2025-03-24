@@ -120,7 +120,10 @@ func lifeProposal(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkN
 		filename, rawDoc = lifeAxaProposalV1(pdf, origin, policy, networkNode, product)
 	case models.ProductV2:
 		log.Println("[lifeProposal] life v2")
-		filename, rawDoc = lifeAxaProposalV2(pdf, origin, policy, networkNode, product)
+		pdf := engine.NewFpdf()
+		gen := contract.NewLifeGenerator(pdf, policy, networkNode, *product, true)
+		gen.Generate()
+		filename, rawDoc = lifeAxaProposalV2(pdf.GetPdf(), origin, policy, networkNode, product)
 	}
 
 	log.Println("[lifeProposal] function end --------------------------------")

@@ -1,25 +1,20 @@
 package dto
 
-import (
-	"github.com/wopta/goworkspace/lib"
-)
-
 type priceDTO struct {
-	Gross     float64
-	GrossText string
-	Net       float64
-	NetText   string
-	Taxes     float64
-	TaxesText string
+	Gross       numeric
+	Net         numeric
+	Taxes       numeric
+	Consultancy numeric
+	Total       numeric
+	Split       string
 }
 
 func newPriceDTO() *priceDTO {
 	return &priceDTO{
-		Gross:     0,
-		GrossText: lib.HumanaizePriceEuro(0),
-		Net:       0,
-		NetText:   lib.HumanaizePriceEuro(0),
-		Taxes:     0,
-		TaxesText: lib.HumanaizePriceEuro(0),
+		Gross:       newNumeric(),
+		Net:         newNumeric(),
+		Taxes:       newNumeric(),
+		Consultancy: newNumeric(),
+		Total:       newNumeric(),
 	}
 }

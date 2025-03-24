@@ -2,6 +2,8 @@ package dto
 
 import (
 	"fmt"
+	"strconv"
+	"time"
 
 	"github.com/wopta/goworkspace/document/internal/constants"
 	"github.com/wopta/goworkspace/lib"
@@ -12,6 +14,17 @@ type numeric struct {
 	ValueFloat float64
 	ValueInt   int64
 	Text       string
+}
+
+func (n *numeric) FromValue(v any) {
+	switch v := v.(type) {
+	case float64:
+		n.ValueFloat = v
+		n.Text = lib.HumanaizePriceEuro(v)
+	case int64:
+		n.ValueInt = v
+		n.Text = strconv.FormatInt(v, 10)
+	}
 }
 
 func newNumeric() numeric {
@@ -72,4 +85,43 @@ func (g *guaranteeDTO) fromPolicy(guarantee models.Guarante) {
 	if guarantee.Value.RetroactiveUsaCanDate != nil && !guarantee.Value.RetroactiveDate.IsZero() {
 		g.RetroactiveDateUsa = guarantee.Value.RetroactiveUsaCanDate.Format(constants.DayMonthYearFormat)
 	}
+}
+
+type quoteGuaranteeDTO struct {
+	Description                string
+	SumInsuredLimitOfIndemnity numeric
+	ExpiryDate                 string
+	Duration                   numeric
+	PremiumGrossYearly         numeric
+}
+
+func newQuoteGuaranteeDTO() *quoteGuaranteeDTO {
+	return &quoteGuaranteeDTO{
+		Description:                constants.EmptyField,
+		SumInsuredLimitOfIndemnity: newNumeric(),
+		Duration:                   newNumeric(),
+		PremiumGrossYearly:         newNumeric(),
+		ExpiryDate:                 constants.EmptyField,
+	}
+}
+
+func (g *quoteGuaranteeDTO) fromData(guarantee models.Guarante, startDate time.Time) {
+	g.Description = guarantee.CompanyName
+
+	g.SumInsuredLimitOfIndemnity.ValueFloat = guarantee.Value.SumInsuredLimitOfIndemnity
+	if g.SumInsuredLimitOfIndemnity.ValueFloat != 0 {
+		g.SumInsuredLimitOfIndemnity.Text = lib.HumanaizePriceEuro(g.SumInsuredLimitOfIndemnity.ValueFloat)
+	}
+
+	if guarantee.Value.Duration != nil {
+		g.Duration.ValueInt = int64(guarantee.Value.Duration.Year)
+		g.Duration.Text = fmt.Sprintf("%d", g.Duration.ValueInt)
+	}
+
+	g.PremiumGrossYearly.ValueFloat = guarantee.Value.PremiumGrossYearly
+	if g.PremiumGrossYearly.ValueFloat != 0 {
+		g.PremiumGrossYearly.Text = lib.HumanaizePriceEuro(g.PremiumGrossYearly.ValueFloat)
+	}
+
+	g.ExpiryDate = startDate.AddDate(int(g.Duration.ValueInt), 0,0).Format(constants.DayMonthYearFormat)
 }

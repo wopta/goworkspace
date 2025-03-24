@@ -35,7 +35,7 @@ type Fpdf struct {
 func NewFpdf() *Fpdf {
 	pdf := fpdf.New(fpdf.OrientationPortrait, fpdf.UnitMillimeter, fpdf.PageSizeA4, "")
 
-	pdf.SetMargins(10, 15, 10)
+	pdf.SetMargins(10, 15, -1)
 	pdf.SetAuthor("Wopta Assicurazioni s.r.l", true)
 	pdf.SetCreationDate(time.Now().UTC())
 	pdf.SetAutoPageBreak(true, 18)
@@ -53,6 +53,10 @@ func NewFpdf() *Fpdf {
 		drawColor:   constants.BlackColor,
 		fillColor:   constants.WhiteColor,
 	}
+}
+
+func (f *Fpdf) GetPdf() *fpdf.Fpdf {
+	return f.pdf
 }
 
 func (f *Fpdf) NewPage() {
@@ -158,6 +162,44 @@ func (f *Fpdf) WriteText(cell domain.TableCell) {
 	f.SetFontStyle(oldFontStyle)
 }
 
+func (f *Fpdf) RawWriteText(cell domain.TableCell) {
+	oldFontStyle := f.style
+	oldFillColor := f.fillColor
+
+	if cell.Fill {
+		f.SetFillColor(cell.FillColor)
+	}
+
+	f.SetFontStyle(cell.FontStyle)
+	f.SetFontColor(cell.FontColor)
+	f.SetFontSize(cell.FontSize)
+	f.SetFontFamily(constants.MontserratFont)
+
+	f.pdf.Write(cell.Height, cell.Text)
+
+	f.SetFillColor(oldFillColor)
+	f.SetFontStyle(oldFontStyle)
+}
+
+func (f *Fpdf) WriteLink(url string, cell domain.TableCell) {
+	oldFontStyle := f.style
+	oldFillColor := f.fillColor
+
+	if cell.Fill {
+		f.SetFillColor(cell.FillColor)
+	}
+
+	f.SetFontStyle(cell.FontStyle)
+	f.SetFontColor(cell.FontColor)
+	f.SetFontSize(cell.FontSize)
+	f.SetFontFamily(constants.MontserratFont)
+
+	f.pdf.WriteLinkString(cell.Height, cell.Text, url)
+
+	f.SetFillColor(oldFillColor)
+	f.SetFontStyle(oldFontStyle)
+}
+
 func (f *Fpdf) DrawTable(table [][]domain.TableCell) {
 	for _, row := range table {
 		maxNumLines := 1
@@ -256,4 +298,52 @@ func (f *Fpdf) GetStringWidth(text string) float64 {
 func (f *Fpdf) Save(rawDoc []byte, filename string) (string, error) {
 	gsLink := lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, rawDoc)
 	return gsLink, nil
+}
+
+// get a tablecell personalized based on passed opts
+func (e *Fpdf) GetTableCell(text string, opts ...any) domain.TableCell {
+	tableCell := domain.TableCell{}
+	tableCell.Text = text
+	tableCell.Height = constants.CellHeight
+	tableCell.Align = constants.LeftAlign
+	tableCell.FontStyle = constants.RegularFontStyle
+	tableCell.FontSize = constants.RegularFontSize
+
+	for _, opt := range opts {
+		switch opt := opt.(type) {
+		case domain.FontSize:
+			tableCell.FontSize = opt
+		case domain.FontStyle:
+			tableCell.FontStyle = opt
+		case domain.Color:
+			tableCell.FontColor = opt
+		}
+	}
+	return tableCell
+}
+
+func (e *Fpdf) WriteTexts(tables ...domain.TableCell) {
+	for _, text := range tables {
+		e.RawWriteText(text)
+	}
+}
+
+func (f *Fpdf) CrossRemainingSpace() {
+	var (
+		minimumAreaHeight     = float64(5)
+		currentX, currentY    = f.pdf.GetXY()
+		_, _, _, bottomMargin = f.pdf.GetMargins()
+		_, pageHeight         = f.GetPageSize()
+		maximumY              = pageHeight - bottomMargin - minimumAreaHeight
+	)
+
+	if currentY > maximumY {
+		return
+	}
+
+	f.DrawLine(currentX, currentY, constants.FullPageWidth, maximumY, 0.25, constants.BlackColor)
+}
+
+func (f *Fpdf) SetMargins(left, top, right float64) {
+	f.pdf.SetMargins(left, top, right)
 }

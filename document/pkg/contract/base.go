@@ -68,7 +68,7 @@ func (bg *baseGenerator) woptaFooter() {
 		entries := [][]string{
 			{"Wopta Assicurazioni s.r.l", " ", " ", "www.wopta.it"},
 			{"Galleria del Corso, 1", "Numero REA: MI 2638708", "CF | P.IVA | n. iscr. Registro Imprese:",
-				"info@wopta.it"},
+			"info@wopta.it"},
 			{"20122 - Milano (MI)", "Capitale Sociale: € 204.839,26 i.v.", "12072020964", "(+39) 02 91240346"},
 		}
 
@@ -104,8 +104,8 @@ func (bg *baseGenerator) woptaFooter() {
 
 		bg.engine.WriteText(domain.TableCell{
 			Text: "Wopta Assicurazioni s.r.l. è un intermediario assicurativo soggetto alla vigilanza dell’IVASS" +
-				" ed iscritto alla Sezione A del Registro Unico degli Intermediari Assicurativi con numero" +
-				" A000701923. Consulta gli estremi dell’iscrizione al sito https://servizi.ivass.it/RuirPubblica/",
+			" ed iscritto alla Sezione A del Registro Unico degli Intermediari Assicurativi con numero" +
+			" A000701923. Consulta gli estremi dell’iscrizione al sito https://servizi.ivass.it/RuirPubblica/",
 			Height:    rowHeight,
 			Width:     constants.FullPageWidth,
 			FontSize:  constants.SmallFontSize,
@@ -175,10 +175,10 @@ func (bg *baseGenerator) woptaPrivacySection() {
 
 	bg.engine.WriteText(domain.TableCell{
 		Text: "Ai sensi del REGOLAMENTO (UE) 2016/679 (" +
-			"relativo alla protezione delle persone fisiche con riguardo al trattamento dei dati personali, " +
-			"nonché alla libera circolazione di tali dati) si informa l’“Interessato” (" +
-			"contraente / aderente alla polizza collettiva o convenzione / assicurato / beneficiario / loro aventi" +
-			" causa) di quanto segue.",
+		"relativo alla protezione delle persone fisiche con riguardo al trattamento dei dati personali, " +
+		"nonché alla libera circolazione di tali dati) si informa l’“Interessato” (" +
+		"contraente / aderente alla polizza collettiva o convenzione / assicurato / beneficiario / loro aventi" +
+		" causa) di quanto segue.",
 		Height:    rowHeight,
 		Width:     columnWidth,
 		FontSize:  constants.RegularFontSize,
@@ -207,7 +207,7 @@ func (bg *baseGenerator) woptaPrivacySection() {
 	bg.engine.NewLine(1)
 	bg.engine.WriteText(domain.TableCell{
 		Text: "Titolare del trattamento è Wopta Assicurazioni, con sede legale in Milano, Galleria del Corso, " +
-			"1 (di seguito “Titolare”), raggiungibile all’indirizzo e-mail: privacy@wopta.it",
+		"1 (di seguito “Titolare”), raggiungibile all’indirizzo e-mail: privacy@wopta.it",
 		Height:    rowHeight,
 		Width:     columnWidth,
 		FontSize:  constants.RegularFontSize,
@@ -249,10 +249,10 @@ func (bg *baseGenerator) woptaPrivacySection() {
 	bg.engine.NewLine(1)
 	bg.engine.WriteText(domain.TableCell{
 		Text: "Fermo restando quanto previsto dalla Privacy & Cookie Policy del Sito, ove " +
-			"applicabile, i dati così conferiti potranno essere trattati, anche con strumenti elettronici, da parte del " +
-			"Titolare per eseguire le prestazioni contrattuali, in qualità di intermediario, richieste dall’interessato, " +
-			"o per adempiere ad obblighi normativi, contabili e fiscali, ovvero ancora per finalità di difesa in " +
-			"giudizio, per il tempo strettamente necessario a tali attività.",
+		"applicabile, i dati così conferiti potranno essere trattati, anche con strumenti elettronici, da parte del " +
+		"Titolare per eseguire le prestazioni contrattuali, in qualità di intermediario, richieste dall’interessato, " +
+		"o per adempiere ad obblighi normativi, contabili e fiscali, ovvero ancora per finalità di difesa in " +
+		"giudizio, per il tempo strettamente necessario a tali attività.",
 		Height:    rowHeight,
 		Width:     columnWidth,
 		FontSize:  constants.RegularFontSize,
@@ -266,13 +266,13 @@ func (bg *baseGenerator) woptaPrivacySection() {
 	bg.engine.NewLine(1)
 	bg.engine.WriteText(domain.TableCell{
 		Text: "La base giuridica del trattamento di dati personali per le finalità di cui sopra " +
-			"è l’art. 6.1 lett. b), c), f) del Regolamento in quanto i trattamenti sono necessari all'erogazione dei " +
-			"servizi o per il riscontro di richieste dell’interessato, in conformità a quanto previsto dall’incarico " +
-			"conferito all’intermediario, nonché ove il trattamento risulti necessario per l’adempimento di un preciso " +
-			"obbligo di legge posto in capo al Titolare, o al fine di accertare, esercitare o difendere un diritto in " +
-			"sede giudiziaria. Il conferimento dei dati personali per queste finalità è facoltativo, ma l'eventuale " +
-			"mancato conferimento comporterebbe l'impossibilità per l’intermediario di eseguire le proprie obbligazioni " +
-			"contrattuali.",
+		"è l’art. 6.1 lett. b), c), f) del Regolamento in quanto i trattamenti sono necessari all'erogazione dei " +
+		"servizi o per il riscontro di richieste dell’interessato, in conformità a quanto previsto dall’incarico " +
+		"conferito all’intermediario, nonché ove il trattamento risulti necessario per l’adempimento di un preciso " +
+		"obbligo di legge posto in capo al Titolare, o al fine di accertare, esercitare o difendere un diritto in " +
+		"sede giudiziaria. Il conferimento dei dati personali per queste finalità è facoltativo, ma l'eventuale " +
+		"mancato conferimento comporterebbe l'impossibilità per l’intermediario di eseguire le proprie obbligazioni " +
+		"contrattuali.",
 		Height:    rowHeight,
 		Width:     columnWidth,
 		FontSize:  constants.RegularFontSize,
@@ -299,14 +299,14 @@ func (bg *baseGenerator) woptaPrivacySection() {
 	bg.engine.NewLine(1)
 	bg.engine.WriteText(domain.TableCell{
 		Text: "Inoltre, i Suoi dati personali potranno essere trattati al fine di inviarLe " +
-			"comunicazioni e proposte commerciali, incluso l’invio di newsletter e ricerche di mercato, attraverso " +
-			"strumenti automatizzati (sms, mms, email, messaggistica istantanea e chat) e non (posta cartacea, telefono); " +
-			"si precisa che il Titolare raccoglie un unico consenso per le finalità di marketing qui descritte, ai sensi " +
-			"del Provvedimento Generale del Garante per la Protezione dei Dati Personali \"Linee guida in materia di " +
-			"attività promozionale e contrasto allo spam” del 4 luglio 2013; qualora, in ogni caso, Lei desiderasse " +
-			"opporsi al trattamento dei Suoi dati per le finalità di marketing eseguito con i mezzi qui indicati, potrà " +
-			"in qualunque momento farlo contattando il Titolare ai recapiti indicati nella sezione \"Contatti\" di " +
-			"questa informativa, senza pregiudicare la liceità del trattamento effettuato prima dell’opposizione.",
+		"comunicazioni e proposte commerciali, incluso l’invio di newsletter e ricerche di mercato, attraverso " +
+		"strumenti automatizzati (sms, mms, email, messaggistica istantanea e chat) e non (posta cartacea, telefono); " +
+		"si precisa che il Titolare raccoglie un unico consenso per le finalità di marketing qui descritte, ai sensi " +
+		"del Provvedimento Generale del Garante per la Protezione dei Dati Personali \"Linee guida in materia di " +
+		"attività promozionale e contrasto allo spam” del 4 luglio 2013; qualora, in ogni caso, Lei desiderasse " +
+		"opporsi al trattamento dei Suoi dati per le finalità di marketing eseguito con i mezzi qui indicati, potrà " +
+		"in qualunque momento farlo contattando il Titolare ai recapiti indicati nella sezione \"Contatti\" di " +
+		"questa informativa, senza pregiudicare la liceità del trattamento effettuato prima dell’opposizione.",
 		Height:    rowHeight,
 		Width:     columnWidth,
 		FontSize:  constants.RegularFontSize,
@@ -320,14 +320,14 @@ func (bg *baseGenerator) woptaPrivacySection() {
 	bg.engine.NewLine(1)
 	bg.engine.WriteText(domain.TableCell{
 		Text: "I trattamenti eseguiti per la finalità di marketing, di cui al paragrafo che " +
-			"precede, si basa sul rilascio del Suo consenso ai sensi dell’art. 6, par. 1, lett. a) ([…] l'interessato ha " +
-			"espresso il consenso al trattamento dei propri dati personali per una o più specifiche finalità) del " +
-			"Regolamento. Tale consenso è revocabile in qualsiasi momento senza pregiudizio alcuno della liceità del " +
-			"trattamento effettuato anteriormente alla revoca in conformità a quanto previsto dall’art. 7 del " +
-			"Regolamento. Il conferimento dei Suoi dati personali per queste finalità è quindi del tutto facoltativo e " +
-			"non pregiudica la fruizione dei servizi. Qualora desiderasse opporsi al trattamento dei Suoi dati per le " +
-			"finalità di marketing, potrà in qualunque momento farlo contattando il Titolare ai recapiti indicati nella " +
-			"sezione \"Contatti\" di questa informativa.",
+		"precede, si basa sul rilascio del Suo consenso ai sensi dell’art. 6, par. 1, lett. a) ([…] l'interessato ha " +
+		"espresso il consenso al trattamento dei propri dati personali per una o più specifiche finalità) del " +
+		"Regolamento. Tale consenso è revocabile in qualsiasi momento senza pregiudizio alcuno della liceità del " +
+		"trattamento effettuato anteriormente alla revoca in conformità a quanto previsto dall’art. 7 del " +
+		"Regolamento. Il conferimento dei Suoi dati personali per queste finalità è quindi del tutto facoltativo e " +
+		"non pregiudica la fruizione dei servizi. Qualora desiderasse opporsi al trattamento dei Suoi dati per le " +
+		"finalità di marketing, potrà in qualunque momento farlo contattando il Titolare ai recapiti indicati nella " +
+		"sezione \"Contatti\" di questa informativa.",
 		Height:    rowHeight,
 		Width:     columnWidth,
 		FontSize:  constants.RegularFontSize,
@@ -346,116 +346,116 @@ func (bg *baseGenerator) woptaPrivacySection() {
 			title: "3. DESTINATARI DEI DATI PERSONALI",
 			subsections: []string{
 				"I Suoi dati personali potranno essere condivisi, " +
-					"per le finalità di cui alla sezione 2 della presente Policy, con:",
+				"per le finalità di cui alla sezione 2 della presente Policy, con:",
 				"- Soggetti che agiscono tipicamente in qualità di Responsabili del trattamento " +
-					"ex art. 28 del Regolamento per conto del Titolare, incaricati dell'erogazione dei Servizi (" +
-					"a titolo esemplificativo: servizi tecnologici, " +
-					"servizi di assistenza e consulenza in materia contabile, amministrativa, legale, " +
-					"tributaria e finanziaria, manutenzione tecnica). Il Titolare conserva una lista aggiornata dei " +
-					"responsabili del trattamento nominati e ne garantisce la presa visione all’interessato presso la" +
-					" sede sopra indicata o previa richiesta indirizzata ai recapiti sopra indicati;",
+				"ex art. 28 del Regolamento per conto del Titolare, incaricati dell'erogazione dei Servizi (" +
+				"a titolo esemplificativo: servizi tecnologici, " +
+				"servizi di assistenza e consulenza in materia contabile, amministrativa, legale, " +
+				"tributaria e finanziaria, manutenzione tecnica). Il Titolare conserva una lista aggiornata dei " +
+				"responsabili del trattamento nominati e ne garantisce la presa visione all’interessato presso la" +
+				" sede sopra indicata o previa richiesta indirizzata ai recapiti sopra indicati;",
 				"- Persone autorizzate dal Titolare al trattamento dei dati personali ai sensi " +
-					"degli artt. 29 e 2-quaterdecies del D.lgs. n. 196/2003 (“Codice “Privacy”) (ad es. " +
-					"il personale dipendente addetto alla manutenzione del Sito, alla gestione del CRM, " +
-					"alla gestione dei sistemi informativi ecc.);",
+				"degli artt. 29 e 2-quaterdecies del D.lgs. n. 196/2003 (“Codice “Privacy”) (ad es. " +
+				"il personale dipendente addetto alla manutenzione del Sito, alla gestione del CRM, " +
+				"alla gestione dei sistemi informativi ecc.);",
 				"- Soggetti terzi, autonomi titolari del trattamento, a cui i dati potrebbero " +
-					"essere trasmessi al fine di dare seguito a specifici servizi da Lei richiesti e/o  per dare" +
-					" esecuzione alle attività di cui alla presente informativa, " +
-					"e con i quali il Titolare abbia stipulato accordi commerciali; soggetti, " +
-					"quali le imprese di assicurazione, che assumono il rischio di sottoscrizione della polizza, ai " +
-					"quali sia obbligatorio comunicare i tuoi Dati personali in forza di obblighi contrattuali e di" +
-					" disposizioni di legge e regolamentari sulla distribuzione di prodotti assicurativi;",
+				"essere trasmessi al fine di dare seguito a specifici servizi da Lei richiesti e/o  per dare" +
+				" esecuzione alle attività di cui alla presente informativa, " +
+				"e con i quali il Titolare abbia stipulato accordi commerciali; soggetti, " +
+				"quali le imprese di assicurazione, che assumono il rischio di sottoscrizione della polizza, ai " +
+				"quali sia obbligatorio comunicare i tuoi Dati personali in forza di obblighi contrattuali e di" +
+				" disposizioni di legge e regolamentari sulla distribuzione di prodotti assicurativi;",
 				"- Soggetti, enti od autorità a cui sia obbligatorio comunicare i Suoi dati personali in forza di" +
-					" disposizioni di legge o di ordini delle autorità.",
+				" disposizioni di legge o di ordini delle autorità.",
 				"Tali soggetti sono, di seguito, collettivamente definiti come “Destinatari”. " +
-					"L'elenco completo dei responsabili del trattamento è disponibile inviando una richiesta scritta" +
-					" al Titolare ai recapiti indicati nella sezione \"Contatti\" di questa informativa.",
+				"L'elenco completo dei responsabili del trattamento è disponibile inviando una richiesta scritta" +
+				" al Titolare ai recapiti indicati nella sezione \"Contatti\" di questa informativa.",
 			},
 		},
 		{
 			title: "4. TRASFERIMENTI DEI DATI PERSONALI",
 			subsections: []string{
 				"Alcuni dei Suoi dati personali sono condivisi con Destinatari che si potrebbero " +
-					"trovare al di fuori dello Spazio Economico Europeo. " +
-					"Il Titolare assicura che il trattamento Suoi dati personali da parte di questi Destinatari" +
-					" avviene nel rispetto degli artt. 44 - 49 del Regolamento. Invero, " +
-					"per quanto concerne il trasferimento dei dati personali verso Paesi terzi, " +
-					"il Titolare rende noto che il trattamento avverrà secondo una delle modalità consentite dalla" +
-					" legge vigente, quali, ad esempio, il consenso dell’interessato, " +
-					"l’adozione di Clausole Standard approvate dalla Commissione Europea, " +
-					"la selezione di soggetti aderenti a programmi internazionali per la libera circolazione dei dati" +
-					" o operanti in Paesi considerati sicuri dalla Commissione Europea sulla base di una decisione di" +
-					" adeguatezza.",
+				"trovare al di fuori dello Spazio Economico Europeo. " +
+				"Il Titolare assicura che il trattamento Suoi dati personali da parte di questi Destinatari" +
+				" avviene nel rispetto degli artt. 44 - 49 del Regolamento. Invero, " +
+				"per quanto concerne il trasferimento dei dati personali verso Paesi terzi, " +
+				"il Titolare rende noto che il trattamento avverrà secondo una delle modalità consentite dalla" +
+				" legge vigente, quali, ad esempio, il consenso dell’interessato, " +
+				"l’adozione di Clausole Standard approvate dalla Commissione Europea, " +
+				"la selezione di soggetti aderenti a programmi internazionali per la libera circolazione dei dati" +
+				" o operanti in Paesi considerati sicuri dalla Commissione Europea sulla base di una decisione di" +
+				" adeguatezza.",
 				"Maggiori informazioni sono disponibili inviando una richiesta scritta al " +
-					"Titolare ai recapiti indicati nella sezione \"Contatti\" di questa informativa.",
+				"Titolare ai recapiti indicati nella sezione \"Contatti\" di questa informativa.",
 			},
 		},
 		{
 			title: "5. CONSERVAZIONE DEI DATI PERSONALI",
 			subsections: []string{
 				"I Suoi dati personali saranno inseriti e conservati, in conformità ai principi " +
-					"di minimizzazione e limitazione della conservazione di cui all’art. 5.1." +
-					"c) ed e) del Regolamento, nei sistemi informativi del Titolare, " +
-					"i cui server sono situati all’interno dello Spazio Economico Europeo.",
+				"di minimizzazione e limitazione della conservazione di cui all’art. 5.1." +
+				"c) ed e) del Regolamento, nei sistemi informativi del Titolare, " +
+				"i cui server sono situati all’interno dello Spazio Economico Europeo.",
 				"I dati personali trattati per le finalità di cui alle lettere a) e b) " +
-					"saranno conservati per il tempo strettamente necessario a raggiungere quelle stesse finalit" +
-					"à ovverossia per il tempo necessario all’esecuzione del contratto, " +
-					"in conformità ai tempi di conservazione obbligatori per legge (vedi anche, in particolare, " +
-					"art. 2946 c.c. e ss.).",
+				"saranno conservati per il tempo strettamente necessario a raggiungere quelle stesse finalit" +
+				"à ovverossia per il tempo necessario all’esecuzione del contratto, " +
+				"in conformità ai tempi di conservazione obbligatori per legge (vedi anche, in particolare, " +
+				"art. 2946 c.c. e ss.).",
 				"Per le finalità di cui alla lettera c), i suoi dati personali saranno invece " +
-					"trattati fino alla revoca del suo consenso. Alla revoca del consenso, " +
-					"i dati trattati per la finalità di cui sopra verranno cancellati o resi anonimi in modo" +
-					" permanente.",
+				"trattati fino alla revoca del suo consenso. Alla revoca del consenso, " +
+				"i dati trattati per la finalità di cui sopra verranno cancellati o resi anonimi in modo" +
+				" permanente.",
 				"In generale, il Titolare si riserva in ogni caso di conservare i Suoi dati per " +
-					"il tempo necessario ad adempiere ogni eventuale obbligo normativo cui lo stesso è soggetto o per" +
-					" soddisfare eventuali esigenze difensive. " +
-					"Resta infatti salva la possibilità per il Titolare di conservare i Suoi dati personali per il" +
-					" periodo di tempo previsto e ammesso dalla legge Italiana a tutela dei propri interessi " +
-					"(Art. 2947 c.c.).",
+				"il tempo necessario ad adempiere ogni eventuale obbligo normativo cui lo stesso è soggetto o per" +
+				" soddisfare eventuali esigenze difensive. " +
+				"Resta infatti salva la possibilità per il Titolare di conservare i Suoi dati personali per il" +
+				" periodo di tempo previsto e ammesso dalla legge Italiana a tutela dei propri interessi " +
+				"(Art. 2947 c.c.).",
 				"Maggiori informazioni in merito al periodo di conservazione dei dati e ai " +
-					"criteri utilizzati per determinare tale periodo possono essere richieste inviando una richiesta" +
-					" scritta al Titolare ai recapiti indicati nella sezione \"Contatti\" di questa informativa.",
+				"criteri utilizzati per determinare tale periodo possono essere richieste inviando una richiesta" +
+				" scritta al Titolare ai recapiti indicati nella sezione \"Contatti\" di questa informativa.",
 			},
 		},
 		{
 			title: "6. DIRITTI DELL’INTERESSATO",
 			subsections: []string{
 				"Lei ha il diritto di accedere in qualunque momento ai Dati Personali che La " +
-					"riguardano, ai sensi degli artt. 15-22 del Regolamento. In particolare, " +
-					"potrà chiedere la rettifica (ex art. 16), la cancellazione (ex art. 17), " +
-					"la limitazione (ex art. 18) e la portabilità dei dati (ex art. 20), " +
-					"di non essere sottoposto a una decisione basata unicamente sul trattamento automatizzato, " +
-					"compresa la profilazione, " +
-					"che produca effetti giuridici che La riguardano o che incida in modo analogo " +
-					"significativamente sulla sua persona (ex art. 22), " +
-					"nonché la revoca del consenso eventualmente prestato (ex art. 7, par. 3).",
+				"riguardano, ai sensi degli artt. 15-22 del Regolamento. In particolare, " +
+				"potrà chiedere la rettifica (ex art. 16), la cancellazione (ex art. 17), " +
+				"la limitazione (ex art. 18) e la portabilità dei dati (ex art. 20), " +
+				"di non essere sottoposto a una decisione basata unicamente sul trattamento automatizzato, " +
+				"compresa la profilazione, " +
+				"che produca effetti giuridici che La riguardano o che incida in modo analogo " +
+				"significativamente sulla sua persona (ex art. 22), " +
+				"nonché la revoca del consenso eventualmente prestato (ex art. 7, par. 3).",
 				"Lei può formulare, inoltre, una richiesta di opposizione al trattamento dei " +
-					"Suoi Dati Personali ex art. 21 del Regolamento nella quale dare evidenza delle ragioni che" +
-					" giustifichino l’opposizione: il titolare si riserva di valutare la Sua istanza, " +
-					"che non verrebbe accettata in caso di esistenza di motivi legittimi cogenti per procedere al" +
-					" trattamento che prevalgano sui Suoi interessi, " +
-					"diritti e libertà. Lei ha altresì il diritto di opporsi in ogni momento e senza" +
-					" alcuna giustificazione all’invio di marketing diretto attraverso strumenti automatizzati (es. " +
-					"sms, mms, e-mail, notifiche push, fax, " +
-					"sistemi di chiamata automatizzati senza operatore) e non (posta cartacea, telefono con operatore). " +
-					"Inoltre, con riguardo al marketing diretto, " +
-					"resta salva la possibilità di esercitare tale diritto anche in parte, ossia, in tal caso, " +
-					"opponendosi, ad esempio, " +
-					"al solo invio di comunicazioni promozionali effettuato tramite strumenti automatizzati.",
+				"Suoi Dati Personali ex art. 21 del Regolamento nella quale dare evidenza delle ragioni che" +
+				" giustifichino l’opposizione: il titolare si riserva di valutare la Sua istanza, " +
+				"che non verrebbe accettata in caso di esistenza di motivi legittimi cogenti per procedere al" +
+				" trattamento che prevalgano sui Suoi interessi, " +
+				"diritti e libertà. Lei ha altresì il diritto di opporsi in ogni momento e senza" +
+				" alcuna giustificazione all’invio di marketing diretto attraverso strumenti automatizzati (es. " +
+				"sms, mms, e-mail, notifiche push, fax, " +
+				"sistemi di chiamata automatizzati senza operatore) e non (posta cartacea, telefono con operatore). " +
+				"Inoltre, con riguardo al marketing diretto, " +
+				"resta salva la possibilità di esercitare tale diritto anche in parte, ossia, in tal caso, " +
+				"opponendosi, ad esempio, " +
+				"al solo invio di comunicazioni promozionali effettuato tramite strumenti automatizzati.",
 				"Le richieste vanno rivolte per iscritto al" +
-					" Titolare ai recapiti indicati nella sezione \"Contatti\" di questa informativa.",
+				" Titolare ai recapiti indicati nella sezione \"Contatti\" di questa informativa.",
 				"Qualora Lei ritenga che il trattamento dei Suoi Dati personali effettuato dal " +
-					"Titolare avvenga in violazione di quanto previsto dal GDPR, " +
-					"ha il diritto di proporre reclamo al Garante Privacy, " +
-					"come previsto dall'art. 77 del GDPR stesso, o di adire le opportune sedi giudiziarie " +
-					"(art. 79 del GDPR).",
+				"Titolare avvenga in violazione di quanto previsto dal GDPR, " +
+				"ha il diritto di proporre reclamo al Garante Privacy, " +
+				"come previsto dall'art. 77 del GDPR stesso, o di adire le opportune sedi giudiziarie " +
+				"(art. 79 del GDPR).",
 			},
 		},
 		{
 			title: "7. CONTATTI",
 			subsections: []string{
 				"Per esercitare i diritti di cui sopra o per qualunque altra richiesta può " +
-					"scrivere al Titolare del trattamento all’indirizzo: privacy@wopta.it.",
+				"scrivere al Titolare del trattamento all’indirizzo: privacy@wopta.it.",
 			},
 		},
 	}
@@ -624,9 +624,9 @@ func (bg *baseGenerator) commercialConsentSection() {
 	bg.engine.NewLine(2)
 	bg.engine.WriteText(domain.TableCell{
 		Text: "al trattamento dei propri dati personali da parte di Wopta Assicurazioni per " +
-			"l’invio di comunicazioni e proposte commerciali e di marketing, incluso l’invio di newsletter e ricerche di " +
-			"mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono " +
-			"con operatore).",
+		"l’invio di comunicazioni e proposte commerciali e di marketing, incluso l’invio di newsletter e ricerche di " +
+		"mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono " +
+		"con operatore).",
 		Height:    3,
 		Width:     constants.FullPageWidth,
 		FontSize:  constants.RegularFontSize,
@@ -658,7 +658,7 @@ func (bg *baseGenerator) signatureForm() {
 		return
 	}
 	text := fmt.Sprintf("\"[[!sigField\"%d\":signer1:signature(sigType=\\\"Click2Sign\\\"):label"+
-		"(\\\"firma qui\\\"):size(width=150,height=60)]]\"", bg.signatureID)
+	"(\\\"firma qui\\\"):size(width=150,height=60)]]\"", bg.signatureID)
 
 	bg.engine.SetX(-90)
 	bg.engine.WriteText(domain.TableCell{
@@ -701,7 +701,7 @@ func (bg *baseGenerator) annexSections() {
 	}
 
 	if bg.networkNode == nil || bg.networkNode.Type == models.PartnershipNetworkNodeType || bg.networkNode.
-		IsMgaProponent {
+	IsMgaProponent {
 
 		bg.woptaHeader()
 
@@ -751,13 +751,13 @@ func (bg *baseGenerator) productInfo() map[string]string {
 	switch bg.networkNode.Type {
 	case models.AgentNetworkNodeType:
 		producer["name"] = strings.ToUpper(bg.networkNode.Agent.Surname) + " " + strings.ToUpper(bg.networkNode.Agent.
-			Name)
+		Name)
 		producer["ruiSection"] = bg.networkNode.Agent.RuiSection
 		producer["ruiCode"] = bg.networkNode.Agent.RuiCode
 		producer["ruiRegistration"] = bg.networkNode.Agent.RuiRegistration.Format("02.01.2006")
 	case models.AgencyNetworkNodeType:
 		producer["name"] = strings.ToUpper(bg.networkNode.Agency.Manager.Name) + " " + strings.ToUpper(bg.networkNode.
-			Agency.Manager.Surname)
+		Agency.Manager.Surname)
 		producer["ruiSection"] = bg.networkNode.Agency.Manager.RuiSection
 		producer["ruiCode"] = bg.networkNode.Agency.Manager.RuiCode
 		producer["ruiRegistration"] = bg.networkNode.Agency.Manager.RuiRegistration.Format("02.01.2006")
@@ -774,7 +774,7 @@ func (bg *baseGenerator) proponentInfo() map[string]string {
 	proponentInfo["name"] = "Wopta Assicurazioni Srl"
 
 	if bg.networkNode == nil || bg.networkNode.Type == models.PartnershipNetworkNodeType || bg.networkNode.
-		IsMgaProponent {
+	IsMgaProponent {
 		proponentInfo["address"] = "Galleria del Corso, 1 - 20122 MILANO (MI)"
 		proponentInfo["phone"] = "02.91.24.03.46"
 		proponentInfo["email"] = "info@wopta.it"
@@ -871,8 +871,8 @@ func (bg *baseGenerator) designationInfo() string {
 func (bg *baseGenerator) annex4Info() (section1Info, section3Info string) {
 	const (
 		mgaProponentFormat = "Secondo quanto indicato nel modulo di proposta/polizza e documentazione " +
-			"precontrattuale ricevuta, la distribuzione  relativamente a questa proposta/contratto è svolta per " +
-			"conto della seguente impresa di assicurazione: %s"
+		"precontrattuale ricevuta, la distribuzione  relativamente a questa proposta/contratto è svolta per " +
+		"conto della seguente impresa di assicurazione: %s"
 		mgaEmitterFormat = "Il contratto viene intermediato da %s, in qualità di soggetto proponente, che opera in " +
 			"virtù della collaborazione con Wopta Assicurazioni Srl (intermediario emittente dell'Impresa di " +
 			"Assicurazione %s, iscritto al RUI sezione A nr A000701923 dal 14.02.2022, ai sensi dell’articolo 22, " +
@@ -969,8 +969,8 @@ func (bg *baseGenerator) woptaTable(producerInfo, proponentInfo map[string]strin
 		{
 			title: "DATI DELLA PERSONA FISICA CHE ENTRA IN CONTATTO CON IL CONTRAENTE",
 			body: producerInfo["name"] + " iscritto alla Sezione " +
-				producerInfo["ruiSection"] + " del RUI con numero " + producerInfo["ruiCode"] + " in data " +
-				producerInfo["ruiRegistration"],
+			producerInfo["ruiSection"] + " del RUI con numero " + producerInfo["ruiCode"] + " in data " +
+			producerInfo["ruiRegistration"],
 		},
 		{
 			title: "QUALIFICA",
@@ -1095,7 +1095,7 @@ func (bg *baseGenerator) woptaTable(producerInfo, proponentInfo map[string]strin
 		{
 			title: "AUTORITÀ COMPETENTE ALLA VIGILANZA DELL’ATTIVITÀ SVOLTA",
 			body: "IVASS – Istituto per la Vigilanza sulle Assicurazioni - Via del Quirinale, " +
-				"21 - 00187 Roma",
+			"21 - 00187 Roma",
 		},
 	}
 	table = append(table, parseEntries(entries, true)...)
@@ -1127,13 +1127,13 @@ func (bg *baseGenerator) annex3(producerInfo, proponentInfo map[string]string, d
 
 	bg.engine.WriteText(domain.TableCell{
 		Text: "Il distributore ha l’obbligo di consegnare/trasmettere al contraente il presente" +
-			" documento, prima della sottoscrizione della prima proposta o, qualora non prevista, del primo contratto di " +
-			"assicurazione, di metterlo a disposizione del pubblico nei propri locali, anche mediante apparecchiature " +
-			"tecnologiche, oppure di pubblicarlo sul proprio sito internet ove utilizzato per la promozione e collocamento " +
-			"di prodotti assicurativi, dando avviso della pubblicazione nei propri locali. In occasione di rinnovo o " +
-			"stipula di un nuovo contratto o di qualsiasi operazione avente ad oggetto un prodotto di investimento " +
-			"assicurativo il distributore consegna o trasmette le informazioni di cui all’Allegato 3 solo in caso di " +
-			"successive modifiche di rilievo delle stesse.",
+		" documento, prima della sottoscrizione della prima proposta o, qualora non prevista, del primo contratto di " +
+		"assicurazione, di metterlo a disposizione del pubblico nei propri locali, anche mediante apparecchiature " +
+		"tecnologiche, oppure di pubblicarlo sul proprio sito internet ove utilizzato per la promozione e collocamento " +
+		"di prodotti assicurativi, dando avviso della pubblicazione nei propri locali. In occasione di rinnovo o " +
+		"stipula di un nuovo contratto o di qualsiasi operazione avente ad oggetto un prodotto di investimento " +
+		"assicurativo il distributore consegna o trasmette le informazioni di cui all’Allegato 3 solo in caso di " +
+		"successive modifiche di rilievo delle stesse.",
 		Height:    3,
 		Width:     constants.FullPageWidth,
 		FontSize:  constants.RegularFontSize,
@@ -1148,7 +1148,7 @@ func (bg *baseGenerator) annex3(producerInfo, proponentInfo map[string]string, d
 
 	bg.engine.WriteText(domain.TableCell{
 		Text: "SEZIONE I - Informazioni generali sull’intermediario che entra in contatto con " +
-			"il contraente",
+		"il contraente",
 		Height:    3,
 		Width:     constants.FullPageWidth,
 		FontSize:  constants.LargeFontSize,
@@ -1165,8 +1165,8 @@ func (bg *baseGenerator) annex3(producerInfo, proponentInfo map[string]string, d
 
 	bg.engine.WriteText(domain.TableCell{
 		Text: "Gli estremi identificativi e di iscrizione dell’Intermediario e dei soggetti che " +
-			"operano per lo stesso possono essere verificati consultando il Registro Unico degli Intermediari assicurativi " +
-			"e riassicurativi sul sito internet dell’IVASS (www.ivass.it)",
+		"operano per lo stesso possono essere verificati consultando il Registro Unico degli Intermediari assicurativi " +
+		"e riassicurativi sul sito internet dell’IVASS (www.ivass.it)",
 		Height:    3,
 		Width:     constants.FullPageWidth,
 		FontSize:  constants.RegularFontSize,
@@ -1183,41 +1183,41 @@ func (bg *baseGenerator) annex3(producerInfo, proponentInfo map[string]string, d
 			title: "SEZIONE II - Informazioni sull’attività svolta dall’intermediario assicurativo",
 			body: []string{
 				proponentInfo["name"] + " comunica di aver messo a disposizione nei propri " +
-					"locali l’elenco degli obblighi di comportamento cui adempie, come indicati nell’allegato 4-ter del Regolamento" +
-					" IVASS n. 40/2018.",
+				"locali l’elenco degli obblighi di comportamento cui adempie, come indicati nell’allegato 4-ter del Regolamento" +
+				" IVASS n. 40/2018.",
 				"Si comunica che nel caso di offerta fuori sede o nel caso in cui la fase " +
-					"precontrattuale si svolga mediante tecniche di comunicazione a distanza il contraente riceve l’elenco " +
-					"degli obblighi.",
+				"precontrattuale si svolga mediante tecniche di comunicazione a distanza il contraente riceve l’elenco " +
+				"degli obblighi.",
 			},
 		},
 		{
 			title: "SEZIONE III - Informazioni relative a potenziali situazioni di conflitto " +
-				"d’interessi",
+			"d’interessi",
 			body: []string{
 				proponentInfo["name"] + " ed i soggetti che operano per la stessa non sono " +
-					"detentori di una partecipazione, diretta o indiretta, pari o superiore al 10% del capitale sociale o dei " +
-					"diritti di voto di alcuna Impresa di assicurazione.",
+				"detentori di una partecipazione, diretta o indiretta, pari o superiore al 10% del capitale sociale o dei " +
+				"diritti di voto di alcuna Impresa di assicurazione.",
 				"Le Imprese di assicurazione o Imprese controllanti un’Impresa di assicurazione " +
-					"non sono detentrici di una partecipazione, diretta o indiretta, pari o superiore al 10% del capitale sociale " +
-					"o dei diritti di voto dell’Intermediario.",
+				"non sono detentrici di una partecipazione, diretta o indiretta, pari o superiore al 10% del capitale sociale " +
+				"o dei diritti di voto dell’Intermediario.",
 			},
 		},
 		{
 			title: "SEZIONE IV - Informazioni sugli strumenti di tutela del contraente",
 			body: []string{
 				"L’attività di distribuzione è garantita da un contratto di assicurazione della " +
-					"responsabilità civile che copre i danni arrecati ai contraenti da negligenze ed errori professionali " +
-					"dell’intermediario o da negligenze, errori professionali ed infedeltà dei dipendenti, dei collaboratori o " +
-					"delle persone del cui operato l’intermediario deve rispondere a norma di legge.",
+				"responsabilità civile che copre i danni arrecati ai contraenti da negligenze ed errori professionali " +
+				"dell’intermediario o da negligenze, errori professionali ed infedeltà dei dipendenti, dei collaboratori o " +
+				"delle persone del cui operato l’intermediario deve rispondere a norma di legge.",
 				"Il contraente ha la facoltà, ferma restando la possibilità di rivolgersi " +
-					"all’Autorità Giudiziaria, di inoltrare reclamo per iscritto all’intermediario, via posta all’indirizzo di " +
-					"sede legale o a mezzo mail alla PEC sopra indicati, oppure all’Impresa secondo le modalità e presso i " +
-					"recapiti indicati nel DIP aggiuntivo nella relativa sezione, nonché la possibilità, qualora non dovesse " +
-					"ritenersi soddisfatto dall’esito del reclamo o in caso di assenza di riscontro da parte dell’intermediario " +
-					"o dell’impresa entro il termine di legge, di rivolgersi all’IVASS secondo quanto indicato nei DIP aggiuntivi.",
+				"all’Autorità Giudiziaria, di inoltrare reclamo per iscritto all’intermediario, via posta all’indirizzo di " +
+				"sede legale o a mezzo mail alla PEC sopra indicati, oppure all’Impresa secondo le modalità e presso i " +
+				"recapiti indicati nel DIP aggiuntivo nella relativa sezione, nonché la possibilità, qualora non dovesse " +
+				"ritenersi soddisfatto dall’esito del reclamo o in caso di assenza di riscontro da parte dell’intermediario " +
+				"o dell’impresa entro il termine di legge, di rivolgersi all’IVASS secondo quanto indicato nei DIP aggiuntivi.",
 				"Il contraente ha la facoltà di avvalersi di altri eventuali sistemi alternativi " +
-					"di risoluzione delle controversie previsti dalla normativa vigente nonché quelli indicati nei" +
-					" DIP aggiuntivi.",
+				"di risoluzione delle controversie previsti dalla normativa vigente nonché quelli indicati nei" +
+				" DIP aggiuntivi.",
 			},
 		},
 	}
@@ -1277,9 +1277,9 @@ func (bg *baseGenerator) annex4(producerInfo, proponentInfo map[string]string, d
 
 	bg.engine.WriteText(domain.TableCell{
 		Text: "Il distributore ha l’obbligo di consegnare o trasmettere al contraente, prima " +
-			"della sottoscrizione di ciascuna proposta o, qualora non prevista, di ciascun contratto assicurativo, il " +
-			"presente documento, che contiene notizie sul modello e l’attività di distribuzione, sulla consulenza fornita " +
-			"e sulle remunerazioni percepite.",
+		"della sottoscrizione di ciascuna proposta o, qualora non prevista, di ciascun contratto assicurativo, il " +
+		"presente documento, che contiene notizie sul modello e l’attività di distribuzione, sulla consulenza fornita " +
+		"e sulle remunerazioni percepite.",
 		Height:    3,
 		Width:     constants.FullPageWidth,
 		FontSize:  constants.RegularFontSize,
@@ -1294,7 +1294,7 @@ func (bg *baseGenerator) annex4(producerInfo, proponentInfo map[string]string, d
 
 	bg.engine.WriteText(domain.TableCell{
 		Text: "SEZIONE I - Informazioni generali sull’intermediario che entra in contatto con " +
-			"il contraente",
+		"il contraente",
 		Height:    3,
 		Width:     constants.FullPageWidth,
 		FontSize:  constants.LargeFontSize,
@@ -1311,8 +1311,8 @@ func (bg *baseGenerator) annex4(producerInfo, proponentInfo map[string]string, d
 
 	bg.engine.WriteText(domain.TableCell{
 		Text: "Gli estremi identificativi e di iscrizione dell’Intermediario e dei soggetti che " +
-			"operano per lo stesso possono essere verificati consultando il Registro Unico degli Intermediari assicurativi " +
-			"e riassicurativi sul sito internet dell’IVASS (www.ivass.it)",
+		"operano per lo stesso possono essere verificati consultando il Registro Unico degli Intermediari assicurativi " +
+		"e riassicurativi sul sito internet dell’IVASS (www.ivass.it)",
 		Height:    3,
 		Width:     constants.FullPageWidth,
 		FontSize:  constants.RegularFontSize,
@@ -1333,12 +1333,12 @@ func (bg *baseGenerator) annex4(producerInfo, proponentInfo map[string]string, d
 			title: "SEZIONE II: Informazioni sull’attività di distribuzione e consulenza",
 			body: []string{
 				"Nello svolgimento dell’attività di distribuzione, l’intermediario non presta " +
-					"attività di consulenza prima della conclusione del contratto né fornisce al contraente una raccomandazione " +
-					"personalizzata ai sensi dell’art. 119-ter, comma 3, del decreto legislativo n. 209/2005 " +
-					"(Codice delle Assicurazioni Private)",
+				"attività di consulenza prima della conclusione del contratto né fornisce al contraente una raccomandazione " +
+				"personalizzata ai sensi dell’art. 119-ter, comma 3, del decreto legislativo n. 209/2005 " +
+				"(Codice delle Assicurazioni Private)",
 				"L'attività di distribuzione assicurativa è svolta in assenza di obblighi " +
-					"contrattuali che impongano di offrire esclusivamente i contratti di una o più imprese di " +
-					"assicurazioni.",
+				"contrattuali che impongano di offrire esclusivamente i contratti di una o più imprese di " +
+				"assicurazioni.",
 			},
 		},
 		{
@@ -1346,20 +1346,20 @@ func (bg *baseGenerator) annex4(producerInfo, proponentInfo map[string]string, d
 			body: []string{
 				annex4Section3Info,
 				"L’informazione sopra resa riguarda i compensi complessivamente percepiti da tutti " +
-					"gli intermediari coinvolti nella distribuzione del prodotto.",
+				"gli intermediari coinvolti nella distribuzione del prodotto.",
 			},
 		},
 		{
 			title: "SEZIONE IV – Informazioni sul pagamento dei premi",
 			body: []string{
 				"Relativamente a questo contratto i premi pagati dal Contraente " +
-					"all’intermediario e le somme destinate ai risarcimenti o ai pagamenti dovuti dalle Imprese di Assicurazione, " +
-					"se regolati per il tramite dell’intermediario costituiscono patrimonio autonomo e separato dal patrimonio " +
-					"dello stesso.",
+				"all’intermediario e le somme destinate ai risarcimenti o ai pagamenti dovuti dalle Imprese di Assicurazione, " +
+				"se regolati per il tramite dell’intermediario costituiscono patrimonio autonomo e separato dal patrimonio " +
+				"dello stesso.",
 				"Indicare le modalità di pagamento ammesse",
 				"Sono consentiti, nei confronti dell'intermediario, esclusivamente bonifico e strumenti di " +
-					"pagamento elettronico, quali ad esempio, carte di credito e/o carte di debito, incluse le carte " +
-					"prepagate.",
+				"pagamento elettronico, quali ad esempio, carte di credito e/o carte di debito, incluse le carte " +
+				"prepagate.",
 			},
 		},
 	}
@@ -1419,12 +1419,12 @@ func (bg *baseGenerator) annex4Ter(producerInfo, proponentInfo map[string]string
 
 	bg.engine.WriteText(domain.TableCell{
 		Text: "Il distributore ha l’obbligo di mettere a disposizione del pubblico il " +
-			"presente documento nei propri locali, anche mediante apparecchiature tecnologiche, oppure pubblicarlo su " +
-			"un sito internet ove utilizzato per la promozione e il collocamento di prodotti assicurativi, dando avviso " +
-			"della pubblicazione nei propri locali. Nel caso di offerta fuori sede o nel caso in cui la fase " +
-			"precontrattuale si svolga mediante tecniche di comunicazione a distanza, il distributore consegna o " +
-			"trasmette al contraente il presente documento prima della sottoscrizione della proposta o, qualora non " +
-			"prevista, del contratto di assicurazione.",
+		"presente documento nei propri locali, anche mediante apparecchiature tecnologiche, oppure pubblicarlo su " +
+		"un sito internet ove utilizzato per la promozione e il collocamento di prodotti assicurativi, dando avviso " +
+		"della pubblicazione nei propri locali. Nel caso di offerta fuori sede o nel caso in cui la fase " +
+		"precontrattuale si svolga mediante tecniche di comunicazione a distanza, il distributore consegna o " +
+		"trasmette al contraente il presente documento prima della sottoscrizione della proposta o, qualora non " +
+		"prevista, del contratto di assicurazione.",
 		Height:    3,
 		Width:     constants.FullPageWidth,
 		FontSize:  constants.RegularFontSize,
@@ -1441,8 +1441,8 @@ func (bg *baseGenerator) annex4Ter(producerInfo, proponentInfo map[string]string
 
 	bg.engine.WriteText(domain.TableCell{
 		Text: "Gli estremi identificativi e di iscrizione dell’Intermediario e dei soggetti che " +
-			"operano per lo stesso possono essere verificati consultando il Registro Unico degli Intermediari assicurativi " +
-			"e riassicurativi sul sito internet dell’IVASS (www.ivass.it)",
+		"operano per lo stesso possono essere verificati consultando il Registro Unico degli Intermediari assicurativi " +
+		"e riassicurativi sul sito internet dell’IVASS (www.ivass.it)",
 		Height:    3,
 		Width:     constants.FullPageWidth,
 		FontSize:  constants.RegularFontSize,
@@ -1459,26 +1459,26 @@ func (bg *baseGenerator) annex4Ter(producerInfo, proponentInfo map[string]string
 			title: "Sezione I - Regole generali per la distribuzione di prodotti assicurativi",
 			body: []string{
 				"a. obbligo di consegna al contraente dell’allegato 3 al Regolamento IVASS " +
-					"n. 40 del 2 agosto 2018, prima della sottoscrizione della prima proposta o, qualora non prevista, del primo " +
-					"contratto di assicurazione, di metterlo a disposizione del pubblico nei locali del distributore, anche " +
-					"mediante apparecchiature tecnologiche, e di pubblicarlo sul sito internet, ove esistente",
+				"n. 40 del 2 agosto 2018, prima della sottoscrizione della prima proposta o, qualora non prevista, del primo " +
+				"contratto di assicurazione, di metterlo a disposizione del pubblico nei locali del distributore, anche " +
+				"mediante apparecchiature tecnologiche, e di pubblicarlo sul sito internet, ove esistente",
 				"b. obbligo di consegna dell’allegato 4 al Regolamento IVASS n. 40 del 2 agosto " +
-					"2018, prima della sottoscrizione di ciascuna proposta di assicurazione o, qualora non prevista, del contratto " +
-					"di assicurazione",
+				"2018, prima della sottoscrizione di ciascuna proposta di assicurazione o, qualora non prevista, del contratto " +
+				"di assicurazione",
 				"c. obbligo di consegnare copia della documentazione precontrattuale e " +
-					"contrattuale prevista dalle vigenti disposizioni, copia della polizza e di ogni altro atto o documento " +
-					"sottoscritto dal contraente",
+				"contrattuale prevista dalle vigenti disposizioni, copia della polizza e di ogni altro atto o documento " +
+				"sottoscritto dal contraente",
 				"d. obbligo di proporre o raccomandare contratti coerenti con le richieste e le " +
-					"esigenze di copertura assicurativa e previdenziale del contraente o dell’assicurato, acquisendo a tal fine, " +
-					"ogni utile informazione",
+				"esigenze di copertura assicurativa e previdenziale del contraente o dell’assicurato, acquisendo a tal fine, " +
+				"ogni utile informazione",
 				"e. obbligo di valutare se il contraente rientra nel mercato di riferimento " +
-					"identificato per il contratto di assicurazione proposto e non appartiene alle categorie di clienti per i quali " +
-					"il prodotto non è compatibile, nonché l’obbligo di adottare opportune disposizioni per ottenere dai produttori" +
-					" le informazioni di cui all’articolo 30-decies comma 5 del Codice e per comprendere le caratteristiche e il " +
-					"mercato di riferimento individuato per ciascun prodotto",
+				"identificato per il contratto di assicurazione proposto e non appartiene alle categorie di clienti per i quali " +
+				"il prodotto non è compatibile, nonché l’obbligo di adottare opportune disposizioni per ottenere dai produttori" +
+				" le informazioni di cui all’articolo 30-decies comma 5 del Codice e per comprendere le caratteristiche e il " +
+				"mercato di riferimento individuato per ciascun prodotto",
 				"f. obbligo di fornire in forma chiara e comprensibile le informazioni " +
-					"oggettive sul prodotto, illustrandone le caratteristiche, la durata, i costi e i limiti della copertura ed " +
-					"ogni altro elemento utile a consentire al contraente di prendere una decisione informata",
+				"oggettive sul prodotto, illustrandone le caratteristiche, la durata, i costi e i limiti della copertura ed " +
+				"ogni altro elemento utile a consentire al contraente di prendere una decisione informata",
 			},
 		},
 	}
@@ -1532,8 +1532,8 @@ func (bg *baseGenerator) howYouCanPaySection() {
 	bg.engine.NewLine(1)
 	bg.engine.WriteText(domain.TableCell{
 		Text: "I mezzi di pagamento consentiti, nei confronti di Wopta, " +
-			"sono esclusivamente bonifico e strumenti di pagamento elettronico, quali ad esempio, " +
-			"carte di credito e/o carte di debito, incluse le carte prepagate.",
+		"sono esclusivamente bonifico e strumenti di pagamento elettronico, quali ad esempio, " +
+		"carte di credito e/o carte di debito, incluse le carte prepagate.",
 		Height:    4.5,
 		Width:     constants.FullPageWidth,
 		FontSize:  constants.RegularFontSize,
@@ -1553,9 +1553,9 @@ func (bg *baseGenerator) emitResumeSection() {
 	}
 
 	text := fmt.Sprintf("Polizza emessa a Milano il %s per un importo di euro %s quale prima rata alla firma, "+
-		"il cui pagamento a saldo è da effettuarsi con i metodi di pagamento sopra indicati. "+
-		"Costituisce quietanza di pagamento la mail di conferma che Wopta invierà al Contraente.",
-		bg.policy.StartDate.Format(constants.DayMonthYearFormat), lib.HumanaizePriceEuro(price))
+	"il cui pagamento a saldo è da effettuarsi con i metodi di pagamento sopra indicati. "+
+	"Costituisce quietanza di pagamento la mail di conferma che Wopta invierà al Contraente.",
+	bg.policy.StartDate.Format(constants.DayMonthYearFormat), lib.HumanaizePriceEuro(price))
 
 	bg.engine.WriteText(domain.TableCell{
 		Text:      "Emissione Polizza e pagamento della prima rata",
@@ -1654,7 +1654,7 @@ func (bg *baseGenerator) companySignature() {
 	})
 	bg.engine.SetY(bg.engine.GetY() - 6)
 	bg.engine.InsertImage(lib.GetAssetPathByEnvV2()+logo.path, logo.x, bg.engine.GetY()+logo.y, logo.width,
-		logo.height)
+	logo.height)
 }
 
 func (bg *baseGenerator) checkSurveySpace(survey models.Survey) {
@@ -1973,10 +1973,10 @@ func (bg *baseGenerator) printStatement(statement models.Statement) {
 
 func (bg *baseGenerator) Save(rawDoc []byte) (string, error) {
 	filename := strings.ReplaceAll(fmt.Sprintf("%s/%s/"+models.ProposalDocumentFormat, "temp", bg.policy.Uid,
-		bg.policy.NameDesc, bg.policy.ProposalNumber), " ", "_")
+	bg.policy.NameDesc, bg.policy.ProposalNumber), " ", "_")
 	if !bg.isProposal {
 		filename = strings.ReplaceAll(fmt.Sprintf("%s/%s/"+models.ContractDocumentFormat, "temp", bg.policy.Uid,
-			bg.policy.NameDesc, bg.policy.CodeCompany), " ", "_")
+		bg.policy.NameDesc, bg.policy.CodeCompany), " ", "_")
 	}
 	return bg.engine.Save(rawDoc, filename)
 }
