@@ -246,7 +246,7 @@ func (n *Namirial) GetEnvelope() (ResponeGetEvelop, error) {
 	if n.idEnvelope == "" {
 		return resp, fmt.Errorf("Error:no envelope id founded")
 	}
-	var urlstring = fmt.Sprint(os.Getenv("ESIGN_BASEURL")+"v6/envelope/"+n.idEnvelope, "/viewerlinks")
+	var urlstring = os.Getenv("ESIGN_BASEURL") + "v6/envelope/" + n.idEnvelope + "/viewerlinks"
 
 	req, err := doRequestNamirial(http.MethodGet, urlstring, nil)
 	if err != nil {
