@@ -2,6 +2,7 @@ package transaction
 
 import (
 	"errors"
+	"log"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
@@ -35,6 +36,28 @@ func ReinitializePaymentInfo(tr *models.Transaction, providerName string) error 
 	tr.Status = models.TransactionStatusToPay
 	tr.StatusHistory = append(tr.StatusHistory, transactionStatusReinitialized, models.TransactionStatusToPay)
 	tr.UpdateDate = now
+	return nil
+}
+
+func SaveTransactionsToDB(transactions []models.Transaction, collection string) error {
+	batch := make(map[string]map[string]models.Transaction)
+	batch[collection] = make(map[string]models.Transaction)
+
+	for idx := range transactions {
+		transactions[idx].BigQueryParse()
+		batch[collection][transactions[idx].Uid] = transactions[idx]
+	}
+
+	if err := lib.SetBatchFirestoreErr(batch); err != nil {
+		log.Printf("error saving transactions to firestore: %s", err.Error())
+		return err
+	}
+
+	if err := lib.InsertRowsBigQuery(lib.WoptaDataset, collection, transactions); err != nil {
+		log.Printf("error saving transactions to bigquery: %s", err.Error())
+		return err
+	}
+
 	return nil
 }
 
