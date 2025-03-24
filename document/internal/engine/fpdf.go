@@ -55,6 +55,10 @@ func NewFpdf() *Fpdf {
 	}
 }
 
+func (f *Fpdf) GetPdf() *fpdf.Fpdf {
+	return f.pdf
+}
+
 func (f *Fpdf) NewPage() {
 	f.pdf.AddPage()
 	f.NewLine(5)
@@ -153,6 +157,44 @@ func (f *Fpdf) WriteText(cell domain.TableCell) {
 	f.SetFontFamily(constants.MontserratFont)
 
 	f.pdf.MultiCell(cell.Width, cell.Height, cell.Text, cell.Border, alignmentMap[cell.Align], cell.Fill)
+
+	f.SetFillColor(oldFillColor)
+	f.SetFontStyle(oldFontStyle)
+}
+
+func (f *Fpdf) RawWriteText(cell domain.TableCell) {
+	oldFontStyle := f.style
+	oldFillColor := f.fillColor
+
+	if cell.Fill {
+		f.SetFillColor(cell.FillColor)
+	}
+
+	f.SetFontStyle(cell.FontStyle)
+	f.SetFontColor(cell.FontColor)
+	f.SetFontSize(cell.FontSize)
+	f.SetFontFamily(constants.MontserratFont)
+
+	f.pdf.Write(cell.Height, cell.Text)
+
+	f.SetFillColor(oldFillColor)
+	f.SetFontStyle(oldFontStyle)
+}
+
+func (f *Fpdf) WriteLink(url string, cell domain.TableCell) {
+	oldFontStyle := f.style
+	oldFillColor := f.fillColor
+
+	if cell.Fill {
+		f.SetFillColor(cell.FillColor)
+	}
+
+	f.SetFontStyle(cell.FontStyle)
+	f.SetFontColor(cell.FontColor)
+	f.SetFontSize(cell.FontSize)
+	f.SetFontFamily(constants.MontserratFont)
+
+	f.pdf.WriteLinkString(cell.Height, cell.Text, url)
 
 	f.SetFillColor(oldFillColor)
 	f.SetFontStyle(oldFontStyle)
@@ -258,23 +300,32 @@ func (f *Fpdf) Save(rawDoc []byte, filename string) (string, error) {
 	return gsLink, nil
 }
 
-func (f *Fpdf) RawWriteText(cell domain.TableCell) {
-	oldFontStyle := f.style
-	oldFillColor := f.fillColor
+// get a tablecell personalized based on passed opts
+func (e *Fpdf) GetTableCell(text string, opts ...any) domain.TableCell {
+	tableCell := domain.TableCell{}
+	tableCell.Text = text
+	tableCell.Height = constants.CellHeight
+	tableCell.Align = constants.LeftAlign
+	tableCell.FontStyle = constants.RegularFontStyle
+	tableCell.FontSize = constants.RegularFontSize
 
-	if cell.Fill {
-		f.SetFillColor(cell.FillColor)
+	for _, opt := range opts {
+		switch opt := opt.(type) {
+		case domain.FontSize:
+			tableCell.FontSize = opt
+		case domain.FontStyle:
+			tableCell.FontStyle = opt
+		case domain.Color:
+			tableCell.FontColor = opt
+		}
 	}
+	return tableCell
+}
 
-	f.SetFontStyle(cell.FontStyle)
-	f.SetFontColor(cell.FontColor)
-	f.SetFontSize(cell.FontSize)
-	f.SetFontFamily(constants.MontserratFont)
-
-	f.pdf.Write(cell.Height, cell.Text)
-
-	f.SetFillColor(oldFillColor)
-	f.SetFontStyle(oldFontStyle)
+func (e *Fpdf) WriteTexts(tables ...domain.TableCell) {
+	for _, text := range tables {
+		e.RawWriteText(text)
+	}
 }
 
 func (f *Fpdf) CrossRemainingSpace() {
