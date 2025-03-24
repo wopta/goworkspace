@@ -78,6 +78,7 @@ func saveContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 		pdfFile, err := os.Create("./document/proposal.pdf")
 		lib.CheckError(err)
+		pdfFile.Write(out.Bytes())
 		defer pdfFile.Close()
 
 		pdf.Output(pdfFile)
@@ -107,6 +108,7 @@ func saveProposal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 		pdfFile, err := os.Create("./document/proposal.pdf")
 		lib.CheckError(err)
+		pdfFile.Write(out.Bytes())
 		defer pdfFile.Close()
 
 		pdf.Output(pdfFile)
