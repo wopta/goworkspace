@@ -1,11 +1,31 @@
 package namirial
 
-import "github.com/wopta/goworkspace/document"
+import (
+	"github.com/wopta/goworkspace/document"
+	"github.com/wopta/goworkspace/models"
+)
+
+type StatusNamirial string
+
+const (
+	Idle        StatusNamirial = "Idle"
+	Upload      StatusNamirial = "Uploaded Files"
+	Prepared    StatusNamirial = "Prepared Files"
+	Sended      StatusNamirial = "Sended Files"
+	GetEnvelope StatusNamirial = "Get Envelope"
+)
+
+type dataForDocument struct {
+	policy     *models.Policy
+	product    *models.Product
+	warrant    *models.Warrant
+	idDocument string
+}
 
 type prepareNamirialDocumentRequest struct {
-	FileIds                     []string                    `json:"FileIds"`
-	ClearAdvancedDocumentTags   bool                     `json:"ClearAdvancedDocumentTags"`
-	SigStringConfigurations     []sigStringConfiguration `json:"SigStringConfigurations"`
+	FileIds                   []string                 `json:"FileIds"`
+	ClearAdvancedDocumentTags bool                     `json:"ClearAdvancedDocumentTags"`
+	SigStringConfigurations   []sigStringConfiguration `json:"SigStringConfigurations"`
 }
 
 type sigStringConfiguration struct {
@@ -16,32 +36,28 @@ type sigStringConfiguration struct {
 }
 
 type documentDescription struct {
-	FileId string
-	DocumentNumber int
+	FileId         string `json:"FileId"`
+	DocumentNumber int    `json:"DocumentNumber"`
 }
 
 type sendNamirialRequest struct {
-	Documents [] documentDescription
-	Name string
-	Activities []document.Activity
+	Documents  []documentDescription `json:"Documents"`
+	Name       string                `json:"Name"`
+	Activities []document.Activity   `json:"Activities"`
 }
 
 type responseSendDocuments struct {
-	EnvelopeId string
+	EnvelopeId string `json:"EnvelopeId"`
 }
 
-type ResponeGetEvelop struct{
-	ViewerLinks []viewerLink
+type ResponeGetEvelop struct {
+	ViewerLinks []viewerLink `json:"ViewerLinks"`
 }
 
 type viewerLink struct {
-	ActivityId  string `json:"ActivityId"`
-	Email       string `json:"Email"`
-	ViewerLink  string `json:"ViewerLink"`
-}
-
-type viewerLinksResponse struct {
-	ViewerLinks []viewerLink `json:"ViewerLinks"`
+	ActivityId string `json:"ActivityId"`
+	Email      string `json:"Email"`
+	ViewerLink string `json:"ViewerLink"`
 }
 
 type documentDesc struct {
@@ -58,8 +74,7 @@ type auditTrail struct {
 }
 
 type FilesIdsResponse struct {
-	Documents   []documentDesc  `json:"Documents"`
-	AuditTrail  auditTrail  `json:"AuditTrail"`
-	Disclaimers []string    `json:"Disclaimers"`
+	Documents   []documentDesc `json:"Documents"`
+	AuditTrail  auditTrail     `json:"AuditTrail"`
+	Disclaimers []string       `json:"Disclaimers"`
 }
-

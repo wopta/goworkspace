@@ -3,12 +3,13 @@ package namirial
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"fmt"
+	"io"
 	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
+
 	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -16,23 +17,6 @@ import (
 	"github.com/wopta/goworkspace/policy"
 	"github.com/wopta/goworkspace/product"
 )
-
-type StatusNamirial string
-
-const (
-	Idle        StatusNamirial = "Idle"
-	Upload      StatusNamirial = "Uploaded Files"
-	Prepared    StatusNamirial = "Prepared Files"
-	Sended      StatusNamirial = "Sended Files"
-	GetEnvelope StatusNamirial = "Get Envelope"
-)
-
-type dataForDocument struct {
-	policy     *models.Policy
-	product    *models.Product
-	warrant    *models.Warrant
-	idDocument string
-}
 
 type Namirial struct {
 	idEnvelope      string
@@ -51,8 +35,8 @@ func NewNamirial(origin string, uids ...string) (*Namirial, error) {
 		warrant      *models.Warrant
 		err          error
 	)
-	if len(uids)==0{
-		return nil,fmt.Errorf("it is necessary have atleast 1 uid")
+	if len(uids) == 0 {
+		return nil, fmt.Errorf("it is necessary have atleast 1 uid")
 	}
 
 	for i, uid := range uids {
@@ -69,6 +53,9 @@ func NewNamirial(origin string, uids ...string) (*Namirial, error) {
 			policy:  &policyModel,
 			product: productModel,
 			warrant: warrant,
+		}
+		if os.Getenv("env") == "local" {
+			<-document.ContractObj("", policyModel, networkModel, productModel)
 		}
 	}
 	return &Namirial{
@@ -93,59 +80,42 @@ func (n *Namirial) UploadFiles() error {
 		var file []byte
 		var err error
 		if os.Getenv("env") == "local" {
-			file, err = os.ReadFile("document/contract.pdf")
+			file, err = os.ReadFile("document/proposal.pdf")
 		} else {
 			file = lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), dto.policy.DocumentName, "")
 		}
-		if file == nil || len(file) == 0 {
-			log.Printf("Error: getting file %v", dto.policy.DocumentName)
-			return fmt.Errorf("Error getting the file %v", dto.policy.DocumentName)
-		}
 		if err != nil {
-			log.Printf("Error:%v", err.Error())
 			return err
+		}
+		if file == nil || len(file) == 0 {
+			return fmt.Errorf("Error getting the file %v", dto.policy.DocumentName)
 		}
 
 		//Create form body
 		w := multipart.NewWriter(&buffer)
 		fw, err := w.CreateFormFile("file", dto.policy.DocumentName+" Polizza.pdf")
 		if err != nil {
-			log.Printf("Error: creating form")
 			return err
 		}
 		nWrite, err := fw.Write(file)
 		if err != nil || nWrite == 0 {
-			log.Printf("Error: writing into form")
 			return err
 		}
 		w.Close()
 
 		req, err := http.NewRequest("POST", urlstring, &buffer)
 		if err != nil {
-			log.Printf("Error: creating request")
 			return err
 		}
 		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
 		req.Header.Set("Content-Type", w.FormDataContentType())
-		resResp, err := lib.RetryDo(req, 5, 30)
-		if err != nil {
-			log.Printf("Error: error request")
-			return err
-		}
 
-		if resResp.StatusCode != http.StatusOK {
-			log.Printf("Error: request %v ", resResp.Status)
-			return err
-		}
-
-		res, err := getBodyResponse[struct{ FileId string }](resResp)
+		res, err := handleResponse[struct{ FileId string }](lib.RetryDo(req, 5, 30))
 		if err != nil {
-			log.Printf("Error: %v", err.Error())
 			return err
 		}
 		if res.FileId == "" {
-			log.Printf("Error: no fileId found")
-			return err
+			return fmt.Errorf("Error: no fileId found")
 		}
 		n.dtos[i].idDocument = res.FileId
 
@@ -183,32 +153,12 @@ func (n *Namirial) PrepareDocument() error {
 		},
 	}}
 
-	reqJson, err := json.Marshal(request)
+	req, err := doRequestNamirial(http.MethodPost, urlstring, request)
 	if err != nil {
-		log.Printf("Error: %v", err.Error())
 		return err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, urlstring, bytes.NewReader(reqJson))
-	if err != nil {
-		log.Printf("Error: %v", err.Error())
-		return err
-	}
-
-	req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
-	req.Header.Set("Content-Type", "application/json")
-
-	resResp, err := lib.RetryDo(req, 5, 30)
-	if err != nil {
-		log.Printf("Error: error request %v", err.Error())
-		return err
-	}
-
-	if resResp.StatusCode != http.StatusOK {
-		log.Printf("Error: request %v ", resResp.Status)
-		return err
-	}
-	resPrepare, err := getBodyResponse[document.PrepareResponse](resResp)
+	resPrepare, err := handleResponse[document.PrepareResponse](lib.RetryDo(req, 5, 30))
 	n.prepareDocument = resPrepare
 	n.status = Prepared
 	if os.Getenv("env") == "local" || os.Getenv("env") == "dev" {
@@ -242,38 +192,19 @@ func (n *Namirial) SendDocuments() (string, error) {
 	for i := range n.dtos {
 		request.Documents[i] = documentDescription{FileId: n.dtos[i].idDocument, DocumentNumber: i + 1}
 	}
-	requestJson, err := json.Marshal(request)
+
+	req, err := doRequestNamirial("POST", urlstring, request)
 	if err != nil {
-		log.Printf("Error:%v", err.Error())
 		return "", err
 	}
 
-	req, err := http.NewRequest("POST", urlstring, bytes.NewReader(requestJson))
+	body, err := handleResponse[responseSendDocuments](lib.RetryDo(req, 5, 30))
 	if err != nil {
-		log.Printf("Error:%v", err.Error())
-		return "", err
-	}
-	req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
-	req.Header.Set("Content-Type", "application/json")
-	res, err := lib.RetryDo(req, 5, 30)
-
-	if err != nil {
-		log.Printf("Error: error request")
-		return "", err
-	}
-	if res.StatusCode != http.StatusOK {
-		log.Printf("Error: request %v", res.Status)
 		return "", err
 	}
 
-	body, err := getBodyResponse[responseSendDocuments](res)
-	if err != nil {
-		log.Printf("Error: %v", err.Error())
-		return "", err
-	}
 	if body.EnvelopeId == "" {
-		log.Printf("Error: no envelopId found")
-		return "", err
+		return "", fmt.Errorf("Error: no envelopId found")
 	}
 
 	n.idEnvelope = body.EnvelopeId
@@ -316,25 +247,15 @@ func (n *Namirial) GetEnvelope() (ResponeGetEvelop, error) {
 		return resp, fmt.Errorf("Error:no envelope id founded")
 	}
 	var urlstring = fmt.Sprint(os.Getenv("ESIGN_BASEURL")+"v6/envelope/"+n.idEnvelope, "/viewerlinks")
-	req, err := http.NewRequest("GET", urlstring, nil)
 
-	req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
-	req.Header.Set("Content-Type", "none")
-	resResp, err := lib.RetryDo(req, 5, 30)
-
+	req, err := doRequestNamirial(http.MethodGet, urlstring, nil)
 	if err != nil {
-		log.Printf("Error: error request %v", err.Error())
-		return resp, err
-	}
-	if resResp.StatusCode != http.StatusOK {
-		log.Printf("Error: request %v ", resResp.Status)
 		return resp, err
 	}
 
-	resp, err = getBodyResponse[ResponeGetEvelop](resResp)
+	resp, err = handleResponse[ResponeGetEvelop](lib.RetryDo(req, 5, 30))
 
 	if err != nil {
-		log.Printf("Error: %v", err.Error())
 		return resp, err
 	}
 
@@ -361,26 +282,13 @@ func (n *Namirial) GetIdsFiles() (FilesIdsResponse, error) {
 	}
 	var urlstring = os.Getenv("ESIGN_BASEURL") + "v6/envelope/" + n.idEnvelope + "/files"
 
-	req, err := http.NewRequest("GET", urlstring, nil)
+	req, err := doRequestNamirial(http.MethodGet, urlstring, nil)
 	if err != nil {
-		log.Printf("Error:%v", err.Error())
-		return resp, err
-	}
-	req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
-	req.Header.Set("Content-Type", "application/json")
-	res, err := lib.RetryDo(req, 5, 30)
-	if err != nil {
-		log.Printf("Error: error request")
 		return resp, err
 	}
 
-	if res.StatusCode != http.StatusOK {
-		log.Printf("Error: request %v", res.Status)
-		return resp, err
-	}
-	body, err := getBodyResponse[FilesIdsResponse](res)
+	body, err := handleResponse[FilesIdsResponse](lib.RetryDo(req, 5, 30))
 	if err != nil {
-		log.Printf("Error: %v", err.Error())
 		return resp, err
 	}
 
@@ -428,10 +336,21 @@ func (n *Namirial) GetIdsFiles() (FilesIdsResponse, error) {
 //	return body,err
 //}
 
-func getBodyResponse[T any](r *http.Response) (T, error) {
+// check http response(status code) and unmarshal the body
+func handleResponse[T any](r *http.Response, err error) (T, error) {
 	var (
 		req T
 	)
+	if err != nil {
+		return req, err
+	}
+
+	if r.StatusCode != http.StatusOK {
+		var body []byte
+		r.Body.Read(body)
+		return req, err
+	}
+
 	log.SetPrefix("[Unmarshal] ")
 	defer log.SetPrefix("")
 
@@ -443,5 +362,32 @@ func getBodyResponse[T any](r *http.Response) (T, error) {
 	if err := json.Unmarshal(body, &req); err != nil {
 		return *new(T), err
 	}
+	return req, nil
+}
+
+// create the request passing the body(struct)
+func doRequestNamirial(method string, url string, body any) (*http.Request, error) {
+	var (
+		err error
+		req *http.Request
+	)
+
+	if body == nil {
+		req, err = http.NewRequest(method, url, nil)
+	} else {
+		requestJson, err := json.Marshal(body)
+		if err != nil {
+			return nil, err
+		}
+		requestReader := bytes.NewReader(requestJson)
+		req, err = http.NewRequest(method, url, requestReader)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
+	req.Header.Set("Content-Type", "application/json")
 	return req, nil
 }
