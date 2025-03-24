@@ -21,11 +21,10 @@ type baseGenerator struct {
 }
 
 func (bg *baseGenerator) Save(rawDoc []byte) (string, error) {
-	// TODO REMOVE WHEN DONE
-	filename := strings.ReplaceAll(fmt.Sprintf("%s/%s/"+"%s_TEST_PROFORMA_%d__%s.pdf", "temp", bg.policy.Uid,
-		bg.policy.NameDesc, bg.policy.ProposalNumber, time.Now().Format("2006-1-2_15:04:05")), " ", "_")
-	//filename := strings.ReplaceAll(fmt.Sprintf("%s/%s/"+models.ProformaDocumentFormat, "temp", bg.policy.Uid,
-	//	bg.policy.NameDesc, bg.policy.ProposalNumber), " ", "_")
+	userPathFormat := "assets/users/%s/"
+	path := fmt.Sprintf(userPathFormat, bg.policy.Contractor.Uid)
+	filename := strings.ReplaceAll(fmt.Sprintf(path+models.ProformaDocumentFormat,
+		bg.policy.NameDesc, bg.policy.CodeCompany, bg.policy.Annuity, time.Now().Format(constants.DayMonthYearFormat)), " ", "_")
 	return bg.engine.Save(rawDoc, filename)
 }
 
