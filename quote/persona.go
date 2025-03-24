@@ -145,6 +145,10 @@ func Persona(policy *models.Policy, channel string, networkNode *models.NetworkN
 
 	roundToTwoDecimalPlaces(policy)
 
+	log.Println("[Persona] apply consultacy price")
+	
+	addConsultacyPrice(policy, personProduct)
+
 	log.Println("[Persona] filter by minimum price")
 
 	companyIdx := slices.IndexFunc(personProduct.Companies, func(c models.Company) bool {

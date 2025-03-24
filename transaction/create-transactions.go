@@ -4,18 +4,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/product"
 )
-
-var numTransactionsMap = map[string]int{
-	string(models.PaySplitMonthly):           12,
-	string(models.PaySplitYear):              1,
-	string(models.PaySplitYearly):            1,
-	string(models.PaySplitSingleInstallment): 1,
-	string(models.PaySplitSemestral):         2,
-}
 
 func CreateTransactions(policy models.Policy, mgaProduct models.Product, uidGenerator func() string) []models.Transaction {
 	var (
@@ -23,7 +16,7 @@ func CreateTransactions(policy models.Policy, mgaProduct models.Product, uidGene
 		transactions    = make([]models.Transaction, 0)
 	)
 
-	numTransactions = numTransactionsMap[policy.PaymentSplit]
+	numTransactions = models.PaySplitRateMap[policy.PaymentComponents.Split]
 	if numTransactions == 0 {
 		return transactions
 	}
@@ -37,7 +30,7 @@ func CreateTransactions(policy models.Policy, mgaProduct models.Product, uidGene
 
 		// enrich transaction with price info
 		// TODO: define a way to determine correct price based on product configuration (e.g., byGuarantee, flat or by offer)
-		tr = setPriceInfo(tr, policy)
+		tr = setPriceInfo(i, tr, policy)
 
 		// enrich transaction with commissions
 		// TODO: define a way to determine right amount of commissions based on renewal
@@ -60,7 +53,7 @@ func createTransaction(policy models.Policy, uidGenerator func() string) models.
 		PolicyUid:     policy.Uid,
 		Company:       policy.Company,
 		NumberCompany: policy.CodeCompany,
-		ProviderName:  policy.Payment,
+		ProviderName:  policy.PaymentComponents.Provider,
 		Status:        models.TransactionStatusToPay,
 		StatusHistory: []string{models.TransactionStatusToPay},
 	}
@@ -73,24 +66,46 @@ func setDateInfo(index int, transaction models.Transaction, policy models.Policy
 	transaction.EffectiveDate = lib.AddMonths(startDate, index)
 	transaction.ScheduleDate = transaction.EffectiveDate.Format(time.DateOnly)
 	// TODO: code smell - this info is needed for Fabrick only but we don't know the params for other scenarios
-	transaction.ExpirationDate = lib.AddMonths(startDate, 18).Format(time.DateOnly)
+	transaction.ExpirationDate = lib.AddMonths(now, 18).Format(time.DateOnly)
 	transaction.CreationDate = now
 	transaction.UpdateDate = now
 
 	return transaction
 }
 
-func setPriceInfo(transaction models.Transaction, policy models.Policy) models.Transaction {
-	priceGross := policy.PriceGross
-	priceNet := policy.PriceNett
+const (
+	ItemRate = "rate"
+	ItemConsultancy = "consultancy"
+)
 
-	if policy.PaymentSplit == string(models.PaySplitMonthly) {
-		priceGross = policy.PriceGrossMonthly
-		priceNet = policy.PriceNettMonthly
+func setPriceInfo(index int, transaction models.Transaction, policy models.Policy) models.Transaction {
+	priceComponent := policy.PaymentComponents.PriceSplit
+	if index == 0 {
+		priceComponent = policy.PaymentComponents.PriceFirstSplit
 	}
 
-	transaction.Amount = priceGross
-	transaction.AmountNet = priceNet
+	transaction.Amount = priceComponent.Total
+	transaction.AmountNet = lib.RoundFloat(priceComponent.Total-priceComponent.Tax, 2)
+
+	if priceComponent.Consultancy > 0 {
+		transaction.Items = make([]models.Item, 0, 2)
+		transaction.Items = append(transaction.Items, models.Item{
+			Type:          fmt.Sprintf("%s-%s", ItemRate, policy.Name),
+			Uid:           uuid.NewString(),
+			EffectiveDate: transaction.EffectiveDate,
+			AmountGross:   priceComponent.Gross,
+			AmountNett:    priceComponent.Nett,
+			AmountTax:     priceComponent.Tax,
+		})
+		transaction.Items = append(transaction.Items, models.Item{
+			Type:          ItemConsultancy,
+			Uid:           uuid.NewString(),
+			EffectiveDate: transaction.EffectiveDate,
+			AmountGross:   priceComponent.Consultancy,
+			AmountNett:    priceComponent.Consultancy,
+			AmountTax:     0,
+		})
+	}
 
 	return transaction
 }

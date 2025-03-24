@@ -3,77 +3,102 @@
      #export namefx=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$TAG_NAME') )
     #Print current tag
     echo "current tag: ${TAG_NAME}"
-   #-------------SPLIT Tag-------------------------------------------------------
-    #Read the string value
-    echo $namefx
-    read text
-    # Set comma as delimiter
+
+    # === EXTRACT FUNCTION NAME AND VERSION FROM TAG ===========================
+    # Read TAG_NAME splitting by the IFS separator into the needed variables
+    # ex.: broker/1.0.0.dev => [fx_name=broker, tag=1.0.0.dev]
     IFS='/'
-    #Read the split words into an array based on comma delimiter
     read -a strarr <<< $TAG_NAME
-    #Print the splitted words
-    echo "namefx : ${strarr[0]}"
-    echo "tag : ${strarr[1]}"
-   #-------------------------NAME FX Cammel case ad tag ver-------------------------------------------
-    namefx=$strarr[0]
-    name_camel=$(sed -r 's/(^|-)(\w)/\U\2/g' <<<"${strarr[0]}")
-    tagVersion=$(echo "${strarr[1]}" | sed -r 's/\./_/g')
-    t=$(tr -s . _ <<< "${strarr[1]}")
-    echo "namefx camel : ${name_camel}"
-    echo "tagVersion camel : ${tagVersion}"
-    echo "tagVersion camel : ${t}"
-   #-----------------SET VAR DEV---------------------------------------------------
-    if [[ "${strarr[1]}" == *"dev"* ]]; then
-      echo "dev enviroment"
+    fx_name=$(echo ${strarr[0]})
+    tag=$(echo ${strarr[1]})
+    echo "fx_name: ${fx_name}"
+    echo "tag: ${tag}"
+
+    # === FX ENTRYPOINT AND TAG VERSION ========================================
+    # Camel case function entrypoint. Ex.: broker -> Broker 
+    fx_entrypoint=$(sed -r 's/(^|-)(\w)/\U\2/g' <<<"${fx_name}")
+    # Replace '.' with '_' for tag version. Ex.: 1.2.3.dev -> 1_2_3_dev 
+    tag_version=$(echo "${tag}" | sed -r 's/\./_/g')
+    echo "fx_entrypoint: ${fx_entrypoint}"
+    echo "tag_version: ${tag_version}"
+
+    # === SET DEV ENV VARS =====================================================
+    if [[ "${tag}" == *"dev"* ]]; then
+      echo "setting DEV environment variables..."
       bucket=function-data
+      region=europe-west1
       project=positive-apex-350507
       env=dev
       genFx=--gen2
       sa=wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com
       timeout=60
-      vpc=wopta-dev-custom-vpc
+      vpc=functions-connector
     fi
-   #---------------------SET VAR PROD-----------------------------------------------
-    if [[ "${strarr[1]}" == *"prod"* ]]; then
-    echo "prod enviroment"
+    # === SET DEV UAT VARS =====================================================
+    if [[ "${tag}" == *"uat"* ]]; then
+      echo "setting UAT environment variables..."
+      bucket=function-data
+      region=europe-west1
+      mem=256Mb
+      project=core-452909
+      env=uat
+      genFx=--gen2
+      sa=wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com
+      timeout=60
+      vpc=functions-connector
+    fi
+    # === SET PROD ENV VARS ====================================================
+    if [[ "${tag}" == *"prod"* ]]; then
+      echo "setting PROD environment variables..."
       bucket=core-350507-function-data
+      region=europe-west1
       project=core-350507
       env=prod
       genFx=""
       sa=wopta-prod-cloud-function@core-350507.iam.gserviceaccount.com
       timeout=520
-      vpc=prod-custom-vpc
+      vpc=functions-connector
     fi
 
-    #--------- Copy assets folder from Google Bucket to directory----------------------------------
-    mkdir -p /workspace/${strarr[0]}/tmp/assets
-    gsutil -m cp -r gs://${bucket}/assets/documents/** /workspace/${strarr[0]}/tmp/assets
-    cp /workspace/.gcloudignore /workspace/${strarr[0]}/.gcloudignore 
-    #----------------------------------
-    #----------DEPLOY FX------------------------
-    gcloud functions deploy ${strarr[0]} \
-    --project=${project} \
-    --region=europe-west1 \
-    --source=/workspace/${strarr[0]} \
-    --entry-point=${name_camel} \
-    --trigger-http \
-    --allow-unauthenticated \
-    --run-service-account=${sa} \
-    --runtime=go121 \
-    --env-vars-file ${env}.yaml \
-    --timeout=${timeout} \
-    --vpc-connector=${vpc} \
-    --egress-settings=all \
-    ${genFx} 
-   
-      #----------------------------------
-      if [[ "${strarr[1]}" == *"dev"* ]]; then
-    echo "dev run services update"
-    gcloud run services update ${strarr[0]}  --update-labels tagversion=${tagVersion} --region=europe-west1 --service-account=${sa}
+    # === SET INGRESS SETTINGS BY FUNCTION =====================================
+    ingress=internal-and-gclb
+    if [[ "${fx_name}" == "callback" ]]; then
+      ingress=all
     fi
+
+    # === SET MEMORY BY FUNCTION ===============================================
+    mem=256Mb
+    if [[ "${fx_name}" == "broker" ]]; then
+      mem=1Gb
+    fi
+
+    # === COPY ASSETS FROM BUCKET ==============================================
+    echo "copying assets..."
+    mkdir -p /workspace/${fx_name}/tmp/assets
+    gsutil -m cp -r gs://${bucket}/assets/documents/** /workspace/${fx_name}/tmp/assets
+    cp /workspace/.gcloudignore /workspace/${fx_name}/.gcloudignore 
+
+    # === DEPLOY ===============================================================
+    echo "deploying function ${fx_name}..."
+    gcloud functions deploy ${fx_name} \
+      --project=${project} \
+      --region=${region} \
+      --source=/workspace/${fx_name} \
+      --entry-point=${fx_entrypoint} \
+      --trigger-http \
+      --allow-unauthenticated \
+      --run-service-account=${sa} \
+      --runtime=go121 \
+      --env-vars-file ${env}.yaml \
+      --timeout=${timeout} \
+      --ingress-settings=${ingress} \
+      --egress-settings=all \
+      --memory=${mem} \
+      --vpc-connector=${vpc} \
+      ${genFx} 
    
-    
-     #gcloud functions add-iam-policy-binding ${strarr[0]} \
-    # --region='europe-west1' \
-    # --member='serviceAccount:wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com' \
-    # --role='roles/cloudfunctions.invoker'
+    # === APPLY TAG VERSION LABEL ==============================================
+    if [[ "${env}" == "dev" ]]; then
+      echo "DEV run services update..."
+      gcloud run services update ${fx_name} --update-labels tagversion=${tag_version} --service-account=${sa} --region=${region}
+    fi

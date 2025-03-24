@@ -122,7 +122,7 @@ func CheckHypeData(r *http.Request) (BankAccountMovement, error) {
 	if obj.HypeId == "" {
 		return obj, GetErrorJson(400, "Bad request", "field HypeId miss")
 	}
-	if obj.GuaranteesCode != "next" && obj.GuaranteesCode != "premium" {
+	if obj.GuaranteesCode != "next" && obj.GuaranteesCode != "premium" && obj.GuaranteesCode != "QUICK2CASH" {
 		return obj, GetErrorJson(400, "Bad request", "field GuaranteesCode out of enum")
 	}
 
@@ -132,35 +132,30 @@ func SetHypeData(obj BankAccountMovement) BankAccountMovement {
 
 	obj.BigStartDate = civil.DateTimeOf(obj.StartDate)
 	obj.BigEndDate = civil.DateTimeOf(obj.EndDate)
+	obj.Customer = "hype"
+	obj.Company = "axa"
+	obj.PolicyType = ""
+	obj.PolicyUid = ""
+	obj.AssetType = ""
+	obj.PostalCode = ""
+	obj.CityCode = ""
+	obj.Address = ""
+	obj.Tenant = "hype"
+	obj.City = ""
 	if obj.GuaranteesCode == "next" {
 		obj.PolicyNumber = "180623"
 		obj.Uid = uuid.New().String()
 		obj.Customer = "hype"
-		obj.Company = "axa"
-		obj.PolicyType = ""
-		obj.PolicyUid = ""
-		obj.AssetType = ""
 		obj.PolicyName = "Hype Next"
-		obj.PostalCode = ""
-		obj.CityCode = ""
-		obj.Address = ""
-		obj.Tenant = "hype"
-		obj.City = ""
 	}
 	if obj.GuaranteesCode == "premium" {
 		obj.PolicyNumber = "191123"
-		obj.Uid = uuid.New().String()
-		obj.Customer = "hype"
-		obj.Company = "axa"
-		obj.PolicyType = ""
-		obj.PolicyUid = ""
-		obj.AssetType = ""
 		obj.PolicyName = "Hype Premium"
-		obj.PostalCode = ""
-		obj.CityCode = ""
-		obj.Address = ""
-		obj.Tenant = "hype"
-		obj.City = ""
+
+	}
+	if obj.GuaranteesCode == "QUICK2CASH" {
+		obj.PolicyNumber = "270125"
+		obj.PolicyName = "Hype QUICK2CASH"
 	}
 	obj.CustomerId = obj.HypeId
 	if obj.MovementType == "insert" {

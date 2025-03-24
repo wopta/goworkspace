@@ -133,13 +133,22 @@ func populateProducerUidParam(r *http.Request, paramsMap map[string]string) erro
 }
 
 func getNodeChildren(producerUid string) (string, error) {
-	childrenList := make([]string, 0)
+	childrenMap := make(map[string]string)
+	// We add the producer to the map because the partnership nodes are not
+	// present in the GetNodeChildren table, returning an empty list.
+	// The map is used to keep only unique uids for the query
+	childrenMap[producerUid] = producerUid
 	children, err := network.GetNodeChildren(producerUid)
 	if err != nil {
 		return "", err
 	}
 	for _, child := range children {
-		childrenList = append(childrenList, child.NodeUid)
+		childrenMap[child.NodeUid] = child.NodeUid
+	}
+
+	childrenList := make([]string, 0)
+	for nodeUid := range childrenMap {
+		childrenList = append(childrenList, nodeUid)
 	}
 	return strings.Join(childrenList, ", "), nil
 }

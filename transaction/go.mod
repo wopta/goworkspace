@@ -9,10 +9,11 @@ require (
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/google/uuid v1.6.0
 	github.com/wopta/goworkspace/lib v1.0.139
-	github.com/wopta/goworkspace/models v1.2.31
-	github.com/wopta/goworkspace/network v1.0.96
-	github.com/wopta/goworkspace/policy v1.0.167
-	github.com/wopta/goworkspace/product v1.1.29
+	github.com/wopta/goworkspace/models v1.2.33
+	github.com/wopta/goworkspace/network v1.0.99
+	github.com/wopta/goworkspace/policy v1.0.171
+	github.com/wopta/goworkspace/product v1.1.31
+	google.golang.org/api v0.181.0
 )
 
 require (
@@ -74,7 +75,7 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	github.com/wopta/goworkspace/document v1.1.123 // indirect
+	github.com/wopta/goworkspace/document v1.1.127 // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
@@ -102,7 +103,6 @@ require (
 	golang.org/x/tools v0.20.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	gonum.org/v1/gonum v0.12.0 // indirect
-	google.golang.org/api v0.181.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/appengine/v2 v2.0.2 // indirect
 	google.golang.org/genproto v0.0.0-20240515191416-fc5f0ca64291 // indirect
