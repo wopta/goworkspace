@@ -505,28 +505,25 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 			policy.Contractor.Uid = lib.NewDoc(models.UserCollection)
 		}*/
 
-		transactionsOutput := make(map[string]TransactionsOutput, 0)
-
 		// create transactions and network node transactions
-
-		scheduleDate := policy.StartDate
-		transactionPayDate := policy.StartDate
-
 		// if monthly create remaining transactions and network transactions if transaction is paid
 
+		var transactionsOutput map[string]TransactionsOutput
+
 		if policy.PaymentSplit == string(models.PaySplitMonthly) {
-			tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", scheduleDate, transactionPayDate, policy.PriceGrossMonthly, policy.PriceNettMonthly, true)
+			sd := policy.StartDate
+			tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", sd, sd, policy.PriceGrossMonthly, policy.PriceNettMonthly, true)
 
 			transactionsOutput = map[string]TransactionsOutput{
-				scheduleDate.Format(models.TimeDateOnly): {
+				sd.Format(models.TimeDateOnly): {
 					Transaction:         tr,
 					NetworkTransactions: createNetworkTransactions(&policy, &tr, networkNode, mgaProducts[policy.ProductVersion]),
 				},
 			}
 
 			for i := 1; i < 12; i++ {
-				transactionPayDate = time.Time{}
-				scheduleDate = scheduleDate.AddDate(0, 1, 0)
+				transactionPayDate := time.Time{}
+				scheduleDate := lib.AddMonths(policy.StartDate, i)
 				isPay := false
 				payDateString := scheduleDate.Format("02012006")
 				if monthlyPolicies[policy.CodeCompany][payDateString] != nil {
@@ -549,10 +546,11 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 				}
 			}
 		} else {
-			tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", scheduleDate, transactionPayDate, policy.PriceGross, policy.PriceNett, true)
+			sd := policy.StartDate
+			tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", sd, sd, policy.PriceGross, policy.PriceNett, true)
 
 			transactionsOutput = map[string]TransactionsOutput{
-				scheduleDate.Format(models.TimeDateOnly): {
+				sd.Format(models.TimeDateOnly): {
 					Transaction:         tr,
 					NetworkTransactions: createNetworkTransactions(&policy, &tr, networkNode, mgaProducts[policy.ProductVersion]),
 				},
@@ -1116,7 +1114,8 @@ func createTransaction(policy models.Policy, mgaProduct *models.Product, custome
 		paymentMethod = models.PayMethodTransfer
 	}
 
-	expireDate := scheduleDate.AddDate(10, 0, 0)
+	now := time.Now().UTC()
+	expireDate := lib.AddMonths(now, 18)
 
 	return models.Transaction{
 		Amount:          priceGross,
@@ -1125,9 +1124,10 @@ func createTransaction(policy models.Policy, mgaProduct *models.Product, custome
 		PolicyName:      policy.Name,
 		PolicyUid:       policy.Uid,
 		CreationDate:    policy.EmitDate,
-		UpdateDate:      time.Now().UTC(),
+		UpdateDate:      now,
 		Status:          status,
 		StatusHistory:   statusHistory,
+		EffectiveDate:   scheduleDate,
 		ScheduleDate:    scheduleDate.Format(models.TimeDateOnly),
 		ExpirationDate:  expireDate.Format(models.TimeDateOnly),
 		NumberCompany:   policy.CodeCompany,
@@ -1324,12 +1324,7 @@ func policyBigquerySave(policy models.Policy, collectionPrefix string) {
 func transactionBigQuerySave(transaction models.Transaction, collectionPrefix string) {
 	fireTransactions := lib.GetDatasetByEnv("", fmt.Sprintf("%s%s", collectionPrefix, lib.TransactionsCollection))
 
-	transaction.BigPayDate = lib.GetBigQueryNullDateTime(transaction.PayDate)
-	transaction.BigTransactionDate = lib.GetBigQueryNullDateTime(transaction.TransactionDate)
-	transaction.BigCreationDate = civil.DateTimeOf(transaction.CreationDate)
-	transaction.BigStatusHistory = strings.Join(transaction.StatusHistory, ",")
-	transaction.BigUpdateDate = lib.GetBigQueryNullDateTime(transaction.UpdateDate)
-	log.Println("Transaction save BigQuery: " + transaction.Uid)
+	transaction.BigQueryParse()
 
 	err := lib.InsertRowsBigQuery(models.WoptaDataset, fireTransactions, transaction)
 	if err != nil {

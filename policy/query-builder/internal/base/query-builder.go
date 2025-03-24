@@ -158,7 +158,7 @@ func (qb *QueryBuilder) extractLimit(params map[string]string) error {
 func (qb *QueryBuilder) parseQuery() string {
 	const queryPrefix = "SELECT **tableAlias**.uid, **tableAlias**.name AS productName, " +
 		"**tableAlias**.codeCompany, CAST(**tableAlias**.proposalNumber AS INT64) AS proposalNumber, " +
-		"**tableAlias**.nameDesc,**tableAlias**.status, RTRIM(COALESCE(JSON_VALUE(**tableAlias**.data, " +
+		"**tableAlias**.nameDesc, **tableAlias**.status, RTRIM(COALESCE(JSON_VALUE(**tableAlias**.data, " +
 		"'$.contractor.name'), '') || ' ' || " +
 		"COALESCE(JSON_VALUE(**tableAlias**.data, '$.contractor.surname'), '')) AS contractor, " +
 		"**tableAlias**.priceGross AS price, **tableAlias**.priceGrossMonthly AS priceMonthly, " +
@@ -174,10 +174,8 @@ func (qb *QueryBuilder) parseQuery() string {
 	)
 
 	rawQuery.WriteString(queryPrefix)
-	if len(qb.WhereClauses) > 1 {
-		rawQuery.WriteString(strings.Join(qb.WhereClauses, " AND "))
-	}
-	rawQuery.WriteString(fmt.Sprintf(" ORDER BY **tableAlias**.updateDate DESC"))
+	rawQuery.WriteString(strings.Join(qb.WhereClauses, " AND "))
+	rawQuery.WriteString(" ORDER BY **tableAlias**.updateDate DESC")
 	rawQuery.WriteString(fmt.Sprintf(" LIMIT %d", qb.limit))
 
 	query := strings.ReplaceAll(rawQuery.String(), "**tableName**", qb.tableName)

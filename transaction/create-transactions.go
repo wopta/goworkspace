@@ -66,7 +66,7 @@ func setDateInfo(index int, transaction models.Transaction, policy models.Policy
 	transaction.EffectiveDate = lib.AddMonths(startDate, index)
 	transaction.ScheduleDate = transaction.EffectiveDate.Format(time.DateOnly)
 	// TODO: code smell - this info is needed for Fabrick only but we don't know the params for other scenarios
-	transaction.ExpirationDate = lib.AddMonths(startDate, 18).Format(time.DateOnly)
+	transaction.ExpirationDate = lib.AddMonths(now, 18).Format(time.DateOnly)
 	transaction.CreationDate = now
 	transaction.UpdateDate = now
 
