@@ -17,6 +17,7 @@ type contractorDTO struct {
 	CityCode     string
 	Mail         string
 	Phone        string
+	BirthDate    string
 }
 
 func newContractorDTO() *contractorDTO {
@@ -32,6 +33,7 @@ func newContractorDTO() *contractorDTO {
 		CityCode:     constants.EmptyField,
 		Mail:         constants.EmptyField,
 		Phone:        constants.EmptyField,
+		BirthDate:    constants.EmptyField,
 	}
 }
 

@@ -2,10 +2,8 @@ package dto
 
 import (
 	"slices"
-	"strconv"
 
 	"github.com/wopta/goworkspace/document/internal/constants"
-	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -104,19 +102,14 @@ func (cc *CommercialCombinedDTO) FromPolicy(policy models.Policy, product models
 			continue
 		}
 		for _, history := range declaredClaim.History {
-			cc.Claims[slug].Quantity.ValueInt += int64(history.Quantity)
-			cc.Claims[slug].Quantity.Text = strconv.FormatInt(cc.Claims[slug].Quantity.ValueInt, 10)
-			cc.Claims[slug].Value.ValueFloat += history.Value
-			cc.Claims[slug].Value.Text = lib.HumanaizePriceEuro(cc.Claims[slug].Value.ValueFloat)
+			cc.Claims[slug].Quantity.FromValue(cc.Claims[slug].Quantity.ValueInt + int64(history.Quantity))
+			cc.Claims[slug].Value.FromValue(cc.Claims[slug].Value.ValueFloat + history.Value)
 		}
 	}
 
-	cc.Prices.Gross = policy.PriceGross
-	cc.Prices.GrossText = lib.HumanaizePriceEuro(cc.Prices.Gross)
-	cc.Prices.Net = policy.PriceNett
-	cc.Prices.NetText = lib.HumanaizePriceEuro(cc.Prices.Net)
-	cc.Prices.Taxes = policy.TaxAmount
-	cc.Prices.TaxesText = lib.HumanaizePriceEuro(cc.Prices.Taxes)
+	cc.Prices.Gross.FromValue(policy.PriceGross)
+	cc.Prices.Net.FromValue(policy.PriceNett)
+	cc.Prices.Taxes.FromValue(policy.TaxAmount)
 
 	sectionMap := map[string]string{
 		"A": "A - INCENDIO E \"TUTTI I RISCHI\"",
@@ -155,13 +148,10 @@ func (cc *CommercialCombinedDTO) FromPolicy(policy models.Policy, product models
 
 	for _, price := range policy.PriceGroup {
 		sectionKey := groupSectionMap[price.Name]
-		cc.PricesBySection[sectionKey].Price.Gross += price.Gross
-		cc.PricesBySection[sectionKey].Price.GrossText = lib.HumanaizePriceEuro(cc.PricesBySection[sectionKey].Price.Gross)
-		cc.PricesBySection[sectionKey].Price.Net += price.Net
-		cc.PricesBySection[sectionKey].Price.NetText = lib.HumanaizePriceEuro(cc.PricesBySection[sectionKey].Price.Net)
-		cc.PricesBySection[sectionKey].Price.Taxes += price.Tax
-		cc.PricesBySection[sectionKey].Price.TaxesText = lib.HumanaizePriceEuro(cc.PricesBySection[sectionKey].Price.Taxes)
-		if cc.PricesBySection[sectionKey].Active == constants.No && cc.PricesBySection[sectionKey].Price.Gross > 0 {
+		cc.PricesBySection[sectionKey].Price.Gross.FromValue(cc.PricesBySection[sectionKey].Price.Gross.ValueFloat + price.Gross)
+		cc.PricesBySection[sectionKey].Price.Net.FromValue(cc.PricesBySection[sectionKey].Price.Net.ValueFloat + price.Net)
+		cc.PricesBySection[sectionKey].Price.Taxes.FromValue(cc.PricesBySection[sectionKey].Price.Taxes.ValueFloat + price.Tax)
+		if cc.PricesBySection[sectionKey].Active == constants.No && cc.PricesBySection[sectionKey].Price.Gross.ValueFloat > 0 {
 			cc.PricesBySection[sectionKey].Active = constants.Yes
 		}
 	}

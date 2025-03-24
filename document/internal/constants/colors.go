@@ -33,4 +33,5 @@ var (
 		G: 216,
 		B: 232,
 	}
+	NoColor = domain.Color{}
 )
