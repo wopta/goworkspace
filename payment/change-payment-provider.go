@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strings"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -64,11 +63,6 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 	}
 
 	policy.SanitizePaymentData()
-
-	if strings.EqualFold(policy.Payment, req.ProviderName) {
-		log.Printf("can't change payment method to %s for policy with payment method %s", req.ProviderName, policy.Payment)
-		return "{}", nil, errors.New("unable to change payment method")
-	}
 
 	err = common.UpdatePaymentProvider(&policy, req.ProviderName)
 	if err != nil {
