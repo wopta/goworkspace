@@ -78,7 +78,7 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	diffPolicy, changed := generateDiffPolicy(originalPolicy, modifiedPolicy)
 	if changed {
-		res, err := document.AddendumObj("", diffPolicy, nil, nil)
+		res, err := document.Addendum("", diffPolicy, nil, nil)
 		if err != nil {
 			log.Printf("error generating addendum for policy %s: %s", inputPolicy.Uid, err.Error())
 			return "{}", nil, err

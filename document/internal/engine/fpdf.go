@@ -3,7 +3,6 @@ package engine
 import (
 	"bytes"
 	"os"
-	"path"
 	"strings"
 	"time"
 

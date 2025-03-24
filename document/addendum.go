@@ -14,7 +14,7 @@ type AddendumResponse struct {
 	Filename string `json:"fileName"`
 }
 
-func AddendumObj(origin string, data models.Policy, networkNode *models.NetworkNode, product *models.Product) (AddendumResponse, error) {
+func Addendum(origin string, data models.Policy, networkNode *models.NetworkNode, product *models.Product) (AddendumResponse, error) {
 	var (
 		err      error
 		filename string
