@@ -24,8 +24,9 @@ type baseGenerator struct {
 
 func (bg *baseGenerator) Save(rawDoc []byte) (string, error) {
 	userPathFormat := "assets/users/%s/"
-	filename := strings.ReplaceAll(fmt.Sprintf(fmt.Sprintf(userPathFormat, bg.policy.Contractor.Uid)+models.AddendumDocumentFormat, "temp", bg.policy.Uid,
-		bg.policy.NameDesc, bg.policy.ProposalNumber, time.Now().Format("2006-01-02_15:04:05")), " ", "_")
+	path := fmt.Sprintf(userPathFormat, bg.policy.Contractor.Uid)
+	filename := strings.ReplaceAll(fmt.Sprintf(path+models.AddendumDocumentFormat, bg.policy.NameDesc, bg.policy.Uid,
+		bg.policy.ProposalNumber, time.Now().Format("2006-01-02_15:04:05")), " ", "_")
 	return bg.engine.Save(rawDoc, filename)
 }
 
