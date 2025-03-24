@@ -6,6 +6,7 @@ type priceDTO struct {
 	Taxes       numeric
 	Consultancy numeric
 	Total       numeric
+	Split       string
 }
 
 func newPriceDTO() *priceDTO {
