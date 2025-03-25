@@ -32,6 +32,12 @@ var testRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodPost,
 		Roles:   []string{},
 	},
+	{
+		Route:   "/accounting/createinvoice",
+		Handler: lib.ResponseLoggerWrapper(createInvoice),
+		Method:  http.MethodPost,
+		Roles:   []string{},
+	},
 }
 
 func init() {
