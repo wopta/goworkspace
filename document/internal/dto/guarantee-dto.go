@@ -106,8 +106,6 @@ func newQuoteGuaranteeDTO() *quoteGuaranteeDTO {
 }
 
 func (g *quoteGuaranteeDTO) fromData(guarantee models.Guarante, startDate time.Time) {
-	g.Description = guarantee.CompanyName
-
 	g.SumInsuredLimitOfIndemnity.ValueFloat = guarantee.Value.SumInsuredLimitOfIndemnity
 	if g.SumInsuredLimitOfIndemnity.ValueFloat != 0 {
 		g.SumInsuredLimitOfIndemnity.Text = lib.HumanaizePriceEuro(g.SumInsuredLimitOfIndemnity.ValueFloat)

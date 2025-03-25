@@ -51,9 +51,12 @@ func (q *QuoteLifeDTO) fromData(p *models.Policy, prd *models.Product) {
 	if companyIdx < 0 {
 		return
 	}
-	for slug := range prd.Companies[companyIdx].GuaranteesMap {
+	for slug, productGuarantee := range prd.Companies[companyIdx].GuaranteesMap {
 		dto := newQuoteGuaranteeDTO()
-		dto.fromData(gMap[slug], q.StartDate)
+		dto.Description = productGuarantee.CompanyName
+		if g, ok := gMap[slug]; ok {
+			dto.fromData(g, q.StartDate)
+		}
 		q.Guarantees[slug] = dto
 	}
 }
