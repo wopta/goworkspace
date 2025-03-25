@@ -206,7 +206,7 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 	setPricesByOffer(&data, "default")
 
 	log.Println("[Life] apply consultacy price")
-	
+
 	addConsultacyPrice(&data, ruleProduct)
 
 	log.Println("[Life] sort guarantees list")
@@ -445,10 +445,14 @@ func roundOfferPrices(offersPrices map[string]map[string]*models.Price) {
 
 func setPricesByOffer(policy *models.Policy, offerName string) {
 	policy.OfferlName = offerName
-	policy.PriceGross = policy.OffersPrices[policy.OfferlName][string(models.PaySplitYearly)].Gross
-	policy.PriceNett = policy.OffersPrices[policy.OfferlName][string(models.PaySplitYearly)].Net
-	policy.TaxAmount = policy.OffersPrices[policy.OfferlName][string(models.PaySplitYearly)].Tax
-	policy.PriceGrossMonthly = policy.OffersPrices[policy.OfferlName][string(models.PaySplitMonthly)].Gross
-	policy.PriceNettMonthly = policy.OffersPrices[policy.OfferlName][string(models.PaySplitMonthly)].Net
-	policy.TaxAmountMonthly = policy.OffersPrices[policy.OfferlName][string(models.PaySplitMonthly)].Tax
+	if price, ok := policy.OffersPrices[policy.OfferlName][string(models.PaySplitYearly)]; ok {
+		policy.PriceGross = price.Gross
+		policy.PriceNett = price.Net
+		policy.TaxAmount = price.Tax
+	}
+	if price, ok := policy.OffersPrices[policy.OfferlName][string(models.PaySplitMonthly)]; ok {
+		policy.PriceGrossMonthly = price.Gross
+		policy.PriceNettMonthly = price.Net
+		policy.TaxAmountMonthly = price.Tax
+	}
 }
