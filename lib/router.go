@@ -63,6 +63,7 @@ func GetRouter(module string, routes []Route) *chi.Mux {
 	mux.Use(corsMiddleware)
 	mux.Use(logRequestMiddleware)
 
+
 	for _, route := range routes {
 		mw := make([]func(http.Handler) http.Handler, 0)
 		mw = append(mw,

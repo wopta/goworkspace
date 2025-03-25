@@ -1,0 +1,94 @@
+package accounting
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"os"
+
+	fattureincloudapi "github.com/fattureincloud/fattureincloud-go-sdk/v2/api"
+	fattureincloud "github.com/fattureincloud/fattureincloud-go-sdk/v2/model"
+)
+
+func (invoiceData *InvoiceInc) CreateInvoice(isPay bool,isProforma bool) {
+	var (
+		fcItems []fattureincloud.IssuedDocumentItemsListItem
+		status  fattureincloud.IssuedDocumentStatus
+		Invoicetype fattureincloud.IssuedDocumentType
+	)
+	const (
+		layout = "2006-02-01"
+	)
+	if isProforma {
+		Invoicetype = fattureincloud.IssuedDocumentTypes.PROFORMA
+	} else {
+		Invoicetype = fattureincloud.IssuedDocumentTypes.INVOICE
+	}
+	if isPay {
+		status = fattureincloud.IssuedDocumentStatuses.PAID
+	} else {
+		status = fattureincloud.IssuedDocumentStatuses.NOT_PAID
+	}
+	auth := context.WithValue(context.Background(), fattureincloudapi.ContextAccessToken, os.Getenv("FATTURE_INCLOUD_KEY"))
+	configuration := fattureincloudapi.NewConfiguration()
+	apiClient := fattureincloudapi.NewAPIClient(configuration)
+
+	//set your company id
+	companyId := int32(11605)
+	for _, item := range invoiceData.Items {
+		fcItems = append(fcItems, *fattureincloud.NewIssuedDocumentItemsListItem().
+			SetProductId(4).
+			SetCode(item.Code).
+			SetName(item.Name).
+			SetNetPrice(item.NetPrice).
+			SetCategory(item.Category).
+			SetDiscount(0).
+			SetQty(1).
+			SetVat(*fattureincloud.NewVatType().SetId(0)))
+	}
+	entity := *fattureincloud.NewEntity().
+		SetId(1).
+		SetName(invoiceData.Name).
+		SetVatNumber(invoiceData.VatNumber).
+		SetTaxCode(invoiceData.TaxCode).
+		SetAddressStreet(invoiceData.Address).
+		SetAddressPostalCode(invoiceData.PostalCode).
+		SetAddressCity(invoiceData.City).
+		SetAddressProvince(invoiceData.CityCode).
+		SetCountry(invoiceData.Country)
+
+	invoice := *fattureincloud.NewIssuedDocument().
+		SetEntity(entity).
+		SetType(Invoicetype).
+		SetDate(invoiceData.Date.Format(layout)).
+		SetNumber(1).
+		SetNumeration("/fatt").
+		SetSubject("internal subject").
+		SetVisibleSubject("visible subject").
+		SetCurrency(*fattureincloud.NewCurrency().SetId("EUR")).
+		SetLanguage(*fattureincloud.NewLanguage().SetCode("it").SetName("italiano")).
+		SetItemsList(fcItems).
+		SetPaymentsList([]fattureincloud.IssuedDocumentPaymentsListItem{
+			*fattureincloud.NewIssuedDocumentPaymentsListItem().
+				SetAmount(invoiceData.Amount).
+				SetDueDate(invoiceData.Date.Format(layout)).
+				SetPaidDate(invoiceData.PayDate.Format(layout)).
+				SetStatus(status).
+				SetPaymentAccount(*fattureincloud.NewPaymentAccount().SetId(110)),
+		}).
+		// Here we add the payment method
+		// List your payment methods: https://github.com/fattureincloud/fattureincloud-go-sdk/blob/master/docs/InfoApi.md#listpaymentmethods
+		SetPaymentMethod(*fattureincloud.NewPaymentMethod().SetId(386683))
+
+	// Here we put our invoice in the request object
+	createIssuedDocumentRequest := *fattureincloud.NewCreateIssuedDocumentRequest().SetData(invoice)
+
+	// Now we are all set for the final call
+	// Create the invoice: https://github.com/fattureincloud/fattureincloud-go-sdk/blob/master/docs/IssuedDocumentsApi.md#createIssuedDocument
+	resp, r, err := apiClient.IssuedDocumentsAPI.CreateIssuedDocument(auth, companyId).CreateIssuedDocumentRequest(createIssuedDocumentRequest).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `IssuedDocumentsAPI.CreateIssuedDocument``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	json.NewEncoder(os.Stdout).Encode(resp)
+}
