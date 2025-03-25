@@ -2551,7 +2551,7 @@ func (ccg *CommercialCombinedGenerator) resumeSection() {
 				Border:    border,
 			},
 			{
-				Text:      section.Price.NetText,
+				Text:      section.Price.Net.Text,
 				Height:    4.5,
 				Width:     cellWidth,
 				FontSize:  constants.RegularFontSize,
@@ -2563,7 +2563,7 @@ func (ccg *CommercialCombinedGenerator) resumeSection() {
 				Border:    border,
 			},
 			{
-				Text:      section.Price.TaxesText,
+				Text:      section.Price.Taxes.Text,
 				Height:    4.5,
 				Width:     cellWidth,
 				FontSize:  constants.RegularFontSize,
@@ -2575,7 +2575,7 @@ func (ccg *CommercialCombinedGenerator) resumeSection() {
 				Border:    border,
 			},
 			{
-				Text:      section.Price.GrossText,
+				Text:      section.Price.Gross.Text,
 				Height:    4.5,
 				Width:     cellWidth,
 				FontSize:  constants.RegularFontSize,
@@ -2616,7 +2616,7 @@ func (ccg *CommercialCombinedGenerator) resumeSection() {
 				Border:    "T",
 			},
 			{
-				Text:      ccg.dto.Prices.NetText,
+				Text:      ccg.dto.Prices.Net.Text,
 				Height:    4.5,
 				Width:     cellWidth,
 				FontSize:  constants.RegularFontSize,
@@ -2628,7 +2628,7 @@ func (ccg *CommercialCombinedGenerator) resumeSection() {
 				Border:    "T",
 			},
 			{
-				Text:      ccg.dto.Prices.TaxesText,
+				Text:      ccg.dto.Prices.Taxes.Text,
 				Height:    4.5,
 				Width:     cellWidth,
 				FontSize:  constants.RegularFontSize,
@@ -2640,7 +2640,7 @@ func (ccg *CommercialCombinedGenerator) resumeSection() {
 				Border:    "T",
 			},
 			{
-				Text:      ccg.dto.Prices.GrossText,
+				Text:      ccg.dto.Prices.Gross.Text,
 				Height:    4.5,
 				Width:     cellWidth,
 				FontSize:  constants.RegularFontSize,
@@ -2678,7 +2678,7 @@ func (ccg *CommercialCombinedGenerator) resumeSection() {
 				Border:    "T",
 			},
 			{
-				Text:      ccg.dto.Prices.NetText,
+				Text:      ccg.dto.Prices.Net.Text,
 				Height:    4.5,
 				Width:     cellWidth,
 				FontSize:  constants.RegularFontSize,
@@ -2690,7 +2690,7 @@ func (ccg *CommercialCombinedGenerator) resumeSection() {
 				Border:    "T",
 			},
 			{
-				Text:      ccg.dto.Prices.TaxesText,
+				Text:      ccg.dto.Prices.Taxes.Text,
 				Height:    4.5,
 				Width:     cellWidth,
 				FontSize:  constants.RegularFontSize,
@@ -2702,7 +2702,7 @@ func (ccg *CommercialCombinedGenerator) resumeSection() {
 				Border:    "T",
 			},
 			{
-				Text:      ccg.dto.Prices.GrossText,
+				Text:      ccg.dto.Prices.Gross.Text,
 				Height:    4.5,
 				Width:     cellWidth,
 				FontSize:  constants.RegularFontSize,
@@ -2740,7 +2740,7 @@ func (ccg *CommercialCombinedGenerator) resumeSection() {
 				Border:    "TB",
 			},
 			{
-				Text:      ccg.dto.Prices.NetText,
+				Text:      ccg.dto.Prices.Net.Text,
 				Height:    4.5,
 				Width:     cellWidth,
 				FontSize:  constants.RegularFontSize,
@@ -2752,7 +2752,7 @@ func (ccg *CommercialCombinedGenerator) resumeSection() {
 				Border:    "TB",
 			},
 			{
-				Text:      ccg.dto.Prices.TaxesText,
+				Text:      ccg.dto.Prices.Taxes.Text,
 				Height:    4.5,
 				Width:     cellWidth,
 				FontSize:  constants.RegularFontSize,
@@ -2764,7 +2764,7 @@ func (ccg *CommercialCombinedGenerator) resumeSection() {
 				Border:    "TB",
 			},
 			{
-				Text:      ccg.dto.Prices.GrossText,
+				Text:      ccg.dto.Prices.Gross.Text,
 				Height:    4.5,
 				Width:     cellWidth,
 				FontSize:  constants.RegularFontSize,

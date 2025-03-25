@@ -226,6 +226,8 @@ const (
 	FlowFileFormat                = "flows/%s.json"
 	ContractDocumentFormat        = "%s_Contratto_%s.pdf"
 	ProposalDocumentFormat        = "%s_Proposta_%d.pdf"
+	AddendumDocumentFormat        = "%s_Appendice_%s_%d_%s.pdf"
+	ProformaDocumentFormat        = "%s_Proforma_%s_%d_%s.pdf"
 	RvmInstructionsDocumentFormat = "Scheda_Rapporto_Visita_Medica_Proposta_%d.pdf"
 	RvmSurveyDocumentFormat       = "Rapporto_Visita_Medica_Proposta_%d.pdf"
 	WarrantFormat                 = "warrants/%s.json"

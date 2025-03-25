@@ -17,6 +17,12 @@
     timeout=60
     vpc=functions-connector
 
+    # === COPY ASSETS FROM BUCKET ==============================================
+    echo "copying assets..."
+    mkdir -p /workspace/${FX_NAME}/tmp/assets
+    gsutil -m cp -r gs://${bucket}/assets/documents/** /workspace/${FX_NAME}/tmp/assets
+    cp /workspace/.gcloudignore /workspace/${FX_NAME}/.gcloudignore
+
     # === SET INGRESS SETTINGS BY FUNCTION =====================================
     ingress=internal-and-gclb
     if [[ "${FX_NAME}" == "callback" ]]; then
@@ -28,8 +34,6 @@
     if [[ "${FX_NAME}" == "broker" ]]; then
       mem=1Gb
     fi
-
-   
 
     # === DEPLOY ===============================================================
     echo "deploying function ${FX_NAME}..."

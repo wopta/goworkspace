@@ -6,9 +6,11 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"reflect"
 	"strings"
 	"time"
 
+	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	plc "github.com/wopta/goworkspace/policy"
@@ -67,12 +69,42 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	log.Printf("original policy: %s", string(rawPolicy))
 
 	log.Printf("modifying policy...")
-	modifiedPolicy, err = modifyController(originalPolicy, inputPolicy)
+	modifiedPolicy, modifiedUser, err := modifyController(originalPolicy, inputPolicy)
 	if err != nil {
 		log.Printf("error during policy modification: %s", err.Error())
 		return "{}", nil, err
 	}
 	log.Printf("policy %s modified successfully", modifiedPolicy.Uid)
+
+	diffPolicy, changed := generateDiffPolicy(originalPolicy, modifiedPolicy)
+	if changed {
+		res, err := document.Addendum("", diffPolicy, nil, nil)
+		if err != nil {
+			log.Printf("error generating addendum for policy %s: %s", inputPolicy.Uid, err.Error())
+			return "{}", nil, err
+		}
+		addendumAtt := models.Attachment{
+			Name:      "Appendice",
+			FileName:  res.Filename,
+			MimeType:  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+			Link:      res.LinkGcs,
+			IsPrivate: false,
+			Section:   "",
+			Note:      "",
+		}
+		*modifiedPolicy.Attachments = append(*modifiedPolicy.Attachments, addendumAtt)
+	}
+
+	err = writePolicyToDb(modifiedPolicy)
+	if err != nil {
+		return "{}", nil, err
+	}
+	log.Printf("policy %s successfully saved", modifiedPolicy.Uid)
+	err = writeUserToDB(modifiedUser)
+	if err != nil {
+		return "{}", nil, err
+	}
+	log.Printf("user %s modified successfully", modifiedUser.Uid)
 
 	rawPolicy, err = json.Marshal(modifiedPolicy)
 
@@ -81,7 +113,180 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	return string(rawPolicy), modifiedPolicy, err
 }
 
-func modifyController(originalPolicy, inputPolicy models.Policy) (models.Policy, error) {
+func generateDiffPolicy(originalPolicy, inputPolicy models.Policy) (models.Policy, bool) {
+	var diff models.Policy
+	globalC := false
+	localC := false
+
+	diff.Contractor, localC = diffForContractor(originalPolicy.Contractor, inputPolicy.Contractor)
+	if localC {
+		globalC = true
+	}
+	assets := make([]models.Asset, 0)
+	ass := models.Asset{}
+
+	gar := models.Guarante{}
+	if inputPolicy.Assets[0].Person != nil {
+		ass.Person, localC = diffForUser(originalPolicy.Assets[0].Person, inputPolicy.Assets[0].Person)
+		if localC {
+			globalC = true
+		}
+	}
+
+	if inputPolicy.Assets[0].Guarantees[0].Beneficiary != nil {
+		gar.Beneficiary, localC = diffForUser(originalPolicy.Assets[0].Guarantees[0].Beneficiary, inputPolicy.Assets[0].Guarantees[0].Beneficiary)
+		if localC {
+			globalC = true
+		}
+	}
+	if inputPolicy.Assets[0].Guarantees[0].BeneficiaryReference != nil {
+		gar.BeneficiaryReference, localC = diffForUser(originalPolicy.Assets[0].Guarantees[0].BeneficiaryReference, inputPolicy.Assets[0].Guarantees[0].BeneficiaryReference)
+		if localC {
+			globalC = true
+		}
+	}
+	if inputPolicy.Assets[0].Guarantees[0].Beneficiaries != nil {
+		if originalPolicy.Assets[0].Guarantees[0].Beneficiaries != nil {
+			gar.Beneficiaries, localC = diffForBeneficiaries(*(originalPolicy.Assets[0].Guarantees[0]).Beneficiaries, *(inputPolicy.Assets[0].Guarantees[0]).Beneficiaries)
+			if localC {
+				globalC = true
+			}
+		} else {
+			gar.Beneficiaries = inputPolicy.Assets[0].Guarantees[0].Beneficiaries
+			globalC = true
+		}
+	} else {
+		if originalPolicy.Assets[0].Guarantees[0].Beneficiaries != nil {
+			globalC = true
+		}
+		gar.Beneficiaries = nil
+	}
+
+	if globalC {
+		diff.Uid = originalPolicy.Uid
+		diff.Name = originalPolicy.Name
+		diff.NameDesc = originalPolicy.NameDesc
+		diff.ProposalNumber = originalPolicy.ProposalNumber
+		diff.StartDate = originalPolicy.StartDate
+		diff.EndDate = originalPolicy.EndDate
+		diff.Company = originalPolicy.Company
+
+		garS := make([]models.Guarante, 0)
+		garS = append(garS, gar)
+		ass.Guarantees = garS
+		assets = append(assets, ass)
+		diff.Assets = assets
+	}
+
+	return diff, globalC
+}
+
+func diffForContractor(orig, input models.Contractor) (models.Contractor, bool) {
+	c := false
+	if orig.FiscalCode != input.FiscalCode {
+		return input, false
+	}
+
+	if input.Residence != nil && orig.Residence != nil {
+		if orig.Residence.StreetName != input.Residence.StreetName {
+			c = true
+		}
+		if orig.Residence.StreetNumber != input.Residence.StreetNumber {
+			c = true
+		}
+		if orig.Residence.City != input.Residence.City {
+			c = true
+		}
+		if orig.Residence.CityCode != input.Residence.CityCode {
+			c = true
+		}
+	}
+	if input.Domicile != nil && orig.Domicile != nil {
+		if orig.Domicile.StreetName != input.Domicile.StreetName {
+			c = true
+		}
+		if orig.Domicile.StreetNumber != input.Domicile.StreetNumber {
+			c = true
+		}
+		if orig.Domicile.City != input.Domicile.City {
+			c = true
+		}
+		if orig.Domicile.CityCode != input.Domicile.CityCode {
+			c = true
+		}
+	}
+	if orig.Mail != input.Mail {
+		c = true
+	}
+	if orig.Phone != input.Phone {
+		c = true
+	}
+
+	if c {
+		return input, true
+	}
+	return models.Contractor{}, false
+}
+
+func diffForBeneficiaries(orig, input []models.Beneficiary) (*[]models.Beneficiary, bool) {
+	if len(input) != len(orig) {
+		return &input, false
+	}
+	if reflect.DeepEqual(orig, input) {
+		diffS := make([]models.Beneficiary, 0)
+		return &diffS, false
+	}
+	return &input, true
+}
+
+func diffForUser(orig, input *models.User) (*models.User, bool) {
+	c := false
+	if orig.FiscalCode != input.FiscalCode {
+		return input, false
+	}
+
+	if input.Residence != nil && orig.Residence != nil {
+		if orig.Residence.StreetName != input.Residence.StreetName {
+			c = true
+		}
+		if orig.Residence.StreetNumber != input.Residence.StreetNumber {
+			c = true
+		}
+		if orig.Residence.City != input.Residence.City {
+			c = true
+		}
+		if orig.Residence.CityCode != input.Residence.CityCode {
+			c = true
+		}
+	}
+	if input.Domicile != nil && orig.Domicile != nil {
+		if orig.Domicile.StreetName != input.Domicile.StreetName {
+			c = true
+		}
+		if orig.Domicile.StreetNumber != input.Domicile.StreetNumber {
+			c = true
+		}
+		if orig.Domicile.City != input.Domicile.City {
+			c = true
+		}
+		if orig.Domicile.CityCode != input.Domicile.CityCode {
+			c = true
+		}
+	}
+	if orig.Mail != input.Mail {
+		c = true
+	}
+	if orig.Phone != input.Phone {
+		c = true
+	}
+
+	if c {
+		return input, true
+	}
+	return &models.User{}, false
+}
+
+func modifyController(originalPolicy, inputPolicy models.Policy) (models.Policy, models.User, error) {
 	var (
 		err            error
 		modifiedPolicy models.Policy
@@ -92,38 +297,28 @@ func modifyController(originalPolicy, inputPolicy models.Policy) (models.Policy,
 
 	err = checkEmailUniqueness(originalPolicy.Contractor, inputPolicy.Contractor)
 	if err != nil {
-		return models.Policy{}, err
+		return models.Policy{}, models.User{}, err
 	}
 
 	modifiedPolicy.Contractor, err = modifyContractorInfo(inputPolicy.Contractor, originalPolicy.Contractor)
 	if err != nil {
-		return models.Policy{}, err
+		return models.Policy{}, models.User{}, err
 	}
 
 	if modifiedPolicy.Contractor.Uid != "" {
 		tmpUser := modifiedPolicy.Contractor.ToUser()
 		modifiedUser, err = modifyUserInfo(*tmpUser)
 		if err != nil {
-			return models.Policy{}, err
+			return models.Policy{}, models.User{}, err
 		}
 	}
 
 	modifiedPolicy.Assets, err = modifyAssets(modifiedPolicy, inputPolicy)
 	if err != nil {
-		return models.Policy{}, err
+		return models.Policy{}, models.User{}, err
 	}
 
-	err = writePolicyToDb(modifiedPolicy)
-	if err != nil {
-		return models.Policy{}, err
-	}
-
-	err = writeUserToDB(modifiedUser)
-	if err != nil {
-		return models.Policy{}, err
-	}
-
-	return modifiedPolicy, err
+	return modifiedPolicy, modifiedUser, err
 }
 
 func checkEmailUniqueness(originalContractor, inputContractor models.Contractor) error {
@@ -206,11 +401,35 @@ func modifyAssets(modifiedPolicy models.Policy, inputPolicy models.Policy) ([]mo
 					return nil, err
 				}
 			}
+
+			if asset.Guarantees != nil {
+				modifiedAsset.Guarantees = modifyBeneficiaryInfo(inputPolicy.Assets[0].Guarantees, modifiedPolicy.Assets[0].Guarantees)
+			}
 		}
 
 		assets = append(assets, modifiedAsset)
 	}
 	return assets, nil
+}
+
+func modifyBeneficiaryInfo(inputGuarantees, originalGuarantees []models.Guarante) []models.Guarante {
+	var (
+		modifiedGuarantees = new([]models.Guarante)
+	)
+
+	log.Println("modifying beneficiary info...")
+	modifiedGuarantees = &originalGuarantees
+
+	for i, g := range inputGuarantees {
+		if g.BeneficiaryReference != nil {
+			(*modifiedGuarantees)[i].BeneficiaryReference = g.BeneficiaryReference
+		}
+		if g.Beneficiaries != nil {
+			(*modifiedGuarantees)[i].Beneficiaries = g.Beneficiaries
+		}
+	}
+
+	return *modifiedGuarantees
 }
 
 func modifyInsuredInfo(inputInsured, originalInsured models.User) (*models.User, error) {

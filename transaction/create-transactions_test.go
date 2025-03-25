@@ -83,7 +83,7 @@ func outputGenerator(numOutput int, startDate time.Time) []dateInfo {
 		effectiveDate := lib.AddMonths(startDate, i)
 		output = append(output, dateInfo{
 			ScheduleDate:   effectiveDate.Format(time.DateOnly),
-			ExpirationDate: lib.AddMonths(startDate, 18).Format(time.DateOnly),
+			ExpirationDate: lib.AddMonths(time.Now().UTC(), 18).Format(time.DateOnly),
 			EffectiveDate:  effectiveDate,
 		})
 	}
