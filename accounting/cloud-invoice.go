@@ -8,12 +8,13 @@ import (
 
 	fattureincloudapi "github.com/fattureincloud/fattureincloud-go-sdk/v2/api"
 	fattureincloud "github.com/fattureincloud/fattureincloud-go-sdk/v2/model"
+	oauth "github.com/fattureincloud/fattureincloud-go-sdk/v2/oauth2"
 )
 
-func (invoiceData *InvoiceInc) CreateInvoice(isPay bool,isProforma bool) {
+func (invoiceData *InvoiceInc) CreateInvoice(isPay bool, isProforma bool) {
 	var (
-		fcItems []fattureincloud.IssuedDocumentItemsListItem
-		status  fattureincloud.IssuedDocumentStatus
+		fcItems     []fattureincloud.IssuedDocumentItemsListItem
+		status      fattureincloud.IssuedDocumentStatus
 		Invoicetype fattureincloud.IssuedDocumentType
 	)
 	const (
@@ -29,10 +30,17 @@ func (invoiceData *InvoiceInc) CreateInvoice(isPay bool,isProforma bool) {
 	} else {
 		status = fattureincloud.IssuedDocumentStatuses.NOT_PAID
 	}
-	auth := context.WithValue(context.Background(), fattureincloudapi.ContextAccessToken, os.Getenv("FATTURE_INCLOUD_KEY"))
+	redirectUri := "http://localhost:3000/oauth"
+	auth := oauth.NewOAuth2AuthorizationCodeManager("EZVpwY4saebHSo293egZqSi3I5nyy1fK", os.Getenv("FATTURE_INCLOUD_KEY"), redirectUri)
+	scopes := []oauth.Scope{oauth.Scopes.SETTINGS_ALL, oauth.Scopes.ISSUED_DOCUMENTS_INVOICES_ALL}
+	url := auth.GetAuthorizationUrl(scopes, "state")
+	params, _ := auth.GetParamsFromUrl(url)
+
+	code := params.AuthorizationCode
+	//state := params.State
+	auth1 := context.WithValue(context.Background(), fattureincloudapi.ContextAccessToken, code)
 	configuration := fattureincloudapi.NewConfiguration()
 	apiClient := fattureincloudapi.NewAPIClient(configuration)
-
 	//set your company id
 	companyId := int32(11605)
 	for _, item := range invoiceData.Items {
@@ -85,7 +93,7 @@ func (invoiceData *InvoiceInc) CreateInvoice(isPay bool,isProforma bool) {
 
 	// Now we are all set for the final call
 	// Create the invoice: https://github.com/fattureincloud/fattureincloud-go-sdk/blob/master/docs/IssuedDocumentsApi.md#createIssuedDocument
-	resp, r, err := apiClient.IssuedDocumentsAPI.CreateIssuedDocument(auth, companyId).CreateIssuedDocumentRequest(createIssuedDocumentRequest).Execute()
+	resp, r, err := apiClient.IssuedDocumentsAPI.CreateIssuedDocument(auth1, companyId).CreateIssuedDocumentRequest(createIssuedDocumentRequest).Execute()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error when calling `IssuedDocumentsAPI.CreateIssuedDocument``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
