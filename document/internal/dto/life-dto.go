@@ -1,11 +1,11 @@
 package dto
 
 import (
-	"time"
-
+	"fmt"
 	"github.com/wopta/goworkspace/document/internal/constants"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"time"
 )
 
 var splitPayment map[string]string = map[string]string{
@@ -22,7 +22,7 @@ type LifeDTO struct {
 	ConsultancyValue consultancyDTO
 	ValidityDate     validityDateDTO
 	ProductorName    string
-	CodeCompany      string
+	ProposalNumber   string
 }
 
 type validityDateDTO struct {
@@ -34,7 +34,7 @@ type validityDateDTO struct {
 func formatDate(t time.Time) string {
 	location, _ := time.LoadLocation("Europe/Rome")
 	time := t.In(location)
-	return time.In(location).Format(constants.DayMonthYearFormat)
+	return time.In(location).Format(constants.DayMonthYearFormat) + " ore 24:00"
 }
 
 func getSplit(split string) string {
@@ -50,7 +50,7 @@ func NewLifeDto() LifeDTO {
 
 func (n *LifeDTO) FromPolicy(policy *models.Policy, network *models.NetworkNode) {
 	n.Channel = policy.Channel
-	n.CodeCompany = policy.CodeCompany
+	n.ProposalNumber = fmt.Sprint(policy.ProposalNumber)
 	(&n.Contractor).fromPolicy(policy.Contractor)
 
 	n.Prizes = priceDTO{

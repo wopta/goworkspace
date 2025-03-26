@@ -326,6 +326,7 @@ func (e *Fpdf) WriteTexts(tables ...domain.TableCell) {
 	for _, text := range tables {
 		e.RawWriteText(text)
 	}
+	e.NewLine(constants.CellHeight)
 }
 
 func (f *Fpdf) CrossRemainingSpace() {
