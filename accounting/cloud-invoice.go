@@ -102,10 +102,11 @@ func getClient() (*fattureincloudapi.APIClient, context.Context, int32) {
 	scopes := []oauth.Scope{oauth.Scopes.SETTINGS_ALL, oauth.Scopes.ISSUED_DOCUMENTS_INVOICES_ALL}
 	url := auth.GetAuthorizationUrl(scopes, "state")
 	log.Println("GetAuthorizationUrl: ", url)
-	params, _ := auth.GetParamsFromUrl(url)
-	code := params.AuthorizationCode
+	//params, _ := auth.GetParamsFromUrl(url)
+	//code := params.AuthorizationCode
 	//state := params.State
-	auth1 := context.WithValue(context.Background(), fattureincloudapi.ContextAccessToken, code)
+	log.Println("os.Getenv(FATTURE_INCLOUD_KEY): ", os.Getenv("FATTURE_INCLOUD_KEY"))
+	auth1 := context.WithValue(context.Background(), fattureincloudapi.ContextAccessToken, os.Getenv("FATTURE_INCLOUD_KEY"))
 	configuration := fattureincloudapi.NewConfiguration()
 	apiClient := fattureincloudapi.NewAPIClient(configuration)
 	// Retrieve the first company id
