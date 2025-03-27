@@ -1,8 +1,6 @@
 package dto
 
 import (
-	"bytes"
-	"fmt"
 	"time"
 
 	"github.com/wopta/goworkspace/document/internal/constants"
@@ -286,23 +284,49 @@ func (b *addendumBeneficiaries) fromPolicy(bens *[]models.Beneficiary, opt map[s
 		if i > 1 {
 			break
 		}
-		buf := new(bytes.Buffer)
-		for _, value := range opt {
-			_, _ = fmt.Fprintf(buf, "%s ", value)
-		}
+
+		// TODO: improve me - shouldnt be needed
 		ben := addendumBeneficiaryDTO{
-			Name:         v.Name,
-			Surname:      v.Surname,
-			FiscalCode:   v.FiscalCode,
-			StreetName:   v.Residence.StreetName,
-			StreetNumber: v.Residence.StreetNumber,
-			City:         v.Residence.City,
-			Province:     v.Residence.CityCode,
-			Phone:        v.Phone,
-			Mail:         v.Mail,
-			BirthDate:    (*b)[i].BirthDate,
-			Contactable:  v.IsContactable,
-			Relation:     "\n" + buf.String(),
+			Name:         constants.EmptyField,
+			Surname:      constants.EmptyField,
+			FiscalCode:   constants.EmptyField,
+			StreetName:   constants.EmptyField,
+			StreetNumber: constants.EmptyField,
+			City:         constants.EmptyField,
+			Province:     constants.EmptyField,
+			Mail:         constants.EmptyField,
+			Relation:     constants.EmptyField,
+			BirthDate:    constants.EmptyField,
+			Phone:        constants.EmptyField,
+		}
+		ben.Relation = " \n" + opt[v.BeneficiaryType]
+
+		if v.BeneficiaryType == models.BeneficiaryChosenBeneficiary {
+			if v.Name != "" {
+				ben.Name = v.Name
+			}
+			if v.Surname != "" {
+				ben.Surname = v.Surname
+			}
+			if v.FiscalCode != "" {
+				ben.FiscalCode = v.FiscalCode
+			}
+			if v.FiscalCode != "" {
+				ben.FiscalCode = v.FiscalCode
+			}
+			if v.Phone != "" {
+				ben.Phone = v.Phone
+			}
+			if v.Mail != "" {
+				ben.Mail = v.Mail
+			}
+			ben.Contactable = v.IsContactable
+			if v.Residence != nil {
+				ben.StreetName = v.Residence.StreetName
+				ben.StreetNumber = v.Residence.StreetNumber
+				ben.City = v.Residence.City
+				ben.Province = v.Residence.CityCode
+			}
 		}
 		(*b)[i] = ben
 	}
