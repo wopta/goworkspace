@@ -418,3 +418,20 @@ func ListLocalFolderContent(folderPath string) ([]string, error) {
 
 	return res, err
 }
+
+func PutToStorageErr(bucketname string, path string, file []byte) (string, error) {
+	const gsLinkFormat = "gs://%s/%s"
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	if err != nil {
+		return "", err
+	}
+	bucket := client.Bucket(bucketname)
+	write := bucket.Object(path).NewWriter(ctx)
+	write.Write(file)
+	if err = write.Close(); err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf(gsLinkFormat, bucketname, path), nil
+}
