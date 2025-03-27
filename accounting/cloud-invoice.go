@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 
 	fattureincloudapi "github.com/fattureincloud/fattureincloud-go-sdk/v2/api"
@@ -18,7 +19,7 @@ func (invoiceData *InvoiceInc) CreateInvoice(isPay bool, isProforma bool) {
 		Invoicetype fattureincloud.IssuedDocumentType
 	)
 	const (
-		layout = "2006-02-01"
+		layout = "2006-01-02"
 	)
 	if isProforma {
 		Invoicetype = fattureincloud.IssuedDocumentTypes.PROFORMA
@@ -30,19 +31,10 @@ func (invoiceData *InvoiceInc) CreateInvoice(isPay bool, isProforma bool) {
 	} else {
 		status = fattureincloud.IssuedDocumentStatuses.NOT_PAID
 	}
-	redirectUri := "http://localhost:3000/oauth"
-	auth := oauth.NewOAuth2AuthorizationCodeManager("EZVpwY4saebHSo293egZqSi3I5nyy1fK", os.Getenv("FATTURE_INCLOUD_KEY"), redirectUri)
-	scopes := []oauth.Scope{oauth.Scopes.SETTINGS_ALL, oauth.Scopes.ISSUED_DOCUMENTS_INVOICES_ALL}
-	url := auth.GetAuthorizationUrl(scopes, "state")
-	params, _ := auth.GetParamsFromUrl(url)
 
-	code := params.AuthorizationCode
-	//state := params.State
-	auth1 := context.WithValue(context.Background(), fattureincloudapi.ContextAccessToken, code)
-	configuration := fattureincloudapi.NewConfiguration()
-	apiClient := fattureincloudapi.NewAPIClient(configuration)
+	apiClient, auth,id := getClient()
 	//set your company id
-	companyId := int32(11605)
+	companyId := id
 	for _, item := range invoiceData.Items {
 		fcItems = append(fcItems, *fattureincloud.NewIssuedDocumentItemsListItem().
 			SetProductId(4).
@@ -90,13 +82,36 @@ func (invoiceData *InvoiceInc) CreateInvoice(isPay bool, isProforma bool) {
 
 	// Here we put our invoice in the request object
 	createIssuedDocumentRequest := *fattureincloud.NewCreateIssuedDocumentRequest().SetData(invoice)
-
+	apiClient.UserAPI.ListUserCompanies(auth)
 	// Now we are all set for the final call
 	// Create the invoice: https://github.com/fattureincloud/fattureincloud-go-sdk/blob/master/docs/IssuedDocumentsApi.md#createIssuedDocument
-	resp, r, err := apiClient.IssuedDocumentsAPI.CreateIssuedDocument(auth1, companyId).CreateIssuedDocumentRequest(createIssuedDocumentRequest).Execute()
+	resp, r, err := apiClient.IssuedDocumentsAPI.CreateIssuedDocument(auth, companyId).CreateIssuedDocumentRequest(createIssuedDocumentRequest).Execute()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error when calling `IssuedDocumentsAPI.CreateIssuedDocument``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	json.NewEncoder(os.Stdout).Encode(resp)
+}
+
+func getClient() (*fattureincloudapi.APIClient, context.Context,int32) {
+	redirectUri := "http://localhost:3000/oauth"
+	auth := oauth.NewOAuth2AuthorizationCodeManager("EZVpwY4saebHSo293egZqSi3I5nyy1fK", os.Getenv("FATTURE_INCLOUD_KEY"), redirectUri)
+	
+	scopes := []oauth.Scope{oauth.Scopes.SETTINGS_ALL, oauth.Scopes.ISSUED_DOCUMENTS_INVOICES_ALL}
+	url := auth.GetAuthorizationUrl(scopes, "state")
+	log.Println(url)
+	params, _ := auth.GetParamsFromUrl(url)
+
+	code := params.AuthorizationCode
+	//state := params.State
+	auth1 := context.WithValue(context.Background(), fattureincloudapi.ContextAccessToken, code)
+	configuration := fattureincloudapi.NewConfiguration()
+	apiClient := fattureincloudapi.NewAPIClient(configuration)
+	// Retrieve the first company id
+	userCompaniesResponse, _, err := apiClient.UserAPI.ListUserCompanies(auth1).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `UserAPI.ListUserCompanies``: %v\n", err)
+	}
+	firstCompanyId := userCompaniesResponse.GetData().Companies[0].GetId()
+	return fattureincloudapi.NewAPIClient(configuration), auth1,firstCompanyId
 }
