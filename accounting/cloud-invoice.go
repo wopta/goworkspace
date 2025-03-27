@@ -13,6 +13,7 @@ import (
 )
 
 func (invoiceData *InvoiceInc) CreateInvoice(isPay bool, isProforma bool) {
+	log.SetPrefix("CreateInvoice")
 	var (
 		fcItems     []fattureincloud.IssuedDocumentItemsListItem
 		status      fattureincloud.IssuedDocumentStatus
@@ -32,7 +33,7 @@ func (invoiceData *InvoiceInc) CreateInvoice(isPay bool, isProforma bool) {
 		status = fattureincloud.IssuedDocumentStatuses.NOT_PAID
 	}
 
-	apiClient, auth,id := getClient()
+	apiClient, auth, id := getClient()
 	//set your company id
 	companyId := id
 	for _, item := range invoiceData.Items {
@@ -93,15 +94,16 @@ func (invoiceData *InvoiceInc) CreateInvoice(isPay bool, isProforma bool) {
 	json.NewEncoder(os.Stdout).Encode(resp)
 }
 
-func getClient() (*fattureincloudapi.APIClient, context.Context,int32) {
+func getClient() (*fattureincloudapi.APIClient, context.Context, int32) {
+	log.SetPrefix("CreateInvoice getClient")
 	redirectUri := "http://localhost:3000/oauth"
 	auth := oauth.NewOAuth2AuthorizationCodeManager("EZVpwY4saebHSo293egZqSi3I5nyy1fK", os.Getenv("FATTURE_INCLOUD_KEY"), redirectUri)
-	
+	oauth.NewOAuth2AuthorizationCodeParams()
+
 	scopes := []oauth.Scope{oauth.Scopes.SETTINGS_ALL, oauth.Scopes.ISSUED_DOCUMENTS_INVOICES_ALL}
 	url := auth.GetAuthorizationUrl(scopes, "state")
-	log.Println(url)
+	log.Println("GetAuthorizationUrl: ", url)
 	params, _ := auth.GetParamsFromUrl(url)
-
 	code := params.AuthorizationCode
 	//state := params.State
 	auth1 := context.WithValue(context.Background(), fattureincloudapi.ContextAccessToken, code)
@@ -112,6 +114,8 @@ func getClient() (*fattureincloudapi.APIClient, context.Context,int32) {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error when calling `UserAPI.ListUserCompanies``: %v\n", err)
 	}
+
 	firstCompanyId := userCompaniesResponse.GetData().Companies[0].GetId()
-	return fattureincloudapi.NewAPIClient(configuration), auth1,firstCompanyId
+	log.Println("firstCompanyId: ", firstCompanyId)
+	return fattureincloudapi.NewAPIClient(configuration), auth1, firstCompanyId
 }
