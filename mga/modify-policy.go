@@ -137,18 +137,18 @@ func generateDiffPolicy(originalPolicy, inputPolicy models.Policy) (models.Polic
 			if guarantee.Beneficiary != nil {
 				if hasVaried := diffForUser(originalPolicy.Assets[idx].Guarantees[gIndex].Beneficiary, inputPolicy.Assets[idx].Guarantees[gIndex].Beneficiary); hasVaried {
 					hasPolicyVaried = true
-					modifiedGuarantee.Beneficiary = guarantee.Beneficiary
+					modifiedGuarantee = guarantee
 				}
 			}
 			if guarantee.BeneficiaryReference != nil {
 				if hasVaried := diffForUser(originalPolicy.Assets[idx].Guarantees[gIndex].BeneficiaryReference, inputPolicy.Assets[idx].Guarantees[gIndex].BeneficiaryReference); hasVaried {
 					hasPolicyVaried = true
-					modifiedGuarantee.BeneficiaryReference = guarantee.BeneficiaryReference
+					modifiedGuarantee = guarantee
 				}
 			}
 			if hasVaried := diffForBeneficiaries(originalPolicy.Assets[idx].Guarantees[gIndex].Beneficiaries, inputPolicy.Assets[idx].Guarantees[gIndex].Beneficiaries); hasVaried {
 				hasPolicyVaried = true
-				modifiedGuarantee.Beneficiaries = guarantee.Beneficiaries
+				modifiedGuarantee = guarantee
 			}
 			if !reflect.DeepEqual(models.Guarante{}, modifiedGuarantee) {
 				modifiedAsset.Guarantees = append(modifiedAsset.Guarantees, modifiedGuarantee)
