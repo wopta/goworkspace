@@ -98,7 +98,6 @@ func getClient() (*fattureincloudapi.APIClient, context.Context, int32) {
 	log.SetPrefix("CreateInvoice getClient")
 	redirectUri := "http://localhost:3000/oauth"
 	auth := oauth.NewOAuth2AuthorizationCodeManager("EZVpwY4saebHSo293egZqSi3I5nyy1fK", os.Getenv("FATTURE_INCLOUD_KEY"), redirectUri)
-	oauth.NewOAuth2AuthorizationCodeParams()
 
 	scopes := []oauth.Scope{oauth.Scopes.SETTINGS_ALL, oauth.Scopes.ISSUED_DOCUMENTS_INVOICES_ALL}
 	url := auth.GetAuthorizationUrl(scopes, "state")
