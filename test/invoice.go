@@ -1,6 +1,7 @@
 package test
 
 import (
+	"log"
 	"net/http"
 	"time"
 
@@ -8,6 +9,7 @@ import (
 )
 
 func createInvoice(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	log.Println("createInvoice")
 	inv := accounting.InvoiceInc{
 		Name:       "luca",
 		VatNumber:  "brblcu81h03f205q",
