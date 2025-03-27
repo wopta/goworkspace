@@ -97,7 +97,7 @@ func NewBeneficiariesDto() *AddendumBeneficiariesDTO {
 	}
 }
 
-func (b *AddendumBeneficiariesDTO) FromPolicy(policy models.Policy, product models.Product) {
+func (b *AddendumBeneficiariesDTO) FromPolicy(policy *models.Policy) {
 	b.Contract.fromPolicy(policy)
 	b.Contractor.fromPolicy(policy.Contractor)
 	for _, a := range policy.Assets {
@@ -197,7 +197,7 @@ func newBeneficiaryReferenceDTO() *addendumBeneficiaryReferenceDTO {
 	}
 }
 
-func (l *addendumContractDTO) fromPolicy(policy models.Policy) {
+func (l *addendumContractDTO) fromPolicy(policy *models.Policy) {
 	l.CodeHeading = "Variazione dati Anagrafici soggetti Polizza:"
 	l.Code = policy.CodeCompany
 

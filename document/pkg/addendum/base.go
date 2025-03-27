@@ -1,18 +1,13 @@
-package addedndum
+package addendum
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/wopta/goworkspace/document/internal/constants"
 	"github.com/wopta/goworkspace/document/internal/domain"
 	"github.com/wopta/goworkspace/document/internal/engine"
 	"github.com/wopta/goworkspace/models"
-)
-
-const (
-	tabDimension = 15
 )
 
 type baseGenerator struct {
@@ -22,12 +17,10 @@ type baseGenerator struct {
 	policy      *models.Policy
 }
 
-func (bg *baseGenerator) Save(rawDoc []byte) (string, error) {
-	userPathFormat := "assets/users/%s/"
-	path := fmt.Sprintf(userPathFormat, bg.policy.Contractor.Uid)
-	filename := strings.ReplaceAll(fmt.Sprintf(path+models.AddendumDocumentFormat, bg.policy.NameDesc, bg.policy.Uid,
-		bg.policy.ProposalNumber, time.Now().Format("2006-01-02_15:04:05")), " ", "_")
-	return bg.engine.Save(rawDoc, filename)
+func (bg *baseGenerator) Save(filename string, rawDoc []byte) (string, error) {
+	path := fmt.Sprintf("assets/users/%s/%s", bg.policy.Contractor.Uid, filename)
+
+	return bg.engine.Save(rawDoc, path)
 }
 
 func (bg *baseGenerator) woptaFooter() {

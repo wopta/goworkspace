@@ -1,4 +1,4 @@
-package addedndum
+package addendum
 
 import (
 	"time"
@@ -16,16 +16,14 @@ type LifeAddendumGenerator struct {
 	dto *dto.AddendumBeneficiariesDTO
 }
 
-func NewLifeAddendumGenerator(engine *engine.Fpdf, policy *models.Policy, node *models.NetworkNode,
-	product models.Product) *LifeAddendumGenerator {
+func NewLifeAddendumGenerator(engine *engine.Fpdf, policy *models.Policy) *LifeAddendumGenerator {
 	LifeAddendumDTO := dto.NewBeneficiariesDto()
-	LifeAddendumDTO.FromPolicy(*policy, product)
+	LifeAddendumDTO.FromPolicy(policy)
 	return &LifeAddendumGenerator{
 		baseGenerator: &baseGenerator{
-			engine:      engine,
-			now:         time.Now(),
-			networkNode: node,
-			policy:      policy,
+			engine: engine,
+			now:    time.Now(),
+			policy: policy,
 		},
 		dto: LifeAddendumDTO,
 	}
