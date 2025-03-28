@@ -216,12 +216,12 @@ func (el *LifeGenerator) addEmailSection() {
 func (el *LifeGenerator) addSignSection() {
 	el.engine.WriteTexts(
 		el.engine.GetTableCell("ATTENZIONE", constants.PinkColor, constants.BoldFontStyle),
-		el.engine.GetTableCell(" :Solo una volta firmati i documenti ed effettuato il pagamento, la copertura assicurativa sarà attiva e così ti invieremo i documenti contrattuali da te firmati, che poi potrai visualizzare nell’area riservata ai clienti della nostra app e/o sito.", constants.BlackColor),
+		el.engine.GetTableCell(": Solo una volta firmati i documenti ed effettuato il pagamento, la copertura assicurativa sarà attiva e così ti invieremo i documenti contrattuali da te firmati, che poi potrai visualizzare nell’area riservata ai clienti della nostra app e/o sito.", constants.BlackColor),
 	)
 }
 
 func (el *LifeGenerator) addPolicyInformationSection() {
-	if el.dtoLife.ConsultancyValue.Price == "€ 0,00"{
+	if el.dtoLife.ConsultancyValue.Price == 0{
 		return
 	}
 	el.engine.NewLine(constants.CellHeight)
