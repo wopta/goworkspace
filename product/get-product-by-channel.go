@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"regexp"
 	"sort"
 	"strings"
@@ -66,14 +67,22 @@ func getDefaultProduct(productName, channel string) *models.Product {
 	)
 
 	log.Println("[GetDefaultProduct] function start --------------")
+	var filesList []string
+	var err error
 
-	filesList, err := lib.ListGoogleStorageFolderContent(fmt.Sprintf("%s/%s/", models.ProductsFolder, productName))
+	if os.Getenv("env")=="local"{
+		filesList, err = lib.ListLocalFolderContent(fmt.Sprintf("%s/%s/", models.ProductsFolder, productName))
+	}else{
+		filesList,err=lib.ListGoogleStorageFolderContent(fmt.Sprintf("%s/%s/", models.ProductsFolder, productName))
+	}
+
 	if err != nil {
 		log.Printf("[GetProduct] error: %s", err.Error())
 		return nil
 	}
 
 	log.Println("[GetDefaultProduct] filtering file list by channel")
+	log.Print(channel)
 
 	filesList = lib.SliceFilter(filesList, func(filePath string) bool {
 		return strings.HasSuffix(filePath, fmt.Sprintf("%s.json", channel))
