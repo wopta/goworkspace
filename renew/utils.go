@@ -67,7 +67,15 @@ func getProductsFileList() []string {
 		log.Printf("error getting file list: %s", err.Error())
 	}
 
-	return fileList
+	checkedList := lib.SliceFilter(fileList, checkSlashes)
+
+	return checkedList
+}
+
+func checkSlashes(s string) bool {
+	// Correct path is: products/{{product_dir}}/{{version_number}}/{{filename.extension}}
+	// but this function supports further nesting
+	return strings.Count(s, "/") >= 3
 }
 
 func getProductsFromFileList(fileList []string) []models.Product {
