@@ -14,6 +14,7 @@ type Guarante struct {
 	OrderAsset                 int                        `firestore:"orderAsset,omitempty" json:"orderAsset,omitempty"  bigquery:"-"`
 	DependsOr                  []string                   `firestore:"dependsOr,omitempty" json:"dependsOr,omitempty"  bigquery:"-"`
 	Depends                    []string                   `firestore:"depends,omitempty" json:"depends,omitempty"  bigquery:"-"`
+	SyncrhozineFields				[]string 						`firestore:"syncrhozinefields,omitempty" json:"syncrhozinefields,omitempty"  bigquery:"-"`
 	Childrens                  []string                   `firestore:"childrens ,omitempty" json:"childrens,omitempty"  bigquery:"-"`
 	SelectedEsclude            []string                   `firestore:"selectedEsclude,omitempty" json:"selectedEsclude,omitempty"  bigquery:"-"`
 	LegalDefence               string                     `firestore:"legalDefence" json:"legalDefence,omitempty"  bigquery:"legalDefence"`
