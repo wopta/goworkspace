@@ -58,9 +58,11 @@ func (n *LifeDTO) FromPolicy(policy *models.Policy, network *models.NetworkNode)
 	}
 	n.Prizes.Gross.ValueFloat = policy.PriceGross
 	n.Prizes.Gross.Text = lib.HumanaizePriceEuro(policy.PriceGross)
-	n.ConsultancyValue.Price = policy.ConsultancyValue.Price
-	n.PriceAnnuity = lib.HumanaizePriceEuro(policy.PaymentComponents.PriceAnnuity.Total)
 
+	n.ConsultancyValue.Price = newNumeric()
+	n.ConsultancyValue.Price.FromValue(policy.ConsultancyValue.Price)
+
+	n.PriceAnnuity = lib.HumanaizePriceEuro(policy.PaymentComponents.PriceAnnuity.Total)
 	n.ValidityDate = validityDateDTO{
 		StartDate:          formatDate(policy.StartDate),
 		EndDate:            formatDate(policy.EndDate),

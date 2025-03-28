@@ -221,14 +221,14 @@ func (el *LifeGenerator) addSignSection() {
 }
 
 func (el *LifeGenerator) addPolicyInformationSection() {
-	if el.dtoLife.ConsultancyValue.Price == 0{
+	if el.dtoLife.ConsultancyValue.Price.ValueFloat == 0{
 		return
 	}
 	el.engine.NewLine(constants.CellHeight)
 	text :=
 	"Infine, ti ricordiamo la presente polizza prevede il pagamento dei seguenti costi:\n" +
 	fmt.Sprintf("- Premio di polizza: euro %v con frazionamento %v\n", el.dtoLife.Prizes.Gross.Text, el.dtoLife.Prizes.Split) +
-	fmt.Sprintf("- Dettaglio dei costi: euro %v corrisposti con il pagamento della prima rata di polizza. Il documento contabile è scaricabile dall’app o nella tua area riservata\n", el.dtoLife.ConsultancyValue.Price) +
+	fmt.Sprintf("- Dettaglio dei costi: euro %v corrisposti con il pagamento della prima rata di polizza. Il documento contabile è scaricabile dall’app o nella tua area riservata\n", el.dtoLife.ConsultancyValue.Price.Text) +
 	fmt.Sprintf("- Per un totale annuo di euro %v", el.dtoLife.PriceAnnuity)
 
 	el.engine.WriteText(el.engine.GetTableCell(text, constants.BlackColor))
