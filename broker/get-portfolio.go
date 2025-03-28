@@ -36,6 +36,8 @@ type policyInfo struct {
 	PaymentSplit   string         `json:"paymentSplit" bigquery:"paymentSplit"`
 	HasMandate     bool           `json:"hasMandate" bigquery:"hasMandate"`
 	ContractorType string         `json:"contractorType" bigquery:"contractorType"`
+	Consultancy		float64   		`json:"consultancy" bigquery:"consultancy"`
+	Total				float64   		`json:"total" bigquery:"total"`
 }
 
 func GetPortfolioFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
