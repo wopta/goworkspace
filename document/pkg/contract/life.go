@@ -221,8 +221,7 @@ func (el *LifeGenerator) addSignSection() {
 }
 
 func (el *LifeGenerator) addPolicyInformationSection() {
-
-	if el.dtoLife.ConsultancyValue.Price == "0" {
+	if el.dtoLife.ConsultancyValue.Price == "€ 0,00"{
 		return
 	}
 	el.engine.NewLine(constants.CellHeight)
