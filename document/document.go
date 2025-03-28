@@ -10,6 +10,11 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
+type DocumentResp struct {
+	LinkGcs        string `json:"linkGcs"`
+	Filename       string `json:"filename"`
+}
+
 var documentRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/v1/proposal",

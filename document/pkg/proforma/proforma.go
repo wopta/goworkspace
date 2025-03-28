@@ -2,7 +2,6 @@ package proforma
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/wopta/goworkspace/document/internal/constants"
@@ -14,18 +13,15 @@ import (
 )
 
 type baseGenerator struct {
-	engine      *engine.Fpdf
-	now         time.Time
-	networkNode *models.NetworkNode
-	policy      *models.Policy
+	engine *engine.Fpdf
+	now    time.Time
+	policy *models.Policy
 }
 
-func (bg *baseGenerator) Save(rawDoc []byte) (string, error) {
-	userPathFormat := "assets/users/%s/"
-	path := fmt.Sprintf(userPathFormat, bg.policy.Contractor.Uid)
-	filename := strings.ReplaceAll(fmt.Sprintf(path+models.ProformaDocumentFormat,
-		bg.policy.NameDesc, bg.policy.CodeCompany, bg.policy.Annuity, time.Now().Format(constants.DayMonthYearFormat)), " ", "_")
-	return bg.engine.Save(rawDoc, filename)
+func (bg *baseGenerator) Save(filename string, rawDoc []byte) (string, error) {
+	path := fmt.Sprintf("assets/users/%s/%s", bg.policy.Contractor.Uid, filename)
+
+	return bg.engine.Save(rawDoc, path)
 }
 
 type ProformaGenerator struct {
@@ -33,16 +29,14 @@ type ProformaGenerator struct {
 	dto *dto.ProformaDTO
 }
 
-func NewProformaGenerator(engine *engine.Fpdf, policy *models.Policy, node *models.NetworkNode,
-	product models.Product) *ProformaGenerator {
+func NewProformaGenerator(engine *engine.Fpdf, policy *models.Policy) *ProformaGenerator {
 	ProformaDTO := dto.NewProformaDTO()
-	ProformaDTO.FromPolicy(*policy, product)
+	ProformaDTO.FromPolicy(*policy)
 	return &ProformaGenerator{
 		baseGenerator: &baseGenerator{
-			engine:      engine,
-			now:         time.Now(),
-			networkNode: node,
-			policy:      policy,
+			engine: engine,
+			now:    time.Now(),
+			policy: policy,
 		},
 		dto: ProformaDTO,
 	}

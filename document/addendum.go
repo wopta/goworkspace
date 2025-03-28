@@ -20,12 +20,7 @@ var (
 	ErrNotImplemented = errors.New("addendum document not implemented for product")
 )
 
-type AddendumResponse struct {
-	LinkGcs  string `json:"linkGcs"`
-	Filename string `json:"fileName"`
-}
-
-func Addendum(policy *models.Policy) (AddendumResponse, error) {
+func Addendum(policy *models.Policy) (DocumentResp, error) {
 	var (
 		err      error
 		filename string
@@ -38,7 +33,7 @@ func Addendum(policy *models.Policy) (AddendumResponse, error) {
 		generator := addendum.NewLifeAddendumGenerator(engine.NewFpdf(), policy)
 		if out, err = generator.Generate(); err != nil {
 			log.Printf("error generating addendum: %v", err)
-			return AddendumResponse{}, err
+			return DocumentResp{}, err
 		}
 
 		filename = strings.ReplaceAll(fmt.Sprintf(addendumDocumentFormat, policy.NameDesc,
@@ -46,14 +41,14 @@ func Addendum(policy *models.Policy) (AddendumResponse, error) {
 
 		if gsLink, err = generator.Save(filename, out); err != nil {
 			log.Printf("error saving addendum: %v", err)
-			return AddendumResponse{}, err
+			return DocumentResp{}, err
 		}
 	default:
 		log.Printf("addendum not implemented for product %s", policy.Name)
-		return AddendumResponse{}, ErrNotImplemented
+		return DocumentResp{}, ErrNotImplemented
 	}
 
-	res := AddendumResponse{
+	res := DocumentResp{
 		LinkGcs:  gsLink,
 		Filename: filename,
 	}

@@ -58,7 +58,7 @@ func newProformaBodyDTO() *proformaBodyDTO {
 	}
 }
 
-func (pf *ProformaDTO) FromPolicy(policy models.Policy, product models.Product) {
+func (pf *ProformaDTO) FromPolicy(policy models.Policy) {
 	pf.Contractor.fromPolicy(policy.Contractor)
 	pf.Body.fromPolicy(policy.ConsultancyValue)
 }
