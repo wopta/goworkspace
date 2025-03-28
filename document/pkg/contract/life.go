@@ -216,20 +216,19 @@ func (el *LifeGenerator) addEmailSection() {
 func (el *LifeGenerator) addSignSection() {
 	el.engine.WriteTexts(
 		el.engine.GetTableCell("ATTENZIONE", constants.PinkColor, constants.BoldFontStyle),
-		el.engine.GetTableCell(" :Solo una volta firmati i documenti ed effettuato il pagamento, la copertura assicurativa sarà attiva e così ti invieremo i documenti contrattuali da te firmati, che poi potrai visualizzare nell’area riservata ai clienti della nostra app e/o sito.", constants.BlackColor),
+		el.engine.GetTableCell(": Solo una volta firmati i documenti ed effettuato il pagamento, la copertura assicurativa sarà attiva e così ti invieremo i documenti contrattuali da te firmati, che poi potrai visualizzare nell’area riservata ai clienti della nostra app e/o sito.", constants.BlackColor),
 	)
 }
 
 func (el *LifeGenerator) addPolicyInformationSection() {
-
-	if el.dtoLife.ConsultancyValue.Price == "0" {
+	if el.dtoLife.ConsultancyValue.Price.ValueFloat == 0{
 		return
 	}
 	el.engine.NewLine(constants.CellHeight)
 	text :=
 	"Infine, ti ricordiamo la presente polizza prevede il pagamento dei seguenti costi:\n" +
 	fmt.Sprintf("- Premio di polizza: euro %v con frazionamento %v\n", el.dtoLife.Prizes.Gross.Text, el.dtoLife.Prizes.Split) +
-	fmt.Sprintf("- Dettaglio dei costi: euro %v corrisposti con il pagamento della prima rata di polizza. Il documento contabile è scaricabile dall’app o nella tua area riservata\n", el.dtoLife.ConsultancyValue.Price) +
+	fmt.Sprintf("- Dettaglio dei costi: euro %v corrisposti con il pagamento della prima rata di polizza. Il documento contabile è scaricabile dall’app o nella tua area riservata\n", el.dtoLife.ConsultancyValue.Price.Text) +
 	fmt.Sprintf("- Per un totale annuo di euro %v", el.dtoLife.PriceAnnuity)
 
 	el.engine.WriteText(el.engine.GetTableCell(text, constants.BlackColor))

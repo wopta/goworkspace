@@ -15,20 +15,63 @@ var splitPayment map[string]string = map[string]string{
 }
 
 type LifeDTO struct {
-	Contractor       contractorDTO
+	Contractor       *contractorDTO
 	Channel          string
-	Prizes           priceDTO
+	Prizes           *priceDTO
 	PriceAnnuity     string
-	ConsultancyValue consultancyDTO
-	ValidityDate     validityDateDTO
+	ConsultancyValue *consultancyDTO
+	ValidityDate     *validityDateDTO
 	ProductorName    string
 	ProposalNumber   string
 }
 
-type validityDateDTO struct {
-	StartDate          string
-	EndDate            string
-	FirstAnnuityExpiry string
+func NewLifeDto() LifeDTO {
+	return LifeDTO{
+		Contractor:       newContractorDTO(),
+		Channel:          constants.EmptyField,
+		Prizes:           newPriceDTO(),
+		PriceAnnuity:     constants.EmptyField,
+		ConsultancyValue: newConsultacyDTO(),
+		ValidityDate:     newValidityDateDTO(),
+		ProductorName:    constants.EmptyField,
+		ProposalNumber:   constants.EmptyField,
+	}
+}
+
+
+func (n *LifeDTO) FromPolicy(policy *models.Policy, network *models.NetworkNode) {
+	n.Channel = policy.Channel
+	n.ProposalNumber = fmt.Sprint(policy.ProposalNumber)
+
+	n.Contractor.fromPolicy(policy.Contractor)
+
+	n.Prizes.Split=getSplit(policy.PaymentSplit)
+	n.Prizes.Gross.ValueFloat = policy.PriceGross
+	n.Prizes.Gross.Text = lib.HumanaizePriceEuro(policy.PriceGross)
+
+	n.ConsultancyValue.Price.FromValue(policy.ConsultancyValue.Price)
+
+	n.PriceAnnuity = lib.HumanaizePriceEuro(policy.PaymentComponents.PriceAnnuity.Total)
+	n.ValidityDate.fromPolicy(policy)
+
+	if policy.Channel == models.ECommerceChannel {
+		n.ProductorName = "Michele Lomazzi"
+	}
+	if policy.Channel == models.NetworkChannel {
+		n.ProductorName = network.GetName()
+	}
+}
+
+func (l *LifeDTO) GetAddressFirstPart() string {
+	return l.Contractor.StreetName + ", " + l.Contractor.StreetNumber
+}
+
+func (l *LifeDTO) GetAddressSecondPart() string {
+	return l.Contractor.PostalCode + " " + l.Contractor.City + " (" + l.Contractor.CityCode + ")"
+}
+
+func (l *LifeDTO) GetFullNameContractor() string {
+	return l.Contractor.Name + " " + l.Contractor.Surname
 }
 
 func formatDate(t time.Time) string {
@@ -42,45 +85,4 @@ func getSplit(split string) string {
 		return split
 	}
 	return ""
-}
-
-func NewLifeDto() LifeDTO {
-	return LifeDTO{}
-}
-
-func (n *LifeDTO) FromPolicy(policy *models.Policy, network *models.NetworkNode) {
-	n.Channel = policy.Channel
-	n.ProposalNumber = fmt.Sprint(policy.ProposalNumber)
-	(&n.Contractor).fromPolicy(policy.Contractor)
-
-	n.Prizes = priceDTO{
-		Split: getSplit(policy.PaymentSplit),
-	}
-	n.Prizes.Gross.ValueFloat = policy.PriceGross
-	n.Prizes.Gross.Text = lib.HumanaizePriceEuro(policy.PriceGross)
-	n.ConsultancyValue.Price = lib.HumanaizePriceEuro(policy.ConsultancyValue.Price)
-	n.PriceAnnuity = lib.HumanaizePriceEuro(policy.PaymentComponents.PriceAnnuity.Total)
-
-	n.ValidityDate = validityDateDTO{
-		StartDate:          formatDate(policy.StartDate),
-		EndDate:            formatDate(policy.EndDate),
-		FirstAnnuityExpiry: formatDate(policy.StartDate.AddDate(1, 0, 0)),
-	}
-
-	if policy.Channel == models.ECommerceChannel {
-		n.ProductorName = "Michele Lomazzi"
-	}
-	if policy.Channel == models.NetworkChannel {
-		n.ProductorName = network.GetName()
-	}
-}
-
-func (l *LifeDTO) GetAddressFirstPart() string {
-	return l.Contractor.StreetName + ", " + l.Contractor.StreetNumber
-}
-func (l *LifeDTO) GetAddressSecondPart() string {
-	return l.Contractor.PostalCode + " " + l.Contractor.City + " (" + l.Contractor.CityCode + ")"
-}
-func (l *LifeDTO) GetFullNameContractor() string {
-	return l.Contractor.Name + " " + l.Contractor.Surname
 }
