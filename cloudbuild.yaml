@@ -28,17 +28,17 @@ steps:
     # === RUN DEV =====================================================
     if [[ "${tag}" == *"dev"* ]]; then
        chmod +x ./deploy-dev.sh
-       ./deploy-dev.sh ${TAG_NAME} ${fx_name} ${fx_entrypoint}
+       ./deploy-dev.sh ${TAG_NAME} ${fx_name} ${fx_entrypoint} ${tag_version}
     fi
     # === RUN UAT =====================================================
     if [[ "${tag}" == *"uat"* ]]; then
        chmod +x ./deploy.sh
-       ./deploy.sh ${TAG_NAME} ${fx_name} ${fx_entrypoint}
+       ./deploy.sh ${TAG_NAME} ${fx_name} ${fx_entrypoint} ${tag_version}
     fi
     # === RUN PROD ENV VARS ====================================================
     if [[ "${tag}" == *"prod"* ]]; then
     chmod +x ./deploy.sh
-       ./deploy.sh ${TAG_NAME} ${fx_name} ${fx_entrypoint}
+       ./deploy.sh ${TAG_NAME} ${fx_name} ${fx_entrypoint} ${tag_version}
     fi
     
 - name: gcr.io/cloud-builders/gcloud:latest
