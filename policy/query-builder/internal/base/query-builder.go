@@ -166,8 +166,8 @@ func (qb *QueryBuilder) parseQuery() string {
 		"**tableAlias**.startDate, **tableAlias**.endDate, **tableAlias**.paymentSplit, " +
 		"COALESCE(**tableAlias**.hasMandate, false) AS hasMandate, COALESCE(JSON_VALUE(**tableAlias**.data, '$.contractor.type'), " +
 		"'') AS contractorType, " +
-		"**tableAlias**.consultancy AS consultancy," +
-		"**tableAlias**.total AS total " +
+		"**tableAlias**.consultancy," +
+		"**tableAlias**.total " +
 		"FROM `wopta.**tableName**` **tableAlias** " +
 		"LEFT JOIN `wopta.networkNodesView` nn ON nn.uid = **tableAlias**.producerUid " +
 		"WHERE "
