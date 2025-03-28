@@ -31,6 +31,12 @@ var sellableRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
+	{
+		Route:   "/v1/catnat",
+		Handler: lib.ResponseLoggerWrapper(CatnatFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
 }
 
 func init() {
