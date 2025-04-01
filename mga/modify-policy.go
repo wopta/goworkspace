@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mohae/deepcopy"
 	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -133,24 +134,38 @@ func generateDiffPolicy(originalPolicy, inputPolicy models.Policy) (models.Polic
 			}
 		}
 		for gIndex, guarantee := range asset.Guarantees {
-			var modifiedGuarantee models.Guarante
-			if guarantee.Beneficiary != nil {
-				if hasVaried := diffForUser(originalPolicy.Assets[idx].Guarantees[gIndex].Beneficiary, inputPolicy.Assets[idx].Guarantees[gIndex].Beneficiary); hasVaried {
-					hasPolicyVaried = true
-					modifiedGuarantee = guarantee
-				}
+			var (
+				modifiedGuarantee            models.Guarante
+				modifiedBeneficiary          *models.User
+				modifiedBeneficiaryReference *models.User
+				modifiedBeneficiaries        *[]models.Beneficiary
+			)
+			if hasVaried := diffForUser(originalPolicy.Assets[idx].Guarantees[gIndex].Beneficiary, inputPolicy.Assets[idx].Guarantees[gIndex].Beneficiary); hasVaried {
+				hasPolicyVaried = true
+				modifiedBeneficiary = guarantee.Beneficiary
 			}
-			if guarantee.BeneficiaryReference != nil {
-				if hasVaried := diffForUser(originalPolicy.Assets[idx].Guarantees[gIndex].BeneficiaryReference, inputPolicy.Assets[idx].Guarantees[gIndex].BeneficiaryReference); hasVaried {
-					hasPolicyVaried = true
-					modifiedGuarantee = guarantee
+			if hasVaried := diffForUser(originalPolicy.Assets[idx].Guarantees[gIndex].BeneficiaryReference, inputPolicy.Assets[idx].Guarantees[gIndex].BeneficiaryReference); hasVaried {
+				hasPolicyVaried = true
+				if guarantee.BeneficiaryReference == nil {
+					modifiedBeneficiaryReference = &models.User{}
+				} else {
+					modifiedBeneficiaryReference = guarantee.BeneficiaryReference
 				}
 			}
 			if hasVaried := diffForBeneficiaries(originalPolicy.Assets[idx].Guarantees[gIndex].Beneficiaries, inputPolicy.Assets[idx].Guarantees[gIndex].Beneficiaries); hasVaried {
 				hasPolicyVaried = true
-				modifiedGuarantee = guarantee
+				modifiedBeneficiaries = guarantee.Beneficiaries
 			}
+
+			modifiedGuarantee.Beneficiary = modifiedBeneficiary
+			modifiedGuarantee.BeneficiaryReference = modifiedBeneficiaryReference
+			modifiedGuarantee.Beneficiaries = modifiedBeneficiaries
+
 			if !reflect.DeepEqual(models.Guarante{}, modifiedGuarantee) {
+				modifiedGuarantee = guarantee
+				modifiedGuarantee.Beneficiary = modifiedBeneficiary
+				modifiedGuarantee.BeneficiaryReference = modifiedBeneficiaryReference
+				modifiedGuarantee.Beneficiaries = modifiedBeneficiaries
 				modifiedAsset.Guarantees = append(modifiedAsset.Guarantees, modifiedGuarantee)
 			}
 		}
@@ -173,6 +188,14 @@ func generateDiffPolicy(originalPolicy, inputPolicy models.Policy) (models.Polic
 }
 
 func diffForUser(orig, input *models.User) bool {
+	if orig == nil && input == nil {
+		return false
+	}
+
+	if (orig == nil && input != nil) || (orig != nil && input == nil) {
+		return true
+	}
+
 	if orig.FiscalCode != input.FiscalCode {
 		return true
 	}
@@ -211,7 +234,57 @@ func diffForBeneficiaries(orig, input *[]models.Beneficiary) bool {
 	if (orig == nil && input != nil) || (orig != nil && input == nil) {
 		return true
 	}
-	return reflect.DeepEqual(orig, input)
+	if len(*orig) != len(*input) {
+		return true
+	}
+
+	for idx := range *orig {
+		if hasChanged := diffForBeneficiary((*orig)[idx], (*input)[idx]); hasChanged {
+			return true
+		}
+	}
+
+	return false
+}
+
+func diffForBeneficiary(orig, input models.Beneficiary) bool {
+	if orig.Name != input.Name {
+		return true
+	}
+	if orig.Surname != input.Surname {
+		return true
+	}
+	if orig.Mail != input.Mail {
+		return true
+	}
+	if orig.Phone != input.Phone {
+		return true
+	}
+	if orig.FiscalCode != input.FiscalCode {
+		return true
+	}
+	if orig.VatCode != input.VatCode {
+		return true
+	}
+	if orig.Residence == nil || input.Residence == nil {
+		return orig.Residence != input.Residence
+	}
+	if orig.CompanyAddress == nil || input.CompanyAddress == nil {
+		return orig.CompanyAddress != input.CompanyAddress
+	}
+	if orig.IsFamilyMember != input.IsFamilyMember {
+		return true
+	}
+	if orig.IsContactable != input.IsContactable {
+		return true
+	}
+	if orig.IsLegitimateSuccessors != input.IsLegitimateSuccessors {
+		return true
+	}
+	if orig.BeneficiaryType != input.BeneficiaryType {
+		return true
+	}
+	return false
 }
 
 func modifyController(originalPolicy, inputPolicy models.Policy) (models.Policy, models.User, error) {
@@ -221,7 +294,7 @@ func modifyController(originalPolicy, inputPolicy models.Policy) (models.Policy,
 		modifiedUser   models.User
 	)
 
-	modifiedPolicy = originalPolicy
+	modifiedPolicy = deepcopy.Copy(originalPolicy).(models.Policy)
 
 	err = checkEmailUniqueness(originalPolicy.Contractor, inputPolicy.Contractor)
 	if err != nil {
@@ -349,12 +422,8 @@ func modifyBeneficiaryInfo(inputGuarantees, originalGuarantees []models.Guarante
 	modifiedGuarantees = &originalGuarantees
 
 	for i, g := range inputGuarantees {
-		if g.BeneficiaryReference != nil {
-			(*modifiedGuarantees)[i].BeneficiaryReference = g.BeneficiaryReference
-		}
-		if g.Beneficiaries != nil {
-			(*modifiedGuarantees)[i].Beneficiaries = g.Beneficiaries
-		}
+		(*modifiedGuarantees)[i].BeneficiaryReference = g.BeneficiaryReference
+		(*modifiedGuarantees)[i].Beneficiaries = g.Beneficiaries
 	}
 
 	return *modifiedGuarantees

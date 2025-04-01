@@ -91,7 +91,7 @@ func NewBeneficiariesDto() *AddendumBeneficiariesDTO {
 		Contractor:           newLifeContractorDTO(),
 		Insured:              newLifeInsuredDTO(),
 		Beneficiaries:        newLifeBeneficiariesDTO(),
-		BeneficiaryReference: newBeneficiaryReferenceDTO(),
+		BeneficiaryReference: &addendumBeneficiaryReferenceDTO{},
 	}
 }
 
@@ -333,23 +333,22 @@ func (b *addendumBeneficiaries) fromPolicy(bens *[]models.Beneficiary, opt map[s
 }
 
 func (br *addendumBeneficiaryReferenceDTO) fromPolicy(benRef *models.User) {
-	if benRef != nil {
-		if benRef.FiscalCode != "" {
-			br.Name = benRef.Name
-			br.Surname = benRef.Surname
-			br.FiscalCode = benRef.FiscalCode
-		}
-		if benRef.Residence != nil {
-			br.StreetName = benRef.Residence.StreetName
-			br.StreetNumber = benRef.Residence.StreetNumber
-			br.City = benRef.Residence.City
-			br.Province = benRef.Residence.CityCode
-		}
-		if benRef.Mail != "" {
-			br.Mail = benRef.Mail
-		}
-		if benRef.Phone != "" {
-			br.Phone = benRef.Phone
-		}
+	*br = *newBeneficiaryReferenceDTO()
+	if benRef.FiscalCode != "" {
+		br.Name = benRef.Name
+		br.Surname = benRef.Surname
+		br.FiscalCode = benRef.FiscalCode
+	}
+	if benRef.Residence != nil {
+		br.StreetName = benRef.Residence.StreetName
+		br.StreetNumber = benRef.Residence.StreetNumber
+		br.City = benRef.Residence.City
+		br.Province = benRef.Residence.CityCode
+	}
+	if benRef.Mail != "" {
+		br.Mail = benRef.Mail
+	}
+	if benRef.Phone != "" {
+		br.Phone = benRef.Phone
 	}
 }
