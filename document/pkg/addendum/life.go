@@ -757,6 +757,15 @@ func (lag *LifeAddendumGenerator) beneficiaryReference() {
 			{"Mail ", brDTO.Mail, "Telefono: ", brDTO.Phone},
 		}
 	} else {
+		checked = "X"
+		rows = [][]string{
+			{"Cognome e Nome ", constants.EmptyField, "Cod. Fisc: ", constants.EmptyField},
+			{"Residente in ", constants.EmptyField, "Data nascita: ", constants.EmptyField},
+			{"Mail ", constants.EmptyField, "Telefono: ", constants.EmptyField},
+		}
+	}
+	if brDTO.Name == "" {
+		checked = " "
 		rows = [][]string{
 			{"Cognome e Nome ", " ", "Cod. Fisc: ", " "},
 			{"Residente in ", " ", "Data nascita: ", " "},
