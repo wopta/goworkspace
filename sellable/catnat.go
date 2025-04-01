@@ -12,6 +12,11 @@ import (
 	"github.com/wopta/goworkspace/product"
 )
 
+type SellableOutput struct {
+	Msg     string
+	Product *models.Product
+}
+
 func CatnatFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		policy *models.Policy
@@ -43,17 +48,13 @@ func CatnatFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	if networkNode != nil {
 		warrant = networkNode.GetWarrant()
 	}
+
 	if pr, err := Catnat(policy, policy.Channel, networkNode, warrant); err == nil {
 		js, err := pr.Marshal()
 		return string(js), err, nil
 	}
 
 	return "", nil, fmt.Errorf("policy not sellable by: %v", err)
-}
-
-type SellableOutput struct {
-	Msg     string
-	Product *models.Product
 }
 
 func Catnat(p *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant) (*models.Product, error) {
@@ -72,33 +73,52 @@ func Catnat(p *models.Policy, channel string, networkNode *models.NetworkNode, w
 
 	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, out, in, nil)
 	out = ruleOutput.(*SellableOutput)
-
-	if out.Msg == "" {
-		return out.Product, nil
-	}
-
-	return out.Product, fmt.Errorf(out.Msg)
+	log.Println(out.Msg)
+	return out.Product, nil
 }
 
 func getCatnatInputRules(p *models.Policy) ([]byte, error) {
 	var res []byte
 	out := make(map[string]any)
 	locationlen := 0
-	out["isEarthQuakeSelected"]=false
-	out["isFloodSelected"]=false
-	out["isSlideLandsSelected"]=false
+	out["isEarthQuakeSelected"] = false
+	out["isFloodSelected"] = false
+	out["isLandSlidesSelected"] = false
+	out["fabricato"] = 0
+	out["contenuto"] = 0
+	out["merci"] = 0
 
-	if g,err:=p.ExtractGuarantee("earthquake");err==nil{
-		log.Println( "jfdsklfjds")
-		out["isEarthQuakeSelected"]=g.IsSelected
-	}else{
-		log.Println(err)
+	setConfSetting := func(conf *models.GuaranteConfig) {
+		if conf == nil {
+			return
+		}
+		//both fabricato e contenuto == true or either fabricato or contenuto
+		if val := conf.SumInsuredTextField; val != nil && len(val.Values) >= 1 && val.Values[0] > 0 {
+			out["fabricato"] = conf.SumInsuredTextField.Values[0]
+		}
+		if val := conf.SumInsuredLimitOfIndemnityTextField; val != nil && len(val.Values) >= 1 && val.Values[0] > 0 {
+			out["contenuto"] = conf.SumInsuredLimitOfIndemnityTextField.Values[0]
+		}
+		if val := conf.LimitOfIndemnityTextField; val != nil && len(val.Values) >= 1 && val.Values[0] > 0 {
+			out["merci"] = conf.LimitOfIndemnityTextField.Values[0]
+		}
 	}
-	if g,err:=p.ExtractGuarantee("flood");err==nil{
-		out["isFloodSelected"]=g.IsSelected
+	if val, ok := p.QuoteQuestions["isEarthQuakeSelected"]; ok {
+		out["isEarthQuakeSelected"] = val
 	}
-	if g,err:=p.ExtractGuarantee("slidelands");err==nil{
-		out["isSlideLandsSelected"]=g.IsSelected
+	if val, ok := p.QuoteQuestions["isFloodSelected"]; ok {
+		out["isFloodSelected"] = val
+	}
+
+	if g, err := p.ExtractGuarantee("earthquake"); err == nil {
+		setConfSetting(g.Config)
+	}
+	if g, err := p.ExtractGuarantee("flood"); err == nil {
+		setConfSetting(g.Config)
+	}
+	if g, err := p.ExtractGuarantee("landslides"); err == nil {
+		setConfSetting(g.Config)
+		out["isLandSlidesSelected"] = g.IsSelected
 	}
 	for _, a := range p.Assets {
 		if a.Type == models.AssetTypeBuilding {
