@@ -38,6 +38,12 @@ var testRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
 	},
+	{
+		Route:   "/log",
+		Handler: lib.ResponseLoggerWrapper(logFx),
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleAll},
+	},
 }
 
 func init() {
