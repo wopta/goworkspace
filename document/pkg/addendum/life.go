@@ -167,7 +167,7 @@ func (lag *LifeAddendumGenerator) declarations() {
 	lag.engine.WriteText(domain.TableCell{
 		Text: "Come da richiesta sono state trasmesse all’assicuratore " +
 			"AXA France Vie S.A. - Rappresentanza Generale per l’Italia le " +
-			"seguenti variazioni Anagrafiche di Polizza:",
+			"seguenti variazioni alla polizza sopra meglio evidenziata",
 		Height: constants.CellHeight,
 		Width:  constants.FullPageWidth,
 	})

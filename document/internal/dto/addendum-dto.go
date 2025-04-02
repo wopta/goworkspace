@@ -1,6 +1,7 @@
 package dto
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/wopta/goworkspace/document/internal/constants"
@@ -199,6 +200,11 @@ func newBeneficiaryReferenceDTO() *addendumBeneficiaryReferenceDTO {
 func (l *addendumContractDTO) fromPolicy(policy *models.Policy, now time.Time) {
 	l.CodeHeading = "Variazione dati Anagrafici soggetti Polizza:"
 	l.Code = policy.CodeCompany
+	if !policy.CompanyEmit {
+		l.CodeHeading = "Variazione dati Anagrafici soggetti Proposta:"
+		l.Code = fmt.Sprintf("%d", policy.ProposalNumber)
+	}
+
 	location, _ := time.LoadLocation("Europe/Rome")
 	l.IssueDate = "Milano, il " + now.In(location).Format(constants.DayMonthYearFormat)
 
