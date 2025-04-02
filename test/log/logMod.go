@@ -52,7 +52,7 @@ func NewLog() *LoggerWopta {
 	var parser ParserMessage = parserMessageGoogleCloud
 	// Create a logger to print structured logs formatted as a single line Json to stdout
 	if os.Getenv("env") == "local" {
-		//	parser = parserMessageLocal
+		parser = parserMessageLocal
 	}
 	return &LoggerWopta{
 		prefix:        []string{},
