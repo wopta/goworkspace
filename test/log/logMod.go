@@ -25,7 +25,7 @@ const (
 	EMERGENCY = "EMERGENCY"
 )
 
-type ParserMessage func(string, severityType, []string) (string, error)
+type ParserMessage func(string, severityType, []string) ([]byte, error)
 
 func formatDate(t time.Time) string {
 	location, _ := time.LoadLocation("Europe/Rome")
@@ -50,8 +50,9 @@ type LoggerWopta struct {
 
 func NewLog() *LoggerWopta {
 	var parser ParserMessage = parserMessageGoogleCloud
+	// Create a logger to print structured logs formatted as a single line Json to stdout
 	if os.Getenv("env") == "local" {
-		parser = parserMessageLocal
+		//	parser = parserMessageLocal
 	}
 	return &LoggerWopta{
 		prefix:        []string{},
@@ -77,7 +78,8 @@ func (l *LoggerWopta) customLog(message string, severuty severityType) {
 	if err != nil {
 		return
 	}
-	l.writer.Write([]byte(str))
+	l.writer.Write(str)
+
 }
 
 func (l *LoggerWopta) Warning(message string) {
@@ -88,17 +90,17 @@ func (l *LoggerWopta) Error(message string) {
 	l.customLog(message, ERROR)
 }
 
-func parserMessageLocal(message string, severity severityType, prefix []string) (string, error) {
+func parserMessageLocal(message string, severity severityType, prefix []string) ([]byte, error) {
 	conPrefix := strings.Join(prefix, "|")
 	if slices.Contains([]severityType{ERROR}, severity) {
 		message = "\x1b[49;31m" + message + "\x1b[39;49m"
 	} else if slices.Contains([]severityType{WARNING}, severity) {
 		message = "\x1b[49;33m" + message + "\x1b[39;49m"
 	}
-	return fmt.Sprintf("%v \x1b[;32m [ %v ] \x1b[39;49m %v \n", formatDate(time.Now()), conPrefix, message), nil
+	return fmt.Appendf(nil, "%v \x1b[;32m [ %v ] \x1b[39;49m %v \n", formatDate(time.Now()), conPrefix, message), nil
 }
 
-func parserMessageGoogleCloud(message string, severity severityType, prefix []string) (string, error) {
+func parserMessageGoogleCloud(message string, severity severityType, prefix []string) ([]byte, error) {
 	conPrefix := strings.Join(prefix, "|")
 	entry := struct {
 		Message  string `json:"message"`
@@ -109,7 +111,7 @@ func parserMessageGoogleCloud(message string, severity severityType, prefix []st
 	}
 	out, err := json.Marshal(entry)
 	if err != nil {
-		return "", err
+		return []byte{}, err
 	}
-	return string(out), nil
+	return append(out, '\n'), nil
 }
