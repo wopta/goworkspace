@@ -13,6 +13,7 @@ type addendumContractDTO struct {
 	StartDate   string
 	EndDate     string
 	Producer    string
+	IssueDate   string
 }
 type addendumContractorDTO struct {
 	Name            string
@@ -95,8 +96,8 @@ func NewBeneficiariesDto() *AddendumBeneficiariesDTO {
 	}
 }
 
-func (b *AddendumBeneficiariesDTO) FromPolicy(policy *models.Policy) {
-	b.Contract.fromPolicy(policy)
+func (b *AddendumBeneficiariesDTO) FromPolicy(policy *models.Policy, now time.Time) {
+	b.Contract.fromPolicy(policy, now)
 	b.Contractor.fromPolicy(policy.Contractor)
 	for _, a := range policy.Assets {
 		if a.Person != nil {
@@ -195,9 +196,11 @@ func newBeneficiaryReferenceDTO() *addendumBeneficiaryReferenceDTO {
 	}
 }
 
-func (l *addendumContractDTO) fromPolicy(policy *models.Policy) {
+func (l *addendumContractDTO) fromPolicy(policy *models.Policy, now time.Time) {
 	l.CodeHeading = "Variazione dati Anagrafici soggetti Polizza:"
 	l.Code = policy.CodeCompany
+	location, _ := time.LoadLocation("Europe/Rome")
+	l.IssueDate = "Milano, il " + now.In(location).Format(constants.DayMonthYearFormat)
 
 	if !policy.StartDate.IsZero() {
 		l.StartDate = policy.StartDate.Format(constants.DayMonthYearFormat)
@@ -208,7 +211,6 @@ func (l *addendumContractDTO) fromPolicy(policy *models.Policy) {
 	}
 
 	l.Producer = policy.Company
-
 }
 
 func parseBirthDate(dateString string) string {
@@ -295,7 +297,7 @@ func (b *addendumBeneficiaries) fromPolicy(bens *[]models.Beneficiary, opt map[s
 			City:         constants.EmptyField,
 			Province:     constants.EmptyField,
 			Mail:         constants.EmptyField,
-			Relation:     constants.EmptyField,
+			Relation:     " \n" + constants.EmptyField,
 			BirthDate:    constants.EmptyField,
 			Phone:        constants.EmptyField,
 		}

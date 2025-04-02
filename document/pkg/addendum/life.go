@@ -17,12 +17,13 @@ type LifeAddendumGenerator struct {
 }
 
 func NewLifeAddendumGenerator(engine *engine.Fpdf, policy *models.Policy) *LifeAddendumGenerator {
+	now := time.Now()
 	LifeAddendumDTO := dto.NewBeneficiariesDto()
-	LifeAddendumDTO.FromPolicy(policy)
+	LifeAddendumDTO.FromPolicy(policy, now)
 	return &LifeAddendumGenerator{
 		baseGenerator: &baseGenerator{
 			engine: engine,
-			now:    time.Now(),
+			now:    now,
 			policy: policy,
 		},
 		dto: LifeAddendumDTO,
@@ -57,6 +58,8 @@ func (lag *LifeAddendumGenerator) Generate() ([]byte, error) {
 	lag.beneficiaryReference()
 
 	lag.engine.NewLine(6)
+
+	lag.contractorSignature()
 
 	lag.woptaFooter()
 
@@ -152,33 +155,32 @@ func (lag *LifeAddendumGenerator) contract() {
 }
 
 func (lag *LifeAddendumGenerator) declarations() {
-	first := domain.TableCell{
-		Text:      "Dichiarazione di Variazione dati anagrafici Contraente-Assicurato-Beneficiario",
-		Height:    3.5,
-		Width:     190,
+	lag.engine.WriteText(domain.TableCell{
+		Text: "Dichiarazione di Variazione dati Anagrafici Contraente-" +
+			"Assicurato-Beneficiario-Referente Terzo",
+		Height:    constants.CellHeight,
+		Width:     constants.FullPageWidth,
 		FontStyle: constants.BoldFontStyle,
 		FontColor: constants.PinkColor,
-		FontSize:  constants.RegularFontSize,
-		Fill:      false,
-		FillColor: domain.Color{},
-		Align:     constants.LeftAlign,
-		Border:    "",
-	}
-	second := domain.TableCell{
-		Text:      "Come da richiesta sono state trasmesse all’assicuratore AXA France Vie S.A. – Rappresentanza Generale per l’Italia le seguenti variazioni Anagrafiche di Polizza:",
-		Height:    3.5,
-		Width:     190,
-		FontStyle: constants.RegularFontStyle,
-		FontColor: constants.BlackColor,
-		FontSize:  constants.RegularFontSize,
-		Fill:      false,
-		FillColor: domain.Color{},
-		Align:     constants.LeftAlign,
-		Border:    "",
-	}
-	lag.engine.WriteText(first)
+	})
 	lag.engine.NewLine(3)
-	lag.engine.WriteText(second)
+	lag.engine.WriteText(domain.TableCell{
+		Text: "Come da richiesta sono state trasmesse all’assicuratore " +
+			"AXA France Vie S.A. - Rappresentanza Generale per l’Italia le " +
+			"seguenti variazioni Anagrafiche di Polizza:",
+		Height: constants.CellHeight,
+		Width:  constants.FullPageWidth,
+	})
+	lag.engine.NewLine(1)
+	lag.engine.WriteText(domain.TableCell{
+		Text: "Le modifiche non sono attive in assenza di firma da parte del " +
+			"Contraente, con allegata copia documento di riconoscimento " +
+			"(carta identità, passaporto, patente, in corso di validità alla " +
+			"data della firma).",
+		Height:    constants.CellHeight,
+		Width:     constants.FullPageWidth,
+		FontStyle: constants.BoldFontStyle,
+	})
 }
 
 func (lag *LifeAddendumGenerator) contractor() {
@@ -697,19 +699,17 @@ func (lag *LifeAddendumGenerator) beneficiaries() {
 				{"Cognome e Nome ", (*bDTO)[i].Surname + " " + (*bDTO)[i].Name, "Cod. Fisc: ", (*bDTO)[i].FiscalCode},
 				{"Residente in ", (*bDTO)[i].StreetName + " " + (*bDTO)[i].StreetNumber + " " + (*bDTO)[i].City + " (" + (*bDTO)[i].Province + ")", "Data nascita: ", (*bDTO)[i].BirthDate},
 				{"Mail ", (*bDTO)[i].Mail, "Telefono ", (*bDTO)[i].Phone},
+				{"Relazione con Assicurato ", (*bDTO)[i].Relation, "Quota indennizzo", " "},
 			}
-			relTxt = [][]string{
-				{"Relazione con Assicurato ", (*bDTO)[i].Relation},
-			}
+			relTxt = [][]string{}
 		} else {
 			rows = [][]string{
 				{"Cognome e Nome ", " ", "Cod. Fisc: ", " "},
 				{"Residente in ", " ", "Data nascita: ", " "},
 				{"Mail ", " ", "Telefono ", " "},
+				{"Relazione con Assicurato ", " ", "Quota indennizzo", " "},
 			}
-			relTxt = [][]string{
-				{"Relazione con Assicurato ", " "},
-			}
+			relTxt = [][]string{}
 		}
 
 		table := parser(rows)
@@ -872,5 +872,38 @@ func (lag *LifeAddendumGenerator) beneficiaryReference() {
 	lag.engine.NewLine(2)
 	lag.engine.DrawLine(10, lag.engine.GetY(), 200, lag.engine.GetY(), 0.25, constants.BlackColor)
 	lag.engine.NewLine(2)
+	lag.engine.DrawTable(table)
+}
+
+func (lag *LifeAddendumGenerator) contractorSignature() {
+	var (
+		cellHeight   = 5
+		colWidth     = float64(50)
+		spacingWidth = constants.FullPageWidth - (2 * colWidth)
+	)
+	row := []domain.TableCell{
+		{
+			Text:   lag.dto.Contract.IssueDate,
+			Height: float64(cellHeight),
+			Width:  colWidth,
+		},
+		{
+			Text:   " ",
+			Height: float64(cellHeight),
+			Width:  spacingWidth,
+		},
+		{
+			Text:   "Firma Contraente",
+			Height: float64(cellHeight),
+			Width:  colWidth,
+			Align:  constants.CenterAlign,
+			Border: constants.BorderTop,
+		},
+	}
+	table := make([][]domain.TableCell, 0, 1)
+	table = append(table, row)
+
+	lag.engine.SetY(-40)
+
 	lag.engine.DrawTable(table)
 }
