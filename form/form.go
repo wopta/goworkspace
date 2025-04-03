@@ -1,7 +1,7 @@
 package form
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
@@ -35,7 +35,6 @@ func init() {
 }
 
 func Form(w http.ResponseWriter, r *http.Request) {
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
 	router := lib.GetRouter("form", formRoutes)
 	router.ServeHTTP(w, r)

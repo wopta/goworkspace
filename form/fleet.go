@@ -3,7 +3,7 @@ package form
 import (
 	"context"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 	"strconv"
@@ -17,7 +17,7 @@ import (
 	//"google.golang.org/api/firebaseappcheck/v1"
 )
 
-func AxaFleet(w http.ResponseWriter, r *http.Request,spreadsheetSource string , spreadsheetArch string) ( [][]interface{}, bool, error) {
+func AxaFleet(w http.ResponseWriter, r *http.Request, spreadsheetSource string, spreadsheetArch string) ([][]interface{}, bool, error) {
 	log.Println("AxaFleetEmit")
 	log.Println(os.Getenv("env"))
 	var (
@@ -97,15 +97,15 @@ func AxaFleet(w http.ResponseWriter, r *http.Request,spreadsheetSource string , 
 					DATAIMMATRICOLAZIONE = row[4].(string)
 					TARGA = row[2].(string)
 					MODELLO = row[3].(string)
-					now:=time.Now()
-					DATAFINECOPERTURA = "31/12/"+strconv.Itoa(now.Year())
+					now := time.Now()
+					DATAFINECOPERTURA = "31/12/" + strconv.Itoa(now.Year())
 					sequence++
 
 				} else {
 					for x, axarow := range axa.Values {
 						// var t string
 						if strings.ToUpper(axarow[13].(string)) == strings.ToUpper(row[7].(string)) {
-							fmt.Println("axarow[13] == row[2]: ",x)
+							fmt.Println("axarow[13] == row[2]: ", x)
 							progressiveFormattedpre = axarow[4].(string)
 							founded = true
 							DATAVALIDITACOPERTURA = axarow[20].(string)
@@ -157,7 +157,6 @@ func AxaFleet(w http.ResponseWriter, r *http.Request,spreadsheetSource string , 
 
 		}
 	}
-	
 
 	return excel, toEmit, e
 
