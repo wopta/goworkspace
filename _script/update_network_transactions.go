@@ -9,6 +9,7 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
@@ -25,7 +26,8 @@ func UpdateCompanyNetworkTransactions() {
 		origin          = ""
 		modifiedCounter = make([]string, 0)
 	)
-
+	log.AddPrefix("UpdateNetworkTransactions")
+	defer log.PopPrefix()
 	// get all network transactions of RemittanceCompany
 	query := fmt.Sprintf(
 		"SELECT * FROM `%s.%s` WHERE paymentType = '%s'",
@@ -35,17 +37,17 @@ func UpdateCompanyNetworkTransactions() {
 	)
 	netTransactions, err = lib.QueryRowsBigQuery[models.NetworkTransaction](query)
 	if err != nil {
-		fmt.Printf("[UpdateNetworkTransactions] error getting network transactions: %s", err.Error())
+		fmt.Printf("error getting network transactions: %s", err.Error())
 		return
 	}
-	fmt.Printf("[UpdateNetworkTransactions] found %d netTransactions\n", len(netTransactions))
+	fmt.Printf("found %d netTransactions\n", len(netTransactions))
 	// loop nt
 	for _, nt := range netTransactions {
 		// for each nt get its parent transaction (t)
 		transaction = tr.GetTransactionByUid(nt.TransactionUid, origin)
 		// update the nt.Amount and nt.AmountNet with t.Amount - nt.Amount
 		if transaction == nil {
-			fmt.Printf("[UpdateNetworkTransactions] error getting transaction '%s': %s", nt.TransactionUid, err.Error())
+			fmt.Printf("error getting transaction '%s': %s", nt.TransactionUid, err.Error())
 			return
 		}
 
@@ -54,7 +56,7 @@ func UpdateCompanyNetworkTransactions() {
 		commissionMga := product.GetCommissionByProduct(&policy, mgaProduct, false)
 
 		if commissionMga != nt.Amount {
-			fmt.Printf("[UpdateNetworkTransactions] netTransaction '%s' with amount '%f' already modified\n", nt.Uid, nt.Amount)
+			fmt.Printf("netTransaction '%s' with amount '%f' already modified\n", nt.Uid, nt.Amount)
 			continue
 		}
 
@@ -66,15 +68,15 @@ func UpdateCompanyNetworkTransactions() {
 		// TODO: remember to manually allow for the modification of amount and amountNet fields
 		err = nt.SaveBigQuery()
 		if err != nil {
-			fmt.Printf("[UpdateNetworkTransactions] error updating network transaction '%s': %s\n", nt.Uid, err.Error())
+			fmt.Printf("error updating network transaction '%s': %s\n", nt.Uid, err.Error())
 			break
 		}
 
 		modifiedCounter = append(modifiedCounter, nt.Uid)
-		fmt.Printf("[UpdateNetworkTransactions] netTransaction '%s' original amount '%f' modified amount '%f'\n", nt.Uid, originalAmount, nt.Amount)
+		fmt.Printf("netTransaction '%s' original amount '%f' modified amount '%f'\n", nt.Uid, originalAmount, nt.Amount)
 	}
-	fmt.Printf("[UpdateNetworkTransactions] modified %d network transactions %s\n", len(modifiedCounter), modifiedCounter)
-	fmt.Println("[UpdateNetworkTransactions] script done")
+	fmt.Printf("modified %d network transactions %s\n", len(modifiedCounter), modifiedCounter)
+	fmt.Println("script done")
 }
 
 func UpdateAreaManagerName() {
@@ -93,10 +95,10 @@ func UpdateAreaManagerName() {
 	)
 	netTransactions, err = lib.QueryRowsBigQuery[models.NetworkTransaction](query)
 	if err != nil {
-		fmt.Printf("[UpdateAreaManagerName] error getting network transactions: %s", err.Error())
+		fmt.Printf("error getting network transactions: %s", err.Error())
 		return
 	}
-	fmt.Printf("[UpdateAreaManagerName] found %d netTransactions\n", len(netTransactions))
+	fmt.Printf("found %d netTransactions\n", len(netTransactions))
 
 	for _, nt := range netTransactions {
 		nn := network.GetNetworkNodeByUid(nt.NetworkNodeUid)
@@ -105,7 +107,7 @@ func UpdateAreaManagerName() {
 		nodeName := nn.GetName()
 
 		if strings.HasSuffix(strings.ToLower(originalName), strings.ToLower(nodeName)) {
-			fmt.Printf("[UpdateAreaManagerName] netTransaction '%s' with name '%s' already contains node name '%s'\n", nt.Uid, originalName, nodeName)
+			fmt.Printf("netTransaction '%s' with name '%s' already contains node name '%s'\n", nt.Uid, originalName, nodeName)
 			continue
 		}
 
@@ -114,16 +116,16 @@ func UpdateAreaManagerName() {
 		// TODO: remember to manually allow for the modification of name field
 		err = nt.SaveBigQuery()
 		if err != nil {
-			fmt.Printf("[UpdateAreaManagerName] error updating network transaction '%s': %s\n", nt.Uid, err.Error())
+			fmt.Printf("error updating network transaction '%s': %s\n", nt.Uid, err.Error())
 			break
 		}
 
 		modifiedCounter = append(modifiedCounter, nt.Uid)
-		fmt.Printf("[UpdateAreaManagerName] netTransaction '%s' original name '%s' modified name '%s'\n", nt.Uid, originalName, nt.Name)
+		fmt.Printf("netTransaction '%s' original name '%s' modified name '%s'\n", nt.Uid, originalName, nt.Name)
 	}
 
-	fmt.Printf("[UpdateAreaManagerName] modified network %d transactions %s\n", len(modifiedCounter), modifiedCounter)
-	fmt.Println("[UpdateAreaManagerName] script done")
+	fmt.Printf("modified network %d transactions %s\n", len(modifiedCounter), modifiedCounter)
+	fmt.Println("script done")
 }
 
 type OutputNT struct {
@@ -147,9 +149,10 @@ func UpdateManualPaymentNetworkTransactions(policyUids ...string) {
 		Modified:    make([]map[string]OutputNT, 0),
 		NotModified: make([]string, 0),
 	}
-
+	log.AddPrefix("UpdateManualPaymentNetworkTransactions")
+	defer log.PopPrefix()
 	for _, policyUid := range policyUids {
-		fmt.Printf("[UpdateManualPaymentNetworkTransactions] quering %s", policyUid)
+		fmt.Printf("quering %s", policyUid)
 		// get nettransaction by id
 		query := fmt.Sprintf(
 			"SELECT * FROM `%s.%s` WHERE policyUid = '%s' AND paymentType = '%s'",
@@ -160,15 +163,15 @@ func UpdateManualPaymentNetworkTransactions(policyUids ...string) {
 		)
 		netTransactions, err := lib.QueryRowsBigQuery[models.NetworkTransaction](query)
 		if err != nil {
-			fmt.Printf("[UpdateManualPaymentNetworkTransactions] error getting network transactions: %s", err.Error())
+			fmt.Printf("error getting network transactions: %s", err.Error())
 			return
 		}
 		if len(netTransactions) != 1 {
-			fmt.Printf("[UpdateManualPaymentNetworkTransactions] expected 1 networkTransaction, got %d\n", len(netTransactions))
+			fmt.Printf("expected 1 networkTransaction, got %d\n", len(netTransactions))
 			output.NotModified = append(output.NotModified, policyUid)
 			continue
 		}
-		fmt.Printf("[UpdateManualPaymentNetworkTransactions] found %d netTransactions\n", len(netTransactions))
+		fmt.Printf("found %d netTransactions\n", len(netTransactions))
 
 		originalNetTransaction := netTransactions[0]
 		modifiedNetTransaction := deepcopy.Copy(originalNetTransaction).(models.NetworkTransaction)
@@ -176,12 +179,12 @@ func UpdateManualPaymentNetworkTransactions(policyUids ...string) {
 		policy := plc.GetPolicyByUid(originalNetTransaction.PolicyUid, "")
 		networkNode := network.GetNetworkNodeByUid(policy.ProducerUid)
 		if networkNode == nil {
-			fmt.Println("[UpdateManualPaymentNetworkTransactions] error getting network node")
+			fmt.Println("error getting network node")
 			return
 		}
 		warrant := networkNode.GetWarrant()
 		if warrant == nil {
-			fmt.Println("[UpdateManualPaymentNetworkTransactions] error getting warrant")
+			fmt.Println("error getting warrant")
 			return
 		}
 		prod := warrant.GetProduct(policy.Name)
@@ -205,22 +208,22 @@ func UpdateManualPaymentNetworkTransactions(policyUids ...string) {
 		// save to bigquery
 		err = saveBigQuery(modifiedNetTransaction)
 		if err != nil {
-			fmt.Printf("[UpdateManualPaymentNetworkTransactions] error saving to db: %s", err.Error())
+			fmt.Printf("error saving to db: %s", err.Error())
 			return
 		}
-		fmt.Println("[UpdateManualPaymentNetworkTransactions] NetworkTransaction saved!")
+		fmt.Println("NetworkTransaction saved!")
 	}
 
 	outputJson, err := json.Marshal(output)
 	if err != nil {
-		fmt.Printf("[UpdateManualPaymentNetworkTransactions] error marshaling output: %s", err.Error())
+		fmt.Printf("error marshaling output: %s", err.Error())
 	}
 
 	now := time.Now().UTC().Format(time.RFC3339)
 
 	err = os.WriteFile(fmt.Sprintf("./%s_update_nt_manual_payment.json", now), outputJson, 0777)
 	if err != nil {
-		fmt.Printf("[UpdateManualPaymentNetworkTransactions] error writing output: %s", err.Error())
+		fmt.Printf("error writing output: %s", err.Error())
 	}
 }
 
