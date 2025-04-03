@@ -3,7 +3,7 @@ package quote
 import (
 	"bytes"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 
@@ -12,8 +12,8 @@ import (
 )
 
 func ExcelFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.SetPrefix("[ExcelFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("[ExcelFx] ")
+	defer log.PopPrefix()
 	log.Println("Handler start -----------------------------------------------")
 
 	Excel()

@@ -3,8 +3,8 @@ package quote
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"os"
 
@@ -13,8 +13,8 @@ import (
 )
 
 func PmiMunichFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.SetPrefix("[PmiMunichFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("[PmiMunichFx] ")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 

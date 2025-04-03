@@ -3,8 +3,8 @@ package quote
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"math"
 	"net/http"
 	"sort"
@@ -33,8 +33,8 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		warrant *models.Warrant
 	)
 
-	log.SetPrefix("[LifeFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -43,7 +43,7 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	err := json.Unmarshal(req, &data)
 	if err != nil {
-		log.Printf("error unmarshaling body: %s", err.Error())
+		log.ErrorF("error unmarshaling body: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -51,7 +51,7 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	authToken, err := lib.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	if err != nil {
-		log.Printf("error getting authToken from idToken: %s", err.Error())
+		log.ErrorF("error getting authToken from idToken: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -80,37 +80,38 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 func Life(data models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant, flow string) (models.Policy, error) {
 	var err error
-
-	log.Println("[Life] function start --------------------------------------")
+	log.AddPrefix("Life")
+	defer log.PopPrefix()
+	log.Println("function start --------------------------------------")
 
 	data.Channel = channel
 	contractorAge, err := data.CalculateContractorAge()
 	if err != nil {
-		log.Printf("[Life] error calculating contractor age: %s", err.Error())
+		log.ErrorF("error calculating contractor age: %s", err.Error())
 		return models.Policy{}, err
 	}
 
-	log.Printf("[Life] contractor age: %d", contractorAge)
+	log.Printf("contractor age: %d", contractorAge)
 
 	b := lib.GetFilesByEnv(fmt.Sprintf("%s/%s/%s/taxes.csv", models.ProductsFolder,
 		data.Name, data.ProductVersion))
 	df := lib.CsvToDataframe(b)
 	var selectRow []string
 
-	log.Printf("[Life] call sellable")
+	log.Printf("call sellable")
 	ruleProduct, err := sellable.Life(&data, channel, networkNode, warrant)
 	if err != nil {
-		log.Printf("[Life] error in sellable: %s", err.Error())
+		log.ErrorF("error in sellable: %s", err.Error())
 		return models.Policy{}, err
 	}
 
-	log.Printf("[Life] loading available rates for flow %s", flow)
+	log.Printf("loading available rates for flow %s", flow)
 
 	availableRates := getAvailableRates(ruleProduct, flow)
 
-	log.Printf("[Life] available rates: %s", availableRates)
+	log.Printf("available rates: %s", availableRates)
 
-	log.Printf("[Life] add default guarantees")
+	log.Printf("add default guarantees")
 
 	addDefaultGuarantees(data, *ruleProduct)
 
@@ -120,33 +121,33 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 		lib.CheckError(err)
 
 		if channel == models.ECommerceChannel {
-			log.Println("[Life] e-commerce flow")
-			log.Println("[Life] setting sumInsuredLimitOfIndeminity")
+			log.Println("e-commerce flow")
+			log.Println("setting sumInsuredLimitOfIndeminity")
 			calculateSumInsuredLimitOfIndemnity(data.Assets, death.Value.SumInsuredLimitOfIndemnity)
-			log.Println("[Life] setting guarantees duration")
+			log.Println("setting guarantees duration")
 			calculateGuaranteeDuration(data.Assets, death.Value.Duration.Year)
 		}
 	case models.ProductV2:
 		if channel == models.ECommerceChannel {
 			death, err := data.ExtractGuarantee(deathGuarantee)
 			lib.CheckError(err)
-			log.Println("[Life] e-commerce flow")
-			log.Println("[Life] setting sumInsuredLimitOfIndeminity")
+			log.Println("e-commerce flow")
+			log.Println("setting sumInsuredLimitOfIndeminity")
 			calculateSumInsuredLimitOfIndemnity(data.Assets, death.Value.SumInsuredLimitOfIndemnity)
-			log.Println("[Life] setting guarantees duration")
+			log.Println("setting guarantees duration")
 			calculateGuaranteeDuration(data.Assets, death.Value.Duration.Year)
 		} else {
-			log.Println("[Life] mga, network flow")
-			log.Println("[Life] setting sumInsuredLimitOfIndeminity")
+			log.Println("mga, network flow")
+			log.Println("setting sumInsuredLimitOfIndeminity")
 			calculateSumInsuredLimitOfIndemnityV2(&data)
 		}
 	}
 
-	log.Println("[Life] updating policy start and end date")
+	log.Println("updating policy start and end date")
 
 	updatePolicyStartEndDate(&data)
 
-	log.Println("[Life] set guarantees subtitle")
+	log.Println("set guarantees subtitle")
 
 	getGuaranteeSubtitle(data.Assets)
 
@@ -164,7 +165,7 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 		},
 	}
 
-	log.Println("[Life] calculate guarantees and offers prices")
+	log.Println("calculate guarantees and offers prices")
 
 	for assetIndex, asset := range data.Assets {
 		for guaranteeIndex, _ := range asset.Guarantees {
@@ -184,38 +185,38 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 
 	}
 
-	log.Println("[Life] check monthly limit")
+	log.Println("check monthly limit")
 
 	monthlyToBeRemoved := !ruleProduct.Companies[0].IsMonthlyPaymentAvailable ||
 		data.OffersPrices["default"]["monthly"].Gross < ruleProduct.Companies[0].MinimumMonthlyPrice
 	if monthlyToBeRemoved {
-		log.Println("[Life] monthly payment disabled")
+		log.Println("monthly payment disabled")
 		delete(data.OffersPrices["default"], "monthly")
 	}
 
-	log.Println("[Life] filtering available rates")
+	log.Println("filtering available rates")
 
 	removeOfferRate(&data, availableRates)
 
-	log.Println("[Life] round offers prices")
+	log.Println("round offers prices")
 
 	roundOfferPrices(data.OffersPrices)
 
-	log.Println("[Life] set default offer price into policy")
+	log.Println("set default offer price into policy")
 
 	setPricesByOffer(&data, "default")
 
-	log.Println("[Life] apply consultacy price")
+	log.Println("apply consultacy price")
 
 	addConsultacyPrice(&data, ruleProduct)
 
-	log.Println("[Life] sort guarantees list")
+	log.Println("sort guarantees list")
 
 	sort.Slice(data.Assets[0].Guarantees, func(i, j int) bool {
 		return data.Assets[0].Guarantees[i].Order < data.Assets[0].Guarantees[j].Order
 	})
 
-	log.Println("[Life] function end --------------------------------------")
+	log.Println("function end --------------------------------------")
 
 	return data, err
 }
@@ -223,7 +224,7 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 func calculateSumInsuredLimitOfIndemnityV2(data *models.Policy) {
 	guaranteesMap := data.GuaranteesToMap()
 
-	log.Println("[Life] setting sumInsuredLimitOfIndeminity")
+	log.Println("setting sumInsuredLimitOfIndeminity")
 	if guaranteesMap[deathGuarantee].IsSelected {
 		guaranteesMap[permanentDisabilityGuarantee].Value.SumInsuredLimitOfIndemnity =
 			math.Max(guaranteesMap[permanentDisabilityGuarantee].Value.SumInsuredLimitOfIndemnity,
@@ -254,7 +255,7 @@ func calculateSumInsuredLimitOfIndemnityV2(data *models.Policy) {
 func addDefaultGuarantees(data models.Policy, product models.Product) {
 	guaranteeList := make([]models.Guarante, 0)
 
-	log.Println("[Life] adding default guarantees")
+	log.Println("adding default guarantees")
 
 	for _, guarantee := range data.Assets[0].Guarantees {
 		product.Companies[0].GuaranteesMap[guarantee.Slug].Value = guarantee.Value
@@ -270,7 +271,7 @@ func addDefaultGuarantees(data models.Policy, product models.Product) {
 	}
 
 	data.Assets[0].Guarantees = guaranteeList
-	log.Println("[Life] added default guarantees")
+	log.Println("added default guarantees")
 }
 
 func getGuaranteeIsSelected(data models.Policy, guarantee *models.Guarante) bool {
@@ -329,7 +330,7 @@ func updatePolicyStartEndDate(policy *models.Policy) {
 }
 
 func getGuaranteeSubtitle(assets []models.Asset) {
-	log.Println("[Life] setting guarantees subtitles")
+	log.Println("setting guarantees subtitles")
 	for assetIndex, asset := range assets {
 		for guaranteeIndex, guarantee := range asset.Guarantees {
 			assets[assetIndex].Guarantees[guaranteeIndex].Subtitle = fmt.Sprintf("Durata: %d anni - "+
@@ -355,7 +356,7 @@ func getMultipliersIndex(guaranteeSlug string) (int, int) {
 		base = 7
 		baseTax = 8
 	}
-	log.Printf("[Life] guarantee multipliers indexes base: %d baseTax: %d", base, baseTax)
+	log.Printf("guarantee multipliers indexes base: %d baseTax: %d", base, baseTax)
 	return base, baseTax
 }
 
@@ -371,7 +372,7 @@ func getOffset(duration int) int {
 	case 20:
 		offset = 8*3 + 4
 	}
-	log.Printf("[Life] offset: %d", offset)
+	log.Printf("offset: %d", offset)
 	return offset
 }
 
@@ -380,7 +381,7 @@ func getMultipliers(selectRow []string, offset int, base int, baseTax int) (floa
 	taxFloat, _ := strconv.ParseFloat(strings.Replace(strings.Replace(selectRow[baseTax+offset], "%", "", 1), ",", ".", 1), 64)
 	baseFloat = baseFloat / 100
 	taxFloat = taxFloat / 100
-	log.Printf("[Life] guarantee multipliers baseFloat: %f taxFloat: %f", baseFloat, taxFloat)
+	log.Printf("guarantee multipliers baseFloat: %f taxFloat: %f", baseFloat, taxFloat)
 	return baseFloat, taxFloat
 }
 
@@ -423,7 +424,7 @@ func calculateGuaranteePrices(guarantee *models.Guarante, baseFloat, taxFloat fl
 }
 
 func calculateOfferPrices(data models.Policy, guarantee models.Guarante) {
-	log.Println("[Life] calculate offer prices")
+	log.Println("calculate offer prices")
 	data.OffersPrices["default"]["yearly"].Gross += guarantee.Value.PremiumGrossYearly
 	data.OffersPrices["default"]["yearly"].Net += guarantee.Value.PremiumNetYearly
 	data.OffersPrices["default"]["yearly"].Tax += guarantee.Value.PremiumGrossYearly - guarantee.Value.PremiumNetYearly
@@ -433,7 +434,7 @@ func calculateOfferPrices(data models.Policy, guarantee models.Guarante) {
 }
 
 func roundOfferPrices(offersPrices map[string]map[string]*models.Price) {
-	log.Println("[Life] round offer prices")
+	log.Println("round offer prices")
 	for offerKey, offerValue := range offersPrices {
 		for paymentKey, _ := range offerValue {
 			offersPrices[offerKey][paymentKey].Net = lib.RoundFloat(offersPrices[offerKey][paymentKey].Net, 2)

@@ -5,13 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/go-gota/gota/dataframe"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/sellable"
@@ -23,8 +23,8 @@ func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 		warrant *models.Warrant
 	)
 
-	log.SetPrefix("[GapFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("GapFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -71,7 +71,7 @@ func Gap(policy *models.Policy, channel string, networkNode *models.NetworkNode,
 	calculateGapOfferPrices(policy, *product)
 
 	log.Println("[Gap] apply consultacy price")
-	
+
 	addConsultacyPrice(policy, product)
 
 	removeOfferRate(policy, availableRates)
