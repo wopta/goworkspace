@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"regexp"
 	"sort"
 	"strings"
@@ -27,28 +27,28 @@ func GetProductV2(productName, productVersion, channel string, networkNode *mode
 	var (
 		product *models.Product
 	)
-
-	log.Println("[GetProductV2] function start -----------------")
+	log.AddPrefix("GetProductV2")
+	log.Println("function start -----------------")
 
 	filePath := fmt.Sprintf("%s/%s/%s/%s.json", models.ProductsFolder, productName, productVersion, channel)
 
-	log.Printf("[GetProductV2] filePath: %s", filePath)
+	log.Printf("filePath: %s", filePath)
 
 	productBytes := lib.GetFilesByEnv(filePath)
 	buffer := new(bytes.Buffer)
 	_ = json.Compact(buffer, productBytes)
 
-	log.Printf("[GetProductV2] retrieved product: %s", buffer.String())
+	log.Printf("retrieved product: %s", buffer.String())
 
 	err := json.Unmarshal(productBytes, &product)
 	if err != nil {
-		log.Printf("[GetProductV2] error unmarshaling product: %s", err.Error())
+		log.ErrorF("error unmarshaling product: %s", err.Error())
 		return nil
 	}
 
 	err = replaceDatesInProduct(product, channel)
 	if err != nil {
-		log.Printf("[GetProductV2] error during replace dates in product: %s", err.Error())
+		log.ErrorF("error during replace dates in product: %s", err.Error())
 		return nil
 	}
 
@@ -64,26 +64,27 @@ func getDefaultProduct(productName, channel string) *models.Product {
 	var (
 		result, product *models.Product
 	)
-
-	log.Println("[GetDefaultProduct] function start --------------")
+	log.AddPrefix("GetDefaultProduct")
+	defer log.PopPrefix()
+	log.Println("function start --------------")
 
 	filesList, err := lib.ListGoogleStorageFolderContent(fmt.Sprintf("%s/%s/", models.ProductsFolder, productName))
 	if err != nil {
-		log.Printf("[GetProduct] error: %s", err.Error())
+		log.ErrorF("error: %s", err.Error())
 		return nil
 	}
 
-	log.Println("[GetDefaultProduct] filtering file list by channel")
+	log.Println("filtering file list by channel")
 
 	filesList = lib.SliceFilter(filesList, func(filePath string) bool {
 		return strings.HasSuffix(filePath, fmt.Sprintf("%s.json", channel))
 	})
 	if len(filesList) == 0 {
-		log.Println("[GetDefaultProduct] empty file list")
+		log.Println("empty file list")
 		return nil
 	}
 
-	log.Println("[GetDefaultProduct] sorting file list by version")
+	log.Println("sorting file list by version")
 
 	sort.Slice(filesList, func(i, j int) bool {
 		return strings.SplitN(filesList[i], "/", 4)[2] > strings.SplitN(filesList[j], "/", 4)[2]
@@ -94,26 +95,26 @@ func getDefaultProduct(productName, channel string) *models.Product {
 
 		err = json.Unmarshal(productBytes, &product)
 		if err != nil {
-			log.Printf("[GetDefaultProduct] error unmarshaling product: %s", err.Error())
+			log.ErrorF("error unmarshaling product: %s", err.Error())
 			return nil
 		}
 
 		if product.IsActive {
-			log.Printf("[GetDefaultProduct] product %s version %s is active", product.Name, product.Version)
+			log.Printf("product %s version %s is active", product.Name, product.Version)
 			result = product
 			break
 		}
-		log.Printf("[GetDefaultProduct] product %s version %s is not active", product.Name, product.Version)
+		log.Printf("product %s version %s is not active", product.Name, product.Version)
 	}
 
 	if result == nil {
-		log.Printf("[GetDefaultProduct] no active %s product found", productName)
+		log.Printf("no active %s product found", productName)
 		return nil
 	}
 
 	product.Steps = loadProductSteps(product)
 
-	log.Println("[GetDefaultProduct] function end ---------------------")
+	log.Println("function end ---------------------")
 
 	return result
 }
