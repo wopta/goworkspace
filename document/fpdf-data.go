@@ -80,7 +80,8 @@ func loadLifeBeneficiariesInfo(policy *models.Policy) ([]map[string]string, stri
 
 func loadProponentInfo(networkNode *models.NetworkNode) map[string]string {
 	policyProponent := make(map[string]string)
-
+	log.AddPrefix("loadProponentInfo")
+	defer log.PopPrefix()
 	policyProponent["name"] = "Wopta Assicurazioni Srl"
 
 	if networkNode == nil || networkNode.Type == models.PartnershipNetworkNodeType || networkNode.IsMgaProponent {
@@ -126,7 +127,7 @@ func loadProponentInfo(networkNode *models.NetworkNode) map[string]string {
 	}
 
 	jsonProponent, _ := json.Marshal(policyProponent)
-	log.Printf("[loadProponentInfo] proponent info %s", string(jsonProponent))
+	log.Printf("proponent info %s", string(jsonProponent))
 	return policyProponent
 }
 
