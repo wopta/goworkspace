@@ -3,11 +3,11 @@ package renew
 import (
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/policy/renew"
 	"github.com/wopta/goworkspace/policy/utils"
@@ -26,13 +26,13 @@ func GetRenewTransactionsByPolicyUidFx(w http.ResponseWriter, r *http.Request) (
 		resp   response
 	)
 
-	log.SetPrefix("[GetRenewTransactionsByPolicyUidFx] ")
+	log.AddPrefix("GetRenewTransactionsByPolicyUidFx")
 	defer func() {
 		if err != nil {
-			log.Printf("error: %s", err)
+			log.Error(err)
 		}
 		log.Println("Handler end ---------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 	log.Println("Handler start -----------------------------------------------")
 
@@ -46,12 +46,12 @@ func GetRenewTransactionsByPolicyUidFx(w http.ResponseWriter, r *http.Request) (
 	policyUid := chi.URLParam(r, "policyUid")
 
 	if policy, err = renew.GetRenewPolicyByUid(policyUid); err != nil {
-		log.Printf("error fetching policy '%s'", policyUid)
+		log.ErrorF("error fetching policy '%s'", policyUid)
 		return "", nil, err
 	}
 
 	if !utils.CanBeAccessedBy(authToken.Role, policy.ProducerUid, authToken.UserID) {
-		log.Printf("policy %s is not included in %s %s portfolio", policyUid, authToken.Role, userUid)
+		log.ErrorF("policy %s is not included in %s %s portfolio", policyUid, authToken.Role, userUid)
 		return "", nil, errUnauthorized
 	}
 

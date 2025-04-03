@@ -2,12 +2,12 @@ package transaction
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/transaction/renew"
 )
@@ -49,7 +49,6 @@ func init() {
 }
 
 func Transaction(w http.ResponseWriter, r *http.Request) {
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
 	router := lib.GetRouter("transaction", transactionRoutes)
 	router.ServeHTTP(w, r)
@@ -161,7 +160,7 @@ func getTransactionByPolicyUidAndScheduleDate(policyUid, scheduleDate, collectio
 	}
 	query, err := q.FirestoreWherefields(collection)
 	if err != nil {
-		log.Printf("[getTransactionByPolicyUidAndScheduleDate] ERROR %s", err.Error())
+		log.ErrorF("[getTransactionByPolicyUidAndScheduleDate] ERROR %s", err.Error())
 		return nil, err
 	}
 	return models.TransactionToListData(query), nil

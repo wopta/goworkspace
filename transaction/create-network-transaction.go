@@ -2,13 +2,13 @@ package transaction
 
 import (
 	"encoding/json"
-	"log"
 	"slices"
 	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/product"
@@ -21,8 +21,11 @@ func createNetworkTransaction(
 	commission float64, // Amount
 	mgaAccountType, paymentType, name string,
 ) (*models.NetworkTransaction, error) {
+	log.AddPrefix("CreateNetworkTransaction")
+	defer log.PopPrefix()
+
 	log.Printf(
-		"[createNetworkTransaction] name '%s' accountType '%s' paymentType '%s' commission '%f' amount '%f'",
+		"name '%s' accountType '%s' paymentType '%s' commission '%f' amount '%f'",
 		name,
 		mgaAccountType,
 		paymentType,
@@ -67,11 +70,11 @@ func createNetworkTransaction(
 
 	err := netTransaction.SaveBigQuery()
 	if err != nil {
-		log.Printf("[createNetworkTransaction] error saving network transaction to bigquery: %s", err.Error())
+		log.ErrorF("error saving network transaction to bigquery: %s", err.Error())
 		return nil, err
 	}
 
-	log.Printf("[createNetworkTransaction] network transaction created! %s", string(jsonLog))
+	log.Printf("network transaction created! %s", string(jsonLog))
 
 	return &netTransaction, err
 }
@@ -82,7 +85,8 @@ func createCompanyNetworkTransaction(
 	producerNode *models.NetworkNode,
 	mgaProduct *models.Product,
 ) (*models.NetworkTransaction, error) {
-	log.Println("[createCompanyNetworkTransaction]")
+	log.AddPrefix("CreateCompanyNetworkTransaction")
+	defer log.PopPrefix()
 
 	var code string
 
@@ -132,13 +136,14 @@ func CreateNetworkTransactions(
 	producerNode *models.NetworkNode,
 	mgaProduct *models.Product,
 ) error {
-	log.Println("[CreateNetworkTransactions]")
+	log.AddPrefix("CreateNetworkTransactions")
+	defer log.PopPrefix()
 
 	var err error
 
 	_, err = createCompanyNetworkTransaction(policy, transaction, producerNode, mgaProduct)
 	if err != nil {
-		log.Printf("[CreateNetworkTransactions] error creating company network-transaction: %s", err.Error())
+		log.ErrorF("error creating company network-transaction: %s", err.Error())
 		return err
 	}
 
@@ -151,12 +156,12 @@ func CreateNetworkTransactions(
 
 			warrant := currentNode.GetWarrant()
 			if warrant == nil {
-				log.Printf("[CreateNetworkTransactions] error getting warrant for node: %s", currentNode.Uid)
+				log.ErrorF("error getting warrant for node: %s", currentNode.Uid)
 				return baseName
 			}
 			prod := warrant.GetProduct(policy.Name)
 			if warrant == nil {
-				log.Printf("[CreateNetworkTransactions] error getting product for warrant: %s", warrant.Name)
+				log.ErrorF("error getting product for warrant: %s", warrant.Name)
 				return baseName
 			}
 
@@ -176,9 +181,9 @@ func CreateNetworkTransactions(
 
 			_, err = createNetworkTransaction(policy, transaction, currentNode, commission, accountType, paymentType, nodeName)
 			if err != nil {
-				log.Printf("[CreateNetworkTransactions] error creating network-transaction: %s", err.Error())
+				log.ErrorF("error creating network-transaction: %s", err.Error())
 			} else {
-				log.Printf("[CreateNetworkTransactions] created network-transaction for node: %s", currentNode.Uid)
+				log.ErrorF("created network-transaction for node: %s", currentNode.Uid)
 			}
 
 			return baseName
