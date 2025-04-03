@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"sort"
 	"strings"
@@ -13,6 +12,7 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
 	"google.golang.org/api/iterator"
@@ -64,7 +64,7 @@ func getProductsFileList() []string {
 	}
 
 	if err != nil {
-		log.Printf("error getting file list: %s", err.Error())
+		log.ErrorF("error getting file list: %s", err.Error())
 	}
 
 	checkedList := lib.SliceFilter(fileList, checkSlashes)
