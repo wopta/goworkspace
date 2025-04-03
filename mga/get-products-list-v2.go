@@ -3,7 +3,7 @@ package mga
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
 	"github.com/wopta/goworkspace/lib"
@@ -22,14 +22,14 @@ func GetProductsListByChannelFx(w http.ResponseWriter, r *http.Request) (string,
 		response GetProductsListByEntitlementResponse
 	)
 
-	log.SetPrefix("[GetProductsListByChannelFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("[GetProductsListByChannelFx] ")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
 	authToken, err := lib.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	if err != nil {
-		log.Printf("error extracting auth token: %s", err.Error())
+		log.ErrorF("error extracting auth token: %s", err.Error())
 		return "", "", err
 	}
 
@@ -65,13 +65,13 @@ func GetProductsListByChannelFx(w http.ResponseWriter, r *http.Request) (string,
 		}
 		response.Products = retrievedProducts
 	default:
-		log.Printf("error channel %s unaavailable", channel)
+		log.ErrorF("error channel %s unaavailable", channel)
 		return "", "", fmt.Errorf("unavailable channel")
 	}
 
 	responseBytes, err := json.Marshal(response)
 	if err != nil {
-		log.Printf("error marshaling response: %s", err.Error())
+		log.ErrorF("error marshaling response: %s", err.Error())
 		return "", "", err
 	}
 

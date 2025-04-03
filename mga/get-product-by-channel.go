@@ -3,8 +3,8 @@ package mga
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 
@@ -27,8 +27,8 @@ func GetProductByChannelFx(w http.ResponseWriter, r *http.Request) (string, inte
 		warrant     *models.Warrant
 	)
 
-	log.SetPrefix("[GetProductByChannelFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("[GetProductByChannelFx] ")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -37,14 +37,14 @@ func GetProductByChannelFx(w http.ResponseWriter, r *http.Request) (string, inte
 
 	err := json.Unmarshal(body, &req)
 	if err != nil {
-		log.Println("error unmarshaling request body")
+		log.ErrorF("error unmarshaling request body")
 		return "", nil, err
 	}
 
 	token := r.Header.Get("Authorization")
 	authToken, err := lib.GetAuthTokenFromIdToken(token)
 	if err != nil {
-		log.Printf("error: %s", err.Error())
+		log.ErrorF("error: %s", err.Error())
 		return "", nil, err
 	}
 

@@ -2,8 +2,8 @@ package mga
 
 import (
 	"encoding/json"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"time"
 
@@ -18,8 +18,8 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 		err       error
 	)
 
-	log.SetPrefix("[CreateNetworkNodeFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("[CreateNetworkNodeFx] ")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -29,13 +29,13 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	err = json.Unmarshal(body, &inputNode)
 	if err != nil {
-		log.Printf("error unmarshaling request: %s", err.Error())
+		log.ErrorF("error unmarshaling request: %s", err.Error())
 		return "", "", err
 	}
 	// TODO: check node.Type in warrant.AllowedTypes
 	// TODO: check unique companyCode for company
 	if err := network.TestNetworkNodeUniqueness(inputNode.Code); err != nil {
-		log.Printf("error validating node code: %s", err)
+		log.ErrorF("error validating node code: %s", err)
 		return "", "", err
 	}
 
@@ -45,7 +45,7 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	node, err := network.CreateNode(*inputNode)
 	if err != nil {
-		log.Println("error creating network node into Firestore...")
+		log.ErrorF("error creating network node into Firestore...")
 		return "", "", err
 	}
 	log.Printf("network node created with uid %s", node.Uid)
@@ -54,7 +54,7 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	err = createNodeRelation(*node)
 	if err != nil {
-		log.Printf("error creating node %s network relations: %s", node.Uid, err.Error())
+		log.ErrorF("error creating node %s network relations: %s", node.Uid, err.Error())
 		return "", nil, err
 	}
 
@@ -78,7 +78,7 @@ func createNodeRelation(node models.NetworkNode) error {
 	if node.ParentUid != "" {
 		ancestorsTreeRelation, err := network.GetNodeAncestors(node.ParentUid)
 		if err != nil {
-			log.Printf("error getting node %s ancestors: %s", node.Uid, err.Error())
+			log.ErrorF("error getting node %s ancestors: %s", node.Uid, err.Error())
 			return err
 		}
 

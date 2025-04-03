@@ -2,8 +2,8 @@ package mga
 
 import (
 	"encoding/json"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"os"
 
@@ -14,8 +14,8 @@ import (
 func CreateWarrantFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var warrant models.Warrant
 
-	log.SetPrefix("[CreateWarrantFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("[CreateWarrantFx] ")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -24,14 +24,14 @@ func CreateWarrantFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	err := json.Unmarshal(bodyBytes, &warrant)
 	if err != nil {
-		log.Printf("error unmarshaling request: %s", err.Error())
+		log.ErrorF("error unmarshaling request: %s", err.Error())
 		return "", nil, err
 	}
 
 	log.Println("creating warrant...")
 	err = CreateWarrant(warrant)
 	if err != nil {
-		log.Printf("error creating warrant: %s", err.Error())
+		log.ErrorF("error creating warrant: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -42,18 +42,20 @@ func CreateWarrantFx(w http.ResponseWriter, r *http.Request) (string, interface{
 }
 
 func CreateWarrant(warrant models.Warrant) error {
+	log.AddPrefix("CreateWarrant")
+	defer log.PopPrefix()
 	fileName := models.WarrantsFolder + warrant.Name + ".json"
 
 	bytesToWrite, err := json.Marshal(warrant)
 	if err != nil {
-		log.Printf("[CreateWarrant] error marshaling warrant: %s", err.Error())
+		log.ErrorF("error marshaling warrant: %s", err.Error())
 		return err
 	}
 
 	_, err = lib.PutToStorageIfNotExists(os.Getenv("GOOGLE_STORAGE_BUCKET"), fileName, bytesToWrite)
 
 	if err != nil {
-		log.Printf("[CreateWarrant] error writing warrant: %s", err.Error())
+		log.ErrorF("error writing warrant: %s", err.Error())
 	}
 
 	return err
