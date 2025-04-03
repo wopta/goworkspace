@@ -3,7 +3,7 @@ package partnership
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"strings"
 	"time"
@@ -29,8 +29,8 @@ func LifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, err
 		err             error
 	)
 
-	log.SetPrefix("[LifePartnershipFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("[LifePartnershipFx] ")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -40,7 +40,7 @@ func LifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, err
 	log.Printf("partnershipUid: %s jwt: %s", partnershipUid, jwtData)
 
 	if partnershipNode, err = network.GetNodeByUid(partnershipUid); err != nil {
-		log.Printf("error getting node: %s", err.Error())
+		log.ErrorF("error getting node: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -71,14 +71,14 @@ func LifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, err
 	if !claims.IsEmpty() {
 		policy, err = setClaimsIntoPolicy(policy, productLife, claims)
 		if err != nil {
-			log.Printf("error extracting data from claims: %s", err.Error())
+			log.ErrorF("error extracting data from claims: %s", err.Error())
 			return "", nil, err
 		}
 
 		if policy.Contractor.BirthDate != "" {
 			quotedPolicy, err := quote.Life(policy, models.ECommerceChannel, partnershipNode, nil, models.ECommerceFlow)
 			if err != nil {
-				log.Printf("error quoting for partnership: %s", err.Error())
+				log.ErrorF("error quoting for partnership: %s", err.Error())
 				return "", nil, err
 			}
 			policy = quotedPolicy
@@ -87,7 +87,7 @@ func LifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, err
 
 	err = savePartnershipLead(&policy, partnershipNode, "")
 	if err != nil {
-		log.Printf("error saving lead: %s", err.Error())
+		log.ErrorF("error saving lead: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -257,8 +257,10 @@ func removeUnselectedGuarantees(policy *models.Policy) models.Policy {
 
 func savePartnershipLead(policy *models.Policy, node *models.NetworkNode, origin string) error {
 	var err error
+	log.AddPrefix("SavePartnershipLead")
+	defer log.PopPrefix()
 
-	log.Println("[savePartnershipLead] start --------------------------------------------")
+	log.Println("start --------------------------------------------")
 
 	policyFire := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 
@@ -268,13 +270,13 @@ func savePartnershipLead(policy *models.Policy, node *models.NetworkNode, origin
 	policy.CreationDate = now
 	policy.Status = models.PolicyStatusPartnershipLead
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
-	log.Printf("[savePartnershipLead] policy status %s", policy.Status)
+	log.Printf("policy status %s", policy.Status)
 
 	policy.IsSign = false
 	policy.IsPay = false
 	policy.Updated = now
 
-	log.Println("[savePartnershipLead] saving lead to firestore...")
+	log.Println("saving lead to firestore...")
 	policyUid := lib.NewDoc(policyFire)
 	policy.Uid = policyUid
 
@@ -284,9 +286,9 @@ func savePartnershipLead(policy *models.Policy, node *models.NetworkNode, origin
 		return err
 	}
 
-	log.Println("[savePartnershipLead] saving lead to bigquery...")
+	log.Println("saving lead to bigquery...")
 	policyToSave.BigquerySave(origin)
 
-	log.Println("[savePartnershipLead] end ----------------------------------------------")
+	log.Println("end ----------------------------------------------")
 	return err
 }
