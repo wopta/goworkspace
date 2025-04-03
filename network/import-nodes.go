@@ -296,14 +296,15 @@ func getWarrants() ([]models.Warrant, error) {
 		err      error
 		warrants []models.Warrant
 	)
-
+	log.AddPrefix("GetWarrants")
+	defer log.PopPrefix()
 	warrantsBytes := lib.GetFolderContentByEnv(models.WarrantsFolder)
 
 	for _, warrantBytes := range warrantsBytes {
 		var warrant models.Warrant
 		err = json.Unmarshal(warrantBytes, &warrant)
 		if err != nil {
-			log.Printf("[GetWarrants] error unmarshaling warrant: %s", err.Error())
+			log.Printf("error unmarshaling warrant: %s", err.Error())
 			return warrants, err
 		}
 
