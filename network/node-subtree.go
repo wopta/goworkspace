@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -18,8 +18,8 @@ func NodeSubTreeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		root models.NetworkTreeElement
 	)
 
-	log.SetPrefix("[NodeSubTreeFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("[NodeSubTreeFx] ")
+	defer log.PopPrefix()
 	log.Println("Handler start -----------------------------------------------")
 
 	nodeUid := chi.URLParam(r, "nodeUid")
@@ -70,7 +70,7 @@ func GetNodeSubTree(nodeUid string) (models.NetworkTreeElement, error) {
 
 	subNetwork, err := lib.QueryParametrizedRowsBigQuery[models.NetworkTreeElement](query, params)
 	if err != nil {
-		log.Printf("error fetching children from BigQuery for node %s: %s", nodeUid, err.Error())
+		log.ErrorF("error fetching children from BigQuery for node %s: %s", nodeUid, err.Error())
 		return root, err
 	}
 
@@ -92,7 +92,7 @@ func GetNodeSubTree(nodeUid string) (models.NetworkTreeElement, error) {
 func checkAccess(idToken, nodeUid string) error {
 	authToken, err := lib.GetAuthTokenFromIdToken(idToken)
 	if err != nil {
-		log.Printf("error getting authToken")
+		log.ErrorF("error getting authToken")
 		return err
 	}
 	log.Printf(
@@ -114,7 +114,7 @@ func checkAccess(idToken, nodeUid string) error {
 
 		result, err := lib.QueryParametrizedRowsBigQuery[models.NetworkTreeElement](query, params)
 		if err != nil {
-			log.Printf("error fetching children from BigQuery for node %s: %s", nodeUid, err.Error())
+			log.ErrorF("error fetching children from BigQuery for node %s: %s", nodeUid, err.Error())
 			return err
 		}
 		if len(result) == 0 {

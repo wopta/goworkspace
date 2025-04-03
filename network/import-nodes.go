@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"reflect"
@@ -128,8 +128,8 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		validatedRows = make(map[string][][]string)
 	)
 
-	log.SetPrefix("[ImportNodesFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("[ImportNodesFx] ")
+	defer log.PopPrefix()
 
 	log.Println("Handler Start -----------------------------------------------")
 

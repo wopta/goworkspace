@@ -1,7 +1,7 @@
 package network
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"strings"
 
 	"github.com/wopta/goworkspace/models"

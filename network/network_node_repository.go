@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"os"
 	"time"
 
@@ -192,7 +192,7 @@ func updateNodeTreeRelations(node models.NetworkNode) error {
 	ctx := context.Background()
 	client, err := bigquery.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
 	if err != nil {
-		log.Printf("error getting BigQuery client: %s", err.Error())
+		log.ErrorF("error getting BigQuery client: %s", err.Error())
 		return err
 	}
 	defer client.Close()
