@@ -4,16 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 
 	fattureincloudapi "github.com/fattureincloud/fattureincloud-go-sdk/v2/api"
 	fattureincloud "github.com/fattureincloud/fattureincloud-go-sdk/v2/model"
 	oauth "github.com/fattureincloud/fattureincloud-go-sdk/v2/oauth2"
+	"github.com/wopta/goworkspace/lib/log"
 )
 
 func (invoiceData *InvoiceInc) CreateInvoice(isPay bool, isProforma bool) {
-	log.SetPrefix("CreateInvoice")
+	log.AddPrefix("CreateInvoice")
+	defer log.PopPrefix()
 	var (
 		fcItems     []fattureincloud.IssuedDocumentItemsListItem
 		status      fattureincloud.IssuedDocumentStatus
@@ -95,7 +96,9 @@ func (invoiceData *InvoiceInc) CreateInvoice(isPay bool, isProforma bool) {
 }
 
 func getClient() (*fattureincloudapi.APIClient, context.Context, int32) {
-	log.SetPrefix("CreateInvoice getClient")
+	log.AddPrefix("CreateInvoice getClient")
+	defer log.PopPrefix()
+
 	redirectUri := "http://localhost:3000/oauth"
 	auth := oauth.NewOAuth2AuthorizationCodeManager("EZVpwY4saebHSo293egZqSi3I5nyy1fK", os.Getenv("FATTURE_INCLOUD_KEY"), redirectUri)
 
