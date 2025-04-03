@@ -3,7 +3,7 @@ package auth
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 	"strings"
@@ -23,11 +23,12 @@ func DynamicJwtFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		responseSsoJwt ResponseSsoJwt
 	)
 
-	log.SetPrefix("[DynamicJwtFx] ")
+	log.AddPrefix("DynamicJwtFx")
 	log.Println("Handler start -----------------------------------------------")
+
 	defer func() {
 		log.Println("Handler end ---------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 
 	jwt := r.URL.Query().Get("jwt")
@@ -64,19 +65,19 @@ func DynamicJwtFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 				node[0].AuthId = userfire.UID
 				err = node[0].SaveFirestore()
 				if err != nil {
-					log.Printf("error updating node %s in Firestore: %s", node[0].Uid, err.Error())
+					log.ErrorF("error updating node %s in Firestore: %s", node[0].Uid, err.Error())
 					return "", nil, err
 				}
 				err = node[0].SaveBigQuery("")
 				if err != nil {
-					log.Printf("error updating node %s in BigQuery: %s", node[0].Uid, err.Error())
+					log.ErrorF("error updating node %s in BigQuery: %s", node[0].Uid, err.Error())
 					return "", nil, err
 				}
 
 			}
 			tokenString, err = lib.CreateCustomJwt(node[0].Mail, node[0].Role, node[0].Type, node[0].AuthId)
 			if err != nil {
-				log.Printf("error creating token: %s", err.Error())
+				log.ErrorF("error creating token: %s", err.Error())
 				return "", nil, err
 			}
 			responseSsoJwt = ResponseSsoJwt{

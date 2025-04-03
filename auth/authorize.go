@@ -3,8 +3,8 @@ package auth
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -22,8 +22,8 @@ func AuthorizeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		e                  error
 	)
 
-	log.SetPrefix("[AuthorizeFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("AuthorizeFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -56,8 +56,8 @@ func TokenFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 		e error
 	)
 
-	log.SetPrefix("[TokenFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("TokenFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
