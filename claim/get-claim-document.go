@@ -65,16 +65,17 @@ func GetClaimDocumentFx(w http.ResponseWriter, r *http.Request) (string, interfa
 
 func getClaimDocument(origin, userUid, claimUid, fileName string) (string, error) {
 	var user models.User
-
+	log.AddPrefix("getClaimDocument")
+	defer log.PopPrefix()
 	fireUser := lib.GetDatasetByEnv(origin, lib.UserCollection)
 	docsnap, err := lib.GetFirestoreErr(fireUser, userUid)
 	if err != nil {
-		log.Printf("[getClaimDocument] error retrieving user %s from database, error message %s", userUid, err.Error())
+		log.Printf("error retrieving user %s from database, error message %s", userUid, err.Error())
 		return "", err
 	}
 	err = docsnap.DataTo(&user)
 	if err != nil {
-		log.Println("[getClaimDocument] error convert docsnap to user")
+		log.Println("error convert docsnap to user")
 		return "", err
 	}
 
@@ -92,5 +93,5 @@ func getClaimDocument(origin, userUid, claimUid, fileName string) (string, error
 		}
 	}
 
-	return "", errors.New("[getClaimDocument] not found")
+	return "", errors.New("not found")
 }
