@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strings"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -33,8 +33,8 @@ func GetPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interface
 		resp    GetPolicyMediaResp
 	)
 
-	log.SetPrefix("[GetPolicyMediaFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("GetPolicyMediaFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -43,7 +43,7 @@ func GetPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interface
 
 	err = json.Unmarshal(body, &req)
 	if err != nil {
-		log.Printf("error unmarshaling request: %s", err.Error())
+		log.ErrorF("error unmarshaling request: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -51,7 +51,7 @@ func GetPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interface
 
 	policy, err = GetPolicy(req.PolicyUid, "")
 	if err != nil {
-		log.Printf("error retrieving policy %s from Firestore: %s", req.PolicyUid, err.Error())
+		log.ErrorF("error retrieving policy %s from Firestore: %s", req.PolicyUid, err.Error())
 		return "", nil, err
 	}
 
@@ -89,7 +89,7 @@ func downloadAttachment(gsLink string) (string, GetPolicyMediaResp, error) {
 
 	rawDoc, err := lib.ReadFileFromGoogleStorage(gsLink)
 	if err != nil {
-		log.Printf("error reading document from Google Storage: %s", err.Error())
+		log.ErrorF("error reading document from Google Storage: %s", err.Error())
 		return "", GetPolicyMediaResp{}, err
 	}
 
@@ -110,7 +110,7 @@ func retrievedMediaFromAttachments(policy models.Policy, req GetPolicyMediaReq) 
 		if strings.EqualFold(att.FileName, req.Filename) {
 			rawResp, resp, err := downloadAttachment(att.Link)
 			if err != nil {
-				log.Printf("error downloading media %s from Google Bucket: %s", req.Filename, err.Error())
+				log.ErrorF("error downloading media %s from Google Bucket: %s", req.Filename, err.Error())
 				return "", GetPolicyMediaResp{}, err
 			}
 			return rawResp, resp, err
@@ -129,7 +129,7 @@ func retrieveMediaFromReservedInfo(policy models.Policy, req GetPolicyMediaReq) 
 		if strings.EqualFold(doc.FileName, req.Filename) {
 			rawResp, resp, err := downloadAttachment(doc.Link)
 			if err != nil {
-				log.Printf("error downloading media %s from Google Bucket: %s", req.Filename, err.Error())
+				log.ErrorF("error downloading media %s from Google Bucket: %s", req.Filename, err.Error())
 				return "", GetPolicyMediaResp{}, err
 			}
 			return rawResp, resp, err
@@ -144,7 +144,7 @@ func retrieveMediaFromIdentityDocuments(policy models.Policy, req GetPolicyMedia
 		if doc.FrontMedia != nil && strings.EqualFold(doc.FrontMedia.FileName, req.Filename) {
 			rawResp, resp, err := downloadAttachment(doc.FrontMedia.Link)
 			if err != nil {
-				log.Printf("error downloading media %s from Google Bucket: %s", req.Filename, err.Error())
+				log.ErrorF("error downloading media %s from Google Bucket: %s", req.Filename, err.Error())
 				return "", GetPolicyMediaResp{}, err
 			}
 			return rawResp, resp, err
@@ -152,7 +152,7 @@ func retrieveMediaFromIdentityDocuments(policy models.Policy, req GetPolicyMedia
 		if doc.BackMedia != nil && strings.EqualFold(doc.BackMedia.FileName, req.Filename) {
 			rawResp, resp, err := downloadAttachment(doc.BackMedia.Link)
 			if err != nil {
-				log.Printf("error downloading media %s from Google Bucket: %s", req.Filename, err.Error())
+				log.ErrorF("error downloading media %s from Google Bucket: %s", req.Filename, err.Error())
 				return "", GetPolicyMediaResp{}, err
 			}
 			return rawResp, resp, err
