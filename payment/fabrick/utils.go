@@ -33,7 +33,7 @@ func callFabrickRequest(req *http.Request) (*http.Response, error) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("x-auth-token", os.Getenv("FABRICK_PERSISTENT_KEY"))
 	req.Header.Set("Accept", "application/json")
-	log.Println("[getFabrickClient]", req)
+	log.Println("getFabrickClient", req)
 
 	return client.Do(req)
 }
