@@ -524,8 +524,10 @@ func drawDynamicCell(pdf *fpdf.Fpdf, fontSize, cellHeight, cellWidth, rowLines, 
 
 func formatPhoneNumber(phone string) string {
 	num, err := libphonenumber.Parse(phone, "IT")
+	log.AddPrefix("DisplayPhoneNumber")
+	defer log.PopPrefix()
 	if err != nil {
-		log.Printf("[DisplayPhoneNumber] error parsing phone %s", phone)
+		log.ErrorF("error parsing phone %s", phone)
 		return "================"
 	}
 	return libphonenumber.Format(num, libphonenumber.INTERNATIONAL)

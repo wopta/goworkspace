@@ -22,7 +22,9 @@ var (
 )
 
 func ContractFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[Contract]")
+	log.AddPrefix("Contract")
+	defer log.PopPrefix()
+
 	//lib.Files("./serverless_function_source_code")
 	origin := r.Header.Get("Origin")
 	req := lib.ErrorByte(io.ReadAll(r.Body))
