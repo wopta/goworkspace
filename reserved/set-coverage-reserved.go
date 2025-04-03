@@ -2,12 +2,12 @@ package reserved
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 	plc "github.com/wopta/goworkspace/policy"
 )
@@ -22,8 +22,8 @@ func SetCoverageReservedFx(w http.ResponseWriter, r *http.Request) (string, inte
 		err      error
 	)
 
-	log.SetPrefix("[SetCoverageReservedFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("[SetCoverageReservedFx] ")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -34,26 +34,26 @@ func SetCoverageReservedFx(w http.ResponseWriter, r *http.Request) (string, inte
 	log.Printf("getting policy %s from firestore...", policyUid)
 	originalPolicy, err := plc.GetPolicy(policyUid, origin)
 	if err != nil {
-		log.Printf("error unable to retrieve original policy: %s", err.Error())
+		log.ErrorF("error unable to retrieve original policy: %s", err.Error())
 		return "", nil, err
 	}
 
 	input, err := UpdatePolicyReservedCoverage(&originalPolicy, origin)
 	if err != nil {
-		log.Printf("error calculating reserved coverage: %s", err.Error())
+		log.ErrorF("error calculating reserved coverage: %s", err.Error())
 		return "", nil, err
 	}
 
 	_, err = lib.FireUpdate(firePolicy, policyUid, input)
 	if err != nil {
-		log.Printf("error updating policy in firestore: %s", err.Error())
+		log.ErrorF("error updating policy in firestore: %s", err.Error())
 		return "", nil, err
 	}
 
 	// TODO: improve me
 	updatedPolicy, err := plc.GetPolicy(policyUid, origin)
 	if err != nil {
-		log.Printf("error unable to retrieve updated policy: %s", err.Error())
+		log.ErrorF("error unable to retrieve updated policy: %s", err.Error())
 		return "", nil, err
 	}
 	response.Policy = &updatedPolicy
