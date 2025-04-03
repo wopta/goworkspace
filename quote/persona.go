@@ -23,7 +23,7 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		warrant *models.Warrant
 	)
 
-	log.Println("[PersonaFx] ")
+	log.AddPrefix("PersonaFx")
 	defer log.PopPrefix()
 	log.Println("Handler start -----------------------------------------------")
 

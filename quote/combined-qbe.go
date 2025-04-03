@@ -26,7 +26,7 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		inputCells []Cell
 	)
 
-	log.AddPrefix("[CombinedQbeFx] ")
+	log.AddPrefix("CombinedQbeFx")
 	defer func() {
 		r.Body.Close()
 		if err != nil {
@@ -235,6 +235,8 @@ func mapCellsToPriceGroup(cells []Cell) []models.Price {
 }
 
 func mapCellPolicy(policy *models.Policy, baseProduct *models.Product, cells []Cell, gsLink string) {
+	log.AddPrefix("Commercial")
+	defer log.PopPrefix()
 	var (
 		hasQuoteError bool
 		quoteAtt      = models.Attachment{
@@ -282,7 +284,7 @@ func mapCellPolicy(policy *models.Policy, baseProduct *models.Product, cells []C
 		}
 	}
 
-	log.Println("[Commercial Combined] apply consultacy price")
+	log.Println("apply consultacy price")
 
 	addConsultacyPrice(policy, baseProduct)
 
