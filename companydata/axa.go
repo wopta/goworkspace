@@ -2,8 +2,8 @@ package companydata
 
 import (
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io/ioutil"
-	"log"
 	"os"
 	"strconv"
 	"time"

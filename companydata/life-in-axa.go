@@ -3,8 +3,8 @@ package companydata
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"reflect"
@@ -88,7 +88,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	defer r.Body.Close()
 	err := json.Unmarshal(body, &req)
 	if err != nil {
-		log.Printf("error unmrashalling request body")
+		log.ErrorF("error unmrashalling request body")
 		return "", nil, err
 	}
 
@@ -489,12 +489,12 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		)
 		retrievedPolicies, err := lib.QueryRowsBigQuery[models.Policy](query)
 		if err != nil {
-			log.Printf("error retrieving policies bigquery: %s", err.Error())
+			log.ErrorF("error retrieving policies bigquery: %s", err.Error())
 			continue
 		}
 		for _, rp := range retrievedPolicies {
 			if rp.Name == models.LifeProduct {
-				log.Printf("error user already has a life policy")
+				log.ErrorF("error user already has a life policy")
 				return "", nil, nil
 			}
 		}
@@ -576,7 +576,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 			err := lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, lib.PolicyCollection), policy.Uid, policy)
 			if err != nil {
-				log.Printf("error saving policy firestore: %s", err.Error())
+				log.ErrorF("error saving policy firestore: %s", err.Error())
 				continue
 			}
 
@@ -589,7 +589,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 			for _, res := range transactionsOutput {
 				err := lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, lib.TransactionsCollection), res.Transaction.Uid, res.Transaction)
 				if err != nil {
-					log.Printf("error saving transaction firestore: %s", err.Error())
+					log.ErrorF("error saving transaction firestore: %s", err.Error())
 					continue
 				}
 
@@ -608,7 +608,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 				err = lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, lib.UserCollection), policy.Contractor.Uid, policy.Contractor.ToUser())
 				if err != nil {
-					log.Printf("error saving contractor firestore: %s", err.Error())
+					log.ErrorF("error saving contractor firestore: %s", err.Error())
 					continue
 				}
 
@@ -625,7 +625,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 						err = lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, lib.UserCollection), usr.Uid, usr)
 						if err != nil {
-							log.Printf("error saving contractor firestore: %s", err.Error())
+							log.ErrorF("error saving contractor firestore: %s", err.Error())
 							continue
 						}
 
@@ -640,7 +640,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 			err = lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, lib.NetworkNodesCollection), networkNode.Uid, networkNode)
 			if err != nil {
-				log.Printf("error saving network node firestore: %s", err.Error())
+				log.ErrorF("error saving network node firestore: %s", err.Error())
 				continue
 			}
 
@@ -669,13 +669,13 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 	out, err := json.Marshal(result)
 	if err != nil {
-		log.Printf("error: %s", err.Error())
+		log.ErrorF("error: %s", err.Error())
 	}
 
 	_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"),
 		"track/in/life/out/result_"+startDateJob.Format(time.RFC3339)+".json", out)
 	if err != nil {
-		log.Printf("error: %s", err.Error())
+		log.ErrorF("error: %s", err.Error())
 	}
 
 	endDateJob = time.Now().UTC()
@@ -799,7 +799,7 @@ func parseIndividualContractor(codeCompany string, row []string, codes map[strin
 
 			missingContractorBirthCityPolicies = append(missingContractorBirthCityPolicies, codeCompany)
 		} else {
-			log.Printf("error: %s", err.Error())
+			log.ErrorF("error: %s", err.Error())
 			skippedPolicies = append(skippedPolicies, codeCompany)
 			return nil
 		}
@@ -901,7 +901,7 @@ func parseInsured(codeCompany string, row []string, codes map[string]map[string]
 
 			missingInsuredBirthCityPolicies = append(missingInsuredBirthCityPolicies, codeCompany)
 		} else {
-			log.Printf("error: %s", err.Error())
+			log.ErrorF("error: %s", err.Error())
 			skippedPolicies = append(skippedPolicies, codeCompany)
 			return nil
 		}
