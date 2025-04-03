@@ -3,8 +3,8 @@ package user
 import (
 	"encoding/json"
 	"errors"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"time"
 
@@ -22,7 +22,7 @@ func ConsumeInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	var ConsumeInviteRequest ConsumeInviteReq
 
 	log.Println("[ConsumeInviteFx] ")
-	defer log.SetPrefix("")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -31,13 +31,13 @@ func ConsumeInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	err := json.Unmarshal(reqBytes, &ConsumeInviteRequest)
 	if err != nil {
-		log.Printf("error unmarshaling request: %s", err.Error())
+		log.ErrorF("error unmarshaling request: %s", err.Error())
 		return "", nil, err
 	}
 
 	_, err = ConsumeInvite(ConsumeInviteRequest.InviteUid, ConsumeInviteRequest.Password, r.Header.Get("Origin"))
 	if err != nil {
-		log.Printf("error consuming invite: %s", err.Error())
+		log.ErrorF("error consuming invite: %s", err.Error())
 		return "", nil, err
 	}
 

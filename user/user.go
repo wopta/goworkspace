@@ -1,7 +1,7 @@
 package user
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 	"time"
@@ -86,7 +86,6 @@ func init() {
 }
 
 func User(w http.ResponseWriter, r *http.Request) {
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
 	router := lib.GetRouter("user", userRoutes)
 	router.ServeHTTP(w, r)

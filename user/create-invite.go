@@ -3,8 +3,8 @@ package user
 import (
 	"encoding/json"
 	"errors"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -57,8 +57,8 @@ type UserInvite struct {
 func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var createInviteRequest CreateInviteRequest
 
-	log.SetPrefix("[CreateInviteFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("[CreateInviteFx] ")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -78,7 +78,7 @@ func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	inviteUid, err := CreateInvite(createInviteRequest, r.Header.Get("Origin"), creatorUid)
 	if err != nil {
-		log.Printf("error: %s", err.Error())
+		log.ErrorF("error: %s", err.Error())
 		return "", nil, err
 	}
 

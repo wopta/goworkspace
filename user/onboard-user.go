@@ -3,8 +3,8 @@ package user
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 
@@ -24,8 +24,8 @@ func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface
 		user               *models.User
 	)
 
-	log.SetPrefix("[OnboardUserFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("[OnboardUserFx] ")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -67,7 +67,7 @@ func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface
 
 	dbUser, e := lib.CreateUserWithEmailAndPassword(requestEmailNormalized, onboardUserRequest.Password, userId)
 	if e != nil {
-		log.Printf("error creating auth user: %s", e.Error())
+		log.ErrorF("error creating auth user: %s", e.Error())
 		return "", nil, e
 	}
 
@@ -76,7 +76,7 @@ func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface
 		e := lib.UpdateFirestoreErr(fireUser, dbUser.UID, map[string]interface{}{"authId": dbUser.UID,
 			"role": models.UserRoleCustomer})
 		if e != nil {
-			log.Printf("error updating user: %s", e.Error())
+			log.ErrorF("error updating user: %s", e.Error())
 		}
 	} else {
 		log.Printf("User with fiscalCode %s is being created", onboardUserRequest.FiscalCode)
@@ -88,7 +88,7 @@ func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface
 
 	err := user.BigquerySave(origin)
 	if err != nil {
-		log.Printf("error save user %s bigquery: %s", user.Uid, err.Error())
+		log.ErrorF("error save user %s bigquery: %s", user.Uid, err.Error())
 	}
 
 	log.Println("updating claims for user")
