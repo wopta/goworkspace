@@ -114,19 +114,21 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 func generateDiffPolicy(originalPolicy, inputPolicy models.Policy) (models.Policy, bool) {
 	var (
 		diff            models.Policy
+		diffContractor  models.Contractor
+		diffAssets      []models.Asset
 		hasPolicyVaried bool
 	)
 
 	if hasVaried := diffForUser(originalPolicy.Contractor.ToUser(), inputPolicy.Contractor.ToUser()); hasVaried {
 		hasPolicyVaried = true
-		diff.Contractor = inputPolicy.Contractor
+		diffContractor = inputPolicy.Contractor
 	}
 
-	diff.Assets = make([]models.Asset, len(inputPolicy.Assets), len(inputPolicy.Assets))
+	diffAssets = make([]models.Asset, len(inputPolicy.Assets))
 
 	// TODO: missing asset uid for life - Enhance how assets are recognized
 	for idx, asset := range inputPolicy.Assets {
-		diff.Assets[idx].Guarantees = make([]models.Guarante, 0, len(inputPolicy.Assets[idx].Guarantees))
+		diffAssets[idx].Guarantees = make([]models.Guarante, 0, len(inputPolicy.Assets[idx].Guarantees))
 		var modifiedAsset models.Asset
 		if asset.Person != nil {
 			if hasVaried := diffForUser(originalPolicy.Assets[idx].Person, inputPolicy.Assets[idx].Person); hasVaried {
@@ -171,18 +173,14 @@ func generateDiffPolicy(originalPolicy, inputPolicy models.Policy) (models.Polic
 			}
 		}
 		if !reflect.DeepEqual(models.Asset{}, modifiedAsset) {
-			diff.Assets[idx] = modifiedAsset
+			diffAssets[idx] = modifiedAsset
 		}
 	}
 
 	if hasPolicyVaried {
-		diff.Uid = originalPolicy.Uid
-		diff.Name = originalPolicy.Name
-		diff.NameDesc = originalPolicy.NameDesc
-		diff.ProposalNumber = originalPolicy.ProposalNumber
-		diff.StartDate = originalPolicy.StartDate
-		diff.EndDate = originalPolicy.EndDate
-		diff.Company = originalPolicy.Company
+		diff = originalPolicy
+		diff.Contractor = diffContractor
+		diff.Assets = diffAssets
 	}
 
 	return diff, hasPolicyVaried
