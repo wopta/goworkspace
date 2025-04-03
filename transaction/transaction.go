@@ -89,17 +89,18 @@ func GetTransactionToBePaid(policyUid, providerId, scheduleDate, collection stri
 		transactions []models.Transaction
 		err          error
 	)
-
+	log.AddPrefix("GetPolicyFirstTransaction")
+	defer log.PopPrefix()
 	transactions, err = getTransactionByPolicyUidAndProviderId(policyUid, providerId, collection)
 	if err != nil {
-		log.Printf("[GetPolicyFirstTransaction] ERROR By ProviderId %s", err.Error())
+		log.ErrorF("ERROR By ProviderId %s", err.Error())
 		return models.Transaction{}, err
 	}
 
 	if len(transactions) == 0 {
 		transactions, err = getTransactionByPolicyUidAndScheduleDate(policyUid, scheduleDate, collection)
 		if err != nil {
-			log.Printf("[GetPolicyFirstTransaction] ERROR By ScheduleDate %s", err.Error())
+			log.ErrorF("ERROR By ScheduleDate %s", err.Error())
 			return models.Transaction{}, err
 		}
 	}
@@ -110,6 +111,8 @@ func GetTransactionToBePaid(policyUid, providerId, scheduleDate, collection stri
 }
 
 func getTransactionByPolicyUidAndProviderId(policyUid, providerId, collection string) ([]models.Transaction, error) {
+	log.AddPrefix("getTransactionByPolicyUidAndProviderId")
+	defer log.PopPrefix()
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{
 			{
@@ -132,13 +135,15 @@ func getTransactionByPolicyUidAndProviderId(policyUid, providerId, collection st
 
 	query, err := q.FirestoreWherefields(collection)
 	if err != nil {
-		log.Printf("[getTransactionByPolicyUidAndProviderId] ERROR %s", err.Error())
+		log.Error(err)
 		return nil, err
 	}
 	return models.TransactionToListData(query), nil
 }
 
 func getTransactionByPolicyUidAndScheduleDate(policyUid, scheduleDate, collection string) ([]models.Transaction, error) {
+	log.AddPrefix("getTransactionByPolicyUidAndScheduleDate")
+	defer log.PopPrefix()
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{
 			{
@@ -160,7 +165,7 @@ func getTransactionByPolicyUidAndScheduleDate(policyUid, scheduleDate, collectio
 	}
 	query, err := q.FirestoreWherefields(collection)
 	if err != nil {
-		log.ErrorF("[getTransactionByPolicyUidAndScheduleDate] ERROR %s", err.Error())
+		log.Error(err)
 		return nil, err
 	}
 	return models.TransactionToListData(query), nil

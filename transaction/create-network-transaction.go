@@ -91,7 +91,7 @@ func createCompanyNetworkTransaction(
 	var code string
 
 	if isGapCamper(policy) {
-		log.Println("[GetCommissionByNode] overrinding product commissions for Gap camper")
+		log.Println("overrinding product commissions for Gap camper")
 		mgaProduct.Offers["base"].Commissions.NewBusiness = 0.22
 		mgaProduct.Offers["base"].Commissions.NewBusinessPassive = 0.22
 		mgaProduct.Offers["base"].Commissions.Renew = 0
