@@ -2,7 +2,7 @@ package fabrick
 
 import (
 	"encoding/json"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"strings"
 
@@ -27,10 +27,10 @@ func AnnuitySingleRateFx(_ http.ResponseWriter, r *http.Request) (string, interf
 		response       = FabrickResponse{Result: true, Locale: "it"}
 	)
 
-	log.SetPrefix("[AnnuitySingleRateFx] ")
+	log.AddPrefix("[AnnuitySingleRateFx] ")
 	defer func() {
 		log.Println("Handler end ---------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 
 	log.Println("Handler start -----------------------------------------------")
@@ -43,12 +43,12 @@ func AnnuitySingleRateFx(_ http.ResponseWriter, r *http.Request) (string, interf
 	err = json.NewDecoder(r.Body).Decode(&requestPayload)
 	defer r.Body.Close()
 	if err != nil {
-		log.Printf("error decoding request body: %s", err)
+		log.ErrorF("error decoding request body: %s", err)
 		return "", nil, err
 	}
 	strPayload, err := request.FromPayload(requestPayload)
 	if err != nil {
-		log.Printf("error decoding request body: %s", err)
+		log.ErrorF("error decoding request body: %s", err)
 		return "", nil, err
 	}
 	response.RequestPayload = strPayload
@@ -69,13 +69,13 @@ func AnnuitySingleRateFx(_ http.ResponseWriter, r *http.Request) (string, interf
 
 	err = annuitySingleRate(policyUid, providerId, trSchedule, paymentMethod)
 	if err != nil {
-		log.Printf("error paying first annuity rate: %s", err)
+		log.ErrorF("error paying first annuity rate: %s", err)
 		response.Result = false
 	}
 
 	stringRes, err := json.Marshal(response)
 	if err != nil {
-		log.Printf("error marshaling error response: %s", err)
+		log.ErrorF("error marshaling error response: %s", err)
 	}
 
 	return string(stringRes), response, nil

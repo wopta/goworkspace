@@ -1,7 +1,7 @@
 package callback
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"strings"
 
 	"github.com/wopta/goworkspace/bpmn"
@@ -33,8 +33,9 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		flow     []models.Process
 		flowFile *models.NodeSetting
 	)
-
-	log.Println("[runCallbackBpmn] configuring flow --------------------------")
+	log.AddPrefix("runCallbackBpmn")
+	defer log.PopPrefix()
+	log.Println("configuring flow --------------------------")
 
 	toAddress = mail.Address{}
 	ccAddress = mail.Address{}
@@ -47,10 +48,10 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 
 	flowName, flowFile = policy.GetFlow(networkNode, warrant)
 	if flowFile == nil {
-		log.Println("[runCallbackBpmn] exiting bpmn - flowFile not loaded")
+		log.Println("exiting bpmn - flowFile not loaded")
 		return nil
 	}
-	log.Printf("[runCallbackBpmn] flowName '%s'", flowName)
+	log.Printf("flowName '%s'", flowName)
 
 	mgaProduct = prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 
@@ -61,12 +62,12 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 	case payFlowKey:
 		flow = flowFile.PayFlow
 	default:
-		log.Println("[runCallbackBpmn] error flow not set")
+		log.Println("error flow not set")
 		return nil
 	}
 
 	flowHandlers := lib.SliceMap[models.Process, string](flow, func(h models.Process) string { return h.Name })
-	log.Printf("[runCallbackBpmn] starting %s flow with set handlers: %s", flowKey, strings.Join(flowHandlers, ","))
+	log.Printf("starting %s flow with set handlers: %s", flowKey, strings.Join(flowHandlers, ","))
 
 	state := bpmn.NewBpmn(*policy)
 
@@ -96,10 +97,13 @@ func addPayHandlers(state *bpmn.State) {
 }
 
 func setSign(state *bpmn.State) error {
+	log.AddPrefix("SetSign")
+	defer log.PopPrefix()
+
 	policy := state.Data
 	err := plc.Sign(policy, origin)
 	if err != nil {
-		log.Printf("[setSign] ERROR: %s", err.Error())
+		log.Error(err)
 		return err
 	}
 
@@ -115,6 +119,8 @@ func addContract(state *bpmn.State) error {
 
 func sendMailContract(state *bpmn.State) error {
 	policy := state.Data
+	log.AddPrefix("sendMailContract")
+	defer log.PopPrefix()
 
 	switch flowName {
 	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
@@ -129,7 +135,7 @@ func sendMailContract(state *bpmn.State) error {
 	}
 
 	log.Printf(
-		"[sendMailContract] from '%s', to '%s', cc '%s'",
+		"from '%s', to '%s', cc '%s'",
 		fromAddress.String(),
 		toAddress.String(),
 		ccAddress.String(),
@@ -141,9 +147,10 @@ func sendMailContract(state *bpmn.State) error {
 
 func fillAttachments(state *bpmn.State) error {
 	policy := state.Data
+	log.AddPrefix("FillAttachments")
 	err := plc.FillAttachments(policy, origin)
 	if err != nil {
-		log.Printf("[fillAttachments] ERROR: %s", err.Error())
+		log.Error(err)
 		return err
 	}
 
@@ -151,10 +158,12 @@ func fillAttachments(state *bpmn.State) error {
 }
 
 func setToPay(state *bpmn.State) error {
+	log.AddPrefix("setToPay")
+	defer log.PopPrefix()
 	policy := state.Data
 	err := plc.SetToPay(policy, origin)
 	if err != nil {
-		log.Printf("[setToPay] ERROR: %s", err.Error())
+		log.Error(err)
 		return err
 	}
 
@@ -163,7 +172,8 @@ func setToPay(state *bpmn.State) error {
 
 func sendMailPay(state *bpmn.State) error {
 	policy := state.Data
-
+	log.AddPrefix("sendMailPay")
+	defer log.PopPrefix()
 	switch flowName {
 	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
 		if sendEmail {
@@ -177,7 +187,7 @@ func sendMailPay(state *bpmn.State) error {
 	}
 
 	log.Printf(
-		"[sendMailPay] from '%s', to '%s', cc '%s'",
+		"from '%s', to '%s', cc '%s'",
 		fromAddress.String(),
 		toAddress.String(),
 		ccAddress.String(),
@@ -190,36 +200,38 @@ func sendMailPay(state *bpmn.State) error {
 func updatePolicy(state *bpmn.State) error {
 	var err error
 	policy := state.Data
+	log.AddPrefix("updatePolicy")
+	defer log.PopPrefix()
 
 	if policy.IsPay || policy.Status != models.PolicyStatusToPay {
-		log.Printf("[updatePolicy] policy already updated with isPay %t and status %s", policy.IsPay, policy.Status)
+		log.Printf("policy already updated with isPay %t and status %s", policy.IsPay, policy.Status)
 		return nil
 	}
 
 	// promote documents from temp bucket to user and connect it to policy
 	err = plc.SetUserIntoPolicyContractor(policy, origin)
 	if err != nil {
-		log.Printf("[updatePolicy] ERROR SetUserIntoPolicyContractor %s", err.Error())
+		log.ErrorF("error SetUserIntoPolicyContractor %s", err.Error())
 		return err
 	}
 
 	// Add Policy contract
 	err = plc.AddContract(policy, origin)
 	if err != nil {
-		log.Printf("[updatePolicy] ERROR AddContract %s", err.Error())
+		log.ErrorF("error AddContract %s", err.Error())
 		return err
 	}
 
 	// Update Policy as paid
 	err = plc.Pay(policy, origin)
 	if err != nil {
-		log.Printf("[updatePolicy] ERROR Policy Pay %s", err.Error())
+		log.ErrorF("error Policy Pay %s", err.Error())
 		return err
 	}
 
 	err = network.UpdateNetworkNodePortfolio(origin, policy, networkNode)
 	if err != nil {
-		log.Printf("[updatePolicy] error updating %s portfolio %s", networkNode.Type, err.Error())
+		log.ErrorF("error updating %s portfolio %s", networkNode.Type, err.Error())
 		return err
 	}
 
@@ -237,7 +249,7 @@ func updatePolicy(state *bpmn.State) error {
 
 	// Send mail with the contract to the user
 	log.Printf(
-		"[updatePolicy] from '%s', to '%s', cc '%s'",
+		"from '%s', to '%s', cc '%s'",
 		fromAddress.String(),
 		toAddress.String(),
 		ccAddress.String(),
@@ -248,11 +260,13 @@ func updatePolicy(state *bpmn.State) error {
 }
 
 func payTransaction(state *bpmn.State) error {
+	log.AddPrefix("fabrickPayment")
+	defer log.PopPrefix()
 	policy := state.Data
 	transaction, _ := tr.GetTransactionToBePaid(policy.Uid, providerId, trSchedule, lib.TransactionsCollection)
 	err := tr.Pay(&transaction, origin, paymentMethod)
 	if err != nil {
-		log.Printf("[fabrickPayment] ERROR Transaction Pay %s", err.Error())
+		log.ErrorF("error Transaction Pay %s", err.Error())
 		return err
 	}
 
