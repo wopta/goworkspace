@@ -1219,12 +1219,13 @@ func createNetworkTransactions(
 	mgaProduct *models.Product,
 ) []*models.NetworkTransaction {
 	var err error
-
+	log.AddPrefix("CreateNetworkTransactions")
+	defer log.PopPrefix()
 	networkTransactions := make([]*models.NetworkTransaction, 0)
 
 	nt, err := createCompanyNetworkTransaction(policy, transaction, producerNode, mgaProduct)
 	if err != nil {
-		log.Printf("[CreateNetworkTransactions] error creating company network-transaction: %s", err.Error())
+		log.Printf("error creating company network-transaction: %s", err.Error())
 		return nil
 	}
 
@@ -1239,12 +1240,12 @@ func createNetworkTransactions(
 
 			warrant := currentNode.GetWarrant()
 			if warrant == nil {
-				log.Printf("[CreateNetworkTransactions] error getting warrant for node: %s", currentNode.Uid)
+				log.Printf("error getting warrant for node: %s", currentNode.Uid)
 				return baseName
 			}
 			prod := warrant.GetProduct(policy.Name)
 			if warrant == nil {
-				log.Printf("[CreateNetworkTransactions] error getting product for warrant: %s", warrant.Name)
+				log.Printf("error getting product for warrant: %s", warrant.Name)
 				return baseName
 			}
 
@@ -1264,9 +1265,9 @@ func createNetworkTransactions(
 
 			nt, err = createNetworkTransaction(policy, transaction, currentNode, commission, accountType, paymentType, nodeName)
 			if err != nil {
-				log.Printf("[CreateNetworkTransactions] error creating network-transaction: %s", err.Error())
+				log.Printf("error creating network-transaction: %s", err.Error())
 			} else {
-				log.Printf("[CreateNetworkTransactions] created network-transaction for node: %s", currentNode.Uid)
+				log.Printf("created network-transaction for node: %s", currentNode.Uid)
 			}
 
 			networkTransactions = append(networkTransactions, nt)
@@ -1292,12 +1293,14 @@ func getPaymentType(transaction *models.Transaction, policy *models.Policy, prod
 }
 
 func policyBigquerySave(policy models.Policy, collectionPrefix string) {
-	log.Printf("[policyBigquerySave] parsing data for policy %s", policy.Uid)
+	log.AddPrefix("policyBigquerySave")
+	defer log.PopPrefix()
+	log.Printf("parsing data for policy %s", policy.Uid)
 
 	policyBig := lib.GetDatasetByEnv("", fmt.Sprintf("%s%s", collectionPrefix, lib.PolicyCollection))
 	policyJson, err := policy.Marshal()
 	if err != nil {
-		log.Printf("[policy.BigquerySave] error marshaling policy: %s", err.Error())
+		log.Printf("error marshaling policy: %s", err.Error())
 	}
 
 	policy.Data = string(policyJson)
@@ -1312,13 +1315,13 @@ func policyBigquerySave(policy models.Policy, collectionPrefix string) {
 		policy.BigAcceptanceDate = lib.GetBigQueryNullDateTime(policy.ReservedInfo.AcceptanceDate)
 	}
 
-	log.Println("[policyBigquerySave] saving to bigquery...")
+	log.Println("saving to bigquery...")
 	err = lib.InsertRowsBigQuery(models.WoptaDataset, policyBig, policy)
 	if err != nil {
-		log.Println("[policyBigquerySave] error saving policy to bigquery: ", err.Error())
+		log.Println("error saving policy to bigquery: ", err.Error())
 		return
 	}
-	log.Println("[policyBigquerySave] bigquery saved!")
+	log.Println("bigquery saved!")
 }
 
 func transactionBigQuerySave(transaction models.Transaction, collectionPrefix string) {
@@ -1335,7 +1338,8 @@ func transactionBigQuerySave(transaction models.Transaction, collectionPrefix st
 }
 
 func networkTransactionBigQuerySave(nt models.NetworkTransaction, collectionPrefix string) error {
-	log.Println("[NetworkTransaction.SaveBigQuery]")
+	log.AddPrefix("NetworkTransaction")
+	defer log.PopPrefix()
 
 	var (
 		err       error
@@ -1349,15 +1353,15 @@ func networkTransactionBigQuerySave(nt models.NetworkTransaction, collectionPref
 
 	result, err := lib.QueryRowsBigQuery[models.NetworkTransaction](query)
 	if err != nil {
-		log.Printf("[NetworkTransaction.SaveBigQuery] error querying db with query %s: %s", query, err.Error())
+		log.Printf("[.SaveBigQuery] error querying db with query %s: %s", query, err.Error())
 		return err
 	}
 
 	if len(result) == 0 {
-		log.Printf("[NetworkTransaction.SaveBigQuery] creating new NetworkTransaction %s", nt.Uid)
+		log.Printf("creating new NetworkTransaction %s", nt.Uid)
 		err = lib.InsertRowsBigQuery(datasetId, tableId, nt)
 	} else {
-		log.Printf("[NetworkTransaction.SaveBigQuery] updating NetworkTransaction %s", nt.Uid)
+		log.Printf("updating NetworkTransaction %s", nt.Uid)
 		updatedFields := make(map[string]interface{})
 		updatedFields["status"] = nt.Status
 		updatedFields["statusHistory"] = nt.StatusHistory
@@ -1381,16 +1385,17 @@ func networkTransactionBigQuerySave(nt models.NetworkTransaction, collectionPref
 	}
 
 	if err != nil {
-		log.Printf("[NetworkTransaction.SaveBigQuery] error saving to db: %s", err.Error())
+		log.Printf("error saving to db: %s", err.Error())
 		return err
 	}
 
-	log.Println("[NetworkTransaction.SaveBigQuery] NetworkTransaction saved!")
+	log.Println("NetworkTransaction saved!")
 	return nil
 }
 
 func networkNodeBigQuerySave(nn models.NetworkNode, collectionPrefix string) error {
-	log.Println("[networkNodeSaveBigQuery]")
+	log.AddPrefix("networkNodeSaveBigQuery")
+	defer log.PopPrefix()
 
 	nnJson, _ := json.Marshal(nn)
 
