@@ -2,8 +2,8 @@ package broker
 
 import (
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"time"
@@ -22,14 +22,14 @@ func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, int
 		policy models.Policy
 	)
 
-	log.SetPrefix("[UploadPolicyContractFx] ")
+	log.AddPrefix("[UploadPolicyContractFx] ")
 	defer func() {
 		r.Body.Close()
 		if err != nil {
-			log.Printf("error: %s", err.Error())
+			log.ErrorF("error: %s", err.Error())
 		}
 		log.Println("Handler end ----------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 
 	log.Println("Handler start -----------------------------------------------")

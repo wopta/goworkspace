@@ -2,7 +2,7 @@ package renew
 
 import (
 	"errors"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"time"
 
@@ -20,20 +20,21 @@ func DeleteRenewPolicyFx(w http.ResponseWriter, r *http.Request) (string, interf
 		policy models.Policy
 	)
 
-	log.SetPrefix("[DeleteRenewPolicyFx] ")
+	log.AddPrefix("DeleteRenewPolicyFx")
+	log.AddPrefix("[DeleteRenewPolicyFx] ")
 	defer func() {
 		if err != nil {
-			log.Printf("error: %s", err)
+			log.ErrorF("error: %s", err)
 		}
 		log.Println("Handler end ---------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 	log.Println("Handler start -----------------------------------------------")
 
 	uid := chi.URLParam(r, "uid")
 
 	if policy, err = plcRenew.GetRenewPolicyByUid(uid); err != nil {
-		log.Printf("error getting renew policy %v", err)
+		log.ErrorF("error getting renew policy %v", err)
 		return "", nil, err
 	}
 
@@ -44,13 +45,13 @@ func DeleteRenewPolicyFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	transactions, err := trxRenew.GetRenewActiveTransactionsByPolicyUid(policy.Uid, policy.Annuity)
 	if err != nil {
-		log.Printf("error getting renew transactions %v", err)
+		log.ErrorF("error getting renew transactions %v", err)
 		return "", nil, err
 	}
 
 	err = providerDeleteTransactions(policy.Payment, transactions)
 	if err != nil {
-		log.Printf("error deleting transaction on fabrick system %v", err)
+		log.ErrorF("error deleting transaction on fabrick system %v", err)
 		return "", nil, err
 	}
 
@@ -61,7 +62,7 @@ func DeleteRenewPolicyFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	err = saveToDatabases(batchData)
 	if err != nil {
-		log.Printf("error saving batch to DB %v", err)
+		log.ErrorF("error saving batch to DB %v", err)
 		return "", nil, err
 	}
 

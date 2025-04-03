@@ -2,8 +2,8 @@ package broker
 
 import (
 	"encoding/json"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"time"
 
@@ -25,8 +25,8 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		response    UpdatePolicyResponse
 	)
 
-	log.SetPrefix("[UpdatePolicyFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("[UpdatePolicyFx] ")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -38,7 +38,7 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	defer r.Body.Close()
 	err = json.Unmarshal(body, &inputPolicy)
 	if err != nil {
-		log.Printf("error unable to unmarshal request body: %s", err.Error())
+		log.ErrorF("error unable to unmarshal request body: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -46,7 +46,7 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	originalPolicy, err := plc.GetPolicy(policyUid, origin)
 	if err != nil {
-		log.Printf("error unable to retrieve original policy: %s", err.Error())
+		log.ErrorF("error unable to retrieve original policy: %s", err.Error())
 		return "", nil, err
 	}
 	originalPolicyBytes, _ := json.Marshal(originalPolicy)
@@ -68,21 +68,21 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	inputJson, err := json.Marshal(mergedInput)
 	if err != nil {
-		log.Printf("error unable to marshal input result: %s", err.Error())
+		log.ErrorF("error unable to marshal input result: %s", err.Error())
 		return "", nil, err
 	}
 	log.Printf("modified policy values: %v", string(inputJson))
 
 	_, err = lib.FireUpdate(firePolicy, policyUid, mergedInput)
 	if err != nil {
-		log.Printf("error updating policy in firestore: %s", err.Error())
+		log.ErrorF("error updating policy in firestore: %s", err.Error())
 		return "", nil, err
 	}
 
 	// TODO: improve me
 	updatedPolicy, err := plc.GetPolicy(policyUid, origin)
 	if err != nil {
-		log.Printf("error unable to retrieve updated policy: %s", err.Error())
+		log.ErrorF("error unable to retrieve updated policy: %s", err.Error())
 		return "", nil, err
 	}
 	response.Policy = &updatedPolicy
@@ -102,8 +102,8 @@ func PatchPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		updateValues map[string]interface{}
 	)
 
-	log.SetPrefix("[PatchPolicyFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("PatchPolicyFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -123,7 +123,7 @@ func PatchPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	err = lib.UpdateFirestoreErr(firePolicy, policyUID, updateValues)
 	if err != nil {
-		log.Println("error during policy update in firestore")
+		log.ErrorF("error during policy update in firestore")
 		return "", nil, err
 	}
 
@@ -140,8 +140,8 @@ func DeletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		request   PolicyDeleteReq
 	)
 
-	log.SetPrefix("[DeletePolicyFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("DeletePolicyFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 

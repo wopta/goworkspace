@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -27,8 +27,8 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		policy models.Policy
 	)
 
-	log.SetPrefix("[RequestApprovalFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("[RequestApprovalFx] ")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -37,7 +37,7 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	token := r.Header.Get("Authorization")
 	authToken, err := lib.GetAuthTokenFromIdToken(token)
 	if err != nil {
-		log.Printf("error getting authToken")
+		log.ErrorF("error getting authToken")
 		return "", nil, err
 	}
 	log.Printf(
@@ -54,14 +54,14 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	err = json.Unmarshal(body, &req)
 	if err != nil {
-		log.Printf("error unmarshaling request body: %s", err.Error())
+		log.ErrorF("error unmarshaling request body: %s", err.Error())
 		return "", nil, err
 	}
 
 	log.Printf("fetching policy %s from Firestore...", req.PolicyUid)
 	policy, err = plc.GetPolicy(req.PolicyUid, origin)
 	if err != nil {
-		log.Printf("error fetching policy %s from Firestore...", req.PolicyUid)
+		log.ErrorF("error fetching policy %s from Firestore...", req.PolicyUid)
 		return "", nil, err
 	}
 
@@ -82,7 +82,7 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	err = requestApproval(&policy)
 	if err != nil {
-		log.Printf("error request approval: %s", err.Error())
+		log.ErrorF("error request approval: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -97,40 +97,44 @@ func requestApproval(policy *models.Policy) error {
 	var (
 		err error
 	)
+	log.AddPrefix("requestApproval")
+	defer log.PopPrefix()
 
-	log.Println("[requestApproval] start -------------------------------------")
+	log.Println("start -------------------------------------")
 
 	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
 	if networkNode != nil {
 		warrant = networkNode.GetWarrant()
 	}
 
-	log.Println("[requestApproval] starting bpmn flow...")
+	log.Println("starting bpmn flow...")
 
 	state := runBrokerBpmn(policy, requestApprovalFlowKey)
 	if state == nil || state.Data == nil {
-		log.Println("[requestApproval] error bpmn - state not set")
+		log.Println("error bpmn - state not set")
 		return errors.New("error on bpmn - no data present")
 	}
 	if state.IsFailed {
-		log.Println("[requestApproval] error bpmn - state failed")
+		log.Println("error bpmn - state failed")
 		return nil
 	}
 
 	*policy = *state.Data
 
-	log.Printf("[requestApproval] saving policy with uid %s to bigquery...", policy.Uid)
+	log.Printf("saving policy with uid %s to bigquery...", policy.Uid)
 	policy.BigquerySave(origin)
 
 	callback_out.Execute(networkNode, *policy, callback_out.RequestApproval)
 
-	log.Println("[requestApproval] end ---------------------------------------")
+	log.Println("end ---------------------------------------")
 
 	return err
 }
 
 func setRequestApprovalData(policy *models.Policy) {
-	log.Printf("[setRequestApprovalData] policy uid %s: reserved flow", policy.Uid)
+	log.AddPrefix("setRequestApprovalData")
+	defer log.PopPrefix()
+	log.Printf("policy uid %s: reserved flow", policy.Uid)
 
 	setProposalNumber(policy)
 

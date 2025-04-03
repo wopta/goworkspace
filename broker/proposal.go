@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -31,8 +31,8 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		req    ProposalReq
 	)
 
-	log.SetPrefix("[ProposalFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("[ProposalFx] ")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -41,7 +41,7 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	token := r.Header.Get("Authorization")
 	authToken, err := lib.GetAuthTokenFromIdToken(token)
 	if err != nil {
-		log.Printf("error getting authToken")
+		log.ErrorF("error getting authToken")
 		return "", nil, err
 	}
 	log.Printf(
@@ -59,7 +59,7 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	if lib.GetBoolEnv("PROPOSAL_V2") {
 		err = json.Unmarshal(body, &req)
 		if err != nil {
-			log.Printf("error proposal body: %s", err.Error())
+			log.ErrorF("error proposal body: %s", err.Error())
 			return "", nil, err
 		}
 
@@ -71,7 +71,7 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 		policy, err = plc.GetPolicy(req.PolicyUid, origin)
 		if err != nil {
-			log.Printf("error fetching policy %s from Firestore...: %s", req.PolicyUid, err.Error())
+			log.ErrorF("error fetching policy %s from Firestore...: %s", req.PolicyUid, err.Error())
 			return "", nil, err
 		}
 
@@ -84,19 +84,19 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 		err = proposal(&policy)
 		if err != nil {
-			log.Printf("error creating proposal: %s", err.Error())
+			log.ErrorF("error creating proposal: %s", err.Error())
 			return "", nil, err
 		}
 	} else {
 		err = json.Unmarshal(body, &policy)
 		if err != nil {
-			log.Printf("error unmarshaling policy: %s", err.Error())
+			log.ErrorF("error unmarshaling policy: %s", err.Error())
 			return "", nil, err
 		}
 
 		err = lead(authToken, &policy)
 		if err != nil {
-			log.Printf("error creating lead: %s", err.Error())
+			log.ErrorF("error creating lead: %s", err.Error())
 			return "", nil, err
 		}
 		setProposalNumber(&policy)
@@ -105,7 +105,7 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	resp, err := policy.Marshal()
 	if err != nil {
-		log.Printf("error marshaling response: %s", err.Error())
+		log.ErrorF("error marshaling response: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -115,7 +115,9 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 }
 
 func proposal(policy *models.Policy) error {
-	log.Println("[proposal] starting bpmn flow...")
+	log.AddPrefix("proposal")
+	defer log.PopPrefix()
+	log.Println("starting bpmn flow...")
 
 	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
 	if networkNode != nil {
@@ -124,17 +126,17 @@ func proposal(policy *models.Policy) error {
 
 	state := runBrokerBpmn(policy, proposalFlowKey)
 	if state == nil || state.Data == nil {
-		log.Println("[proposal] error bpmn - state not set")
+		log.Println("error bpmn - state not set")
 		return errors.New("error on bpmn - no data present")
 	}
 	if state.IsFailed {
-		log.Println("[proposal] error bpmn - state failed")
+		log.Println("error bpmn - state failed")
 		return errors.New("error bpmn - state failed")
 	}
 
 	*policy = *state.Data
 
-	log.Printf("[proposal] saving proposal n. %d to bigquery...", policy.ProposalNumber)
+	log.Printf("saving proposal n. %d to bigquery...", policy.ProposalNumber)
 	policy.BigquerySave(origin)
 
 	if !policy.IsReserved {
@@ -145,13 +147,13 @@ func proposal(policy *models.Policy) error {
 }
 
 func setProposalData(policy *models.Policy) {
-	log.Println("[setProposalData]")
-
+	log.AddPrefix("setProposalData")
+	defer log.PopPrefix()
 	setProposalNumber(policy)
 	policy.Status = models.PolicyStatusProposal
 
 	if policy.IsReserved {
-		log.Println("[setProposalData] setting NeedsApproval status")
+		log.Println("setting NeedsApproval status")
 		policy.Status = models.PolicyStatusNeedsApproval
 
 		for _, reason := range policy.ReservedInfo.Reasons {
@@ -167,11 +169,11 @@ func setProposalData(policy *models.Policy) {
 		var err error
 		policy.Statements = new([]models.Statement)
 
-		log.Println("[setProposalData] setting policy statements")
+		log.Println("setting policy statements")
 
 		*policy.Statements, err = question.GetStatements(policy)
 		if err != nil {
-			log.Printf("[setProposalData] error setting policy statements: %s", err.Error())
+			log.ErrorF("error setting policy statements: %s", err.Error())
 			return
 		}
 
@@ -179,22 +181,24 @@ func setProposalData(policy *models.Policy) {
 
 	plc.AddProposalDoc(origin, policy, networkNode, mgaProduct)
 
-	log.Printf("[setProposalData] policy status %s", policy.Status)
+	log.Printf("policy status %s", policy.Status)
 
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 	policy.Updated = time.Now().UTC()
 }
 
 func setProposalNumber(policy *models.Policy) {
-	log.Println("[setProposalNumber] set proposal number start ---------------")
+	log.AddPrefix("SetProposalNumber")
+	defer log.PopPrefix()
+	log.Println("set proposal number start ---------------")
 
 	if policy.ProposalNumber != 0 {
-		log.Printf("[setProposalNumber] proposal number already set %d", policy.ProposalNumber)
+		log.Printf("proposal number already set %d", policy.ProposalNumber)
 		return
 	}
 
-	log.Println("[setProposalNumber] setting proposal number...")
+	log.Println("setting proposal number...")
 	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 	policy.ProposalNumber = GetSequenceProposal("", firePolicy)
-	log.Printf("[setProposalNumber] proposal number %d", policy.ProposalNumber)
+	log.Printf("proposal number %d", policy.ProposalNumber)
 }
