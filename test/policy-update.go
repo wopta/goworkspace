@@ -6,10 +6,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/product"
 	"github.com/wopta/goworkspace/transaction"
-	"log"
 	"os"
 	"strings"
 	"sync"
@@ -22,7 +22,7 @@ func getAllPolicies(numPolicies int) ([]models.Policy, error) {
 
 	snapshots, err := docIterator.GetAll()
 	if err != nil {
-		log.Printf("error getting polcies from Firestore: %s", err.Error())
+		log.ErrorF("error getting polcies from Firestore: %s", err.Error())
 		return policies, err
 	}
 
@@ -30,7 +30,7 @@ func getAllPolicies(numPolicies int) ([]models.Policy, error) {
 		var policy models.Policy
 		err = snapshot.DataTo(&policy)
 		if err != nil {
-			log.Printf("error parsing policy %s: %s", snapshot.Ref.ID, err.Error())
+			log.ErrorF("error parsing policy %s: %s", snapshot.Ref.ID, err.Error())
 		} else {
 			policies = append(policies, policy)
 		}
@@ -97,7 +97,7 @@ func policyTransactionsUpdate(request int) {
 
 			err = setBatchFirestoreErr(m)
 			if err != nil {
-				log.Printf("error saving policy and transactiosn into firestore: %s", err.Error())
+				log.ErrorF("error saving policy and transactiosn into firestore: %s", err.Error())
 				return
 			}
 
@@ -105,7 +105,7 @@ func policyTransactionsUpdate(request int) {
 
 			err = lib.InsertRowsBigQuery(lib.WoptaDataset, lib.TransactionsCollection, transactionsList)
 			if err != nil {
-				log.Println("error saving transactions into BigQuery", err)
+				log.ErrorF("error saving transactions into BigQuery", err)
 			}
 			log.Printf("Updated data for policy %s", p.Uid)
 		}(p)
@@ -134,7 +134,7 @@ func setBatchFirestoreErr[T any](operations map[string]map[string]T) error {
 			col := c.Doc(k)
 			_, err = bulk.Set(col, v)
 			if err != nil {
-				log.Printf("error batch firestore: %s", err.Error())
+				log.ErrorF("error batch firestore: %s", err.Error())
 				return err
 			}
 		}

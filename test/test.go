@@ -1,7 +1,7 @@
 package test
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
@@ -39,7 +39,7 @@ var testRoutes []lib.Route = []lib.Route{
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
-		Route:   "/log",
+		Route:   "/log/{severity}/{message}",
 		Handler: lib.ResponseLoggerWrapper(logFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
@@ -52,7 +52,6 @@ func init() {
 }
 
 func Test(w http.ResponseWriter, r *http.Request) {
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
 	router := lib.GetRouter("test", testRoutes)
 	router.ServeHTTP(w, r)

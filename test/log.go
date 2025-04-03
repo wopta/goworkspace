@@ -3,14 +3,16 @@ package test
 import (
 	"net/http"
 
-	"github.com/wopta/goworkspace/test/log"
+	"github.com/go-chi/chi/v5"
+	"github.com/wopta/goworkspace/lib/log"
 )
 
 func logFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	logger := log.NewLog()
-	logger.AddPrefix("titleeee1")
-	logger.AddPrefix("titleeee2")
-	logger.Error("scoppiooo")
-	logger.Warning("waaarr")
+	log.AddPrefix("TestLog")
+	defer log.PopPrefix()
+
+	secutiry := chi.URLParam(r, "severity")
+	message := chi.URLParam(r, "message")
+	log.Log().CustomLog(message, log.SeverityType(secutiry))
 	return "", nil, nil
 }

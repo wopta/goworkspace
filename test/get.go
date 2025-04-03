@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -15,8 +15,8 @@ import (
 )
 
 // func TestGetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-// 	log.SetPrefix("[TestGetFx] ")
-// 	defer log.SetPrefix("")
+// 	log.AddPrefix("[TestGetFx] ")
+// 	defer log.PopPrefix()
 // 	log.Println("Handler start -----------------------------------------------")
 
 // 	operation := chi.URLParam(r, "operation")
@@ -122,7 +122,7 @@ func TestGetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		Message:  "This is a notice message",
 	})
 
-	log.SetPrefix("[TestGetFx] ")
+	log.AddPrefix("[TestGetFx] ")
 
 	log.Println(Entry{
 		Severity: logging.Warning.String(),
@@ -143,8 +143,7 @@ func TestGetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	logger.Warn("This is a warn log", "env", os.Getenv("env"))
 	logger.Error("This is an error log", "env", os.Getenv("env"))
 
-	log.SetFlags(0)
-	log.SetPrefix("")
+	log.PopPrefix()
 
 	log.Println(Entry{
 		Severity: logging.Notice.String(),

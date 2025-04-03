@@ -1,7 +1,7 @@
 package test
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"time"
 
