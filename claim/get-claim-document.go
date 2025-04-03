@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"log"
 	"net/http"
 	"os"
 
 	"github.com/go-chi/chi/v5"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -28,8 +28,8 @@ func GetClaimDocumentFx(w http.ResponseWriter, r *http.Request) (string, interfa
 		request  GetClaimDocumentReq
 		response GetClaimDocumentResp
 	)
-	log.SetPrefix("[GetClaimDocumentFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("GetClaimDocumentFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -44,13 +44,13 @@ func GetClaimDocumentFx(w http.ResponseWriter, r *http.Request) (string, interfa
 
 	err = json.Unmarshal(body, &request)
 	if err != nil {
-		log.Printf("error parsing body, error %s", err.Error())
+		log.ErrorF("error parsing body, error %s", err.Error())
 		return "", "", err
 	}
 
 	res, err := getClaimDocument(r.Header.Get("Origin"), authToken.UID, chi.URLParam(r, "claimUid"), request.DocumentName)
 	if err != nil {
-		log.Printf("error getting document, error %s", err.Error())
+		log.ErrorF("error getting document, error %s", err.Error())
 		return "", "", err
 	}
 

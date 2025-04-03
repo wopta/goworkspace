@@ -1,11 +1,11 @@
 package claim
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 )
 
 var claimRoutes []lib.Route = []lib.Route{
@@ -29,7 +29,6 @@ func init() {
 }
 
 func Claim(w http.ResponseWriter, r *http.Request) {
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
 	router := lib.GetRouter("claim", claimRoutes)
 	router.ServeHTTP(w, r)
