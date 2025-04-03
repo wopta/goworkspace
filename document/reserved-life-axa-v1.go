@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
-	"log"
 	"strings"
 	"time"
 )

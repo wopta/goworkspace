@@ -3,7 +3,7 @@ package document
 import (
 	"errors"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"strings"
 	"time"
 
@@ -32,7 +32,7 @@ func Addendum(policy *models.Policy) (DocumentResp, error) {
 	case models.LifeProduct:
 		generator := addendum.NewLifeAddendumGenerator(engine.NewFpdf(), policy)
 		if out, err = generator.Generate(); err != nil {
-			log.Printf("error generating addendum: %v", err)
+			log.ErrorF("error generating addendum: %v", err)
 			return DocumentResp{}, err
 		}
 
@@ -40,7 +40,7 @@ func Addendum(policy *models.Policy) (DocumentResp, error) {
 			policy.CodeCompany, time.Now().Format("2006-01-02_15:04:05")), " ", "_")
 
 		if gsLink, err = generator.Save(filename, out); err != nil {
-			log.Printf("error saving addendum: %v", err)
+			log.ErrorF("error saving addendum: %v", err)
 			return DocumentResp{}, err
 		}
 	default:

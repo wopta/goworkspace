@@ -2,7 +2,7 @@ package document
 
 import (
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"strings"
 	"time"
 
@@ -17,22 +17,22 @@ const (
 
 func Proforma(policy models.Policy) (DocumentResp, error) {
 	var (
-		err      error
+		err    error
 		gsLink string
-		out      []byte
+		out    []byte
 	)
 
 	generator := proforma.NewProformaGenerator(engine.NewFpdf(), &policy)
 	if out, err = generator.Generate(); err != nil {
-		log.Printf("error generating proforma: %v", err)
+		log.ErrorF("error generating proforma: %v", err)
 		return DocumentResp{}, err
 	}
 
 	filename := strings.ReplaceAll(fmt.Sprintf(proformaDocumentFormat, policy.NameDesc,
 		policy.CodeCompany, policy.Annuity+1, time.Now().Format("2006-01-02_15:04:05")), " ", "_")
-	
+
 	if gsLink, err = generator.Save(filename, out); err != nil {
-		log.Printf("error saving proforma: %v", err)
+		log.ErrorF("error saving proforma: %v", err)
 		return DocumentResp{}, err
 	}
 

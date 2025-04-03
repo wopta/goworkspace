@@ -3,7 +3,7 @@ package document
 import (
 	"bytes"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"math"
 	"os"
 	"strings"

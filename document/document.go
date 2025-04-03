@@ -1,7 +1,7 @@
 package document
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
@@ -11,8 +11,8 @@ import (
 )
 
 type DocumentResp struct {
-	LinkGcs        string `json:"linkGcs"`
-	Filename       string `json:"filename"`
+	LinkGcs  string `json:"linkGcs"`
+	Filename string `json:"filename"`
 }
 
 var documentRoutes []lib.Route = []lib.Route{
@@ -60,7 +60,6 @@ func init() {
 }
 
 func Document(w http.ResponseWriter, r *http.Request) {
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 	router := lib.GetRouter("document", documentRoutes)
 	router.ServeHTTP(w, r)
 }

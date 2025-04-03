@@ -3,8 +3,8 @@ package document
 import (
 	"encoding/base64"
 	"encoding/json"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 
 	"github.com/go-pdf/fpdf"
@@ -86,12 +86,12 @@ func Proposal(origin string, policy *models.Policy, networkNode *models.NetworkN
 		generator := contract.NewCommercialCombinedGenerator(engine.NewFpdf(), policy, networkNode, *product, true)
 		rawDoc, err = generator.Contract()
 		if err != nil {
-			log.Printf("error generating contract: %v", err)
+			log.ErrorF("error generating contract: %v", err)
 			return nil
 		}
 		filename, err = generator.Save(rawDoc)
 		if err != nil {
-			log.Printf("error generating contract: %v", err)
+			log.ErrorF("error generating contract: %v", err)
 			return nil
 		}
 	}

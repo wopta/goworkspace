@@ -3,7 +3,7 @@ package document
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"sort"
 	"strconv"
 	"strings"
