@@ -21,7 +21,7 @@ type ConsumeInviteReq struct {
 func ConsumeInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var ConsumeInviteRequest ConsumeInviteReq
 
-	log.Println("[ConsumeInviteFx] ")
+	log.AddPrefix("ConsumeInviteFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
@@ -47,26 +47,28 @@ func ConsumeInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{
 }
 
 func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
-	log.Printf("[ConsumeInvite] Consuming invite %s", inviteUid)
+	log.AddPrefix("ConsumeInvite")
+	defer log.PopPrefix()
+	log.Printf("Consuming invite %s", inviteUid)
 
 	// Get the invite
 	collection := lib.GetDatasetByEnv(origin, lib.InvitesCollection)
 	docSnapshot, err := lib.GetFirestoreErr(collection, inviteUid)
 	if err != nil {
-		log.Printf("[ConsumeInvite] error retrieving data from firestore: %s", err.Error())
+		log.ErrorF("error retrieving data from firestore: %s", err.Error())
 		return false, err
 	}
 
 	var invite UserInvite
 	err = docSnapshot.DataTo(&invite)
 	if err != nil {
-		log.Printf("[ConsumeInvite] error unmarshaling data: %s", err.Error())
+		log.ErrorF("error unmarshaling data: %s", err.Error())
 		return false, err
 	}
 
 	// Check if invite is not consumed nor expired
 	if invite.Consumed || time.Now().UTC().After(invite.Expiration) {
-		log.Printf("[ConsumeInvite] cannot consume invite with Consumed %t and Expiration %s", invite.Consumed, invite.Expiration.String())
+		log.ErrorF("cannot consume invite with Consumed %t and Expiration %s", invite.Consumed, invite.Expiration.String())
 		return false, errors.New("invite consumed or expired")
 	}
 
@@ -103,7 +105,7 @@ func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 	invitesCollectionName := lib.GetDatasetByEnv(origin, lib.InvitesCollection)
 	lib.SetFirestore(invitesCollectionName, invite.Uid, invite)
 
-	log.Printf("[ConsumeInvite] Consumed invite with uid %s", invite.Uid)
+	log.Printf("Consumed invite with uid %s", invite.Uid)
 	return true, nil
 }
 
