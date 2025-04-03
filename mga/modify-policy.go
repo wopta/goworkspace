@@ -3,6 +3,7 @@ package mga
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"reflect"
@@ -404,7 +405,10 @@ func modifyAssets(modifiedPolicy models.Policy, inputPolicy models.Policy) ([]mo
 			}
 
 			if asset.Guarantees != nil {
-				modifiedAsset.Guarantees = modifyBeneficiaryInfo(inputPolicy.Assets[0].Guarantees, modifiedPolicy.Assets[0].Guarantees)
+				modifiedAsset.Guarantees, err = modifyBeneficiaryInfo(inputPolicy.Assets[0].Guarantees, modifiedPolicy.Assets[0].Guarantees)
+				if err != nil {
+					return nil, err
+				}
 			}
 		}
 
@@ -413,20 +417,19 @@ func modifyAssets(modifiedPolicy models.Policy, inputPolicy models.Policy) ([]mo
 	return assets, nil
 }
 
-func modifyBeneficiaryInfo(inputGuarantees, originalGuarantees []models.Guarante) []models.Guarante {
-	var (
-		modifiedGuarantees = new([]models.Guarante)
-	)
-
+func modifyBeneficiaryInfo(inputGuarantees, originalGuarantees []models.Guarante) ([]models.Guarante, error) {
 	log.Println("modifying beneficiary info...")
-	modifiedGuarantees = &originalGuarantees
+	modifiedGuarantees := deepcopy.Copy(&originalGuarantees).(*[]models.Guarante)
 
 	for i, g := range inputGuarantees {
+		if originalGuarantees[i].Beneficiaries != nil && (g.Beneficiaries == nil || (len(*g.Beneficiaries) == 0 && len(*originalGuarantees[i].Beneficiaries) > 0)) {
+			return nil, fmt.Errorf("must have at least one beneficiary")
+		}
 		(*modifiedGuarantees)[i].BeneficiaryReference = g.BeneficiaryReference
 		(*modifiedGuarantees)[i].Beneficiaries = g.Beneficiaries
 	}
 
-	return *modifiedGuarantees
+	return *modifiedGuarantees, nil
 }
 
 func modifyInsuredInfo(inputInsured, originalInsured models.User) (*models.User, error) {
