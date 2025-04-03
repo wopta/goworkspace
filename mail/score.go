@@ -2,8 +2,8 @@ package mail
 
 import (
 	"encoding/json"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -16,8 +16,8 @@ import (
 func ScoreFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var result map[string]string
 
-	log.SetPrefix("[ScoreFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("[ScoreFx] ")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
