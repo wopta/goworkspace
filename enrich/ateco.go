@@ -1,7 +1,7 @@
 package enrich
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 	"strings"
@@ -19,8 +19,8 @@ func AtecoFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 		enrichByte []byte
 	)
 
-	log.SetPrefix("[AtecoFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("[AtecoFx] ")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 

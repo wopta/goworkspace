@@ -2,7 +2,6 @@ package enrich
 
 import (
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -10,11 +9,12 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 )
 
 func MunichVatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.SetPrefix("[MunichVatFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("[MunichVatFx] ")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -26,7 +26,7 @@ func MunichVatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	var urlstring = os.Getenv("MUNICHREBASEURL") + "/api/company/vat/" + vat
 	u, err := url.Parse(urlstring)
 	lib.CheckError(err)
-	log.Println("url parse:", u)
+	log.Printf("url parse: %v", u)
 	client := lib.ClientCredentials(os.Getenv("MUNICHRECLIENTID"),
 		os.Getenv("MUNICHRECLIENTSECRET"), os.Getenv("MUNICHRESCOPE"), os.Getenv("MUNICHRETOKENENDPOINT"))
 	req, _ := http.NewRequest("GET", urlstring, nil)
