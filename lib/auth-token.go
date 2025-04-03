@@ -1,6 +1,6 @@
 package lib
 
-import "log"
+import "github.com/wopta/goworkspace/lib/log"
 
 type AuthToken struct {
 	Role          string `json:"role"`

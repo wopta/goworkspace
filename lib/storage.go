@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"google.golang.org/api/iterator"
 	"io/ioutil"
-	"log"
 	"os"
 	"strings"
 	"time"
@@ -68,7 +68,9 @@ func PromoteFile(fromPath, toPath string) (string, error) {
 }
 
 func ReadFileFromGoogleStorage(gsLink string) ([]byte, error) {
-	log.Printf("[ReadFileFromGoogleStorage] gsLink: %s", gsLink)
+	log.AddPrefix("ReadFileFromGoogleStorage")
+	defer log.PopPrefix()
+	log.Printf("gsLink: %s", gsLink)
 	components := strings.Split(gsLink, "://")
 
 	// Check if there are two components (scheme and path)
@@ -89,17 +91,18 @@ func ReadFileFromGoogleStorage(gsLink string) ([]byte, error) {
 			return GetFromStorageErr(bucketName, objectName, "")
 		}
 	}
-	log.Printf("[ReadFileFromGoogleStorage] invalid gsLink: %s", gsLink)
+	log.Printf("invalid gsLink: %s", gsLink)
 	return nil, errors.New("invalid gsLink")
 }
 
 func ListGoogleStorageFolderContent(folderPath string) ([]string, error) {
 	filesList := make([]string, 0)
 	bucket := os.Getenv("GOOGLE_STORAGE_BUCKET")
+	log.AddPrefix("ListGoogleStorageFolderContent")
+	defer log.PopPrefix()
+	log.Println("function start ---------------")
 
-	log.Println("[ListGoogleStorageFolderContent] function start ---------------")
-
-	log.Printf("[ListGoogleStorageFolderContent] bucket: %s ---- folderPath: %s", bucket, folderPath)
+	log.Printf("bucket: %s ---- folderPath: %s", bucket, folderPath)
 
 	client, ctx, err := GetGoogleStorageClient()
 	if err != nil {
@@ -126,9 +129,9 @@ func ListGoogleStorageFolderContent(folderPath string) ([]string, error) {
 		filesList = append(filesList, attrs.Name)
 	}
 
-	log.Printf("[ListGoogleStorageFolderContent] found %d files", len(filesList))
+	log.Printf("found %d files", len(filesList))
 
-	log.Println("[ListGoogleStorageFolderContent] function end --------------")
+	log.Println("function end --------------")
 
 	return filesList, nil
 }

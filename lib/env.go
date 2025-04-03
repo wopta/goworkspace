@@ -1,7 +1,10 @@
 package lib
 
-import "os"
+import (
+	"os"
+	"slices"
+)
 
 func IsLocal() bool {
-	return os.Getenv("env") == "local"
+	return slices.Contains([]string{"local", ""}, os.Getenv("env"))
 }

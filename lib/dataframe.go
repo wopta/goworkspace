@@ -2,8 +2,8 @@ package lib
 
 import (
 	"bytes"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"os"
 
 	"github.com/go-gota/gota/dataframe"

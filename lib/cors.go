@@ -1,7 +1,7 @@
 package lib
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 )

@@ -3,7 +3,7 @@ package lib
 import (
 	"context"
 	"errors"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"os"
 
 	"cloud.google.com/go/firestore"
@@ -318,7 +318,7 @@ func FireToListData[T interface{}](query *firestore.DocumentIterator) []T {
 		d, err := query.Next()
 		log.Println("for")
 		if err != nil {
-			log.Println("error")
+			log.ErrorF("error")
 			if err == iterator.Done {
 				log.Println("iterator.Done")
 				break
@@ -353,7 +353,7 @@ func SetBatchFirestoreErr[T any](operations map[string]map[string]T) error {
 			col := c.Doc(k)
 			_, err = bulk.Set(col, v)
 			if err != nil {
-				log.Printf("error batch firestore: %s", err.Error())
+				log.ErrorF("error batch firestore: %s", err.Error())
 				return err
 			}
 		}
@@ -380,7 +380,7 @@ func DeleteBatchFirestoreErr[T any](operations map[string]map[string]T) error {
 			col := c.Doc(k)
 			_, err = bulk.Delete(col)
 			if err != nil {
-				log.Printf("error batch firestore: %s", err.Error())
+				log.ErrorF("error batch firestore: %s", err.Error())
 				return err
 			}
 		}
