@@ -3,7 +3,6 @@ package models
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
@@ -11,6 +10,7 @@ import (
 	"cloud.google.com/go/civil"
 	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"google.golang.org/api/iterator"
 )
 
@@ -218,6 +218,8 @@ func isLeapYear(year int) bool {
 }
 
 func (policy *Policy) CalculateContractorAge() (int, error) {
+	log.AddPrefix("CalculateContractorAge")
+	defer log.PopPrefix()
 	var startDate time.Time
 	if policy.StartDate.IsZero() {
 		startDate = time.Now()
@@ -233,13 +235,13 @@ func (policy *Policy) CalculateContractorAge() (int, error) {
 		startDateYearDay -= 1
 	}
 
-	log.Printf("[CalculateContractorAge] startDate.YearDay %d - birthdate.YearDay %d", startDateYearDay, birthdate.YearDay())
+	log.Printf("startDate.YearDay %d - birthdate.YearDay %d", startDateYearDay, birthdate.YearDay())
 
 	if startDateYearDay < birthdate.YearDay() && !(startDate.Month() == birthdate.Month() && startDate.Day() == birthdate.Day()) {
 		age--
 	}
 
-	log.Printf("[CalculateContractorAge] age: %d", age)
+	log.Printf("age: %d", age)
 
 	return age, e
 }
@@ -303,18 +305,20 @@ func (policy *Policy) BigQueryParse() {
 }
 
 func (policy *Policy) BigquerySave(origin string) {
-	log.Printf("[policy.BigquerySave] parsing data for policy %s", policy.Uid)
+	log.AddPrefix("policy.BigquerySave")
+	defer log.PopPrefix()
+	log.Printf("parsing data for policy %s", policy.Uid)
 
 	policyBig := lib.GetDatasetByEnv(origin, PolicyCollection)
 
 	policy.BigQueryParse()
 
-	log.Println("[policy.BigquerySave] saving to bigquery...")
+	log.Println("saving to bigquery...")
 	if err := lib.InsertRowsBigQuery(WoptaDataset, policyBig, policy); err != nil {
-		log.Println("[policy.BigquerySave] error saving policy to bigquery: ", err.Error())
+		log.ErrorF("error saving policy to bigquery: ", err.Error())
 		return
 	}
-	log.Println("[policy.BigquerySave] bigquery saved!")
+	log.Println("bigquery saved!")
 }
 
 func PolicyToListData(query *firestore.DocumentIterator) []Policy {
@@ -322,7 +326,7 @@ func PolicyToListData(query *firestore.DocumentIterator) []Policy {
 	for {
 		d, err := query.Next()
 		if err != nil {
-			log.Println("error")
+			log.ErrorF("error")
 			if err == iterator.Done {
 				log.Println("iterator.Done")
 				break
@@ -334,7 +338,7 @@ func PolicyToListData(query *firestore.DocumentIterator) []Policy {
 			log.Println("todata")
 			lib.CheckError(e)
 			result = append(result, value)
-			log.Println(len(result))
+			log.Println(fmt.Sprint(len(result)))
 		}
 	}
 	return result
@@ -348,14 +352,15 @@ func (policy *Policy) GetFlow(networkNode *NetworkNode, warrant *Warrant) (strin
 		flowFile NodeSetting
 		err      error
 	)
-
-	log.Printf("[Policy.GetFlow] loading file for channel %s", channel)
+	log.AddPrefix("Policy.GetFlow")
+	defer log.PopPrefix()
+	log.Printf("loading file for channel %s", channel)
 
 	// Retrocompatibility with old emitted policies without channel when there was only e-commerce
 	if channel == "" {
 		policy.Channel = ECommerceChannel
 		channel = policy.Channel
-		log.Println("[Policy.GetFlow] overriding unset channel as e-commerce")
+		log.Println("overriding unset channel as e-commerce")
 	}
 
 	switch channel {
@@ -365,18 +370,18 @@ func (policy *Policy) GetFlow(networkNode *NetworkNode, warrant *Warrant) (strin
 		flowName = channel
 		flowByte = lib.GetFilesByEnv(fmt.Sprintf(FlowFileFormat, channel))
 	default:
-		log.Printf("[Policy.GetFlow] error unavailable channel: '%s'", channel)
+		log.ErrorF("error unavailable channel: '%s'", channel)
 		return flowName, nil
 	}
 
 	if len(flowByte) == 0 {
-		log.Printf("[Policy.GetFlow] error flowFile '%s' empty", flowName)
+		log.ErrorF("error flowFile '%s' empty", flowName)
 		return flowName, nil
 	}
 
 	err = json.Unmarshal(flowByte, &flowFile)
 	if err != nil {
-		log.Printf("[Policy.GetFlow] error unmarshaling flow '%s' file: %s", flowName, err.Error())
+		log.ErrorF("error unmarshaling flow '%s' file: %s", flowName, err.Error())
 		return flowName, nil
 	}
 

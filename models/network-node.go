@@ -3,13 +3,13 @@ package models
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"time"
 
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/firestore"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"google.golang.org/api/iterator"
 )
 
@@ -125,14 +125,18 @@ func (nn *NetworkNode) Normalize() {
 
 func (nn *NetworkNode) SaveFirestore() error {
 	err := lib.SetFirestoreErr(NetworkNodesCollection, nn.Uid, nn)
+	log.AddPrefix("NetworkNode.SaveFirestore")
+	defer log.PopPrefix()
+
 	if err != nil {
-		log.Printf("[NetworkNode.SaveFirestore] error: %s", err.Error())
+		log.Error(err)
 	}
 	return err
 }
 
 func (nn *NetworkNode) SaveBigQuery(origin string) error {
-	log.Println("[NetworkNode.SaveBigQuery]")
+	log.AddPrefix("NetworkNode.SaveBigQuery")
+	defer log.PopPrefix()
 
 	nnJson, _ := json.Marshal(nn)
 
@@ -185,19 +189,20 @@ func (nn *NetworkNode) GetWarrant() *Warrant {
 	var (
 		warrant *Warrant
 	)
-
+	log.AddPrefix("GetWarrant")
+	defer log.PopPrefix()
 	if nn.Warrant == "" {
-		log.Printf("[GetWarrant] warrant not set for node %s", nn.Uid)
+		log.Printf("warrant not set for node %s", nn.Uid)
 		return nil
 	}
 
-	log.Printf("[GetWarrant] requesting warrant %s", nn.Warrant)
+	log.Printf("requesting warrant %s", nn.Warrant)
 
 	warrantBytes := lib.GetFilesByEnv(fmt.Sprintf(WarrantFormat, nn.Warrant))
 
 	err := json.Unmarshal(warrantBytes, &warrant)
 	if err != nil {
-		log.Printf("[GetWarrant] error unmarshaling warrant %s: %s", nn.Warrant, err.Error())
+		log.ErrorF("error unmarshaling warrant %s: %s", nn.Warrant, err.Error())
 		return nil
 	}
 
@@ -205,7 +210,9 @@ func (nn *NetworkNode) GetWarrant() *Warrant {
 }
 
 func (nn *NetworkNode) HasAccessToProduct(productName string, warrant *Warrant) bool {
-	log.Println("[HasAccessToProduct] method start -----------------")
+	log.AddPrefix("HasAccessToProduct")
+	defer log.PopPrefix()
+	log.Println("method start -----------------")
 
 	needCheckTypes := []string{AgencyNetworkNodeType, AgentNetworkNodeType, BrokerNetworkNodeType}
 
@@ -217,11 +224,11 @@ func (nn *NetworkNode) HasAccessToProduct(productName string, warrant *Warrant) 
 		warrant = nn.GetWarrant()
 	}
 	if warrant == nil {
-		log.Printf("[HasAccessToProduct] no %s warrant found", nn.Warrant)
+		log.ErrorF("no %s warrant found", nn.Warrant)
 		return false
 	}
 
-	log.Printf("[HasAccessToProduct] checking if network node %s has access product %s", nn.Uid, productName)
+	log.ErrorF("checking if network node %s has access product %s", nn.Uid, productName)
 
 	for _, product := range warrant.Products {
 		if product.Name == productName {
@@ -234,17 +241,17 @@ func (nn *NetworkNode) HasAccessToProduct(productName string, warrant *Warrant) 
 
 func (nn *NetworkNode) GetNetworkNodeFlow(productName string, warrant *Warrant) (string, []byte) {
 	if warrant == nil {
-		log.Printf("[getNetworkNodeFlow] error warrant not set for node %s", nn.Uid)
+		log.ErrorF("error warrant not set for node %s", nn.Uid)
 		return "", []byte{}
 	}
 
 	product := warrant.GetProduct(productName)
 	if product == nil {
-		log.Printf("[getNetworkNodeFlow] error product not set for warrant %s", warrant.Name)
+		log.ErrorF("error product not set for warrant %s", warrant.Name)
 		return "", []byte{}
 	}
 
-	log.Printf("[getNetworkNodeFlow] getting flow '%s' file for product '%s'", product.Flow, productName)
+	log.Printf("getting flow '%s' file for product '%s'", product.Flow, productName)
 
 	return product.Flow, lib.GetFilesByEnv(fmt.Sprintf(FlowFileFormat, product.Flow))
 }

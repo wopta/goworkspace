@@ -2,11 +2,12 @@ package models
 
 import (
 	"encoding/json"
-	"log"
+	"fmt"
 	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"google.golang.org/api/iterator"
 )
 
@@ -15,30 +16,30 @@ func (r *Product) Marshal() ([]byte, error) {
 }
 
 type Product struct {
-	NameTitle          string            `firestore:"nameTitle,omitempty" json:"nameTitle,omitempty"`
-	NameSubtitle       string            `firestore:"nameSubtitle,omitempty" json:"nameSubtitle,omitempty"`
-	NameDesc           *string           `firestore:"nameDesc,omitempty" json:"nameDesc,omitempty"`
-	Companies          []Company         `firestore:"companies,omitempty" json:"companies,omitempty"`
-	ProductUid         string            `firestore:"productUid,omitempty" json:"productUid,omitempty"`
-	ProductVersion     int               `firestore:"productVersion,omitempty" json:"productVersion,omitempty"`
-	Version            string            `firestore:"version,omitempty" json:"version,omitempty"`
-	Number             int               `firestore:"number,omitempty" json:"number,omitempty"`
-	Name               string            `firestore:"name,omitempty" json:"name,omitempty"`
-	Commission         float64           `firestore:"commission,omitempty" json:"commission,omitempty"`
-	CommissionRenew    float64           `firestore:"commissionRenew,omitempty" json:"commissionRenew,omitempty"`
-	Steps              []Step            `firestore:"steps,omitempty" json:"steps"`
-	Offers             map[string]Offer  `firestore:"offers,omitempty" json:"offers,omitempty"`
-	Logo               string            `json:"logo,omitempty" firestore:"logo,omitempty" bigquery:"-"`
-	PaymentProviders   []PaymentProvider `json:"paymentProviders,omitempty" firestore:"paymentProviders,omitempty" bigquery:"-"`
-	Flow               string            `json:"flow,omitempty" firestore:"flow,omitempty" bigquery:"-"` // the name of the flow file to be used
-	IsActive           bool              `json:"isActive" firestore:"isActive" bigquery:"-"`
-	RenewOffset        int               `json:"renewOffset" firestore:"renewOffset" bigquery:"-"`
-	IsAutoRenew        bool              `json:"isAutoRenew" firestore:"isAutoRenew" bigquery:"-"`
-	IsRenewable        bool              `json:"isRenewable" firestore:"isRenewable" bigquery:"-"`
-	PolicyType         string            `json:"policyType,omitempty" firestore:"policyType,omitempty" bigquery:"-"`
-	QuoteType          string            `json:"quoteType" firestore:"quoteType" bigquery:"-"`
-	EmitMaxElapsedDays uint              `json:"emitMaxElapsedDays" firestore:"-" bigquery:"-"`
-	Categories         []string          `json:"categories" firestore:"-" bigquery:"-"`
+	NameTitle          string             `firestore:"nameTitle,omitempty" json:"nameTitle,omitempty"`
+	NameSubtitle       string             `firestore:"nameSubtitle,omitempty" json:"nameSubtitle,omitempty"`
+	NameDesc           *string            `firestore:"nameDesc,omitempty" json:"nameDesc,omitempty"`
+	Companies          []Company          `firestore:"companies,omitempty" json:"companies,omitempty"`
+	ProductUid         string             `firestore:"productUid,omitempty" json:"productUid,omitempty"`
+	ProductVersion     int                `firestore:"productVersion,omitempty" json:"productVersion,omitempty"`
+	Version            string             `firestore:"version,omitempty" json:"version,omitempty"`
+	Number             int                `firestore:"number,omitempty" json:"number,omitempty"`
+	Name               string             `firestore:"name,omitempty" json:"name,omitempty"`
+	Commission         float64            `firestore:"commission,omitempty" json:"commission,omitempty"`
+	CommissionRenew    float64            `firestore:"commissionRenew,omitempty" json:"commissionRenew,omitempty"`
+	Steps              []Step             `firestore:"steps,omitempty" json:"steps"`
+	Offers             map[string]Offer   `firestore:"offers,omitempty" json:"offers,omitempty"`
+	Logo               string             `json:"logo,omitempty" firestore:"logo,omitempty" bigquery:"-"`
+	PaymentProviders   []PaymentProvider  `json:"paymentProviders,omitempty" firestore:"paymentProviders,omitempty" bigquery:"-"`
+	Flow               string             `json:"flow,omitempty" firestore:"flow,omitempty" bigquery:"-"` // the name of the flow file to be used
+	IsActive           bool               `json:"isActive" firestore:"isActive" bigquery:"-"`
+	RenewOffset        int                `json:"renewOffset" firestore:"renewOffset" bigquery:"-"`
+	IsAutoRenew        bool               `json:"isAutoRenew" firestore:"isAutoRenew" bigquery:"-"`
+	IsRenewable        bool               `json:"isRenewable" firestore:"isRenewable" bigquery:"-"`
+	PolicyType         string             `json:"policyType,omitempty" firestore:"policyType,omitempty" bigquery:"-"`
+	QuoteType          string             `json:"quoteType" firestore:"quoteType" bigquery:"-"`
+	EmitMaxElapsedDays uint               `json:"emitMaxElapsedDays" firestore:"-" bigquery:"-"`
+	Categories         []string           `json:"categories" firestore:"-" bigquery:"-"`
 	ConsultancyConfig  *ConsultancyConfig `json:"consultancyConfig" firestore:"consultancyConfig" bigquery:"-"`
 
 	// DEPRECATED FIELDS
@@ -304,14 +305,14 @@ func ProductToListData(query *firestore.DocumentIterator) []Product {
 			if err == iterator.Done {
 				break
 			}
-			log.Println(err)
+			log.Error(err)
 		}
 		var value Product
 		e := d.DataTo(&value)
 		lib.CheckError(e)
 		result = append(result, value)
 
-		log.Println(len(result))
+		log.Println(fmt.Sprint(len(result)))
 	}
 	return result
 }

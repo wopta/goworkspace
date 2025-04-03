@@ -1,10 +1,10 @@
 package models
 
 import (
-	"log"
 	"strconv"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 )
 
 // {"responses":{"TIPO MOVIMENTO":"Inserimento","Targa Inserimento":"test","MODELLO VEICOLO":"test mod","DATA IMMATRICOLAZIONE":"1212-12-02","DATA INIZIO VALIDITA' COPERTURA":"1212-12-12"}}
@@ -28,7 +28,7 @@ func GetFirestoreSequenceLast(name string) string {
 		}}
 
 	node, uid, e := q.FireQueryUid("sequence")
-	log.Println(e)
+	log.Error(e)
 	if len(node) > 0 {
 		last := node[0].Add()
 		node[0].Last = last
