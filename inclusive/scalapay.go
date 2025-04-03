@@ -2,8 +2,8 @@ package inclusive
 
 import (
 	"encoding/json"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -24,7 +24,7 @@ const (
 
 // TO DO security,payload,error,fasature
 func BankAccountScalapayFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.SetPrefix("BankAccountScalapayFx ")
+	log.AddPrefix("BankAccountScalapayFx ")
 	var (
 		e   error
 		obj BankAccountMovement
@@ -80,10 +80,10 @@ func BankAccountScalapayFx(resp http.ResponseWriter, r *http.Request) (string, i
 
 	}
 
-	log.Println("error: ", e)
+	log.ErrorF("error: ", e)
 	if e != nil {
 		return "", nil, GetErrorJson(500, "internal server error", "")
-	}else{
+	} else {
 		log.Println(`200 {"woptaUid":"` + obj.Uid + `"}`)
 	}
 	return `{"woptaUid":"` + obj.Uid + `"}`, nil, e

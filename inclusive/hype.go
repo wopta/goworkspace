@@ -6,7 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 	"time"
@@ -28,7 +28,7 @@ const (
 
 // TO DO security,payload,error,fasature
 func BankAccountHypeFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.SetPrefix("BankAccountHypeFx ")
+	log.AddPrefix("BankAccountHypeFx ")
 	var (
 		e   error
 		obj BankAccountMovement
