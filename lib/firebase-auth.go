@@ -167,10 +167,11 @@ func GetAuthUserIdByEmail(mail string) (string, error) {
 }
 
 func VerifyAppcheck(handler func(w http.ResponseWriter, r *http.Request) (string, interface{}, error)) func(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-
+	log.AddPrefix("VerifyAppcheck")
+	defer log.PopPrefix()
 	wrappedHandler := func(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 		errorHandler := func(w http.ResponseWriter) (string, interface{}, error) {
-			log.Println("[VerifyAppcheck]: unauthenticated.")
+			log.Println("unauthenticated.")
 			return "", nil, fmt.Errorf("Unavailable")
 		}
 
