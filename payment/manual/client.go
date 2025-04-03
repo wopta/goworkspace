@@ -2,7 +2,7 @@ package manual
 
 import (
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"time"
 
 	"github.com/wopta/goworkspace/models"

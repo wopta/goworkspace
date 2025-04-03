@@ -3,7 +3,7 @@ package payment
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"strconv"
 
@@ -29,13 +29,13 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	defer func() {
 		if err != nil {
-			log.Printf("error: %s", err.Error())
+			log.ErrorF("error: %s", err.Error())
 		}
 		log.Println("Handler end -------------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 
-	log.SetPrefix("[DeleteTransactionFx] ")
+	log.AddPrefix("[DeleteTransactionFx] ")
 	log.Println("Handler start -----------------------------------------------")
 
 	idToken := r.Header.Get("Authorization")
@@ -47,7 +47,7 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 	uid := chi.URLParam(r, "uid")
 	rawIsRenew := r.URL.Query().Get("isRenew")
 	if isRenew, err = strconv.ParseBool(rawIsRenew); rawIsRenew != "" && err != nil {
-		log.Printf("error: %s", err.Error())
+		log.ErrorF("error: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -78,7 +78,7 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 	if transaction.ProviderName == models.FabrickPaymentProvider && transaction.ProviderId != "" {
 		err = fabrick.FabrickExpireBill(transaction.ProviderId)
 		if err != nil {
-			log.Printf("error deleting transaction on fabrick: %s", err.Error())
+			log.ErrorF("error deleting transaction on fabrick: %s", err.Error())
 			return "", nil, err
 		}
 	}
@@ -113,7 +113,7 @@ func saveTransaction(transaction *models.Transaction, collection string) error {
 
 	err = lib.InsertRowsBigQuery(lib.WoptaDataset, collection, transaction)
 	if err != nil {
-		log.Printf("error saving transaction %s in BigQuery: %v", transaction.Uid, err.Error())
+		log.ErrorF("error saving transaction %s in BigQuery: %v", transaction.Uid, err.Error())
 		return err
 	}
 	return nil
