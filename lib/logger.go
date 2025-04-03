@@ -51,7 +51,8 @@ type LoggerWopta struct {
 	parserMessage ParserMessage
 }
 
-func NewLog() *LoggerWopta {
+// Create a new log, check if use the local parser or the google cloud one
+func newLog() *LoggerWopta {
 	var parser ParserMessage
 	if !IsLocal() {
 		parser = parserMessageGoogleCloud
@@ -65,9 +66,9 @@ func NewLog() *LoggerWopta {
 	}
 }
 
-// used for test
+// Create a new log used for test
 func _newLog(isLocal bool) *LoggerWopta {
-	log := NewLog()
+	log := newLog()
 	if isLocal {
 		log.parserMessage = parserMessageLocal
 	} else {
@@ -76,10 +77,13 @@ func _newLog(isLocal bool) *LoggerWopta {
 	return log
 }
 
+// Append the prefix, ex: [prefix1] -> [prefix1|prefix2]
+// Remember to use PopPrefix to remove eventually
 func (l *LoggerWopta) AddPrefix(prefix string) {
 	l.prefix = append(l.prefix, prefix)
 }
 
+// Remove the younger prefix, ex: [prefix1|prefix2] -> [prefix1]
 func (l *LoggerWopta) PopPrefix() {
 	if len(l.prefix) == 0 {
 		return
@@ -87,38 +91,46 @@ func (l *LoggerWopta) PopPrefix() {
 	l.prefix = slices.Delete(l.prefix, len(l.prefix)-1, len(l.prefix)) //pop of a stack
 }
 
+// Remove all prefixs, ex: [prefix1|prefix2] -> <None>
 func (l *LoggerWopta) ResetPrefix() {
 	l.prefix = []string{}
 }
 
-func (l *LoggerWopta) SetLog(writer io.Writer) {
+// Set the writer to use for logging
+func (l *LoggerWopta) SetWriter(writer io.Writer) {
 	l.writer = writer
 }
 
-func (l *LoggerWopta) CustomLog(message string, severuty severityType) {
-	str, err := l.parserMessage(message, severuty, l.prefix)
+// Log a message with the chosen severity
+func (l *LoggerWopta) CustomLog(message string, severity severityType) {
+	str, err := l.parserMessage(message, severity, l.prefix)
 	if err != nil {
 		return
 	}
 	l.writer.Write(str)
-
 }
+
+// Log a formatted message with severity 'DEFAULT'
 func (l *LoggerWopta) Printf(format string, a ...any) {
 	l.CustomLog(fmt.Sprintf(format, a...), DEFAULT)
 }
 
-func (l *LoggerWopta) Println(format string, a ...any) {
-	l.CustomLog(fmt.Sprintf(format, a...), DEFAULT)
+// Log a message with severity equal 'DEFAULT'
+func (l *LoggerWopta) Println(message string) {
+	l.CustomLog(fmt.Sprintf(message), DEFAULT)
 }
 
+// Log a formatted message with severity 'INFO'
 func (l *LoggerWopta) InfoF(format string, a ...any) {
 	l.CustomLog(fmt.Sprintf(format, a...), INFO)
 }
 
+// Log a formatted message with severity 'WARNING'
 func (l *LoggerWopta) WarningF(format string, a ...any) {
 	l.CustomLog(fmt.Sprintf(format, a...), WARNING)
 }
 
+// Log a error, with struct : 'Error: <err>'
 func (l *LoggerWopta) Error(err error) {
 	if err == nil {
 		return
@@ -126,10 +138,12 @@ func (l *LoggerWopta) Error(err error) {
 	l.CustomLog("Error: "+err.Error(), ERROR)
 }
 
+// Log a formatted message with severity 'ERROR'
 func (l *LoggerWopta) ErrorF(format string, a ...any) {
 	l.CustomLog(fmt.Sprintf(format, a...), ERROR)
 }
 
+// Compose the final message with the passed parameters for local debugging
 func parserMessageLocal(message string, severity severityType, prefix []string) ([]byte, error) {
 	conPrefix := strings.Join(prefix, "|")
 	if slices.Contains([]severityType{ERROR, CRITICAL, ALERT, EMERGENCY}, severity) {
@@ -147,6 +161,7 @@ func parserMessageLocal(message string, severity severityType, prefix []string) 
 	return fmt.Appendf(nil, "%v%v%v\n", formatDate(time.Now()), conPrefix, message), nil
 }
 
+// Compose the final message using the given parameters to send to Google Cloud
 func parserMessageGoogleCloud(message string, severity severityType, prefix []string) ([]byte, error) {
 	conPrefix := strings.Join(prefix, "|")
 
@@ -168,11 +183,12 @@ func parserMessageGoogleCloud(message string, severity severityType, prefix []st
 
 var logger *LoggerWopta
 
+// Singleton implementation to get the logger
 func Log() *LoggerWopta {
 	if logger != nil {
 		return logger
 	}
-	logger = NewLog()
+	logger = newLog()
 	logger.WarningF("INIT LOGGER")
 	return logger
 }

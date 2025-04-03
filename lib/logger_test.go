@@ -20,7 +20,7 @@ func (m *mockWriter) Write(p []byte) (n int, err error) {
 func TestLocalSendMultipleMessages(t *testing.T) {
 	log := _newLog(true)
 	mockW := mockWriter{}
-	log.SetLog(&mockW)
+	log.SetWriter(&mockW)
 	messages := make([]string, 100)
 
 	for i := 0; i < 100; i++ {
@@ -37,7 +37,7 @@ func TestLocalSendMultipleMessages(t *testing.T) {
 func TestGoogleCloudSendCustomMessage(t *testing.T) {
 	log := _newLog(false)
 	mockW := mockWriter{}
-	log.SetLog(&mockW)
+	log.SetWriter(&mockW)
 	messages := make([]MessageGoogleCloud, 100)
 	var randI int
 	for i := 0; i < len(messages); i++ {
@@ -58,7 +58,7 @@ func TestGoogleCloudSendCustomMessage(t *testing.T) {
 func TestSendGoogleMessage(t *testing.T) {
 	log := _newLog(false)
 	mockW := mockWriter{}
-	log.SetLog(&mockW)
+	log.SetWriter(&mockW)
 	messages := make([]MessageGoogleCloud, 100)
 	for i := 0; i < len(messages); i++ {
 		message := randStringBytes(100)
@@ -141,7 +141,6 @@ func randFunctionLogSend(logger *LoggerWopta) (func(string, ...any), severityTyp
 		s severityType
 	}{
 		makeStruct(logger.ErrorF, ERROR),
-		makeStruct(logger.Println, DEFAULT),
 		makeStruct(logger.InfoF, INFO),
 		makeStruct(logger.Printf, DEFAULT),
 		makeStruct(logger.WarningF, WARNING),
