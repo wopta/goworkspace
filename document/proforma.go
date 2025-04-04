@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"strings"
-	"time"
 
 	"github.com/wopta/goworkspace/document/internal/engine"
 	"github.com/wopta/goworkspace/document/pkg/proforma"
@@ -12,14 +11,14 @@ import (
 )
 
 const (
-	proformaDocumentFormat = "%s_Proforma_%s_%d_%s.pdf"
+	proformaDocumentFormat = "nota_informativa_polizza_%s_%d.pdf"
 )
 
 func Proforma(policy models.Policy) (DocumentResp, error) {
 	var (
-		err      error
+		err    error
 		gsLink string
-		out      []byte
+		out    []byte
 	)
 
 	generator := proforma.NewProformaGenerator(engine.NewFpdf(), &policy)
@@ -28,9 +27,9 @@ func Proforma(policy models.Policy) (DocumentResp, error) {
 		return DocumentResp{}, err
 	}
 
-	filename := strings.ReplaceAll(fmt.Sprintf(proformaDocumentFormat, policy.NameDesc,
-		policy.CodeCompany, policy.Annuity+1, time.Now().Format("2006-01-02_15:04:05")), " ", "_")
-	
+	filename := strings.ReplaceAll(fmt.Sprintf(proformaDocumentFormat,
+		policy.CodeCompany, policy.StartDate.AddDate(policy.Annuity, 0, 0).Year()), " ", "_")
+
 	if gsLink, err = generator.Save(filename, out); err != nil {
 		log.Printf("error saving proforma: %v", err)
 		return DocumentResp{}, err

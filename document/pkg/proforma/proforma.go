@@ -220,7 +220,7 @@ func (pg *ProformaGenerator) body() {
 	}
 
 	title := []string{
-		"Proforma del " + body.Date,
+		"Nota Informativa del " + body.Date,
 	}
 
 	data := [][]string{
