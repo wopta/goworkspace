@@ -236,18 +236,16 @@ func (el *LifeGenerator) addPolicyInformationSection() {
 
 func (el *LifeGenerator) addSupportInformationSection() {
 	if el.dtoLife.Channel != models.NetworkChannel {
-		text := "Restiamo a disposizione per ogni ulteriore informazione anche attraverso informativa e dichiarazioni privacy per l’Intermediario canali di contatto che trovi a questo "
 		el.engine.RawWriteText(
-			el.engine.GetTableCell(text, constants.BlackColor),
+			el.engine.GetTableCell("Restiamo a disposizione per ogni ulteriore informazione anche attraverso i canali di contatto che trovi a questo ", constants.BlackColor),
 		)
 		el.engine.WriteLink("https://www.wopta.it/it/vita/#contact-us", el.engine.GetTableCell("link", constants.PinkColor))
-		return
-	}
-
-	if el.dtoLife.Channel == models.NetworkChannel {
+		el.engine.RawWriteText(el.engine.GetTableCell(".", constants.BlackColor))
+	} else {
 		el.engine.RawWriteText(
 			el.engine.GetTableCell("Se hai necessità di ulteriori informazioni e supporto, rivolgiti al tuo intermediario, che trovi in copia conoscenza alla mail accompagnatoria di questa comunicazione.", constants.BlackColor))
 	}
+	el.engine.NewLine(constants.CellHeight)
 }
 
 func (el *LifeGenerator) addGreatingsSection() {
