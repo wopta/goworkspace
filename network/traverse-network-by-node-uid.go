@@ -13,6 +13,8 @@ func TraverseWithCallbackNetworkByNodeUid(
 	callback func(n *models.NetworkNode, currentName string) string,
 ) {
 	log.AddPrefix("TraverseNetworkByNodeUid")
+	defer log.PopPrefix()
+
 	log.Printf("executing callback for node %s", node.Code)
 	name := callback(node, lastName)
 

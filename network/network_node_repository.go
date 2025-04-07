@@ -130,7 +130,7 @@ func UpdateNode(node models.NetworkNode) error {
 		err = lib.HandleUserAuthenticationStatus(originalNode.Uid, !node.IsActive)
 		if err != nil {
 			// TODO: in case of error we might want to restore the old email in auth
-			log.Printf("error updating network node auth status on Firebase Auth: %s", err.Error())
+			log.ErrorF("error updating network node auth status on Firebase Auth: %s", err.Error())
 			return err
 		}
 	}
@@ -155,7 +155,7 @@ func UpdateNode(node models.NetworkNode) error {
 
 	err = addWorksForUid(originalNode, &node)
 	if err != nil {
-		log.Printf("error updating WorksForUid '%s' in network node '%s': %s", originalNode.WorksForUid, originalNode.Uid, err.Error())
+		log.ErrorF("error updating WorksForUid '%s' in network node '%s': %s", originalNode.WorksForUid, originalNode.Uid, err.Error())
 		return err
 	}
 
@@ -180,7 +180,7 @@ func UpdateNode(node models.NetworkNode) error {
 
 	err = originalNode.SaveFirestore()
 	if err != nil {
-		log.Printf("error updating network node %s in Firestore", originalNode.Uid)
+		log.ErrorF("error updating network node %s in Firestore", originalNode.Uid)
 		return err
 	}
 

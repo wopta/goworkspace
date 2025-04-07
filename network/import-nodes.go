@@ -128,7 +128,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		validatedRows = make(map[string][][]string)
 	)
 
-	log.AddPrefix("[ImportNodesFx] ")
+	log.AddPrefix("ImportNodesFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler Start -----------------------------------------------")
@@ -138,20 +138,20 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	err = json.Unmarshal(body, &req)
 	if err != nil {
-		log.Printf("Error unmarshiling request body: %s", err.Error())
+		log.ErrorF("Error unmarshiling request body: %s", err.Error())
 		return "{}", nil, err
 	}
 
 	// check file mimetype
 	if req.MimeType != "text/csv" {
-		log.Printf("File format %s not supported", req.MimeType)
+		log.ErrorF("File format %s not supported", req.MimeType)
 		return "{}", nil, errors.New("file format not supported")
 	}
 
 	// convert csv to bytes
 	data, err := base64.StdEncoding.DecodeString(req.Bytes)
 	if err != nil {
-		log.Printf("Error decoding file: %s", err.Error())
+		log.ErrorF("Error decoding file: %s", err.Error())
 		return "{}", nil, err
 	}
 
@@ -159,7 +159,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	df := lib.CsvToDataframe(data)
 	log.Printf("#rows: %02d #cols: %02d", df.Nrow(), df.Ncol())
 	if df.Ncol() != expectedColumns {
-		log.Printf("#columns isn't correct, expected %02d got %02d", expectedColumns, df.Ncol())
+		log.ErrorF("#columns isn't correct, expected %02d got %02d", expectedColumns, df.Ncol())
 		return "{}", nil, fmt.Errorf("invalid file content")
 	}
 
@@ -169,7 +169,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	log.Printf("Fetching all network nodes from Firestore...")
 	dbNodes, err = GetAllNetworkNodes()
 	if err != nil {
-		log.Printf("Error fetching all network nodes from Firestore: %s", err.Error())
+		log.ErrorF("Error fetching all network nodes from Firestore: %s", err.Error())
 		return "{}", nil, err
 	}
 	log.Printf("#Network nodes fetched from Firestore: %02d", len(dbNodes))
@@ -178,7 +178,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	log.Printf("Loading all warrants from Google Bucket...")
 	warrants, err = getWarrants()
 	if err != nil {
-		log.Printf("Error loading warrants from Google Bucket: %s", err.Error())
+		log.ErrorF("Error loading warrants from Google Bucket: %s", err.Error())
 		return "{}", nil, err
 	}
 	log.Printf("#Warrants loaded from Google Bucket: %02d", len(warrants))
@@ -208,7 +208,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		// check if all required fields have been compiled
 		columnsErr := validateRow(row)
 		if len(columnsErr) > 0 {
-			log.Printf("Error processing node %s at indexes: %v", row[codeCol], columnsErr)
+			log.ErrorF("Error processing node %s at indexes: %v", row[codeCol], columnsErr)
 			resp.ErrorNodes[row[codeCol]] = columnsErr
 			resp.TotalErrorNodes++
 			continue
@@ -304,7 +304,7 @@ func getWarrants() ([]models.Warrant, error) {
 		var warrant models.Warrant
 		err = json.Unmarshal(warrantBytes, &warrant)
 		if err != nil {
-			log.Printf("error unmarshaling warrant: %s", err.Error())
+			log.ErrorF("error unmarshaling warrant: %s", err.Error())
 			return warrants, err
 		}
 
@@ -371,7 +371,7 @@ func validateRow(row []string) []int {
 	nodeCode := row[codeCol]
 
 	if !lib.SliceContains(nodeTypeList, row[typeCol]) {
-		log.Printf("Error processing node %s: invalid node type %s", nodeCode, row[typeCol])
+		log.ErrorF("Error processing node %s: invalid node type %s", nodeCode, row[typeCol])
 		columnsError = append(columnsError, typeCol)
 	}
 
@@ -405,31 +405,31 @@ func validateRow(row []string) []int {
 	// check fiscalCode format
 	regExp, _ := regexp.Compile(fiscalCodeRegexPattern)
 	if lib.SliceContains(requiredFields, agentFiscalCodeCol) && !regExp.MatchString(row[agentFiscalCodeCol]) {
-		log.Printf("Error processing node %s: invalid fiscalCode %s", nodeCode, row[agentFiscalCodeCol])
+		log.ErrorF("Error processing node %s: invalid fiscalCode %s", nodeCode, row[agentFiscalCodeCol])
 		columnsError = append(columnsError, agentFiscalCodeCol)
 	}
 
 	for fieldIndex, fieldValue := range row {
 		if (fieldValue == "" || strings.EqualFold(fieldValue, "NaN")) && lib.SliceContains(requiredFields, fieldIndex) {
-			log.Printf("Error processing node %s: missing required field at index %02d", nodeCode, fieldIndex)
+			log.ErrorF("Error processing node %s: missing required field at index %02d", nodeCode, fieldIndex)
 			columnsError = append(columnsError, fieldIndex)
 		}
 	}
 
 	if lib.SliceContains(requiredFields, designationCol) && !lib.SliceContains(designationsList, row[designationCol]) {
-		log.Printf("Error processing node %s: invalid designation %s", nodeCode, row[designationCol])
+		log.ErrorF("Error processing node %s: invalid designation %s", nodeCode, row[designationCol])
 		columnsError = append(columnsError, designationCol)
 	}
 
 	var dateFieldsIndexes = []int{agencyRuiRegistrationCol, agentRuiRegistrationCol}
 	for _, colNumber := range dateFieldsIndexes {
 		if row[colNumber] == "" && lib.SliceContains(requiredFields, colNumber) {
-			log.Printf("Error processing node %s: missing required field at index %02d", nodeCode, colNumber)
+			log.ErrorF("Error processing node %s: missing required field at index %02d", nodeCode, colNumber)
 			columnsError = append(columnsError, colNumber)
 		}
 		_, err := time.Parse("02012006", fmt.Sprintf("%08s", row[colNumber]))
 		if err != nil && lib.SliceContains(requiredFields, colNumber) {
-			log.Printf("Error processing node %s: malformed date at index %02d", nodeCode, colNumber)
+			log.ErrorF("Error processing node %s: malformed date at index %02d", nodeCode, colNumber)
 			columnsError = append(columnsError, colNumber)
 		}
 	}
@@ -456,7 +456,7 @@ func nodeConfigurationValidation(errorNodes map[string][]int, nodeType string, r
 
 		// check if node is not already present
 		if !reflect.ValueOf(nodesMap[nodeCode]).IsZero() {
-			log.Printf("Error processing node %s: duplicated node code", nodeCode)
+			log.ErrorF("Error processing node %s: duplicated node code", nodeCode)
 			columnsError = append(columnsError, parentUidCol)
 		}
 
@@ -465,20 +465,20 @@ func nodeConfigurationValidation(errorNodes map[string][]int, nodeType string, r
 
 		// check if parent is present in nodesMap, if not skip
 		if reflect.ValueOf(parentNode).IsZero() {
-			log.Printf("Error processing node %s: parent node not found", nodeCode)
+			log.ErrorF("Error processing node %s: parent node not found", nodeCode)
 			columnsError = append(columnsError, parentUidCol)
 		}
 
 		// check if parent is an agent in nodesMap, if not skip
 		if parentNode.Type == models.AgentNetworkNodeType {
-			log.Printf("Error processing node %s: node can't have parent node of type agent", nodeCode)
+			log.ErrorF("Error processing node %s: node can't have parent node of type agent", nodeCode)
 			columnsError = append(columnsError, parentUidCol)
 		}
 
 		// check if node email is unique
 		err := checkDuplicatedMails(emailsList, email)
 		if err != nil {
-			log.Printf("Error processing node %s: email is not unique", nodeCode)
+			log.ErrorF("Error processing node %s: email is not unique", nodeCode)
 			columnsError = append(columnsError, mailCol)
 		}
 
@@ -488,43 +488,43 @@ func nodeConfigurationValidation(errorNodes map[string][]int, nodeType string, r
 			- check warrant compatibility with father
 		*/
 		if parentNode.Type != models.AreaManagerNetworkNodeType && parentNode.IsMgaProponent != isMgaProponent {
-			log.Printf("Error processing node %s: isMgaProponent configuration not matching parent configuration", nodeCode)
+			log.ErrorF("Error processing node %s: isMgaProponent configuration not matching parent configuration", nodeCode)
 			columnsError = append(columnsError, parentUidCol, isMgaProponentCol)
 		}
 
 		if !lib.SliceContains(warrantsMap[parentNode.Warrant], warrantName) {
-			log.Printf("Error processing node %s: warrant configuration not matching parent configuration", nodeCode)
+			log.ErrorF("Error processing node %s: warrant configuration not matching parent configuration", nodeCode)
 			columnsError = append(columnsError, warrantCol)
 		}
 
 		if nodeType == models.AgencyNetworkNodeType {
 			// check if fields for simplo are configured correctly
 			if worksForUid != "" {
-				log.Printf("Error processing node %s: not empty worksForUid", nodeCode)
+				log.ErrorF("Error processing node %s: not empty worksForUid", nodeCode)
 				columnsError = append(columnsError, worksForUidCol)
 			}
 
 			if isMgaProponent && (!hasAnnex || designation == "") {
-				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = true", nodeCode)
+				log.ErrorF("Error processing node %s: invalid node configuration for isMgaProponent = true", nodeCode)
 				columnsError = append(columnsError, isMgaProponentCol, hasAnnexCol, designationCol)
 			} else if !isMgaProponent && hasAnnex && designation == "" {
-				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = false", nodeCode)
+				log.ErrorF("Error processing node %s: invalid node configuration for isMgaProponent = false", nodeCode)
 				columnsError = append(columnsError, isMgaProponentCol, hasAnnexCol, designationCol)
 			}
 		} else if nodeType == models.AgentNetworkNodeType {
 			// check if fields for simplo are configured correctly
 			if isMgaProponent && (!hasAnnex || designation == "" || worksForUid == "" || (worksForUid != models.WorksForMgaUid && nodesMap[worksForUid].RuiSection != "E")) {
-				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = true", nodeCode)
+				log.ErrorF("Error processing node %s: invalid node configuration for isMgaProponent = true", nodeCode)
 				columnsError = append(columnsError, isMgaProponentCol, hasAnnexCol, designationCol, worksForUidCol)
 			} else if !isMgaProponent && ((hasAnnex && designation == "" && lib.SliceContains([]string{"A", "B"}, nodesMap[worksForUid].RuiSection)) || (!hasAnnex && designation != "" && worksForUid != "")) {
-				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = false", nodeCode)
+				log.ErrorF("Error processing node %s: invalid node configuration for isMgaProponent = false", nodeCode)
 				columnsError = append(columnsError, isMgaProponentCol, hasAnnexCol, designationCol, worksForUidCol)
 			}
 		}
 
 		// check if node is part of a known network
 		if !lib.SliceContains(networkNameList, row[networkNameCol]) {
-			log.Printf("Error processing node %s: invalid network %s", nodeCode, row[networkNameCol])
+			log.ErrorF("Error processing node %s: invalid network %s", nodeCode, row[networkNameCol])
 			columnsError = append(columnsError, networkNameCol)
 		}
 
@@ -558,12 +558,12 @@ func writeCSVToBucket(outputRows [][]string, filename string) error {
 	// generate new csv
 	err := lib.WriteCsv(tmpFilePath, outputRows, ';')
 	if err != nil {
-		log.Printf("Error writing csv: %s", err.Error())
+		log.ErrorF("Error writing csv: %s", err.Error())
 		return err
 	}
 	rawDoc, err := os.ReadFile(tmpFilePath)
 	if err != nil {
-		log.Printf("Error reading generated csv: %s", err.Error())
+		log.ErrorF("Error reading generated csv: %s", err.Error())
 		return err
 	}
 
@@ -572,7 +572,7 @@ func writeCSVToBucket(outputRows [][]string, filename string) error {
 	filePath := fmt.Sprintf("dataflow/in_network_node/%s", filename)
 	_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, rawDoc)
 	if err != nil {
-		log.Printf("Error saving import file to Google Bucket: %s", err.Error())
+		log.ErrorF("Error saving import file to Google Bucket: %s", err.Error())
 		return err
 	}
 	log.Printf("Import file saved into Google Bucket")
@@ -604,7 +604,7 @@ func triggerPipeline(r *http.Request, filename string) error {
 	log.Println("Getting invoker address...")
 	authToken, err := lib.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	if err != nil {
-		log.Printf("Error getting invoker authToken: %s", err.Error())
+		log.ErrorF("Error getting invoker authToken: %s", err.Error())
 		return err
 	}
 	invokerAddress := authToken.Email
@@ -612,7 +612,7 @@ func triggerPipeline(r *http.Request, filename string) error {
 
 	pubSubClient, err := pubsub.NewClient(context.Background(), os.Getenv("GOOGLE_PROJECT_ID"))
 	if err != nil {
-		log.Printf("Error getting pub/sub client: %s", err.Error())
+		log.ErrorF("Error getting pub/sub client: %s", err.Error())
 		return err
 	}
 	topic := pubSubClient.Topic("dataflow")
