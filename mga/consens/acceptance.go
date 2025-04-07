@@ -37,7 +37,6 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		log.Println("Handler end ---------------------------------------------")
 		log.PopPrefix()
 	}()
-
 	log.AddPrefix("[AcceptanceFx] ")
 	log.Println("Handler start -----------------------------------------------")
 

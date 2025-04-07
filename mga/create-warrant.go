@@ -14,7 +14,7 @@ import (
 func CreateWarrantFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var warrant models.Warrant
 
-	log.AddPrefix("[CreateWarrantFx] ")
+	log.AddPrefix("CreateWarrantFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")

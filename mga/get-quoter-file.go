@@ -17,7 +17,7 @@ func GetQuoterFileFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	)
 	var err error
 
-	log.AddPrefix("[GetQuoterFileFx] ")
+	log.AddPrefix("GetQuoterFileFx")
 	log.Printf("Handler start -------------------------------------------------")
 	defer func() {
 		if err != nil {

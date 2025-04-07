@@ -24,7 +24,7 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		hasDiff                                 bool
 	)
 
-	log.AddPrefix("[ModifyPolicyFx] ")
+	log.AddPrefix("ModifyPolicyFx")
 	defer func() {
 		r.Body.Close()
 		if err != nil {

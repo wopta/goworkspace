@@ -18,7 +18,7 @@ func UpdateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 		inputNode models.NetworkNode
 	)
 
-	log.AddPrefix("[UpdateNetworkNodeFx] ")
+	log.AddPrefix("UpdateNetworkNodeFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")

@@ -18,7 +18,7 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 		err       error
 	)
 
-	log.AddPrefix("[CreateNetworkNodeFx] ")
+	log.AddPrefix("CreateNetworkNodeFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")

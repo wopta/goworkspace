@@ -22,7 +22,7 @@ func GetProductsListByChannelFx(w http.ResponseWriter, r *http.Request) (string,
 		response GetProductsListByEntitlementResponse
 	)
 
-	log.AddPrefix("[GetProductsListByChannelFx] ")
+	log.AddPrefix("GetProductsListByChannelFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")

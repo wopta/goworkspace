@@ -33,7 +33,7 @@ func CreateNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, 
 		networkNode *models.NetworkNode
 	)
 
-	log.AddPrefix("[CreateNetworkNodeInviteFx] ")
+	log.AddPrefix("CreateNetworkNodeInviteFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
