@@ -312,7 +312,7 @@ func ProductToListData(query *firestore.DocumentIterator) []Product {
 		lib.CheckError(e)
 		result = append(result, value)
 
-		log.Println(fmt.Sprint(len(result)))
+		log.Println(len(result))
 	}
 	return result
 }

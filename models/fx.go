@@ -21,7 +21,7 @@ type Fx struct{}
 func (fx *Fx) ToString(value float64) string {
 	var r int
 	r = int(math.Round(value))
-	log.Printf("", r)
+	log.Println(r)
 
 	return fmt.Sprint(r)
 }
@@ -124,7 +124,7 @@ func (fx *Fx) GetBuildigValue(buildingType string) int {
 	return 0
 }
 func (fx *Fx) Log(any interface{}) {
-	log.Printf("", any)
+	log.Println(any)
 
 }
 
@@ -145,7 +145,7 @@ func (fx *Fx) ReplaceAt(input string, replacement string, index int64) string {
 }
 
 func (fx *Fx) RoundNear(value float64, nearest int64) float64 {
-	log.Printf("", (math.Round(float64(value)/float64(nearest))*float64(nearest))-float64(nearest))
+	log.Println((math.Round(float64(value)/float64(nearest)) * float64(nearest)) - float64(nearest))
 
 	return (math.Round(float64(value)/float64(nearest)) * float64(nearest)) - float64(nearest)
 }
