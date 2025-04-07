@@ -37,10 +37,10 @@ func RefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, interfa
 		isRenew               bool
 	)
 
-	log.AddPrefix("[RefreshPayByLinkFx] ")
+	log.AddPrefix("RefreshPayByLinkFx")
 	defer func() {
 		if err != nil {
-			log.ErrorF("error: %s", err)
+			log.Error(err)
 		}
 		log.Println("Handler end ---------------------------------------------")
 		log.PopPrefix()

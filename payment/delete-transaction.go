@@ -27,6 +27,7 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 		collection  = lib.TransactionsCollection
 	)
 
+	log.AddPrefix("DeleteTransactionFx")
 	defer func() {
 		if err != nil {
 			log.ErrorF("error: %s", err.Error())
@@ -35,7 +36,6 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 		log.PopPrefix()
 	}()
 
-	log.AddPrefix("[DeleteTransactionFx] ")
 	log.Println("Handler start -----------------------------------------------")
 
 	idToken := r.Header.Get("Authorization")

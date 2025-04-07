@@ -41,7 +41,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		toAddress   = mail.Address{}
 	)
 
-	log.AddPrefix("[ManualPaymentFx] ")
+	log.AddPrefix("ManualPaymentFx")
 	defer func() {
 		if err != nil {
 			log.ErrorF("error: %s", err.Error())

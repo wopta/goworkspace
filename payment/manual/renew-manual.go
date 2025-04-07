@@ -30,7 +30,7 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 		flowName    string = models.ECommerceFlow
 	)
 
-	log.AddPrefix("[RenewManualPaymentFx] ")
+	log.AddPrefix("RenewManualPaymentFx")
 	defer func() {
 		if err != nil {
 			log.ErrorF("error: %s", err)
