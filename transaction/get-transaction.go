@@ -8,6 +8,7 @@ import (
 
 func GetTransactionByUid(transactionUid, origin string) *models.Transaction {
 	log.AddPrefix("GetTransactionByUid")
+	defer log.PopPrefix()
 	log.Printf("uid %s", transactionUid)
 
 	var (
