@@ -28,6 +28,7 @@ func GetProductV2(productName, productVersion, channel string, networkNode *mode
 		product *models.Product
 	)
 	log.AddPrefix("GetProductV2")
+	defer log.PopPrefix()
 	log.Println("function start -----------------")
 
 	filePath := fmt.Sprintf("%s/%s/%s/%s.json", models.ProductsFolder, productName, productVersion, channel)

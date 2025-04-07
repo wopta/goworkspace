@@ -78,7 +78,7 @@ func GetCommissionByProduct(policy *models.Policy, prod *models.Product, isActiv
 
 func getCommissionAmountByPaymentSplit(policy *models.Policy) float64 {
 	log.AddPrefix("GetCommissionAmountByPaymentSplit")
-	log.PopPrefix()
+	defer log.PopPrefix()
 
 	switch policy.PaymentSplit {
 	case string(models.PaySplitMonthly), string(models.PaySplitSemestral):

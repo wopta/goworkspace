@@ -130,6 +130,7 @@ func getProductsFileList() []string {
 		fileList = make([]string, 0)
 	)
 	log.AddPrefix("GetNetworkNodeProducts")
+	defer log.PopPrefix()
 	switch os.Getenv("env") {
 	case "local":
 		fileList, err = lib.ListLocalFolderContent(models.ProductsFolder)
