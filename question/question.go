@@ -45,7 +45,7 @@ func GetQuestionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		policy *models.Policy
 	)
 
-	log.AddPrefix("[GetQuestionsFx] ")
+	log.AddPrefix("GetQuestionsFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
