@@ -65,7 +65,7 @@ func PmiAllrisk(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		status                int64
 	)
 
-	log.AddPrefix("[PmiAllrisk] ")
+	log.AddPrefix("PmiAllrisk")
 	defer log.PopPrefix()
 	log.Println("Handler start -----------------------------------------------")
 
