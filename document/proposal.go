@@ -36,7 +36,7 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	err = json.Unmarshal(body, &policy)
 	if err != nil {
-		log.Printf("error unmarshaling request body: %s", err.Error())
+		log.ErrorF("error unmarshaling request body: %s", err.Error())
 		return "", nil, err
 	}
 

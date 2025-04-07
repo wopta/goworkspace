@@ -18,6 +18,7 @@ func ReservedFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		product *models.Product
 	)
 	log.AddPrefix("ReservedFx")
+	defer log.PopPrefix()
 	log.Println("handler start ---------------------------------")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
