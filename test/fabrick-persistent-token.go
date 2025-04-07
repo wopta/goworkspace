@@ -27,7 +27,7 @@ func fabrickPersistentToken(r *http.Request) (string, interface{}, error) {
 		body fabrickPersistentTokenReq
 	)
 
-	log.AddPrefix("[fabrickPersistentToken] ")
+	log.AddPrefix("fabrickPersistentToken")
 	defer log.PopPrefix()
 	log.Println("Handler Start -----------------------------------------------")
 

@@ -30,7 +30,7 @@ func fabrickPaymentInstrument(r *http.Request) (string, interface{}, error) {
 		body FabrickPaymentInstrumentReq
 	)
 
-	log.AddPrefix("[FabrickPaymentInstrument] ")
+	log.AddPrefix("FabrickPaymentInstrument")
 	defer log.PopPrefix()
 	log.Println("Handler start -----------------------------------------------")
 

@@ -122,7 +122,8 @@ func TestGetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		Message:  "This is a notice message",
 	})
 
-	log.AddPrefix("[TestGetFx] ")
+	log.AddPrefix("TestGetFx")
+	defer log.PopPrefix()
 
 	log.Println(Entry{
 		Severity: logging.Warning.String(),
@@ -142,8 +143,6 @@ func TestGetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	logger.Info("This is an info log", "env", os.Getenv("env"))
 	logger.Warn("This is a warn log", "env", os.Getenv("env"))
 	logger.Error("This is an error log", "env", os.Getenv("env"))
-
-	log.PopPrefix()
 
 	log.Println(Entry{
 		Severity: logging.Notice.String(),
