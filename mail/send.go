@@ -54,7 +54,7 @@ func (a *loginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
 func SendFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var obj MailRequest
 
-	log.AddPrefix("[SendFx] ")
+	log.AddPrefix("SendFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")

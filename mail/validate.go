@@ -16,7 +16,7 @@ import (
 func ValidateFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var result map[string]string
 
-	log.AddPrefix("[ValidateFx] ")
+	log.AddPrefix("ValidateFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")

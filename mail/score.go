@@ -16,7 +16,7 @@ import (
 func ScoreFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var result map[string]string
 
-	log.AddPrefix("[ScoreFx] ")
+	log.AddPrefix("ScoreFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
