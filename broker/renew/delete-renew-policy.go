@@ -21,7 +21,6 @@ func DeleteRenewPolicyFx(w http.ResponseWriter, r *http.Request) (string, interf
 	)
 
 	log.AddPrefix("DeleteRenewPolicyFx")
-	log.AddPrefix("[DeleteRenewPolicyFx] ")
 	defer func() {
 		if err != nil {
 			log.ErrorF("error: %s", err)

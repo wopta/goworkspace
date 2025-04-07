@@ -24,7 +24,7 @@ func PolicyFiscalcodeFx(w http.ResponseWriter, r *http.Request) (string, interfa
 		response           GetPolicesByFiscalCodeResponse
 	)
 
-	log.AddPrefix("[PolicyFiscalcodeFx] ")
+	log.AddPrefix("PolicyFiscalcodeFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")

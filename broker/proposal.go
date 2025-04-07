@@ -31,7 +31,7 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		req    ProposalReq
 	)
 
-	log.AddPrefix("[ProposalFx] ")
+	log.AddPrefix("ProposalFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")

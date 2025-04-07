@@ -27,7 +27,7 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		policy models.Policy
 	)
 
-	log.AddPrefix("[RequestApprovalFx] ")
+	log.AddPrefix("RequestApprovalFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")

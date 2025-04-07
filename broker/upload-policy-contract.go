@@ -22,7 +22,7 @@ func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, int
 		policy models.Policy
 	)
 
-	log.AddPrefix("[UploadPolicyContractFx] ")
+	log.AddPrefix("UploadPolicyContractFx")
 	defer func() {
 		r.Body.Close()
 		if err != nil {

@@ -22,7 +22,7 @@ import (
 func GetPolicyAttachmentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var response GetPolicyAttachmentsResponse
 
-	log.AddPrefix("[GetPolicyAttachmentFx] ")
+	log.AddPrefix("GetPolicyAttachmentFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")

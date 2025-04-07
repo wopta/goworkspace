@@ -25,7 +25,7 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		response    UpdatePolicyResponse
 	)
 
-	log.AddPrefix("[UpdatePolicyFx] ")
+	log.AddPrefix("UpdatePolicyFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
