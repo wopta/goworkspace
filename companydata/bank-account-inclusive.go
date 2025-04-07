@@ -40,6 +40,7 @@ func BankAccountInclusive(w http.ResponseWriter, r *http.Request) (string, inter
 	)
 
 	log.AddPrefix("BankAccountInclusive ")
+	defer log.PopPrefix()
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 	log.Println(r.Header)
 	log.Println(string(req))
@@ -62,6 +63,7 @@ func setPolicy(code string, now time.Time, upload bool) {
 	)
 
 	log.AddPrefix("BankAccountInclusive setPolicy " + code)
+	defer log.PopPrefix()
 	refDay = now.AddDate(0, 0, -1)
 	log.Println("  refMontly: ", refDay)
 	//from, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 1))
@@ -228,6 +230,7 @@ func setScalapayPolicy(code string, now time.Time, upload bool) {
 	)
 
 	log.AddPrefix("BankAccountInclusive setScalapayPolicy " + code)
+	defer log.PopPrefix()
 	header := []string{
 		"NUMERO POLIZZA",                       // NUMERO POLIZZA
 		"LOB",                                  //    LOB
