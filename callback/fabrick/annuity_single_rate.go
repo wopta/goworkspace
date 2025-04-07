@@ -27,7 +27,7 @@ func AnnuitySingleRateFx(_ http.ResponseWriter, r *http.Request) (string, interf
 		response       = FabrickResponse{Result: true, Locale: "it"}
 	)
 
-	log.AddPrefix("[AnnuitySingleRateFx] ")
+	log.AddPrefix("AnnuitySingleRateFx")
 	defer func() {
 		log.Println("Handler end ---------------------------------------------")
 		log.PopPrefix()

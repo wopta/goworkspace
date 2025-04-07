@@ -48,7 +48,7 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 
 	flowName, flowFile = policy.GetFlow(networkNode, warrant)
 	if flowFile == nil {
-		log.Println("exiting bpmn - flowFile not loaded")
+		log.ErrorF("exiting bpmn - flowFile not loaded")
 		return nil
 	}
 	log.Printf("flowName '%s'", flowName)
@@ -62,7 +62,7 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 	case payFlowKey:
 		flow = flowFile.PayFlow
 	default:
-		log.Println("error flow not set")
+		log.ErrorF("error flow not set")
 		return nil
 	}
 

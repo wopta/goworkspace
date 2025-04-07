@@ -32,7 +32,7 @@ func AnnuityFirstRateFx(_ http.ResponseWriter, r *http.Request) (string, any, er
 		response       = FabrickResponse{Result: true, Locale: "it"}
 	)
 
-	log.AddPrefix("[AnnuityFirstRateFx] ")
+	log.AddPrefix("AnnuityFirstRateFx")
 	defer func() {
 		log.Println("Handler end ---------------------------------------------")
 		log.PopPrefix()

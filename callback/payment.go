@@ -25,7 +25,7 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		fabrickCallback FabrickCallback
 	)
 
-	log.AddPrefix("[PaymentFx] ")
+	log.AddPrefix("PaymentFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")

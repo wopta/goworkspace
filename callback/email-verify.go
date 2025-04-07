@@ -9,7 +9,7 @@ import (
 )
 
 func EmailVerifyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.AddPrefix("[EmailVerifyFx] ")
+	log.AddPrefix("EmailVerifyFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")

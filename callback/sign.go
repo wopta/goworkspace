@@ -22,7 +22,7 @@ const (
 )
 
 func SignFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.AddPrefix("[SignFx] ")
+	log.AddPrefix("SignFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
