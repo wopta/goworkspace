@@ -12,7 +12,7 @@ import (
 )
 
 func ExcelFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.AddPrefix("[ExcelFx] ")
+	log.AddPrefix("ExcelFx")
 	defer log.PopPrefix()
 	log.Println("Handler start -----------------------------------------------")
 

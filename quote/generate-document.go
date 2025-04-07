@@ -26,7 +26,7 @@ func GenerateDocumentFx(_ http.ResponseWriter, r *http.Request) (string, any, er
 		responseBytes []byte
 	)
 
-	log.AddPrefix("[GenerateQuoteDocumentFx] ")
+	log.AddPrefix("GenerateQuoteDocumentFx")
 	defer func() {
 		r.Body.Close()
 		if err != nil {

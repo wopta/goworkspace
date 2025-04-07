@@ -163,6 +163,7 @@ func (qs *QuoteSpreadsheet) export(sheetClient *sheets.Service, ctx context.Cont
 		Requests: requests,
 	}).Context(ctx).Do(); err != nil {
 		log.Error(err)
+		panic(err)
 	}
 
 }

@@ -13,7 +13,7 @@ import (
 )
 
 func PmiMunichFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.AddPrefix("[PmiMunichFx] ")
+	log.AddPrefix("PmiMunichFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
