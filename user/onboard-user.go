@@ -24,7 +24,7 @@ func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface
 		user               *models.User
 	)
 
-	log.AddPrefix("[OnboardUserFx] ")
+	log.AddPrefix("OnboardUserFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")

@@ -33,7 +33,7 @@ func GetUsersFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		limitValue = 10
 	)
 
-	log.AddPrefix("[GetUsersFx] ")
+	log.AddPrefix("GetUsersFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
@@ -87,7 +87,7 @@ func GetUsersFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 }
 
 func GetUserByAuthIdFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.AddPrefix("[GetUserByAuthIdFx] ")
+	log.AddPrefix("GetUserByAuthIdFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
@@ -180,7 +180,7 @@ type userInfo struct {
 func GetUsersV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var err error
 
-	log.AddPrefix("[GetUsersV2Fx] ")
+	log.AddPrefix("GetUsersV2Fx")
 	defer func() {
 		if err != nil {
 			log.ErrorF("error: %s", err)

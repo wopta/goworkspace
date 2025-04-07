@@ -134,13 +134,13 @@ func CreateInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) 
 	// check if user exists
 	_, err := GetAuthUserByMail(origin, inviteRequest.Email)
 	if err == nil {
-		log.Printf("user %s already exists", inviteRequest.Email)
+		log.ErrorF("user %s already exists", inviteRequest.Email)
 		return "", errors.New("user already exists")
 	}
 
 	err = lib.SetFirestoreErr(collectionName, invite.Uid, invite)
 	if err != nil {
-		log.Printf("could not create user %s", inviteRequest.Email)
+		log.ErrorF("could not create user %s", inviteRequest.Email)
 		return "", errors.New("could not create user")
 	}
 

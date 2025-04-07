@@ -24,7 +24,7 @@ func FiscalCodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		outJson string
 	)
 
-	log.AddPrefix("[FiscalCodeFx] ")
+	log.AddPrefix("FiscalCodeFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
