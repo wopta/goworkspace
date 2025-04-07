@@ -11,6 +11,7 @@ import (
 
 func (state *State) AddTaskHandler(name string, handler func(state *State) error) map[string]func(state *State) error {
 	log.AddPrefix("AddTaskHandler")
+	log.PopPrefix()
 	if nil == state.Handlers {
 		log.Println("state.Handlers == nil")
 	}
