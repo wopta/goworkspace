@@ -35,7 +35,7 @@ func GetClaimDocumentFx(w http.ResponseWriter, r *http.Request) (string, interfa
 
 	authToken, err := lib.VerifyUserIdToken(r.Header.Get("Authorization"))
 	if err != nil {
-		log.Printf("invalid idToken, error %s", err.Error())
+		log.ErrorF("invalid idToken, error %s", err.Error())
 		return "", "", err
 	}
 
