@@ -31,7 +31,7 @@ func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interf
 		req    UploadPolicyMediaReq
 	)
 
-	log.AddPrefix("[UploadPolicyMediaFx] ")
+	log.AddPrefix("UploadPolicyMediaFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
