@@ -22,7 +22,7 @@ func SetCoverageReservedFx(w http.ResponseWriter, r *http.Request) (string, inte
 		err      error
 	)
 
-	log.AddPrefix("[SetCoverageReservedFx] ")
+	log.AddPrefix("SetCoverageReservedFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
