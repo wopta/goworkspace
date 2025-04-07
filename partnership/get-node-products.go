@@ -25,7 +25,7 @@ func GetPartnershipNodeAndProductsFx(w http.ResponseWriter, r *http.Request) (st
 		err      error
 	)
 
-	log.AddPrefix("[GetPartnershipNodeAndProductsFx] ")
+	log.AddPrefix("GetPartnershipNodeAndProductsFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")

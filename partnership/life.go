@@ -29,7 +29,7 @@ func LifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, err
 		err             error
 	)
 
-	log.AddPrefix("[LifePartnershipFx] ")
+	log.AddPrefix("LifePartnershipFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
