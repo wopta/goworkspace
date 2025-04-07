@@ -54,8 +54,8 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 		if err != nil {
 			log.Error(err)
 		}
-		log.PopPrefix()
 		log.Println("Handler end -------------------------------------------------")
+		log.PopPrefix()
 	}()
 
 	log.Println("Handler start -----------------------------------------------")

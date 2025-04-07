@@ -41,7 +41,7 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 			log.Error(err)
 		}
 		log.Println("Handler end -------------------------------------------------")
-		defer log.PopPrefix()
+		log.PopPrefix()
 	}()
 
 	log.Println("Handler start -----------------------------------------------")
