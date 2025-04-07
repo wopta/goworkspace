@@ -25,6 +25,7 @@ const (
 // TO DO security,payload,error,fasature
 func BankAccountScalapayFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.AddPrefix("BankAccountScalapayFx ")
+	defer log.PopPrefix()
 	var (
 		e   error
 		obj BankAccountMovement

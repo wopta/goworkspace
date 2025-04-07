@@ -29,6 +29,7 @@ const (
 // TO DO security,payload,error,fasature
 func BankAccountHypeFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.AddPrefix("BankAccountHypeFx ")
+	defer log.PopPrefix()
 	var (
 		e   error
 		obj BankAccountMovement
