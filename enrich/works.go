@@ -14,7 +14,7 @@ func WorksFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 		result []Work
 	)
 
-	log.AddPrefix("[WorksFx] ")
+	log.AddPrefix("WorksFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")

@@ -14,7 +14,7 @@ func NaicsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 		result []Naics
 	)
 
-	log.AddPrefix("[NaicsFx] ")
+	log.AddPrefix("NaicsFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")

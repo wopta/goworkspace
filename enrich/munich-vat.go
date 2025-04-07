@@ -13,7 +13,7 @@ import (
 )
 
 func MunichVatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.AddPrefix("[MunichVatFx] ")
+	log.AddPrefix("MunichVatFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
