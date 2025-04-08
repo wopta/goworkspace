@@ -1,19 +1,32 @@
 package accounting
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
+	"strconv"
 
 	fattureincloudapi "github.com/fattureincloud/fattureincloud-go-sdk/v2/api"
 	fattureincloud "github.com/fattureincloud/fattureincloud-go-sdk/v2/model"
 	oauth "github.com/fattureincloud/fattureincloud-go-sdk/v2/oauth2"
 )
 
+const (
+	baseurlInc = "http://api-v2.fattureincloud.it/"
+)
+
+var (
+	token = "Bearer " + os.Getenv("FATTURE_INCLOUD_KEY")
+)
+
 func (invoiceData *InvoiceInc) CreateInvoice(isPay bool, isProforma bool) {
 	log.SetPrefix("CreateInvoice")
+	companyId := getCompanyId()
 	var (
 		fcItems     []fattureincloud.IssuedDocumentItemsListItem
 		status      fattureincloud.IssuedDocumentStatus
@@ -32,10 +45,8 @@ func (invoiceData *InvoiceInc) CreateInvoice(isPay bool, isProforma bool) {
 	} else {
 		status = fattureincloud.IssuedDocumentStatuses.NOT_PAID
 	}
-
-	apiClient, auth, id := getClient()
 	//set your company id
-	companyId := id
+
 	for _, item := range invoiceData.Items {
 		fcItems = append(fcItems, *fattureincloud.NewIssuedDocumentItemsListItem().
 			SetProductId(4).
@@ -83,21 +94,30 @@ func (invoiceData *InvoiceInc) CreateInvoice(isPay bool, isProforma bool) {
 
 	// Here we put our invoice in the request object
 	createIssuedDocumentRequest := *fattureincloud.NewCreateIssuedDocumentRequest().SetData(invoice)
-	apiClient.UserAPI.ListUserCompanies(auth)
-	// Now we are all set for the final call
-	// Create the invoice: https://github.com/fattureincloud/fattureincloud-go-sdk/blob/master/docs/IssuedDocumentsApi.md#createIssuedDocument
-	resp, r, err := apiClient.IssuedDocumentsAPI.CreateIssuedDocument(auth, companyId).CreateIssuedDocumentRequest(createIssuedDocumentRequest).Execute()
+
+	uri := baseurlInc + "/c/" + strconv.FormatInt(int64(companyId), 10) + "/issued_documents"
+	bodyreq, e := createIssuedDocumentRequest.MarshalJSON()
+	log.Println(e)
+	req, _ := http.NewRequest(http.MethodPost, uri, bytes.NewBuffer(bodyreq))
+	req.Header.Add("Authorization", token)
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `IssuedDocumentsAPI.CreateIssuedDocument``: %v\n", err)
-		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+		log.Println("Error on response.\n[ERROR] -", err)
 	}
-	json.NewEncoder(os.Stdout).Encode(resp)
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("Error while reading the response bytes:", err)
+	}
+	log.Println(string([]byte(body)))
 }
 
 func getClient() (*fattureincloudapi.APIClient, context.Context, int32) {
 	log.SetPrefix("CreateInvoice getClient")
 	redirectUri := "http://localhost:3000/oauth"
-	auth := oauth.NewOAuth2AuthorizationCodeManager("EZVpwY4saebHSo293egZqSi3I5nyy1fK", os.Getenv("FATTURE_INCLOUD_KEY"), redirectUri)
+	auth := oauth.NewOAuth2AuthorizationCodeManager("EZVpwY4saebHSo293egZqSi3I5nyy1fK", os.Getenv("FATTURE_INCLOUD_SECRET"), redirectUri)
 
 	scopes := []oauth.Scope{oauth.Scopes.SETTINGS_ALL, oauth.Scopes.ISSUED_DOCUMENTS_INVOICES_ALL}
 	url := auth.GetAuthorizationUrl(scopes, "state")
@@ -118,4 +138,62 @@ func getClient() (*fattureincloudapi.APIClient, context.Context, int32) {
 	firstCompanyId := userCompaniesResponse.GetData().Companies[0].GetId()
 	log.Println("firstCompanyId: ", firstCompanyId)
 	return fattureincloudapi.NewAPIClient(configuration), auth1, firstCompanyId
+}
+func getCompanyId() int32 {
+	var (
+		listCompany *fattureincloud.ListUserCompaniesResponse
+	)
+	// for this example we define the token as string, but you should have obtained it in the previous steps
+
+	uri := baseurlInc + "user/companies"
+	req, _ := http.NewRequest("GET", uri, nil)
+	req.Header.Add("Authorization", token)
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("Error on response.\n[ERROR] -", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("Error while reading the response bytes:", err)
+	}
+	log.Println(string([]byte(body)))
+
+	e := json.Unmarshal(body, listCompany)
+	log.Println(e)
+
+	companyId := listCompany.GetData().Companies[0].Id
+	log.Println("companyId:", companyId)
+	return int32(*companyId.Get())
+}
+func putInvoive() int32 {
+	var (
+		listCompany *fattureincloud.ListUserCompaniesResponse
+	)
+	// for this example we define the token as string, but you should have obtained it in the previous steps
+
+	uri := baseurlInc + "user/companies"
+	req, _ := http.NewRequest("GET", uri, nil)
+	req.Header.Add("Authorization", token)
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("Error on response.\n[ERROR] -", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("Error while reading the response bytes:", err)
+	}
+	log.Println(string([]byte(body)))
+
+	e := json.Unmarshal(body, listCompany)
+	log.Println(e)
+
+	companyId := listCompany.GetData().Companies[0].Id
+	log.Println("companyId:", companyId)
+	return int32(*companyId.Get())
 }
