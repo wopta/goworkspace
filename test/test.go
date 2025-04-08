@@ -36,7 +36,7 @@ var testRoutes []lib.Route = []lib.Route{
 		Route:   "/accounting/createinvoice",
 		Handler: lib.ResponseLoggerWrapper(createInvoice),
 		Method:  http.MethodGet,
-		Roles:   []string{lib.UserRoleAll},
+		Roles:   []string{},
 	},
 }
 
