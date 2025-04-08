@@ -98,8 +98,11 @@ func (invoiceData *InvoiceInc) CreateInvoice(isPay bool, isProforma bool) {
 	uri := baseurlInc + "/c/" + strconv.FormatInt(int64(companyId), 10) + "/issued_documents"
 	bodyreq, e := createIssuedDocumentRequest.MarshalJSON()
 	log.Println(e)
+	log.Println(string(bodyreq))
 	req, _ := http.NewRequest(http.MethodPost, uri, bytes.NewBuffer(bodyreq))
 	req.Header.Add("Authorization", token)
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Accept", "application/json")
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
