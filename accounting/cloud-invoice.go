@@ -95,7 +95,7 @@ func (invoiceData *InvoiceInc) CreateInvoice(isPay bool, isProforma bool) {
 	// Here we put our invoice in the request object
 	createIssuedDocumentRequest := *fattureincloud.NewCreateIssuedDocumentRequest().SetData(invoice)
 
-	uri := baseurlInc + "/c/" + strconv.FormatInt(int64(companyId), 10) + "/issued_documents"
+	uri := baseurlInc + "c/" + strconv.FormatInt(int64(companyId), 10) + "/issued_documents"
 	bodyreq, e := createIssuedDocumentRequest.MarshalJSON()
 	log.Println(e)
 	log.Println(string(bodyreq))
