@@ -141,7 +141,7 @@ func getClient() (*fattureincloudapi.APIClient, context.Context, int32) {
 }
 func getCompanyId() int32 {
 	var (
-		listCompany *fattureincloud.ListUserCompaniesResponse
+		listCompany CompanyResponseData
 	)
 	// for this example we define the token as string, but you should have obtained it in the previous steps
 
@@ -161,12 +161,12 @@ func getCompanyId() int32 {
 	}
 	log.Println(string([]byte(body)))
 
-	e := json.Unmarshal(body, listCompany)
+	e := json.Unmarshal(body, &listCompany)
 	log.Println(e)
 
-	companyId := listCompany.GetData().Companies[0].Id
+	companyId := listCompany.Data.Companies[0].ID
 	log.Println("companyId:", companyId)
-	return int32(*companyId.Get())
+	return int32(companyId)
 }
 func putInvoive() int32 {
 	var (
@@ -196,4 +196,48 @@ func putInvoive() int32 {
 	companyId := listCompany.GetData().Companies[0].Id
 	log.Println("companyId:", companyId)
 	return int32(*companyId.Get())
+}
+
+type CompanyResponseData struct {
+	Data Data `json:"data,omitempty"`
+}
+type Permissions struct {
+	FicSituation         string `json:"fic_situation,omitempty"`
+	FicClients           string `json:"fic_clients,omitempty"`
+	FicSuppliers         string `json:"fic_suppliers,omitempty"`
+	FicProducts          string `json:"fic_products,omitempty"`
+	FicIssuedDocuments   string `json:"fic_issued_documents,omitempty"`
+	FicReceivedDocuments string `json:"fic_received_documents,omitempty"`
+	FicReceipts          string `json:"fic_receipts,omitempty"`
+	FicCalendar          string `json:"fic_calendar,omitempty"`
+	FicArchive           string `json:"fic_archive,omitempty"`
+	FicTaxes             string `json:"fic_taxes,omitempty"`
+	FicStock             string `json:"fic_stock,omitempty"`
+	FicCashbook          string `json:"fic_cashbook,omitempty"`
+	FicSettings          string `json:"fic_settings,omitempty"`
+	FicEmails            string `json:"fic_emails,omitempty"`
+	DicEmployees         string `json:"dic_employees,omitempty"`
+	DicTimesheet         string `json:"dic_timesheet,omitempty"`
+	DicSettings          string `json:"dic_settings,omitempty"`
+}
+type Companies struct {
+	ID                  int         `json:"id,omitempty"`
+	Name                string      `json:"name,omitempty"`
+	Email               string      `json:"email,omitempty"`
+	Alias               any         `json:"alias,omitempty"`
+	VatNumber           string      `json:"vat_number,omitempty"`
+	TaxCode             string      `json:"tax_code,omitempty"`
+	Type                string      `json:"type,omitempty"`
+	ConnectionID        int         `json:"connection_id,omitempty"`
+	ConnectionRole      string      `json:"connection_role,omitempty"`
+	ControlledCompanies []any       `json:"controlled_companies,omitempty"`
+	FicPlan             string      `json:"fic_plan,omitempty"`
+	DicPlan             int         `json:"dic_plan,omitempty"`
+	Fic                 bool        `json:"fic,omitempty"`
+	Dic                 bool        `json:"dic,omitempty"`
+	FicLicenseExpire    string      `json:"fic_license_expire,omitempty"`
+	Permissions         Permissions `json:"permissions,omitempty"`
+}
+type Data struct {
+	Companies []Companies `json:"companies,omitempty"`
 }
