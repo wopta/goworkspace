@@ -22,3 +22,31 @@ func (a *Address) Normalize() {
 	a.CityCode = lib.ToUpper(a.CityCode)
 	a.Area = lib.ToUpper(a.Area)
 }
+
+func (a Address) IsEqual(address Address) bool {
+	if a.StreetName != address.StreetName {
+		return false
+	}
+	if a.StreetNumber != address.StreetNumber {
+		return false
+	}
+	if a.City != address.City {
+		return false
+	}
+	if a.PostalCode != address.PostalCode {
+		return false
+	}
+	if a.Locality != address.Locality {
+		return false
+	}
+	if a.CityCode != address.CityCode {
+		return false
+	}
+	if a.Area != address.Area {
+		return false
+	}
+	if a.IsManualInput != address.IsManualInput {
+		return false
+	}
+	return true
+}

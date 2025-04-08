@@ -13,6 +13,7 @@ import (
 	"github.com/mohae/deepcopy"
 	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/compare"
 	"github.com/wopta/goworkspace/models"
 	plc "github.com/wopta/goworkspace/policy"
 	usr "github.com/wopta/goworkspace/user"
@@ -187,103 +188,80 @@ func generateDiffPolicy(originalPolicy, inputPolicy models.Policy) (models.Polic
 }
 
 func diffForUser(orig, input *models.User) bool {
-	if orig == nil && input == nil {
-		return false
-	}
+	compareFunc := func(a, b *models.User) bool {
+		if a.FiscalCode != b.FiscalCode {
+			return false
+		}
 
-	if (orig == nil && input != nil) || (orig != nil && input == nil) {
+		if a.Mail != b.Mail {
+			return false
+		}
+
+		if a.Phone != b.Phone {
+			return false
+		}
+
+		if a.Name != b.Name {
+			return false
+		}
+
+		if a.Surname != b.Surname {
+			return false
+		}
+		if !compare.AreEqual(a.Residence, b.Residence) {
+			return false
+		}
+
+		if !compare.AreEqual(a.Domicile, b.Domicile) {
+			return false
+		}
 		return true
-	}
 
-	if orig.FiscalCode != input.FiscalCode {
-		return true
 	}
-
-	if orig.Mail != input.Mail {
-		return true
-	}
-
-	if orig.Phone != input.Phone {
-		return true
-	}
-
-	if orig.Name != input.Name {
-		return true
-	}
-
-	if orig.Surname != input.Surname {
-		return true
-	}
-
-	if input.Residence == nil || orig.Residence == nil {
-		return input.Residence != orig.Residence
-	}
-
-	if input.Domicile == nil || orig.Domicile == nil {
-		return input.Domicile != orig.Domicile
-	}
-
-	return false
+	return !compare.AreEqualFunc(orig, input, compareFunc)
 }
 
 func diffForBeneficiaries(orig, input *[]models.Beneficiary) bool {
-	if orig == nil && input == nil {
-		return false
-	}
-	if (orig == nil && input != nil) || (orig != nil && input == nil) {
-		return true
-	}
-	if len(*orig) != len(*input) {
-		return true
-	}
-
-	for idx := range *orig {
-		if hasChanged := diffForBeneficiary((*orig)[idx], (*input)[idx]); hasChanged {
-			return true
+	compareFunc := func(a, b models.Beneficiary) bool {
+		if a.Name != b.Name {
+			return false
 		}
-	}
-
-	return false
-}
-
-func diffForBeneficiary(orig, input models.Beneficiary) bool {
-	if orig.Name != input.Name {
+		if a.Surname != b.Surname {
+			return false
+		}
+		if a.Mail != b.Mail {
+			return false
+		}
+		if a.Phone != b.Phone {
+			return false
+		}
+		if a.FiscalCode != b.FiscalCode {
+			return false
+		}
+		if a.VatCode != b.VatCode {
+			return false
+		}
+		if !compare.AreEqual(a.Residence, b.Residence) {
+			return false
+		}
+		if !compare.AreEqual(a.CompanyAddress, b.CompanyAddress) {
+			return false
+		}
+		if a.IsFamilyMember != b.IsFamilyMember {
+			return false
+		}
+		if a.IsContactable != b.IsContactable {
+			return false
+		}
+		if a.IsLegitimateSuccessors != b.IsLegitimateSuccessors {
+			return false
+		}
+		if a.BeneficiaryType != b.BeneficiaryType {
+			return false
+		}
 		return true
 	}
-	if orig.Surname != input.Surname {
-		return true
-	}
-	if orig.Mail != input.Mail {
-		return true
-	}
-	if orig.Phone != input.Phone {
-		return true
-	}
-	if orig.FiscalCode != input.FiscalCode {
-		return true
-	}
-	if orig.VatCode != input.VatCode {
-		return true
-	}
-	if orig.Residence == nil || input.Residence == nil {
-		return orig.Residence != input.Residence
-	}
-	if orig.CompanyAddress == nil || input.CompanyAddress == nil {
-		return orig.CompanyAddress != input.CompanyAddress
-	}
-	if orig.IsFamilyMember != input.IsFamilyMember {
-		return true
-	}
-	if orig.IsContactable != input.IsContactable {
-		return true
-	}
-	if orig.IsLegitimateSuccessors != input.IsLegitimateSuccessors {
-		return true
-	}
-	if orig.BeneficiaryType != input.BeneficiaryType {
-		return true
-	}
-	return false
+	return !compare.AreSlicesEqualFunc(orig, input, compareFunc)
 }
 
 func modifyController(originalPolicy, inputPolicy models.Policy) (models.Policy, models.User, error) {
