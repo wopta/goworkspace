@@ -193,13 +193,13 @@ func (lag *LifeAddendumGenerator) contractor() {
 		checked = "X"
 		rows1 = [][]string{
 			{"Cognome e Nome ", cDTO.Surname + " " + cDTO.Name, "Cod. Fisc: ", cDTO.FiscalCode},
-			{"Residente in ", cDTO.StreetName + " " + cDTO.StreetNumber + " " + cDTO.City + " (" + cDTO.Province + ")", "Data nascita: ", cDTO.BirthDate},
+			{"Residente in ", cDTO.StreetName + " " + cDTO.StreetNumber + ", " + cDTO.PostalCode + " " + cDTO.City + " (" + cDTO.Province + ")", "Data nascita: ", cDTO.BirthDate},
 		}
 		rows2 = [][]string{
 			{"Mail ", cDTO.Mail, "Telefono: ", cDTO.Phone},
 		}
 		domTxt = [][]string{
-			{"Domicilio ", cDTO.DomStreetName + " " + cDTO.DomStreetNumber + " " + cDTO.DomCity + " (" + cDTO.DomProvince + ")"},
+			{"Domicilio ", cDTO.DomStreetName + " " + cDTO.DomStreetNumber + ", " + cDTO.DomPostalCode + " " + cDTO.DomCity + " (" + cDTO.DomProvince + ")"},
 		}
 	} else {
 		rows1 = [][]string{
@@ -372,13 +372,13 @@ func (lag *LifeAddendumGenerator) insured() {
 		checked = "X"
 		rows1 = [][]string{
 			{"Cognome e Nome ", iDTO.Surname + " " + iDTO.Name, "Cod. Fisc: ", iDTO.FiscalCode},
-			{"Residente in ", iDTO.StreetName + " " + iDTO.StreetNumber + " " + iDTO.City + " (" + iDTO.Province + ")", "Data nascita: ", iDTO.BirthDate},
+			{"Residente in ", iDTO.StreetName + " " + iDTO.StreetNumber + ", " + iDTO.PostalCode + " " + iDTO.City + " (" + iDTO.Province + ")", "Data nascita: ", iDTO.BirthDate},
 		}
 		rows2 = [][]string{
 			{"Mail ", iDTO.Mail, "Telefono: ", iDTO.Phone},
 		}
 		domTxt = [][]string{
-			{"Domicilio ", iDTO.DomStreetName + " " + iDTO.DomStreetNumber + " " + iDTO.DomCity + " (" + iDTO.DomProvince + ")"},
+			{"Domicilio ", iDTO.DomStreetName + " " + iDTO.DomStreetNumber + ", " + iDTO.DomPostalCode + " " + iDTO.DomCity + " (" + iDTO.DomProvince + ")"},
 		}
 	} else {
 		rows1 = [][]string{
@@ -697,7 +697,7 @@ func (lag *LifeAddendumGenerator) beneficiaries() {
 		if checked == "X" {
 			rows = [][]string{
 				{"Cognome e Nome ", (*bDTO)[i].Surname + " " + (*bDTO)[i].Name, "Cod. Fisc: ", (*bDTO)[i].FiscalCode},
-				{"Residente in ", (*bDTO)[i].StreetName + " " + (*bDTO)[i].StreetNumber + " " + (*bDTO)[i].City + " (" + (*bDTO)[i].Province + ")", "Data nascita: ", (*bDTO)[i].BirthDate},
+				{"Residente in ", (*bDTO)[i].StreetName + " " + (*bDTO)[i].StreetNumber + ", " + (*bDTO)[i].PostalCode + " " + (*bDTO)[i].City + " (" + (*bDTO)[i].Province + ")", "Data nascita: ", (*bDTO)[i].BirthDate},
 				{"Mail ", (*bDTO)[i].Mail, "Telefono ", (*bDTO)[i].Phone},
 				{"Relazione con Assicurato ", (*bDTO)[i].Relation, "Quota indennizzo", " "},
 			}
@@ -753,7 +753,7 @@ func (lag *LifeAddendumGenerator) beneficiaryReference() {
 		checked = "X"
 		rows = [][]string{
 			{"Cognome e Nome ", brDTO.Surname + " " + brDTO.Name, "Cod. Fisc: ", brDTO.FiscalCode},
-			{"Residente in ", brDTO.StreetName + " " + brDTO.StreetNumber + " " + brDTO.City + " (" + brDTO.Province + ")", "Data nascita: ", brDTO.BirthDate},
+			{"Residente in ", brDTO.StreetName + " " + brDTO.StreetNumber + ", " + brDTO.PostalCode + " " + brDTO.City + " (" + brDTO.Province + ")", "Data nascita: ", brDTO.BirthDate},
 			{"Mail ", brDTO.Mail, "Telefono: ", brDTO.Phone},
 		}
 	} else {

@@ -27,10 +27,12 @@ type addendumContractorDTO struct {
 	DomStreetName   string
 	DomStreetNumber string
 	DomCity         string
+	DomPostalCode   string
 	DomProvince     string
 	Mail            string
 	Phone           string
 	BirthDate       string
+	PostalCode      string
 }
 
 type addendumInsuredDTO struct {
@@ -40,10 +42,12 @@ type addendumInsuredDTO struct {
 	StreetName      string
 	StreetNumber    string
 	City            string
+	PostalCode      string
 	Province        string
 	DomStreetName   string
 	DomStreetNumber string
 	DomCity         string
+	DomPostalCode   string
 	DomProvince     string
 	Mail            string
 	Phone           string
@@ -57,6 +61,7 @@ type addendumBeneficiaryDTO struct {
 	StreetName   string
 	StreetNumber string
 	City         string
+	PostalCode   string
 	Province     string
 	Mail         string
 	Relation     string
@@ -71,6 +76,7 @@ type addendumBeneficiaryReferenceDTO struct {
 	StreetName   string
 	StreetNumber string
 	City         string
+	PostalCode   string
 	Province     string
 	Mail         string
 	Phone        string
@@ -134,10 +140,12 @@ func newLifeContractorDTO() *addendumContractorDTO {
 		StreetName:      constants.EmptyField,
 		StreetNumber:    constants.EmptyField,
 		City:            constants.EmptyField,
+		PostalCode:      constants.EmptyField,
 		Province:        constants.EmptyField,
 		DomStreetName:   constants.EmptyField,
 		DomStreetNumber: constants.EmptyField,
 		DomCity:         constants.EmptyField,
+		DomPostalCode:   constants.EmptyField,
 		DomProvince:     constants.EmptyField,
 		Mail:            constants.EmptyField,
 		Phone:           constants.EmptyField,
@@ -152,11 +160,13 @@ func newLifeInsuredDTO() *addendumInsuredDTO {
 		StreetName:      constants.EmptyField,
 		StreetNumber:    constants.EmptyField,
 		City:            constants.EmptyField,
+		PostalCode:      constants.EmptyField,
 		Province:        constants.EmptyField,
 		DomStreetName:   constants.EmptyField,
 		DomStreetNumber: constants.EmptyField,
 		DomCity:         constants.EmptyField,
 		DomProvince:     constants.EmptyField,
+		DomPostalCode:   constants.EmptyField,
 		Mail:            constants.EmptyField,
 		Phone:           constants.EmptyField,
 	}
@@ -171,6 +181,7 @@ func newLifeBeneficiariesDTO() *addendumBeneficiaries {
 		StreetName:   constants.EmptyField,
 		StreetNumber: constants.EmptyField,
 		City:         constants.EmptyField,
+		PostalCode:   constants.EmptyField,
 		Province:     constants.EmptyField,
 		Mail:         constants.EmptyField,
 		Relation:     constants.EmptyField,
@@ -239,12 +250,14 @@ func (lc *addendumContractorDTO) fromPolicy(contr models.Contractor) {
 		lc.StreetNumber = contr.Residence.StreetNumber
 		lc.City = contr.Residence.City
 		lc.Province = contr.Residence.CityCode
+		lc.PostalCode = contr.Residence.PostalCode
 	}
 	if contr.Domicile != nil {
 		lc.DomStreetName = contr.Domicile.StreetName
 		lc.DomStreetNumber = contr.Domicile.StreetNumber
 		lc.DomCity = contr.Domicile.City
 		lc.DomProvince = contr.Domicile.CityCode
+		lc.DomPostalCode = contr.Domicile.PostalCode
 	}
 	if contr.Mail != "" {
 		lc.Mail = contr.Mail
@@ -266,6 +279,7 @@ func (li *addendumInsuredDTO) fromPolicy(ins *models.User) {
 			li.StreetName = ins.Residence.StreetName
 			li.StreetNumber = ins.Residence.StreetNumber
 			li.City = ins.Residence.City
+			li.PostalCode = ins.Residence.PostalCode
 			li.Province = ins.Residence.CityCode
 		}
 
@@ -273,6 +287,7 @@ func (li *addendumInsuredDTO) fromPolicy(ins *models.User) {
 			li.DomStreetName = ins.Domicile.StreetName
 			li.DomStreetNumber = ins.Domicile.StreetNumber
 			li.DomCity = ins.Domicile.City
+			li.DomPostalCode = ins.Domicile.PostalCode
 			li.DomProvince = ins.Domicile.CityCode
 		}
 		if ins.Mail != "" {
@@ -301,6 +316,7 @@ func (b *addendumBeneficiaries) fromPolicy(bens *[]models.Beneficiary, opt map[s
 			StreetName:   constants.EmptyField,
 			StreetNumber: constants.EmptyField,
 			City:         constants.EmptyField,
+			PostalCode:   constants.EmptyField,
 			Province:     constants.EmptyField,
 			Mail:         constants.EmptyField,
 			Relation:     " \n" + constants.EmptyField,
@@ -333,6 +349,7 @@ func (b *addendumBeneficiaries) fromPolicy(bens *[]models.Beneficiary, opt map[s
 				ben.StreetName = v.Residence.StreetName
 				ben.StreetNumber = v.Residence.StreetNumber
 				ben.City = v.Residence.City
+				ben.PostalCode = v.Residence.PostalCode
 				ben.Province = v.Residence.CityCode
 			}
 		}
@@ -351,6 +368,7 @@ func (br *addendumBeneficiaryReferenceDTO) fromPolicy(benRef *models.User) {
 		br.StreetName = benRef.Residence.StreetName
 		br.StreetNumber = benRef.Residence.StreetNumber
 		br.City = benRef.Residence.City
+		br.PostalCode = benRef.Residence.PostalCode
 		br.Province = benRef.Residence.CityCode
 	}
 	if benRef.Mail != "" {
