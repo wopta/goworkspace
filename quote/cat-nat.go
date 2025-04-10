@@ -205,10 +205,6 @@ func buildNetInsuranceDTO(policy *models.Policy) (catNatRequestDTO, error) {
 		VatNumber:                 policy.Contractor.VatCode,
 		FiscalCode:                policy.Contractor.FiscalCode,
 		AtecoCode:                 atecoCode,
-		PostalCode:                policy.Contractor.PostalCode,
-		Address:                   policy.Contractor.Address,
-		Locality:                  policy.Contractor.Locality,
-		CityCode:                  policy.Contractor.CityCode,
 		Phone:                     policy.Contractor.Phone,
 		Email:                     policy.Contractor.Mail,
 		PrivacyConsentDate:        policy.StartDate.Format("2006-01-02"),
@@ -217,6 +213,11 @@ func buildNetInsuranceDTO(policy *models.Policy) (catNatRequestDTO, error) {
 		MarketingProfilingConsent: "no",
 		MarketingActivityConsent:  "no",
 		DocumentationFormat:       1,
+	}
+	if policy.Contractor.Residence != nil {
+		contr.Address = formatAddress(policy.Contractor.Residence)
+		contr.Locality = policy.Contractor.Residence.Locality
+		contr.CityCode = policy.Contractor.Residence.CityCode
 	}
 
 	dto.Contractor = contr
@@ -228,12 +229,14 @@ func buildNetInsuranceDTO(policy *models.Policy) (catNatRequestDTO, error) {
 				legalRep.Name = v.Name
 				legalRep.Surname = v.Surname
 				legalRep.FiscalCode = v.FiscalCode
-				legalRep.PostalCode = v.PostalCode
-				legalRep.Address = v.Address
-				legalRep.Locality = v.Locality
-				legalRep.CityCode = v.CityCode
 				legalRep.Phone = v.Phone
 				legalRep.Email = v.Mail
+				if v.Residence != nil {
+					legalRep.Address = formatAddress(v.Residence)
+					legalRep.PostalCode = v.Residence.PostalCode
+					legalRep.Locality = v.Residence.Locality
+					legalRep.CityCode = v.Residence.CityCode
+				}
 				break
 			}
 		}
@@ -248,10 +251,6 @@ func buildNetInsuranceDTO(policy *models.Policy) (catNatRequestDTO, error) {
 		EarthquakePurchase:   "no",
 		FloodPurchase:        "no",
 		LandSlidePurchase:    "no",
-		PostalCode:           "",
-		Address:              "",
-		Locality:             "",
-		CityCode:             "",
 		ConstructionMaterial: 0, // TODO
 		ConstructionYear:     0, // TODO
 		FloorNumber:          0, // TODO
@@ -261,10 +260,12 @@ func buildNetInsuranceDTO(policy *models.Policy) (catNatRequestDTO, error) {
 
 	for _, v := range policy.Assets {
 		if v.Building != nil {
-			asset.PostalCode = v.Building.PostalCode
-			asset.Address = v.Building.Address
-			asset.Locality = v.Building.Locality
-			asset.CityCode = v.Building.CityCode
+			if v.Building.BuildingAddress != nil {
+				asset.PostalCode = v.Building.BuildingAddress.PostalCode
+				asset.Address = formatAddress(v.Building.BuildingAddress)
+				asset.Locality = v.Building.BuildingAddress.Locality
+				asset.CityCode = v.Building.BuildingAddress.CityCode
+			}
 		}
 		for _, g := range v.Guarantees {
 			if g.Slug == "earthquake" { // TODO check slug
@@ -340,6 +341,12 @@ func buildNetInsuranceDTO(policy *models.Policy) (catNatRequestDTO, error) {
 	}
 
 	return dto, nil
+}
+
+func formatAddress(addr *models.Address) string {
+	res := addr.StreetName + "," + addr.StreetNumber
+
+	return res
 }
 
 func netInsuranceQuotation(cl *http.Client, dto catNatRequestDTO) (catNatResponseDTO, *errorResponse, error) {
