@@ -13,7 +13,7 @@ require (
 	github.com/wopta/goworkspace/models v1.2.37
 	github.com/wopta/goworkspace/network v1.0.102
 	github.com/wopta/goworkspace/product v1.1.34
-	github.com/wopta/goworkspace/quote v1.0.137
+	github.com/wopta/goworkspace/quote v1.0.138
 	github.com/wopta/goworkspace/user v1.0.137
 )
 
