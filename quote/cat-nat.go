@@ -3,8 +3,6 @@ package quote
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -115,6 +113,15 @@ type detail struct {
 	Description string `json:"descrizione,omitempty"`
 }
 
+type errorResponse struct {
+	Type     string         `json:"type"`
+	Title    string         `json:"title"`
+	Status   int            `json:"status"`
+	Detail   string         `json:"detail"`
+	Instance string         `json:"instance"`
+	Errors   map[string]any `json:"errors"`
+}
+
 func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err       error
@@ -153,13 +160,18 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	tokenUrl := "https://apigatewaydigital.netinsurance.it/Identity/connect/token"
 	client := lib.ClientCredentials(os.Getenv("NETINS_ID"), os.Getenv("NETINS_SECRET"), scope, tokenUrl)
 
-	resp, err := netInsuranceQuotation(client, catNatRequest)
+	resp, errResp, err := netInsuranceQuotation(client, catNatRequest)
 	if err != nil {
 		log.Printf("error calling NetInsurance api: %s", err.Error())
 		return "", nil, err
 	}
+	var out []byte
+	if errResp != nil {
+		out, err = json.Marshal(errResp)
+	} else {
+		out, err = json.Marshal(resp)
+	}
 
-	out, err := json.Marshal(resp)
 	if err != nil {
 		log.Println("error encoding response %w", err.Error())
 		return "", nil, err
@@ -181,12 +193,18 @@ func buildNetInsuranceDTO(policy *models.Policy) (catNatRequestDTO, error) {
 		SalesChannel:      "3",
 	}
 
+	var atecoCode string
+	for _, v := range policy.Assets {
+		if v.Building != nil {
+			atecoCode = v.Building.Ateco
+		}
+	}
 	contr := contractor{
 		PersonalDataType:          "2",
 		CompanyName:               policy.Contractor.Name,
 		VatNumber:                 policy.Contractor.VatCode,
 		FiscalCode:                policy.Contractor.FiscalCode,
-		AtecoCode:                 policy.Assets[0].Building.Ateco,
+		AtecoCode:                 atecoCode,
 		PostalCode:                policy.Contractor.PostalCode,
 		Address:                   policy.Contractor.Address,
 		Locality:                  policy.Contractor.Locality,
@@ -324,36 +342,37 @@ func buildNetInsuranceDTO(policy *models.Policy) (catNatRequestDTO, error) {
 	return dto, nil
 }
 
-func netInsuranceQuotation(cl *http.Client, dto catNatRequestDTO) (catNatResponseDTO, error) {
+func netInsuranceQuotation(cl *http.Client, dto catNatRequestDTO) (catNatResponseDTO, *errorResponse, error) {
 	url := "https://apigatewaydigital.netinsurance.it/PolizzeGateway24/emettiPolizza/441-029-007"
 	reqBodyBytes := new(bytes.Buffer)
 	err := json.NewEncoder(reqBodyBytes).Encode(dto)
 	if err != nil {
-		return catNatResponseDTO{}, err
+		return catNatResponseDTO{}, nil, err
 	}
 	r := reqBodyBytes.Bytes()
 	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(r))
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := cl.Do(req)
 	if err != nil {
-		return catNatResponseDTO{}, err
+		return catNatResponseDTO{}, nil, err
 	}
-	if resp != nil {
-		if resp.StatusCode != http.StatusOK {
-			body, _ := io.ReadAll(resp.Body)
-			return catNatResponseDTO{}, fmt.Errorf(string(body))
-		}
-		//body, err := io.ReadAll(res.Body)
-		//lib.CheckError(err)
-		cndto := catNatResponseDTO{}
-		if err = json.NewDecoder(resp.Body).Decode(&cndto); err != nil {
-			log.Println("error decoding catnat response")
-			return catNatResponseDTO{}, err
-		}
+	defer resp.Body.Close()
 
-		resp.Body.Close()
-		return cndto, nil
-
+	if resp.StatusCode != http.StatusOK {
+		errResp := errorResponse{
+			Errors: make(map[string]any),
+		}
+		if err = json.NewDecoder(resp.Body).Decode(&errResp); err != nil {
+			log.Println("error decoding catnat error response")
+			return catNatResponseDTO{}, nil, err
+		}
+		return catNatResponseDTO{}, &errResp, nil
 	}
-	return catNatResponseDTO{}, fmt.Errorf("empty catnat response")
+	cndto := catNatResponseDTO{}
+	if err = json.NewDecoder(resp.Body).Decode(&cndto); err != nil {
+		log.Println("error decoding catnat response")
+		return catNatResponseDTO{}, nil, err
+	}
+
+	return cndto, nil, nil
 }
