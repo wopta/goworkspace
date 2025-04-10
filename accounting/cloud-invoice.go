@@ -49,7 +49,7 @@ func (invoiceData *InvoiceInc) CreateInvoice(isPay bool, isProforma bool) {
 
 	for _, item := range invoiceData.Items {
 		fcItems = append(fcItems, *fattureincloud.NewIssuedDocumentItemsListItem().
-			SetProductId(4).
+			//SetProductId(4).
 			SetCode(item.Code).
 			SetName(item.Name).
 			SetNetPrice(item.NetPrice).
@@ -73,10 +73,10 @@ func (invoiceData *InvoiceInc) CreateInvoice(isPay bool, isProforma bool) {
 		SetEntity(entity).
 		SetType(Invoicetype).
 		SetDate(invoiceData.Date.Format(layout)).
-		SetNumber(1).
-		SetNumeration("/fatt").
-		SetSubject("internal subject").
-		SetVisibleSubject("visible subject").
+		//SetNumber(1).
+		//SetNumeration("/fatt").
+		//SetSubject("internal subject").
+		//SetVisibleSubject("visible subject").
 		SetCurrency(*fattureincloud.NewCurrency().SetId("EUR")).
 		SetLanguage(*fattureincloud.NewLanguage().SetCode("it").SetName("italiano")).
 		SetItemsList(fcItems).
@@ -87,10 +87,10 @@ func (invoiceData *InvoiceInc) CreateInvoice(isPay bool, isProforma bool) {
 				SetPaidDate(invoiceData.PayDate.Format(layout)).
 				SetStatus(status).
 				SetPaymentAccount(*fattureincloud.NewPaymentAccount().SetId(110)),
-		}).
+		})
 		// Here we add the payment method
 		// List your payment methods: https://github.com/fattureincloud/fattureincloud-go-sdk/blob/master/docs/InfoApi.md#listpaymentmethods
-		SetPaymentMethod(*fattureincloud.NewPaymentMethod().SetId(386683))
+		//SetPaymentMethod(*fattureincloud.NewPaymentMethod().SetId(386683))
 
 	// Here we put our invoice in the request object
 	createIssuedDocumentRequest := *fattureincloud.NewCreateIssuedDocumentRequest().SetData(invoice)
