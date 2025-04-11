@@ -67,6 +67,10 @@ func TestBpnmHappyPath(t *testing.T) {
 		st.AddLocal("validationObject", new(validity))
 		return nil
 	})
+	g.AddHandler("CEvent", func(st StorageData) error {
+		log.Println("init C")
+		return nil
+	})
 	flow, err := g.Build()
 	if err != nil {
 		t.Fatal(err)
@@ -119,6 +123,10 @@ func TestBpnmHappyPath2(t *testing.T) {
 		st.AddLocal("validationObject", new(validity))
 		return nil
 	})
+	g.AddHandler("CEvent", func(st StorageData) error {
+		log.Println("init C")
+		return nil
+	})
 	flow, err := g.Build()
 	if err != nil {
 		t.Fatal(err)
@@ -133,9 +141,6 @@ func TestBpnmHappyPath2(t *testing.T) {
 		"init B",
 		"init A",
 	}
-	for _, exp := range log.log {
-		println(exp)
-	}
 	if len(exps) != len(log.log) {
 		t.Fatalf("exp n message: %v,got: %v", len(exps), len(log.log))
 	}
@@ -145,4 +150,128 @@ func TestBpnmHappyPath2(t *testing.T) {
 		}
 	}
 
+}
+func TestBpnmMissingOutput(t *testing.T) {
+	g, err := NewBpnmBuilder()
+	log := mockLog{}
+	if err != nil {
+		t.Fatal(err)
+	}
+	storage := NewStorageBpnm()
+	storage.AddGlobal("policyPr", &PolicyMock{Age: 1})
+	p := new(models.Policy)
+	p.Name = "pippo"
+	g.SetPoolDate(storage)
+
+	g.AddHandler("init", func(st StorageData) error {
+		log.Println("init")
+		return nil
+	})
+	g.AddHandler("AEvent", func(st StorageData) error {
+		log.Println("init A")
+		st.AddLocal("error", &Error{Result: true})
+		return nil
+	})
+	g.AddHandler("BEvent", func(st StorageData) error {
+		log.Println("init B")
+		st.AddLocal("error", &Error{Result: false})
+		st.AddLocal("validationObject", new(validity))
+		return nil
+	})
+	g.AddHandler("CEvent", func(st StorageData) error {
+		log.Println("init C")
+		return nil
+	})
+	flow, err := g.Build()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = flow.Run("emit")
+	if err == nil {
+		t.Fatalf("should have error")
+	}
+	if err.Error() != "Activity: init, output: resource required is not found validationObject" {
+		t.Fatalf("should have another error, got: %v", err.Error())
+	}
+	if len(log.log) != 1 {
+		t.Fatalf("should have 1 log")
+	}
+}
+func TestBpnmMissingInput(t *testing.T) {
+	g, err := NewBpnmBuilder()
+	log := mockLog{}
+	if err != nil {
+		t.Fatal(err)
+	}
+	storage := NewStorageBpnm()
+	storage.AddGlobal("policyPr", &PolicyMock{Age: 10})
+	p := new(models.Policy)
+	p.Name = "pippo"
+	g.SetPoolDate(storage)
+
+	g.AddHandler("init", func(st StorageData) error {
+		log.Println("init")
+		st.AddLocal("validationObject", new(validity))
+		return nil
+	})
+	g.AddHandler("AEvent", func(st StorageData) error {
+		log.Println("init A")
+		st.AddLocal("error", &Error{Result: true})
+		return nil
+	})
+	g.AddHandler("BEvent", func(st StorageData) error {
+		log.Println("init B")
+		return nil
+	})
+	g.AddHandler("CEvent", func(st StorageData) error {
+		log.Println("init C")
+		return nil
+	})
+	flow, err := g.Build()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = flow.Run("emit")
+	if err == nil {
+		t.Fatalf("should have error")
+	}
+	if err.Error() != "Activity: CEvent, input: resource required is not found error" {
+		t.Fatalf("should have another error, got: %v", err.Error())
+	}
+	if len(log.log) != 1 {
+		t.Fatalf("should have 1 log")
+	}
+}
+func TestBpnmMissingHandler(t *testing.T) {
+	g, err := NewBpnmBuilder()
+	log := mockLog{}
+	if err != nil {
+		t.Fatal(err)
+	}
+	storage := NewStorageBpnm()
+	storage.AddGlobal("policyPr", &PolicyMock{Age: 10})
+	p := new(models.Policy)
+	p.Name = "pippo"
+	g.SetPoolDate(storage)
+
+	g.AddHandler("init", func(st StorageData) error {
+		log.Println("init")
+		st.AddLocal("validationObject", new(validity))
+		return nil
+	})
+	g.AddHandler("BEvent", func(st StorageData) error {
+		log.Println("init B")
+		return nil
+	})
+	g.AddHandler("CEvent", func(st StorageData) error {
+		log.Println("init C")
+		return nil
+	})
+	_, err = g.Build()
+	if err.Error() != "no handler registered for the activity: AEvent" {
+		t.Fatalf("should have another error, got: %v", err.Error())
+	}
+	if len(log.log) != 0 {
+		t.Fatalf("should have 0 log")
+	}
 }

@@ -27,8 +27,6 @@ const (
 )
 
 type Branch struct {
-	OutputData         map[string]*DataBpnm
-	InputData          map[string]*DataBpnm
 	RequiredOutputData []TypeData
 	RequiredInputData  []TypeData
 	GatewayType        GatewayType

@@ -33,7 +33,7 @@ func (f *ProcessBpnm) Run() error {
 			return fmt.Errorf("no handler defined for %v", f.activeActivity.Name)
 		}
 		if e := checkAndCleanLocalStorage(f.storageBpnm, f.activeActivity.Branch.RequiredInputData); e != nil {
-			return fmt.Errorf("Act: %v, input: %v", f.activeActivity.Name, e.Error())
+			return fmt.Errorf("Activity: %v, input: %v", f.activeActivity.Name, e.Error())
 		}
 		if e := f.activeActivity.handler(f.storageBpnm); e != nil {
 			return e
@@ -55,11 +55,11 @@ func (f *ProcessBpnm) Run() error {
 			eval := goval.NewEvaluator()
 			result, e := eval.Evaluate(ga.Decision, jsonMap, nil)
 			if e != nil {
-				return fmt.Errorf("Act: %v, error eval:%v ", act.Name, e.Error())
+				return fmt.Errorf("Activity: %v, error eval:%v ", act.Name, e.Error())
 			}
 			if result.(bool) {
 				if e := checkAndCleanLocalStorage(f.storageBpnm, act.Branch.RequiredOutputData); e != nil {
-					return fmt.Errorf("Act: %v, output: %v \n", act.Name, e.Error())
+					return fmt.Errorf("Activity: %v, output: %v", act.Name, e.Error())
 				}
 				if len(ga.NextActivities) == 0 {
 					return nil
@@ -89,10 +89,10 @@ func checkAndCleanLocalStorage(st StorageData, req []TypeData) error {
 	for _, dR := range req {
 		d, ok := temp[dR.Name]
 		if !ok {
-			return fmt.Errorf("resource required not found %v", dR.Name)
+			return fmt.Errorf("resource required is not found %v", dR.Name)
 		}
 		if d.(DataBpnm).Type() != dR.Type {
-			return fmt.Errorf("resource %v has differente type, exp:%v, got %v", dR.Name, dR.Type, d.(DataBpnm).Type())
+			return fmt.Errorf("resource %v has a differente type, exp:%v, got %v", dR.Name, dR.Type, d.(DataBpnm).Type())
 		}
 		st.AddLocal(dR.Name, d.(DataBpnm))
 	}
@@ -103,10 +103,10 @@ func checkValidityGlobalStorage(st StorageData, req []TypeData) error {
 	for _, d := range req {
 		v, err := st.GetGlobal(d.Name)
 		if err != nil {
-			return fmt.Errorf("required resource no present %v", d.Name)
+			return fmt.Errorf("required resource is not present %v", d.Name)
 		}
 		if v.Type() != d.Type {
-			return fmt.Errorf("resource %v has differente type, exp:%v, got %v", d.Name, d.Type, v.Type())
+			return fmt.Errorf("resource %v has a differente type, exp:%v, got %v", d.Name, d.Type, v.Type())
 		}
 	}
 	return nil

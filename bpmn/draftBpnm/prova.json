@@ -35,6 +35,12 @@
 									"AEvent"
 								],
 								"decision": "policyPr.age<3"
+							},
+							{
+								"nextActivities": [
+									"CEvent"
+								],
+								"decision": "policyPr.age==10"
 							}
 						]
 					}
@@ -92,6 +98,24 @@
 								],
 								"decision": "error.Result==false"
 							}
+						]
+					}
+				},
+				{
+					"name": "CEvent",
+					"description": "emit policy",
+					"branch": {
+						"outputData": [],
+						"inputData": [
+							{
+								"name": "error",
+								"type": "error"
+							}
+						],
+						"gatewayType": "AND",
+						"mergingType": "AND",
+						"gateways": [
+							{}
 						]
 					}
 				}
