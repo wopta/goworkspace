@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"maps"
 	"os"
 
 	"github.com/maja42/goval"
@@ -47,7 +46,7 @@ func (f *ProcessBpnm) Run() error {
 
 		act := f.activeActivity
 		f.activeActivity = nil
-		if e := f.RunDecision(act, jsonMap); e != nil {
+		if e := f.EvaluateDecisions(act, jsonMap); e != nil {
 			return e
 		}
 		if f.activeActivity == nil {
@@ -56,7 +55,7 @@ func (f *ProcessBpnm) Run() error {
 	}
 }
 
-func (f *ProcessBpnm) RunDecision(act *Activity, date map[string]any) error {
+func (f *ProcessBpnm) EvaluateDecisions(act *Activity, date map[string]any) error {
 	for _, ga := range act.Branch.Gateway { //é xor attualmente
 		if ga.Decision == "" {
 			f.activeActivity = ga.NextActivities[0]
@@ -92,7 +91,7 @@ func NewBpnmBuilder() (*BpnmBuilder, error) {
 }
 
 func checkAndCleanLocalStorage(st StorageData, req []TypeData) error {
-	temp := maps.Clone(st.GetAllLocal())
+	temp := st.GetAllLocal()
 	st.resetLocal()
 	for _, dR := range req {
 		d, ok := temp[dR.Name]
@@ -102,7 +101,9 @@ func checkAndCleanLocalStorage(st StorageData, req []TypeData) error {
 		if d.(DataBpnm).Type() != dR.Type {
 			return fmt.Errorf("resource %v has a differente type, exp:%v, got %v", dR.Name, dR.Type, d.(DataBpnm).Type())
 		}
-		st.AddLocal(dR.Name, d.(DataBpnm))
+		if e := st.AddLocal(dR.Name, d.(DataBpnm)); e != nil {
+			return e
+		}
 	}
 	return nil
 }
