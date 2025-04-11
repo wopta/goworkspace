@@ -21,7 +21,7 @@ func (f *FlowBpnm) Run(processName string) error {
 			}
 		}
 
-		if e := process.Run(); e != nil {
+		if e := process.Run(); e != nil { //TODO: how to check if there is an infinite loop
 			return e
 		}
 		log.Println("Stop ", processName)
@@ -118,7 +118,7 @@ func checkValidityGlobalStorage(st StorageData, req []TypeData) error {
 	for _, d := range req {
 		v, err := st.GetGlobal(d.Name)
 		if err != nil {
-			return fmt.Errorf("Required resource is not present %v", d.Name)
+			return fmt.Errorf("Required resource is not found %v", d.Name)
 		}
 		if v.Type() != d.Type {
 			return fmt.Errorf("Resource %v has a differente type, exp:%v, got %v", d.Name, d.Type, v.Type())
