@@ -30,6 +30,8 @@ type Branch struct {
 	RequiredOutputData []TypeData
 	RequiredInputData  []TypeData
 	GatewayType        GatewayType
+	PreActivity        []*Activity //TODO: to implement
+	PostActivity       []*Activity //TODO: to implement
 	Gateway            []*Gateway
 }
 type Gateway struct {

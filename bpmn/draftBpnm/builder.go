@@ -16,7 +16,7 @@ type TypeData struct {
 	Type string
 }
 type ProcessBuilder struct {
-	GlobalData           []TypeData        `json:"globalData"`
+	GlobalDataRequired   []TypeData        `json:"globalData"`
 	Description          string            `json:"description"`
 	Name                 string            `json:"name"`
 	Activities           []ActivityBuilder `json:"activities"`
@@ -31,11 +31,11 @@ type ActivityBuilder struct {
 }
 
 type BranchBuilder struct {
-	OutputData  []TypeData     `json:"outputData,omitempty"`
-	InputData   []TypeData     `json:"inputData,omitempty"`
-	GatewayType string         `json:"gatewayType,omitempty"`
-	Gateways    []GatewayBlock `json:"gateways"`
-	Recorver    string         `json:"recorver,omitempty"`
+	OutputDataRequired []TypeData     `json:"outputData,omitempty"`
+	InputDataRequired  []TypeData     `json:"inputData,omitempty"`
+	GatewayType        string         `json:"gatewayType,omitempty"`
+	Gateways           []GatewayBlock `json:"gateways"`
+	Recorver           string         `json:"recorver,omitempty"`
 }
 
 type GatewayBlock struct {
@@ -43,6 +43,19 @@ type GatewayBlock struct {
 	Decision       string   `json:"decision,omitempty"`
 }
 
+type InjectActivity struct {
+	ToProcess  string
+	ToActivity string
+	When       string //Pre/Post
+}
+
+func (b *BpnmBuilder) Inject(where InjectActivity, ProcessToInject *ProcessBuilder) {
+	//merge store
+	//add the activity inside the process (passed) to relative Activity.Branch
+	//	PreActivity        []*Activity //TODO: to implement
+	//	PostActivity       []*Activity //TODO: to implement
+	panic("to implement")
+}
 func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 	flow := new(FlowBpnm)
 	var process *ProcessBpnm
@@ -51,7 +64,7 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 		process.storageBpnm = b.storage
 		process.Description = p.Description
 		process.Name = p.Name
-		process.RequiredGlobalData = p.GlobalData
+		process.RequiredGlobalData = p.GlobalDataRequired
 		buildedActivities, err := b.BuildActivity(p.Activities)
 		if err != nil {
 			return nil, err
@@ -110,8 +123,8 @@ func (a *BpnmBuilder) BuildActivity(activities []ActivityBuilder) (map[string]*A
 func (a *BpnmBuilder) BuildBranchBuilder(gatewayDto *BranchBuilder) (*Branch, error) {
 	activity := new(Branch)
 	activity.GatewayType = GatewayType(gatewayDto.GatewayType)
-	activity.RequiredInputData = gatewayDto.InputData
-	activity.RequiredOutputData = gatewayDto.OutputData
+	activity.RequiredInputData = gatewayDto.InputDataRequired
+	activity.RequiredOutputData = gatewayDto.OutputDataRequired
 	return activity, nil
 }
 
