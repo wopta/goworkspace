@@ -4,12 +4,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/maja42/goval"
 )
 
 func (f *FlowBpnm) Run(processName string) error {
+	log.SetPrefix("Bpnm")
+	defer log.SetPrefix("")
+	log.Println("Run ", processName)
 	for _, process := range f.Process {
 		if process.Name == processName {
 			if e := checkValidityGlobalStorage(process.storageBpnm, process.RequiredGlobalData); e != nil {
@@ -20,16 +24,17 @@ func (f *FlowBpnm) Run(processName string) error {
 		if e := process.Run(); e != nil {
 			return e
 		}
+		log.Println("Stop ", processName)
 		return nil
 	}
-	return errors.New("no process founded")
+	return errors.New("No process founded")
 }
 
 func (f *ProcessBpnm) Run() error {
 	f.activeActivity = f.Activities["init"]
 	for {
 		if f.activeActivity.handler == nil {
-			return fmt.Errorf("no handler defined for %v", f.activeActivity.Name)
+			return fmt.Errorf("No handler defined for %v", f.activeActivity.Name)
 		}
 		if e := checkAndCleanLocalStorage(f.storageBpnm, f.activeActivity.Branch.RequiredInputData); e != nil {
 			return fmt.Errorf("Activity: %v, input: %v", f.activeActivity.Name, e.Error())
@@ -62,6 +67,7 @@ func (f *ProcessBpnm) EvaluateDecisions(act *Activity, date map[string]any) erro
 			break
 		}
 		if len(ga.NextActivities) == 0 {
+			log.Println("No activity")
 			return nil
 		}
 		eval := goval.NewEvaluator()
@@ -92,14 +98,14 @@ func NewBpnmBuilder() (*BpnmBuilder, error) {
 
 func checkAndCleanLocalStorage(st StorageData, req []TypeData) error {
 	temp := st.GetAllLocal()
-	st.resetLocal()
+	st.ResetLocal()
 	for _, dR := range req {
 		d, ok := temp[dR.Name]
 		if !ok {
-			return fmt.Errorf("resource required is not found %v", dR.Name)
+			return fmt.Errorf("Resource required is not found %v", dR.Name)
 		}
 		if d.(DataBpnm).Type() != dR.Type {
-			return fmt.Errorf("resource %v has a differente type, exp:%v, got %v", dR.Name, dR.Type, d.(DataBpnm).Type())
+			return fmt.Errorf("Resource %v has a differente type, exp:%v, got %v", dR.Name, dR.Type, d.(DataBpnm).Type())
 		}
 		if e := st.AddLocal(dR.Name, d.(DataBpnm)); e != nil {
 			return e
@@ -112,10 +118,10 @@ func checkValidityGlobalStorage(st StorageData, req []TypeData) error {
 	for _, d := range req {
 		v, err := st.GetGlobal(d.Name)
 		if err != nil {
-			return fmt.Errorf("required resource is not present %v", d.Name)
+			return fmt.Errorf("Required resource is not present %v", d.Name)
 		}
 		if v.Type() != d.Type {
-			return fmt.Errorf("resource %v has a differente type, exp:%v, got %v", d.Name, d.Type, v.Type())
+			return fmt.Errorf("Resource %v has a differente type, exp:%v, got %v", d.Name, d.Type, v.Type())
 		}
 	}
 	return nil

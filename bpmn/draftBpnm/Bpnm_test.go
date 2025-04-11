@@ -190,7 +190,7 @@ func TestBpnmMissingOutput(t *testing.T) {
 	if err == nil {
 		t.Fatalf("should have error")
 	}
-	if err.Error() != "Activity: init, output: resource required is not found validationObject" {
+	if err.Error() != "Activity: init, output: Resource required is not found validationObject" {
 		t.Fatalf("should have another error, got: %v", err.Error())
 	}
 	if len(log.log) != 1 {
@@ -235,7 +235,7 @@ func TestBpnmMissingInput(t *testing.T) {
 	if err == nil {
 		t.Fatalf("should have error")
 	}
-	if err.Error() != "Activity: CEvent, input: resource required is not found error" {
+	if err.Error() != "Activity: CEvent, input: Resource required is not found error" {
 		t.Fatalf("should have another error, got: %v", err.Error())
 	}
 	if len(log.log) != 1 {
@@ -268,7 +268,7 @@ func TestBpnmMissingHandler(t *testing.T) {
 		return nil
 	})
 	_, err = g.Build()
-	if err.Error() != "no handler registered for the activity: AEvent" {
+	if err.Error() != "No handler registered for the activity: AEvent" {
 		t.Fatalf("should have another error, got: %v", err.Error())
 	}
 	if len(log.log) != 0 {
