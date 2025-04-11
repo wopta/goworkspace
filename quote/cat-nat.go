@@ -169,7 +169,12 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	if errResp != nil {
 		out, err = json.Marshal(errResp)
 	} else {
-		out, err = json.Marshal(resp)
+		if resp.Result == "OK" {
+			appendQuotationToPolicy(reqPolicy, resp)
+			out, err = json.Marshal(reqPolicy)
+		} else {
+			out, err = json.Marshal(resp)
+		}
 	}
 
 	if err != nil {
@@ -178,6 +183,56 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	}
 
 	return string(out), out, err
+}
+
+func appendQuotationToPolicy(pol *models.Policy, quot catNatResponseDTO) {
+	eOffer := make(map[string]*models.GuaranteValue)
+	fOffer := make(map[string]*models.GuaranteValue)
+	lOffer := make(map[string]*models.GuaranteValue)
+	for _, a := range quot.AssetDetail {
+		for _, g := range a.GuaranteeDetail {
+			if g.GuaranteeCode == "211/00" {
+				eOffer["default"].SumInsuredLimitOfIndemnity = g.GuaranteeGross
+			}
+			if g.GuaranteeCode == "211/01" {
+				eOffer["default"].SumInsured = g.GuaranteeGross
+			}
+			if g.GuaranteeCode == "211/02" {
+				eOffer["default"].LimitOfIndemnity = g.GuaranteeGross
+			}
+			if g.GuaranteeCode == "212/00" {
+				fOffer["default"].SumInsuredLimitOfIndemnity = g.GuaranteeGross
+			}
+			if g.GuaranteeCode == "212/01" {
+				fOffer["default"].SumInsured = g.GuaranteeGross
+			}
+			if g.GuaranteeCode == "212/02" {
+				fOffer["default"].LimitOfIndemnity = g.GuaranteeGross
+			}
+			if g.GuaranteeCode == "209/00" {
+				lOffer["default"].SumInsuredLimitOfIndemnity = g.GuaranteeGross
+			}
+			if g.GuaranteeCode == "209/01" {
+				lOffer["default"].SumInsured = g.GuaranteeGross
+			}
+			if g.GuaranteeCode == "209/02" {
+				lOffer["default"].LimitOfIndemnity = g.GuaranteeGross
+			}
+		}
+	}
+	for _, a := range pol.Assets {
+		for _, g := range a.Guarantees {
+			if g.Slug == "earthquake" {
+				g.Offer = eOffer
+			}
+			if g.Slug == "flood" {
+				g.Offer = fOffer
+			}
+			if g.Slug == "landslide" {
+				g.Offer = lOffer
+			}
+		}
+	}
 }
 
 func buildNetInsuranceDTO(policy *models.Policy) (catNatRequestDTO, error) {
