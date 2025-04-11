@@ -41,38 +41,46 @@ func (f *ProcessBpnm) Run() error {
 
 		//TODO: to improve
 		m := mergeMaps(f.storageBpnm.GetAllGlobal(), f.storageBpnm.GetAllLocal())
-		jsonMap := make(map[string]interface{})
+		jsonMap := make(map[string]any)
 		b, _ := json.Marshal(m)
 		_ = json.Unmarshal(b, &jsonMap)
 
 		act := f.activeActivity
 		f.activeActivity = nil
-		for _, ga := range act.Branch.Gateway { //é xor attualmente
-			if ga.Decision == "" {
-				f.activeActivity = ga.NextActivities[0]
-				break
-			}
-			eval := goval.NewEvaluator()
-			result, e := eval.Evaluate(ga.Decision, jsonMap, nil)
-			if e != nil {
-				return fmt.Errorf("Activity: %v, error eval:%v ", act.Name, e.Error())
-			}
-			if result.(bool) {
-				if e := checkAndCleanLocalStorage(f.storageBpnm, act.Branch.RequiredOutputData); e != nil {
-					return fmt.Errorf("Activity: %v, output: %v", act.Name, e.Error())
-				}
-				if len(ga.NextActivities) == 0 {
-					return nil
-				}
-				f.activeActivity = ga.NextActivities[0]
-				break
-			}
+		if e := f.RunDecision(act, jsonMap); e != nil {
+			return e
 		}
 		if f.activeActivity == nil {
 			return nil
 		}
 	}
 }
+
+func (f *ProcessBpnm) RunDecision(act *Activity, date map[string]any) error {
+	for _, ga := range act.Branch.Gateway { //é xor attualmente
+		if ga.Decision == "" {
+			f.activeActivity = ga.NextActivities[0]
+			break
+		}
+		if len(ga.NextActivities) == 0 {
+			return nil
+		}
+		eval := goval.NewEvaluator()
+		result, e := eval.Evaluate(ga.Decision, date, nil)
+		if e != nil {
+			return fmt.Errorf("Activity: %v, error eval:%v ", act.Name, e.Error())
+		}
+		if result.(bool) {
+			if e := checkAndCleanLocalStorage(f.storageBpnm, act.Branch.RequiredOutputData); e != nil {
+				return fmt.Errorf("Activity: %v, output: %v", act.Name, e.Error())
+			}
+			f.activeActivity = ga.NextActivities[0]
+			break
+		}
+	}
+	return nil
+}
+
 func NewBpnmBuilder() (*BpnmBuilder, error) {
 	var Bpnm BpnmBuilder
 	jsonProva, err := os.ReadFile("prova.json")
