@@ -371,7 +371,7 @@ type Data struct {
 	Companies []Companies `json:"companies,omitempty"`
 }
 
-func mapPolicyInvoiceInc(policy models.Policy, tr models.Transaction, desc string) InvoiceInc {
+func MapPolicyInvoiceInc(policy models.Policy, tr models.Transaction, desc string) InvoiceInc {
 	inv := InvoiceInc{
 
 		Name:       policy.Contractor.Name + " " + policy.Contractor.Surname,
