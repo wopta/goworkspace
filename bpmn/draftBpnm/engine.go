@@ -36,11 +36,27 @@ func (f *ProcessBpnm) Run() error {
 		if f.activeActivity.handler == nil {
 			return fmt.Errorf("No handler defined for %v", f.activeActivity.Name)
 		}
+
+		if pre := f.activeActivity.PreActivity; pre != nil {
+			pre.storageBpnm.Merge(f.storageBpnm)
+			if e := pre.Run(); e != nil {
+				return e
+			}
+		}
+
 		if e := checkAndCleanLocalStorage(f.storageBpnm, f.activeActivity.Branch.RequiredInputData); e != nil {
 			return fmt.Errorf("Activity: %v, input: %v", f.activeActivity.Name, e.Error())
 		}
+
 		if e := f.activeActivity.handler(f.storageBpnm); e != nil {
 			return e
+		}
+
+		if post := f.activeActivity.PostActivity; post != nil {
+			post.storageBpnm.Merge(f.storageBpnm)
+			if e := post.Run(); e != nil {
+				return e
+			}
 		}
 
 		//TODO: to improve
@@ -86,9 +102,9 @@ func (f *ProcessBpnm) EvaluateDecisions(act *Activity, date map[string]any) erro
 	return nil
 }
 
-func NewBpnmBuilder() (*BpnmBuilder, error) {
+func NewBpnmBuilder(path string) (*BpnmBuilder, error) {
 	var Bpnm BpnmBuilder
-	jsonProva, err := os.ReadFile("prova.json")
+	jsonProva, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
@@ -125,15 +141,4 @@ func checkValidityGlobalStorage(st StorageData, req []TypeData) error {
 		}
 	}
 	return nil
-}
-
-func mergeMaps(m1 map[string]any, m2 map[string]any) map[string]any {
-	merged := make(map[string]any)
-	for k, v := range m1 {
-		merged[k] = v
-	}
-	for k, v := range m2 {
-		merged[k] = v
-	}
-	return merged
 }

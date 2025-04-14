@@ -14,10 +14,12 @@ type ProcessBpnm struct {
 }
 
 type Activity struct {
-	Name        string
-	handler     ActivityHandler
-	Description string
-	Branch      *Branch
+	Name         string
+	handler      ActivityHandler
+	Description  string
+	PreActivity  *ProcessBpnm
+	PostActivity *ProcessBpnm
+	Branch       *Branch
 }
 type GatewayType string
 
@@ -30,8 +32,6 @@ type Branch struct {
 	RequiredOutputData []TypeData
 	RequiredInputData  []TypeData
 	GatewayType        GatewayType
-	PreActivity        []*Activity //TODO: to implement
-	PostActivity       []*Activity //TODO: to implement
 	Gateway            []*Gateway
 }
 type Gateway struct {

@@ -1,0 +1,54 @@
+{
+	"processes": [
+		{
+			"name": "emit",
+			"globalData": [
+				{
+					"name": "policyPr",
+					"type": "policy"
+				}
+			],
+			"description": "",
+			"activities": [
+				{
+					"name": "init",
+					"branch": {
+						"inputData": [
+							{
+								"name": "validationObject",
+								"type": "validity"
+							}
+						],
+						"outputData": [
+							{
+								"name": "error",
+								"type": "error"
+							}
+						],
+						"gateways": [
+							{
+								"nextActivities": [
+									"pre-B"
+								]
+							}
+						]
+					}
+				},
+				{
+					"name": "pre-B",
+					"description": "download doc policy",
+					"branch": {
+						"outputData": [
+							{
+								"name": "error",
+								"type": "error"
+							}
+						],
+						"inputData": [],
+						"gateways": []
+					}
+				}
+			]
+		}
+	]
+}

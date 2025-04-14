@@ -15,6 +15,7 @@ type StorageData interface {
 	GetGlobal(string) (DataBpnm, error)
 	GetAllLocal() map[string]any
 	GetAllGlobal() map[string]any
+	Merge(StorageData) error
 }
 type StorageBpnm struct {
 	local  map[string]any
@@ -80,4 +81,13 @@ func (p *StorageBpnm) GetLocal(name string) (DataBpnm, error) {
 		return data.(DataBpnm), nil
 	}
 	return nil, fmt.Errorf("no data founded %v", name)
+}
+
+func (p *StorageBpnm) Merge(from StorageData) error {
+	if from == nil {
+		return nil
+	}
+	p.global = mergeMaps(from.GetAllGlobal(), p.global)
+	p.local = mergeMaps(from.GetAllLocal(), p.local)
+	return nil
 }

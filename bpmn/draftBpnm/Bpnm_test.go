@@ -34,7 +34,7 @@ func (m *mockLog) Println(mes string) {
 }
 
 func TestBpnmHappyPath(t *testing.T) {
-	g, err := NewBpnmBuilder()
+	g, err := NewBpnmBuilder("prova.json")
 	log := mockLog{}
 	if err != nil {
 		t.Fatal(err)
@@ -42,6 +42,8 @@ func TestBpnmHappyPath(t *testing.T) {
 	storage := NewStorageBpnm()
 	storage.AddLocal("validationObject", new(validity))
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 3})
+	p := new(models.Policy)
+	p.Name = "pippo"
 	g.SetPoolDate(storage)
 
 	g.AddHandler("init", func(st StorageData) error {
@@ -93,7 +95,7 @@ func TestBpnmHappyPath(t *testing.T) {
 
 }
 func TestBpnmHappyPath2(t *testing.T) {
-	g, err := NewBpnmBuilder()
+	g, err := NewBpnmBuilder("prova.json")
 	log := mockLog{}
 	if err != nil {
 		t.Fatal(err)
@@ -150,7 +152,7 @@ func TestBpnmHappyPath2(t *testing.T) {
 
 }
 func TestBpnmMissingOutput(t *testing.T) {
-	g, err := NewBpnmBuilder()
+	g, err := NewBpnmBuilder("prova.json")
 	log := mockLog{}
 	if err != nil {
 		t.Fatal(err)
@@ -196,7 +198,7 @@ func TestBpnmMissingOutput(t *testing.T) {
 	}
 }
 func TestBpnmMissingInput(t *testing.T) {
-	g, err := NewBpnmBuilder()
+	g, err := NewBpnmBuilder("prova.json")
 	log := mockLog{}
 	if err != nil {
 		t.Fatal(err)
@@ -241,7 +243,7 @@ func TestBpnmMissingInput(t *testing.T) {
 	}
 }
 func TestBpnmMissingHandler(t *testing.T) {
-	g, err := NewBpnmBuilder()
+	g, err := NewBpnmBuilder("prova.json")
 	log := mockLog{}
 	if err != nil {
 		t.Fatal(err)
@@ -271,5 +273,90 @@ func TestBpnmMissingHandler(t *testing.T) {
 	}
 	if len(log.log) != 0 {
 		t.Fatalf("should have 0 log")
+	}
+}
+
+func TestBpnmInjection(t *testing.T) {
+	g, err := NewBpnmBuilder("prova.json")
+	log := mockLog{}
+	if err != nil {
+		t.Fatal(err)
+	}
+	storage := NewStorageBpnm()
+	storage.AddGlobal("policyPr", &PolicyMock{Age: 3})
+	g.SetPoolDate(storage)
+
+	preflow, err := NewBpnmBuilder("provaInjectionPre.json")
+	preflow.SetPoolDate(NewStorageBpnm())
+	preflow.AddHandler("init", func(st StorageData) error {
+		log.Println("init pre")
+		return nil
+	})
+	preflow.AddHandler("pre-B", func(st StorageData) error {
+		log.Println("init pre-B")
+		return nil
+	})
+	if err := g.Inject("emit", "BEvent", "emit", PreActivity, preflow); err != nil {
+		t.Fatal(err)
+	}
+
+	postflow, err := NewBpnmBuilder("provaInjectionPost.json")
+	postflow.SetPoolDate(NewStorageBpnm())
+	postflow.AddHandler("init", func(st StorageData) error {
+		log.Println("init post")
+		return nil
+	})
+	if err := g.Inject("emit", "AEvent", "emit", PostActivity, postflow); err != nil {
+		t.Fatal(err)
+	}
+	g.AddHandler("init", func(st StorageData) error {
+		log.Println("init")
+		st.AddLocal("validationObject", new(validity))
+		d, _ := st.GetGlobal("policyPr")
+		if d == nil {
+			return errors.New("no polscy")
+		}
+		return nil
+	})
+	g.AddHandler("AEvent", func(st StorageData) error {
+		log.Println("init A")
+		st.AddLocal("validationObject", new(validity))
+		st.AddLocal("error", &Error{Result: false})
+		return nil
+	})
+	g.AddHandler("BEvent", func(st StorageData) error {
+		log.Println("init B")
+		st.AddLocal("error", &Error{Result: false})
+		st.AddLocal("validationObject", new(validity))
+		return nil
+	})
+	g.AddHandler("CEvent", func(st StorageData) error {
+		log.Println("init C")
+		return nil
+	})
+	flow, err := g.Build()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = flow.Run("emit")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	exps := []string{
+		"init",
+		"init pre",
+		"init pre-B",
+		"init B",
+		"init A",
+		"init post",
+	}
+	if len(exps) != len(log.log) {
+		t.Fatalf("exp n message: %v,got: %v", len(exps), len(log.log))
+	}
+	for i, exp := range exps {
+		if log.log[i] != exp {
+			t.Fatalf("exp: %v,got: %v", exp[i], log.log[i])
+		}
 	}
 }
