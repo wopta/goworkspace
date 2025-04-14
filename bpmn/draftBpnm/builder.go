@@ -87,18 +87,20 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 		return err
 	}
 	var order Order
-	for i, p := range process.Process {
+	for i, p := range bpnmToInject.Processes {
 		order = bpnmToInject.Processes[i].Order
 		if _, ok := b.toInject[getKeyInjectedProcess(order.InWhatProcessBeInjected, order.InWhatActivityBeInjected, order.Order)]; ok {
 			return fmt.Errorf("Injection's been already done: target process %v, target activity %v", order.InWhatProcessBeInjected, order.InWhatActivityBeInjected)
 		}
-		b.toInject[getKeyInjectedProcess(order.InWhatProcessBeInjected, order.InWhatActivityBeInjected, order.Order)] = p
+		b.toInject[getKeyInjectedProcess(order.InWhatProcessBeInjected, order.InWhatActivityBeInjected, order.Order)] = process.Process[p.Name]
 	}
 	return nil
 }
 
 func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 	flow := new(FlowBpnm)
+	flow.Process = make(map[string]*ProcessBpnm)
+
 	var process *ProcessBpnm
 	if b.storage == nil {
 		return nil, errors.New("miss storage")
@@ -117,8 +119,13 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 		if err := b.BuildGatewayBlock(p, process); err != nil {
 			return nil, err
 		}
-		flow.Process = append(flow.Process, process)
+		if flow.Process[process.Name] != nil {
+			return nil, fmt.Errorf("Process %v's been already defined", process.Name)
+		}
+
+		flow.Process[process.Name] = process
 	}
+	//Return error if some processes isnt injected, when a process is injected it's removed from b.toInject
 	if len(b.toInject) != 0 {
 		var keyNoInjected string
 		for i := range b.toInject {
@@ -157,7 +164,7 @@ func (a *BpnmBuilder) BuildActivity(activities []ActivityBuilder, processName st
 		}
 		newActivity.PreActivity = a.toInject[getKeyInjectedProcess(processName, activity.Name, PreActivity)]
 		newActivity.PostActivity = a.toInject[getKeyInjectedProcess(processName, activity.Name, PostActivity)]
-		//To check eventually if the some injection went bad
+		//To check eventually if the some injection isnt possible
 		delete(a.toInject, getKeyInjectedProcess(processName, activity.Name, PreActivity))
 		delete(a.toInject, getKeyInjectedProcess(processName, activity.Name, PostActivity))
 

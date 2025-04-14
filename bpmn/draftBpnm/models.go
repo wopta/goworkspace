@@ -1,7 +1,7 @@
 package draftbpnm
 
 type FlowBpnm struct {
-	Process []*ProcessBpnm
+	Process map[string]*ProcessBpnm
 }
 
 type ProcessBpnm struct {
