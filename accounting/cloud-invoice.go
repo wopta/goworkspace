@@ -87,8 +87,8 @@ func (invoiceData InvoiceInc) Create(isPay bool, isProforma bool) string {
 				SetAmount(invoiceData.Amount).
 				SetDueDate(invoiceData.Date.Format(layout)).
 				SetPaidDate(invoiceData.PayDate.Format(layout)).
-				SetStatus(status),
-			//SetPaymentAccount(*fattureincloud.NewPaymentAccount().SetId(110)),
+				SetStatus(status).
+				SetPaymentAccount(*fattureincloud.NewPaymentAccount().SetName("carta di credito")),
 		})
 		// Here we add the payment method
 		// List your payment methods: https://github.com/fattureincloud/fattureincloud-go-sdk/blob/master/docs/InfoApi.md#listpaymentmethods
