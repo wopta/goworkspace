@@ -276,16 +276,7 @@ func TestBpnmMissingHandler(t *testing.T) {
 	}
 }
 
-func TestBpnmInjection(t *testing.T) {
-	g, err := NewBpnmBuilder("prova.json")
-	log := mockLog{}
-	if err != nil {
-		t.Fatal(err)
-	}
-	storage := NewStorageBpnm()
-	storage.AddGlobal("policyPr", &PolicyMock{Age: 3})
-	g.SetPoolDate(storage)
-
+func getFlowcatnat(log *mockLog) (*BpnmBuilder, error) {
 	injectedFlow, err := NewBpnmBuilder("provaInjection.json")
 	injectedFlow.SetPoolDate(NewStorageBpnm())
 	injectedFlow.AddHandler("provaPost", "init", func(st StorageData) error {
@@ -301,7 +292,20 @@ func TestBpnmInjection(t *testing.T) {
 		log.Println("init pre")
 		return nil
 	})
-	if err := g.Inject(injectedFlow); err != nil {
+	return injectedFlow, err
+}
+
+func TestBpnmInjection(t *testing.T) {
+	g, err := NewBpnmBuilder("prova.json")
+	log := mockLog{}
+	if err != nil {
+		t.Fatal(err)
+	}
+	storage := NewStorageBpnm()
+	storage.AddGlobal("policyPr", &PolicyMock{Age: 3})
+	g.SetPoolDate(storage)
+	flowCatnat, err := getFlowcatnat(&log)
+	if err := g.Inject(flowCatnat); err != nil {
 		t.Fatal(err)
 	}
 
