@@ -22,6 +22,7 @@ type InvoiceInc struct {
 }
 type Items struct {
 	Name      string
+	Desc      string
 	Code      string
 	ProductId int32
 	Qty       int32
