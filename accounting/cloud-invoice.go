@@ -14,6 +14,7 @@ import (
 	fattureincloudapi "github.com/fattureincloud/fattureincloud-go-sdk/v2/api"
 	fattureincloud "github.com/fattureincloud/fattureincloud-go-sdk/v2/model"
 	oauth "github.com/fattureincloud/fattureincloud-go-sdk/v2/oauth2"
+	"github.com/wopta/goworkspace/lib"
 )
 
 const (
@@ -24,7 +25,7 @@ var (
 	token = "Bearer " + os.Getenv("FATTURE_INCLOUD_KEY")
 )
 
-func (invoiceData *InvoiceInc) CreateInvoice(isPay bool, isProforma bool) {
+func (invoiceData InvoiceInc) Create(isPay bool, isProforma bool) string {
 	log.SetPrefix("CreateInvoice")
 	companyId := getCompanyId()
 	var (
@@ -50,6 +51,7 @@ func (invoiceData *InvoiceInc) CreateInvoice(isPay bool, isProforma bool) {
 	for _, item := range invoiceData.Items {
 		fcItems = append(fcItems, *fattureincloud.NewIssuedDocumentItemsListItem().
 			//SetProductId(4).
+			SetDescription(item.Name).
 			SetCode(item.Code).
 			SetName(item.Name).
 			SetNetPrice(item.NetPrice).
@@ -115,6 +117,13 @@ func (invoiceData *InvoiceInc) CreateInvoice(isPay bool, isProforma bool) {
 		log.Println("Error while reading the response bytes:", err)
 	}
 	log.Println(string([]byte(body)))
+	var invresp InvoiceResponse
+	err = json.Unmarshal([]byte(body), &invresp)
+	if err != nil {
+		panic(err)
+	}
+
+	return invresp.Data.URL
 }
 
 func getClient() (*fattureincloudapi.APIClient, context.Context, int32) {
@@ -171,34 +180,10 @@ func getCompanyId() int32 {
 	log.Println("companyId:", companyId)
 	return int32(companyId)
 }
-func putInvoive() int32 {
-	var (
-		listCompany *fattureincloud.ListUserCompaniesResponse
-	)
-	// for this example we define the token as string, but you should have obtained it in the previous steps
-
-	uri := baseurlInc + "user/companies"
-	req, _ := http.NewRequest("GET", uri, nil)
-	req.Header.Add("Authorization", token)
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Println("Error on response.\n[ERROR] -", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Println("Error while reading the response bytes:", err)
-	}
-	log.Println(string([]byte(body)))
-
-	e := json.Unmarshal(body, listCompany)
-	log.Println(e)
-
-	companyId := listCompany.GetData().Companies[0].Id
-	log.Println("companyId:", companyId)
-	return int32(*companyId.Get())
+func (invoiceData InvoiceInc) Save(url string, path string) error {
+	out, e := HttpFileToByte(url)
+	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), path, out.Bytes())
+	return e
 }
 
 type CompanyResponseData struct {
@@ -240,6 +225,146 @@ type Companies struct {
 	Dic                 bool        `json:"dic,omitempty"`
 	FicLicenseExpire    string      `json:"fic_license_expire,omitempty"`
 	Permissions         Permissions `json:"permissions,omitempty"`
+}
+type InvoiceResponse struct {
+	Data struct {
+		ID                               int    `json:"id,omitempty"`
+		Type                             string `json:"type,omitempty"`
+		Year                             int    `json:"year,omitempty"`
+		Numeration                       string `json:"numeration,omitempty"`
+		Subject                          string `json:"subject,omitempty"`
+		VisibleSubject                   string `json:"visible_subject,omitempty"`
+		RcCenter                         string `json:"rc_center,omitempty"`
+		AmountRivalsa                    int    `json:"amount_rivalsa,omitempty"`
+		AmountRivalsaTaxable             int    `json:"amount_rivalsa_taxable,omitempty"`
+		AmountGlobalCassaTaxable         int    `json:"amount_global_cassa_taxable,omitempty"`
+		AmountCassa                      int    `json:"amount_cassa,omitempty"`
+		AmountCassaTaxable               int    `json:"amount_cassa_taxable,omitempty"`
+		AmountCassa2                     int    `json:"amount_cassa2,omitempty"`
+		AmountCassa2Taxable              int    `json:"amount_cassa2_taxable,omitempty"`
+		AmountWithholdingTax             int    `json:"amount_withholding_tax,omitempty"`
+		AmountWithholdingTaxTaxable      int    `json:"amount_withholding_tax_taxable,omitempty"`
+		AmountOtherWithholdingTax        int    `json:"amount_other_withholding_tax,omitempty"`
+		AmountEnasarcoTaxable            int    `json:"amount_enasarco_taxable,omitempty"`
+		AmountOtherWithholdingTaxTaxable int    `json:"amount_other_withholding_tax_taxable,omitempty"`
+		EiCassaType                      any    `json:"ei_cassa_type,omitempty"`
+		EiCassa2Type                     any    `json:"ei_cassa2_type,omitempty"`
+		EiWithholdingTaxCausal           any    `json:"ei_withholding_tax_causal,omitempty"`
+		EiOtherWithholdingTaxType        any    `json:"ei_other_withholding_tax_type,omitempty"`
+		EiOtherWithholdingTaxCausal      any    `json:"ei_other_withholding_tax_causal,omitempty"`
+		StampDuty                        int    `json:"stamp_duty,omitempty"`
+		UseGrossPrices                   bool   `json:"use_gross_prices,omitempty"`
+		EInvoice                         bool   `json:"e_invoice,omitempty"`
+		AgyoCompanyID                    any    `json:"agyo_company_id,omitempty"`
+		AgyoID                           any    `json:"agyo_id,omitempty"`
+		AgyoSentAt                       any    `json:"agyo_sent_at,omitempty"`
+		DeliveryNote                     bool   `json:"delivery_note,omitempty"`
+		AccompanyingInvoice              bool   `json:"accompanying_invoice,omitempty"`
+		AmountNet                        int    `json:"amount_net,omitempty"`
+		AmountVat                        int    `json:"amount_vat,omitempty"`
+		AmountGross                      int    `json:"amount_gross,omitempty"`
+		AmountDueDiscount                int    `json:"amount_due_discount,omitempty"`
+		PermanentToken                   string `json:"permanent_token,omitempty"`
+		HMargins                         int    `json:"h_margins,omitempty"`
+		VMargins                         int    `json:"v_margins,omitempty"`
+		ShowPaymentMethod                bool   `json:"show_payment_method,omitempty"`
+		ShowPayments                     bool   `json:"show_payments,omitempty"`
+		ShowTotals                       string `json:"show_totals,omitempty"`
+		ShowNotificationButton           bool   `json:"show_notification_button,omitempty"`
+		IsMarked                         bool   `json:"is_marked,omitempty"`
+		CreatedAt                        string `json:"created_at,omitempty"`
+		UpdatedAt                        string `json:"updated_at,omitempty"`
+		AttachPdfToXML                   bool   `json:"attach_pdf_to_xml,omitempty"`
+		PriceListID                      any    `json:"price_list_id,omitempty"`
+		Entity                           struct {
+			Name              string `json:"name,omitempty"`
+			VatNumber         string `json:"vat_number,omitempty"`
+			TaxCode           string `json:"tax_code,omitempty"`
+			AddressStreet     string `json:"address_street,omitempty"`
+			AddressPostalCode string `json:"address_postal_code,omitempty"`
+			AddressCity       string `json:"address_city,omitempty"`
+			AddressProvince   string `json:"address_province,omitempty"`
+			AddressExtra      string `json:"address_extra,omitempty"`
+			Country           string `json:"country,omitempty"`
+			CertifiedEmail    string `json:"certified_email,omitempty"`
+			EiCode            string `json:"ei_code,omitempty"`
+			EntityType        string `json:"entity_type,omitempty"`
+			Type              any    `json:"type,omitempty"`
+		} `json:"entity,omitempty"`
+		Date     string `json:"date,omitempty"`
+		Number   int    `json:"number,omitempty"`
+		Currency struct {
+			ID           string `json:"id,omitempty"`
+			ExchangeRate string `json:"exchange_rate,omitempty"`
+			Symbol       string `json:"symbol,omitempty"`
+		} `json:"currency,omitempty"`
+		Language struct {
+			Code string `json:"code,omitempty"`
+			Name string `json:"name,omitempty"`
+		} `json:"language,omitempty"`
+		Notes                      string `json:"notes,omitempty"`
+		Rivalsa                    int    `json:"rivalsa,omitempty"`
+		RivalsaTaxable             int    `json:"rivalsa_taxable,omitempty"`
+		GlobalCassaTaxable         int    `json:"global_cassa_taxable,omitempty"`
+		Cassa                      int    `json:"cassa,omitempty"`
+		CassaTaxable               int    `json:"cassa_taxable,omitempty"`
+		Cassa2                     int    `json:"cassa2,omitempty"`
+		Cassa2Taxable              int    `json:"cassa2_taxable,omitempty"`
+		WithholdingTax             int    `json:"withholding_tax,omitempty"`
+		WithholdingTaxTaxable      int    `json:"withholding_tax_taxable,omitempty"`
+		OtherWithholdingTax        int    `json:"other_withholding_tax,omitempty"`
+		OtherWithholdingTaxTaxable int    `json:"other_withholding_tax_taxable,omitempty"`
+		PaymentMethod              struct {
+			ID      any    `json:"id,omitempty"`
+			Name    string `json:"name,omitempty"`
+			Details []struct {
+				Title       string `json:"title,omitempty"`
+				Description string `json:"description,omitempty"`
+			} `json:"details,omitempty"`
+		} `json:"payment_method,omitempty"`
+		UseSplitPayment  bool `json:"use_split_payment,omitempty"`
+		MergedIn         any  `json:"merged_in,omitempty"`
+		OriginalDocument any  `json:"original_document,omitempty"`
+		ItemsList        []struct {
+			ProductID             any    `json:"product_id,omitempty"`
+			Code                  string `json:"code,omitempty"`
+			Name                  string `json:"name,omitempty"`
+			Measure               string `json:"measure,omitempty"`
+			Category              string `json:"category,omitempty"`
+			ID                    int    `json:"id,omitempty"`
+			ApplyWithholdingTaxes bool   `json:"apply_withholding_taxes,omitempty"`
+			Discount              int    `json:"discount,omitempty"`
+			DiscountHighlight     bool   `json:"discount_highlight,omitempty"`
+			InDn                  bool   `json:"in_dn,omitempty"`
+			Qty                   int    `json:"qty,omitempty"`
+			NetPrice              int    `json:"net_price,omitempty"`
+			Vat                   struct {
+				ID          int    `json:"id,omitempty"`
+				Value       int    `json:"value,omitempty"`
+				Description string `json:"description,omitempty"`
+			} `json:"vat,omitempty"`
+			Stock       bool   `json:"stock,omitempty"`
+			Description string `json:"description,omitempty"`
+			GrossPrice  int    `json:"gross_price,omitempty"`
+			NotTaxable  bool   `json:"not_taxable,omitempty"`
+		} `json:"items_list,omitempty"`
+		PaymentsList  []any `json:"payments_list,omitempty"`
+		AttachmentURL any   `json:"attachment_url,omitempty"`
+		SeenDate      any   `json:"seen_date,omitempty"`
+		NextDueDate   any   `json:"next_due_date,omitempty"`
+		Template      struct {
+			ID   int    `json:"id,omitempty"`
+			Name string `json:"name,omitempty"`
+		} `json:"template,omitempty"`
+		ExtraData              any    `json:"extra_data,omitempty"`
+		URL                    string `json:"url,omitempty"`
+		Locked                 bool   `json:"locked,omitempty"`
+		EiLocked               bool   `json:"ei_locked,omitempty"`
+		HasTsPayPendingPayment bool   `json:"has_ts_pay_pending_payment,omitempty"`
+		ShowTspayButton        bool   `json:"show_tspay_button,omitempty"`
+		PayWithTspayURL        any    `json:"pay_with_tspay_url,omitempty"`
+		HasAttachment          bool   `json:"has_attachment,omitempty"`
+	} `json:"data,omitempty"`
 }
 type Data struct {
 	Companies []Companies `json:"companies,omitempty"`

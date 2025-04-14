@@ -6,6 +6,7 @@ import (
 
 type InvoiceInc struct {
 	Name       string
+	Desc       string
 	VatNumber  string
 	TaxCode    string
 	Address    string
@@ -23,6 +24,7 @@ type Items struct {
 	Name      string
 	Code      string
 	ProductId int32
+	Qty       int32
 	NetPrice  float32
 	Category  string
 	Date      time.Time
