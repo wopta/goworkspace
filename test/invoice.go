@@ -11,7 +11,7 @@ import (
 func createInvoice(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("createInvoice")
 	inv := accounting.InvoiceInc{
-		Desc:       "Contributo per intermediazione",
+
 		Name:       "luca",
 		VatNumber:  "brblcu81h03f205q",
 		TaxCode:    "brblcu81h03f205q",
@@ -25,6 +25,7 @@ func createInvoice(w http.ResponseWriter, r *http.Request) (string, interface{},
 		Date:       time.Now(),
 		PayDate:    time.Now(),
 		Items: []accounting.Items{{
+			Desc:      "Contributo per intermediazione",
 			Name:      "",
 			Code:      "Vita",
 			Qty:       1,
