@@ -1,10 +1,7 @@
 package draftbpnm
 
 import (
-	"errors"
 	"testing"
-
-	"github.com/wopta/goworkspace/models"
 )
 
 type validity struct {
@@ -42,16 +39,14 @@ func TestBpnmHappyPath(t *testing.T) {
 	storage := NewStorageBpnm()
 	storage.AddLocal("validationObject", new(validity))
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 3})
-	p := new(models.Policy)
-	p.Name = "pippo"
 	g.SetPoolDate(storage)
 
 	g.AddHandler("emit", "init", func(st StorageData) error {
 		log.Println("init")
 		st.AddLocal("validationObject", new(validity))
-		d, _ := st.GetGlobal("policyPr")
-		if d == nil {
-			return errors.New("no polscy")
+		_, e := st.GetGlobal("policyPr")
+		if e != nil {
+			return e
 		}
 		return nil
 	})
@@ -103,8 +98,6 @@ func TestBpnmHappyPath2(t *testing.T) {
 	storage := NewStorageBpnm()
 	storage.AddLocal("validationObject", new(validity))
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 1})
-	p := new(models.Policy)
-	p.Name = "pippo"
 	g.SetPoolDate(storage)
 
 	g.AddHandler("emit", "init", func(st StorageData) error {
@@ -159,8 +152,6 @@ func TestBpnmMissingOutput(t *testing.T) {
 	}
 	storage := NewStorageBpnm()
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 1})
-	p := new(models.Policy)
-	p.Name = "pippo"
 	g.SetPoolDate(storage)
 
 	g.AddHandler("emit", "init", func(st StorageData) error {
@@ -205,8 +196,6 @@ func TestBpnmMissingInput(t *testing.T) {
 	}
 	storage := NewStorageBpnm()
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 10})
-	p := new(models.Policy)
-	p.Name = "pippo"
 	g.SetPoolDate(storage)
 
 	g.AddHandler("emit", "init", func(st StorageData) error {
@@ -250,8 +239,6 @@ func TestBpnmMissingHandler(t *testing.T) {
 	}
 	storage := NewStorageBpnm()
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 10})
-	p := new(models.Policy)
-	p.Name = "pippo"
 	g.SetPoolDate(storage)
 
 	g.AddHandler("emit", "init", func(st StorageData) error {
@@ -312,9 +299,9 @@ func TestBpnmInjection(t *testing.T) {
 	g.AddHandler("emit", "init", func(st StorageData) error {
 		log.Println("init")
 		st.AddLocal("validationObject", new(validity))
-		d, _ := st.GetGlobal("policyPr")
-		if d == nil {
-			return errors.New("no polscy")
+		_, e := st.GetGlobal("policyPr")
+		if e != nil {
+			return e
 		}
 		return nil
 	})
