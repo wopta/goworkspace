@@ -1,7 +1,42 @@
 {
 	"processes": [
 		{
-			"name": "emit",
+			"name": "provaPost",
+			"globalData": [
+				{
+					"name": "policyPr",
+					"type": "policy"
+				}
+			],
+			"order": {
+				"inWhatProcessBeInjected": "emit",
+				"inWhatActivityBeInjected": "AEvent",
+				"order": "Post"
+			},
+			"description": "",
+			"activities": [
+				{
+					"name": "init",
+					"branch": {
+						"inputData": [],
+						"outputData": [
+							{
+								"name": "error",
+								"type": "error"
+							}
+						],
+						"gateways": []
+					}
+				}
+			]
+		},
+		{
+			"name": "provaPre",
+			"order": {
+				"inWhatProcessBeInjected": "emit",
+				"inWhatActivityBeInjected": "BEvent",
+				"order": "pre"
+			},
 			"globalData": [
 				{
 					"name": "policyPr",

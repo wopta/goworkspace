@@ -32,6 +32,9 @@ func (f *FlowBpnm) Run(processName string) error {
 
 func (f *ProcessBpnm) Run() error {
 	f.activeActivity = f.Activities["init"]
+	if f.storageBpnm == nil {
+		return errors.New("miss storage")
+	}
 	for {
 		if f.activeActivity.handler == nil {
 			return fmt.Errorf("No handler defined for %v", f.activeActivity.Name)

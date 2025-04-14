@@ -53,6 +53,10 @@
 							{
 								"name": "error",
 								"type": "error"
+							},
+							{
+								"name": "validationObject",
+								"type": "validity"
 							}
 						],
 						"inputData": [

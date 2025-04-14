@@ -3,13 +3,19 @@ package draftbpnm
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
+type Order struct {
+	InWhatProcessBeInjected  string        `json:"inWhatProcessBeInjected"`
+	InWhatActivityBeInjected string        `json:"inWhatActivityBeInjected"`
+	Order                    OrderActivity `json:"order"`
+}
 type BpnmBuilder struct {
 	handlers  map[string]ActivityHandler
 	storage   StorageData
 	Processes []*ProcessBuilder `json:"processes"`
-	toInject  map[string]*ProcessBpnm
+	toInject  map[KeyInject]*ProcessBpnm
 }
 
 type TypeData struct {
@@ -18,6 +24,7 @@ type TypeData struct {
 }
 type ProcessBuilder struct {
 	GlobalDataRequired []TypeData        `json:"globalData"`
+	Order              Order             `json:"order"`
 	Description        string            `json:"description"`
 	Name               string            `json:"name"`
 	Activities         []ActivityBuilder `json:"activities"`
@@ -45,37 +52,47 @@ type GatewayBlock struct {
 type OrderActivity string
 
 const (
-	PreActivity  OrderActivity = "Pre"
-	PostActivity OrderActivity = "Post"
+	PreActivity  OrderActivity = "pre"
+	PostActivity OrderActivity = "post"
 )
 
 type InjectActivity struct {
 	Order              OrderActivity
 	ActivitiesToInject []ActivityBuilder
 }
-
-func getNameInjectedProcess(targetPro, targetAct string, order OrderActivity) string {
-	return targetPro + "_" + targetAct + "_" + string(order)
+type KeyInject struct {
+	TargetProcess  string
+	TargetActivity string
+	OrderActivity
 }
 
-// injectedProcess: what process contains the activities to inject
-// targetProcess: what process'll receive the new activities
-// order: define when execute the activities, before or after targetActivity
-func (b *BpnmBuilder) Inject(targetPro, targetAct, processToTake string, order OrderActivity, bpnmToInject *BpnmBuilder) error {
+func getKeyInjectedProcess(targetPro, targetAct string, order OrderActivity) KeyInject {
+	order = OrderActivity(strings.ToLower(string(order)))
+	return KeyInject{
+		TargetProcess:  targetPro,
+		TargetActivity: targetAct,
+		OrderActivity:  order,
+	}
+}
+
+func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 	if b.handlers == nil {
 		b.handlers = make(map[string]ActivityHandler)
 	}
 	if b.toInject == nil {
-		b.toInject = make(map[string]*ProcessBpnm)
+		b.toInject = make(map[KeyInject]*ProcessBpnm)
 	}
 	process, err := bpnmToInject.Build()
 	if err != nil {
-		return fmt.Errorf("Injected process: target process %v, target activity %v, error: %v", targetPro, targetAct, err.Error())
+		return err
 	}
-	for _, p := range process.Process {
-		if p.Name == processToTake {
-			b.toInject[getNameInjectedProcess(targetPro, targetAct, order)] = p
+	var order Order
+	for i, p := range process.Process {
+		order = bpnmToInject.Processes[i].Order
+		if _, ok := b.toInject[getKeyInjectedProcess(order.InWhatProcessBeInjected, order.InWhatActivityBeInjected, order.Order)]; ok {
+			return fmt.Errorf("Injection's been already done: target process %v, target activity %v", order.InWhatProcessBeInjected, order.InWhatActivityBeInjected)
 		}
+		b.toInject[getKeyInjectedProcess(order.InWhatProcessBeInjected, order.InWhatActivityBeInjected, order.Order)] = p
 	}
 	return nil
 }
@@ -102,17 +119,24 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 		}
 		flow.Process = append(flow.Process, process)
 	}
+	if len(b.toInject) != 0 {
+		var keyNoInjected string
+		for i := range b.toInject {
+			keyNoInjected += fmt.Sprintf("process: %v, activity: %v, order: %v\n", i.TargetProcess, i.TargetActivity, i.OrderActivity)
+		}
+		return nil, fmt.Errorf("Following injection went bad:\n  %v", keyNoInjected)
+	}
 	return flow, nil
 }
 
-func (b *BpnmBuilder) AddHandler(nameHandler string, handler ActivityHandler) error {
+func (b *BpnmBuilder) AddHandler(nameProcess, nameHandler string, handler ActivityHandler) error {
 	if b.handlers == nil {
 		b.handlers = make(map[string]ActivityHandler)
 	}
-	if _, ok := b.handlers[nameHandler]; ok {
+	if _, ok := b.handlers[nameProcess+nameHandler]; ok {
 		return errors.New("Handler's been already defined")
 	}
-	b.handlers[nameHandler] = handler
+	b.handlers[nameProcess+nameHandler] = handler
 	return nil
 }
 
@@ -127,10 +151,16 @@ func (a *BpnmBuilder) BuildActivity(activities []ActivityBuilder, processName st
 			return nil, fmt.Errorf("Double event with same name %v", activity.Name)
 		}
 		newActivity := new(Activity)
-		handler, ok := a.handlers[activity.Name]
+		handler, ok := a.handlers[processName+activity.Name]
 		if !ok {
 			return nil, fmt.Errorf("No handler registered for the activity: %v", activity.Name)
 		}
+		newActivity.PreActivity = a.toInject[getKeyInjectedProcess(processName, activity.Name, PreActivity)]
+		newActivity.PostActivity = a.toInject[getKeyInjectedProcess(processName, activity.Name, PostActivity)]
+		//To check eventually if the some injection went bad
+		delete(a.toInject, getKeyInjectedProcess(processName, activity.Name, PreActivity))
+		delete(a.toInject, getKeyInjectedProcess(processName, activity.Name, PostActivity))
+
 		newActivity.Name = activity.Name
 		newActivity.Description = activity.Description
 		newActivity.handler = handler
@@ -142,8 +172,6 @@ func (a *BpnmBuilder) BuildActivity(activities []ActivityBuilder, processName st
 			return nil, e
 		}
 		newActivity.Branch = builtBranch
-		newActivity.PreActivity = a.toInject[getNameInjectedProcess(processName, activity.Name, PreActivity)]
-		newActivity.PostActivity = a.toInject[getNameInjectedProcess(processName, activity.Name, PostActivity)]
 		result[newActivity.Name] = newActivity
 	}
 	return result, nil
