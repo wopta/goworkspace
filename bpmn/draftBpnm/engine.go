@@ -105,7 +105,7 @@ func checkAndCleanLocalStorage(st StorageData, req []TypeData) error {
 			return fmt.Errorf("Resource required is not found %v", dR.Name)
 		}
 		if d.(DataBpnm).Type() != dR.Type {
-			return fmt.Errorf("Resource %v has a differente type, exp:%v, got %v", dR.Name, dR.Type, d.(DataBpnm).Type())
+			return fmt.Errorf("Resource %v has a difference type, exp:%v, got %v", dR.Name, dR.Type, d.(DataBpnm).Type())
 		}
 		if e := st.AddLocal(dR.Name, d.(DataBpnm)); e != nil {
 			return e
@@ -121,7 +121,7 @@ func checkValidityGlobalStorage(st StorageData, req []TypeData) error {
 			return fmt.Errorf("Required resource is not found %v", d.Name)
 		}
 		if v.Type() != d.Type {
-			return fmt.Errorf("Resource %v has a differente type, exp:%v, got %v", d.Name, d.Type, v.Type())
+			return fmt.Errorf("Resource %v has a difference type, exp:%v, got %v", d.Name, d.Type, v.Type())
 		}
 	}
 	return nil

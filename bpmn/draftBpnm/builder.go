@@ -65,11 +65,11 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 		process.Description = p.Description
 		process.Name = p.Name
 		process.RequiredGlobalData = p.GlobalDataRequired
-		buildedActivities, err := b.BuildActivity(p.Activities)
+		builtActivities, err := b.BuildActivity(p.Activities)
 		if err != nil {
 			return nil, err
 		}
-		process.Activities = buildedActivities
+		process.Activities = builtActivities
 		if err := b.BuildGatewayBlock(p, process); err != nil {
 			return nil, err
 		}
@@ -110,11 +110,11 @@ func (a *BpnmBuilder) BuildActivity(activities []ActivityBuilder) (map[string]*A
 		if activity.Branch == nil {
 			return nil, fmt.Errorf("No branch founded for activity: %v", activity.Name)
 		}
-		buildedBranch, e := a.BuildBranchBuilder(activity.Branch)
+		builtBranch, e := a.BuildBranchBuilder(activity.Branch)
 		if e != nil {
 			return nil, e
 		}
-		newActivity.Branch = buildedBranch
+		newActivity.Branch = builtBranch
 		result[newActivity.Name] = newActivity
 	}
 	return result, nil

@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-type InitializeDataTipe func() DataBpnm
+type InitializeDataType func() DataBpnm
 type StorageData interface {
 	ResetLocal()
 	ResetGlobal()

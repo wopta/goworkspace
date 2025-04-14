@@ -42,8 +42,6 @@ func TestBpnmHappyPath(t *testing.T) {
 	storage := NewStorageBpnm()
 	storage.AddLocal("validationObject", new(validity))
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 3})
-	p := new(models.Policy)
-	p.Name = "pippo"
 	g.SetPoolDate(storage)
 
 	g.AddHandler("init", func(st StorageData) error {
