@@ -15,6 +15,7 @@ import (
 	fattureincloud "github.com/fattureincloud/fattureincloud-go-sdk/v2/model"
 	oauth "github.com/fattureincloud/fattureincloud-go-sdk/v2/oauth2"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 const (
@@ -368,4 +369,32 @@ type InvoiceResponse struct {
 }
 type Data struct {
 	Companies []Companies `json:"companies,omitempty"`
+}
+
+func mapPolicyInvoiceInc(policy models.Policy, tr models.Transaction,desc ) InvoiceInc {
+	inv := InvoiceInc{
+
+		Name:       policy.Contractor.Name + " " + policy.Contractor.Surname,
+		VatNumber:  policy.Contractor.VatCode,
+		TaxCode:    policy.Contractor.FiscalCode,
+		Address:    policy.Contractor.Address,
+		PostalCode: policy.Contractor.PostalCode,
+		City:       policy.Contractor.City,
+		CityCode:   policy.Contractor.CityCode,
+		Country:    "Italia",
+		Mail:       policy.Contractor.Mail,
+		Amount:     float32(tr.Amount),
+		Date:       tr.CreationDate,
+		PayDate:    tr.PayDate,
+		Items: []Items{{
+			Desc:      desc,
+			Name:      policy.Name,
+			Code:      policy.Name,
+			Qty:       1,
+			ProductId: 0,
+			NetPrice:  float32(tr.Amount),
+			Category:  policy.Name,
+			Date:      tr.CreationDate}}}
+	return inv
+
 }

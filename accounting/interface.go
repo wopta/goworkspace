@@ -7,6 +7,7 @@ type Invoice interface {
 }
 
 func DoInvicePaid(inv Invoice, path string) {
+
 	url := inv.Create(true, false)
 	inv.Save(url, path)
 
