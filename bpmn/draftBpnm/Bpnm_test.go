@@ -347,3 +347,26 @@ func TestBpnmInjection(t *testing.T) {
 		}
 	}
 }
+
+func TestBpnmWithMultipleInjection(t *testing.T) {
+	g, err := NewBpnmBuilder("prova.json")
+	log := mockLog{}
+	if err != nil {
+		t.Fatal(err)
+	}
+	storage := NewStorageBpnm()
+	storage.AddGlobal("policyPr", &PolicyMock{Age: 3})
+	g.SetPoolDate(storage)
+	flowCatnat, err := getFlowcatnat(&log)
+	if err := g.Inject(flowCatnat); err != nil {
+		t.Fatal(err)
+	}
+	err = g.Inject(flowCatnat)
+	if err == nil {
+		t.Fatalf("Should have an error")
+	}
+
+	if err.Error() != "Injection's been already done: target process: emit, process: injected provaPost" {
+		t.Fatalf("Should have the error,exp: Injection's been already done: target process: emit, process: injected provaPost, got: %v", err.Error())
+	}
+}

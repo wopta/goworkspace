@@ -90,7 +90,7 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 	for i, p := range bpnmToInject.Processes {
 		order = bpnmToInject.Processes[i].Order
 		if _, ok := b.toInject[getKeyInjectedProcess(order.InWhatProcessBeInjected, order.InWhatActivityBeInjected, order.Order)]; ok {
-			return fmt.Errorf("Injection's been already done: target process %v, target activity %v", order.InWhatProcessBeInjected, order.InWhatActivityBeInjected)
+			return fmt.Errorf("Injection's been already done: target process: %v, process: injected %v", order.InWhatProcessBeInjected, p.Name)
 		}
 		b.toInject[getKeyInjectedProcess(order.InWhatProcessBeInjected, order.InWhatActivityBeInjected, order.Order)] = process.Process[p.Name]
 	}
