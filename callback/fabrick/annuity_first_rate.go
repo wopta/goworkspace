@@ -16,7 +16,7 @@ import (
 	plc "github.com/wopta/goworkspace/policy"
 	prd "github.com/wopta/goworkspace/product"
 	tr "github.com/wopta/goworkspace/transaction"
-	"github.com/wopta/goworkspace/transaction/consultancy"
+	"github.com/wopta/goworkspace/payment/consultancy"
 )
 
 /*
