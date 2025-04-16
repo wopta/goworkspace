@@ -11,23 +11,7 @@ import (
 )
 
 func (f *FlowBpnm) Run(processName string) error {
-	log.SetPrefix("Bpnm")
-	defer log.SetPrefix("")
-	log.Println("Run ", processName)
-	for _, process := range f.Process {
-		if process.Name == processName {
-			if e := checkValidityGlobalStorage(process.storageBpnm, process.RequiredGlobalData); e != nil {
-				return e
-			}
-		}
-
-		if e := process.Run("init"); e != nil { //TODO: how to check if there is an infinite loop
-			return e
-		}
-		log.Println("Stop ", processName)
-		return nil
-	}
-	return errors.New("No process founded")
+	return f.RunAt(processName, "init")
 }
 
 func (f *FlowBpnm) RunAt(processName, activityName string) error {
@@ -47,7 +31,7 @@ func (f *FlowBpnm) RunAt(processName, activityName string) error {
 		log.Println("Stop ", processName)
 		return nil
 	}
-	return errors.New("No process founded")
+	return fmt.Errorf("Process '%v' with activity '%v' not founded", processName, activityName)
 }
 
 func (f *ProcessBpnm) Run(nameActivity string) error {
@@ -57,7 +41,7 @@ func (f *ProcessBpnm) Run(nameActivity string) error {
 	}
 	for {
 		if f.activeActivity.handler == nil {
-			return fmt.Errorf("No handler defined for %v", f.activeActivity.Name)
+			return fmt.Errorf("Process '%v' has no handler defined for activity '%v'", f.Name, f.activeActivity.Name)
 		}
 
 		if pre := f.activeActivity.PreActivity; pre != nil {
@@ -68,7 +52,7 @@ func (f *ProcessBpnm) Run(nameActivity string) error {
 		}
 
 		if e := checkAndCleanLocalStorage(f.storageBpnm, f.activeActivity.Branch.RequiredInputData); e != nil {
-			return fmt.Errorf("Activity: %v, input: %v", f.activeActivity.Name, e.Error())
+			return fmt.Errorf("Process '%v' with activity '%v' has an input error: %v", f.Name, f.activeActivity.Name, e.Error())
 		}
 
 		if e := f.activeActivity.handler(f.storageBpnm); e != nil {
@@ -106,17 +90,17 @@ func (f *ProcessBpnm) EvaluateDecisions(act *Activity, date map[string]any) erro
 			break
 		}
 		if len(ga.NextActivities) == 0 {
-			log.Println("No activity")
+			log.Printf("Process '%v' has not activities", f.Name)
 			return nil
 		}
 		eval := goval.NewEvaluator()
 		result, e := eval.Evaluate(ga.Decision, date, nil)
 		if e != nil {
-			return fmt.Errorf("Activity: %v, error eval:%v ", act.Name, e.Error())
+			return fmt.Errorf("Process '%v' with activity '%v' has an eval error: %v", f.Name, act.Name, e.Error())
 		}
 		if result.(bool) {
 			if e := checkAndCleanLocalStorage(f.storageBpnm, act.Branch.RequiredOutputData); e != nil {
-				return fmt.Errorf("Activity: %v, output: %v", act.Name, e.Error())
+				return fmt.Errorf("Process '%v' with activity '%v' has error: %v", f.Name, act.Name, e.Error())
 			}
 			f.activeActivity = ga.NextActivities[0]
 			break
@@ -141,10 +125,10 @@ func checkAndCleanLocalStorage(st StorageData, req []TypeData) error {
 	for _, dR := range req {
 		d, ok := temp[dR.Name]
 		if !ok {
-			return fmt.Errorf("Resource required is not found %v", dR.Name)
+			return fmt.Errorf("Resource required is not found '%v'", dR.Name)
 		}
 		if d.(DataBpnm).Type() != dR.Type {
-			return fmt.Errorf("Resource %v has a difference type, exp:%v, got %v", dR.Name, dR.Type, d.(DataBpnm).Type())
+			return fmt.Errorf("Resource %v has a difference type, exp: '%v', got: '%v'", dR.Name, dR.Type, d.(DataBpnm).Type())
 		}
 		if e := st.AddLocal(dR.Name, d.(DataBpnm)); e != nil {
 			return e
@@ -157,10 +141,10 @@ func checkValidityGlobalStorage(st StorageData, req []TypeData) error {
 	for _, d := range req {
 		v, err := st.GetGlobal(d.Name)
 		if err != nil {
-			return fmt.Errorf("Required resource is not found %v", d.Name)
+			return fmt.Errorf("Required resource is not found '%v'", d.Name)
 		}
 		if v.Type() != d.Type {
-			return fmt.Errorf("Resource %v has a difference type, exp:%v, got %v", d.Name, d.Type, v.Type())
+			return fmt.Errorf("Resource %v has a difference type, exp: '%v', got: '%v'", d.Name, d.Type, v.Type())
 		}
 	}
 	return nil
