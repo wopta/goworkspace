@@ -21,7 +21,7 @@ func (f *FlowBpnm) Run(processName string) error {
 			}
 		}
 
-		if e := process.Run(); e != nil { //TODO: how to check if there is an infinite loop
+		if e := process.Run("init"); e != nil { //TODO: how to check if there is an infinite loop
 			return e
 		}
 		log.Println("Stop ", processName)
@@ -30,8 +30,28 @@ func (f *FlowBpnm) Run(processName string) error {
 	return errors.New("No process founded")
 }
 
-func (f *ProcessBpnm) Run() error {
-	f.activeActivity = f.Activities["init"]
+func (f *FlowBpnm) RunAt(processName, activityName string) error {
+	log.SetPrefix("Bpnm")
+	defer log.SetPrefix("")
+	log.Println("Run ", processName)
+	for _, process := range f.Process {
+		if process.Name == processName {
+			if e := checkValidityGlobalStorage(process.storageBpnm, process.RequiredGlobalData); e != nil {
+				return e
+			}
+		}
+
+		if e := process.Run(activityName); e != nil { //TODO: how to check if there is an infinite loop
+			return e
+		}
+		log.Println("Stop ", processName)
+		return nil
+	}
+	return errors.New("No process founded")
+}
+
+func (f *ProcessBpnm) Run(nameActivity string) error {
+	f.activeActivity = f.Activities[nameActivity]
 	if f.storageBpnm == nil {
 		return errors.New("miss storage")
 	}
@@ -42,7 +62,7 @@ func (f *ProcessBpnm) Run() error {
 
 		if pre := f.activeActivity.PreActivity; pre != nil {
 			pre.storageBpnm.Merge(f.storageBpnm)
-			if e := pre.Run(); e != nil {
+			if e := pre.Run("init"); e != nil {
 				return e
 			}
 		}
@@ -57,7 +77,7 @@ func (f *ProcessBpnm) Run() error {
 
 		if post := f.activeActivity.PostActivity; post != nil {
 			post.storageBpnm.Merge(f.storageBpnm)
-			if e := post.Run(); e != nil {
+			if e := post.Run("init"); e != nil {
 				return e
 			}
 		}

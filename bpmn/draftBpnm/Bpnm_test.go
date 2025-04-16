@@ -370,3 +370,68 @@ func TestBpnmWithMultipleInjection(t *testing.T) {
 		t.Fatalf("Should have the error,exp: Injection's been already done: target process: emit, process: injected provaPost, got: %v", err.Error())
 	}
 }
+func TestRunFromSpecificActivity(t *testing.T) {
+	g, err := NewBpnmBuilder("prova.json")
+	log := mockLog{}
+	if err != nil {
+		t.Fatal(err)
+	}
+	storage := NewStorageBpnm()
+	storage.AddGlobal("policyPr", &PolicyMock{Age: 3})
+	storage.AddLocal("validationObject", new(validity))
+	g.SetPoolDate(storage)
+	flowCatnat, err := getFlowcatnat(&log)
+	if err := g.Inject(flowCatnat); err != nil {
+		t.Fatal(err)
+	}
+
+	g.AddHandler("emit", "init", func(st StorageData) error {
+		log.Println("init")
+		st.AddLocal("validationObject", new(validity))
+		_, e := st.GetGlobal("policyPr")
+		if e != nil {
+			return e
+		}
+		return nil
+	})
+	g.AddHandler("emit", "AEvent", func(st StorageData) error {
+		log.Println("init A")
+		st.AddLocal("validationObject", new(validity))
+		st.AddLocal("error", &Error{Result: false})
+		return nil
+	})
+	g.AddHandler("emit", "BEvent", func(st StorageData) error {
+		log.Println("init B")
+		st.AddLocal("error", &Error{Result: false})
+		st.AddLocal("validationObject", new(validity))
+		return nil
+	})
+	g.AddHandler("emit", "CEvent", func(st StorageData) error {
+		log.Println("init C")
+		return nil
+	})
+	flow, err := g.Build()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = flow.RunAt("emit", "BEvent")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	exps := []string{
+		"init pre",
+		"init pre-B",
+		"init B",
+		"init A",
+		"init post",
+	}
+	if len(exps) != len(log.log) {
+		t.Fatalf("exp n message: %v,got: %v", len(exps), len(log.log))
+	}
+	for i, exp := range exps {
+		if log.log[i] != exp {
+			t.Fatalf("exp: %v,got: %v", exp[i], log.log[i])
+		}
+	}
+}
