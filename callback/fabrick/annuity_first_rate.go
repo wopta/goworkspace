@@ -16,6 +16,7 @@ import (
 	plc "github.com/wopta/goworkspace/policy"
 	prd "github.com/wopta/goworkspace/product"
 	tr "github.com/wopta/goworkspace/transaction"
+	"github.com/wopta/goworkspace/transaction/consultancy"
 )
 
 /*
@@ -164,6 +165,10 @@ func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod string) e
 		mail.SendMailContract(policy, nil, fromAddress, toAddress, ccAddress, flowName)
 
 		defer callback_out.Execute(networkNode, policy, callback_out.Paid)
+	}
+
+	if err := consultancy.GenerateInvoice(policy, transaction); err != nil {
+		log.Printf("error handling consultancy: %s", err.Error())
 	}
 
 	firestoreBatch := map[string]map[string]interface{}{

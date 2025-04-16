@@ -18,6 +18,7 @@ import (
 	plc "github.com/wopta/goworkspace/policy"
 	prd "github.com/wopta/goworkspace/product"
 	trn "github.com/wopta/goworkspace/transaction"
+	"github.com/wopta/goworkspace/transaction/consultancy"
 )
 
 type ManualPaymentPayload struct {
@@ -163,6 +164,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	trn.CreateNetworkTransactions(&policy, &transaction, networkNode, mgaProduct)
 
+	isFirstTransactionAnnuity := lib.IsEqual(policy.StartDate.AddDate(policy.Annuity, 0, 0), transaction.EffectiveDate)
 	// Update policy if needed
 	if !policy.IsPay && policy.Annuity == 0 {
 		policy.SanitizePaymentData()
@@ -181,6 +183,12 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		}
 
 		// Update Policy as paid
+		if isFirstTransactionAnnuity {
+			if err := consultancy.GenerateInvoice(policy, transaction); err != nil {
+				log.Printf("error handling consultancy: %s", err.Error())
+			}
+		}
+
 		err = plc.Pay(&policy, "")
 		if err != nil {
 			log.Printf("ERROR policy pay: %s", err.Error())
@@ -214,13 +222,19 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 			ccAddress.String(),
 		)
 		mail.SendMailContract(policy, nil, fromAddress, toAddress, ccAddress, flowName)
-	} else if !policy.IsPay && policy.Annuity > 0 && lib.IsEqual(policy.StartDate.AddDate(policy.Annuity, 0, 0), transaction.EffectiveDate) {
+	} else if !policy.IsPay && policy.Annuity > 0 && isFirstTransactionAnnuity {
 		policy.SanitizePaymentData()
 		// Update Policy as paid and renewed
 		policy.IsPay = true
 		policy.Status = models.PolicyStatusRenewed
 		policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusPay, policy.Status)
 		policy.Updated = time.Now().UTC()
+
+		if isFirstTransactionAnnuity {
+			if err := consultancy.GenerateInvoice(policy, transaction); err != nil {
+				log.Printf("error handling consultancy: %s", err.Error())
+			}
+		}
 
 		err = lib.SetFirestoreErr(lib.PolicyCollection, policy.Uid, policy)
 		if err != nil {

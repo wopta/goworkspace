@@ -1,14 +1,14 @@
 package accounting
 
 type Invoice interface {
-	Create(isPay bool, isProforma bool) string
-
-	Save(url string, path string) error
+	create(isPay bool, isProforma bool) (string, error)
+	save(url string, path string) error
 }
 
-func DoInvicePaid(inv Invoice, path string) {
-
-	url := inv.Create(true, false)
-	inv.Save(url, path)
-
+func DoInvoicePaid(inv Invoice, path string) error {
+	url, err := inv.create(true, false)
+	if err != nil {
+		return err
+	}
+	return inv.save(url, path)
 }

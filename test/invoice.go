@@ -35,7 +35,7 @@ func createInvoice(w http.ResponseWriter, r *http.Request) (string, interface{},
 			Date:      time.Now()}}}
 
 	//"inv.CreateInvoice(false, true)
-	accounting.DoInvicePaid(inv, "test/test.pdf")
+	accounting.DoInvoicePaid(inv, "test/test.pdf")
 
 	return string(""), nil, nil
 }
