@@ -4,18 +4,18 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
-	"io"
-	"log"
-	"net/http"
-	"os"
-	"strconv"
-
 	fattureincloudapi "github.com/fattureincloud/fattureincloud-go-sdk/v2/api"
 	fattureincloud "github.com/fattureincloud/fattureincloud-go-sdk/v2/model"
 	oauth "github.com/fattureincloud/fattureincloud-go-sdk/v2/oauth2"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"io"
+	"log"
+	"net/http"
+	"os"
+	"strconv"
 )
 
 const (
@@ -26,9 +26,11 @@ var (
 	token = "Bearer " + os.Getenv("FATTURE_INCLOUD_KEY")
 )
 
-func (invoiceData InvoiceInc) Create(isPay bool, isProforma bool) string {
-	log.SetPrefix("CreateInvoice")
-	companyId := getCompanyId()
+func (invoiceData InvoiceInc) create(isPay bool, isProforma bool) (string, error) {
+	companyId, err := getCompanyId()
+	if err != nil {
+		return "", err
+	}
 	var (
 		fcItems     []fattureincloud.IssuedDocumentItemsListItem
 		status      fattureincloud.IssuedDocumentStatus
@@ -48,7 +50,9 @@ func (invoiceData InvoiceInc) Create(isPay bool, isProforma bool) string {
 		status = fattureincloud.IssuedDocumentStatuses.NOT_PAID
 	}
 	//set your company id
-
+	if len(invoiceData.Items) == 0 {
+		return "", errors.New("Error No invoice items founded")
+	}
 	for _, item := range invoiceData.Items {
 		fcItems = append(fcItems, *fattureincloud.NewIssuedDocumentItemsListItem().
 			//SetProductId(4).
@@ -99,9 +103,10 @@ func (invoiceData InvoiceInc) Create(isPay bool, isProforma bool) string {
 	createIssuedDocumentRequest := *fattureincloud.NewCreateIssuedDocumentRequest().SetData(invoice)
 
 	uri := baseurlInc + "c/" + strconv.FormatInt(int64(companyId), 10) + "/issued_documents"
-	bodyreq, e := createIssuedDocumentRequest.MarshalJSON()
-	log.Println(e)
-	log.Println(string(bodyreq))
+	bodyreq, err := createIssuedDocumentRequest.MarshalJSON()
+	if err != nil {
+		return "", err
+	}
 	req, _ := http.NewRequest(http.MethodPost, uri, bytes.NewBuffer(bodyreq))
 	req.Header.Add("Authorization", token)
 	req.Header.Add("Content-Type", "application/json")
@@ -109,22 +114,21 @@ func (invoiceData InvoiceInc) Create(isPay bool, isProforma bool) string {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Error on response.\n[ERROR] -", err)
+		return "", fmt.Errorf("Error on response %v ", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Println("Error while reading the response bytes:", err)
+		return "", fmt.Errorf("Error while reading the response bytes: %v", err)
 	}
-	log.Println(string([]byte(body)))
 	var invresp InvoiceResponse
 	err = json.Unmarshal([]byte(body), &invresp)
 	if err != nil {
-		panic(err)
+		return "", fmt.Errorf("Error unmarshalling: %v", err)
 	}
 
-	return invresp.Data.URL
+	return invresp.Data.URL, nil
 }
 
 func getClient() (*fattureincloudapi.APIClient, context.Context, int32) {
@@ -152,7 +156,7 @@ func getClient() (*fattureincloudapi.APIClient, context.Context, int32) {
 	log.Println("firstCompanyId: ", firstCompanyId)
 	return fattureincloudapi.NewAPIClient(configuration), auth1, firstCompanyId
 }
-func getCompanyId() int32 {
+func getCompanyId() (int32, error) {
 	var (
 		listCompany CompanyResponseData
 	)
@@ -164,24 +168,27 @@ func getCompanyId() int32 {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Error on response.\n[ERROR] -", err)
+		return 0, fmt.Errorf("Error on response %v", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Println("Error while reading the response bytes:", err)
+		return 0, fmt.Errorf("Error while reading the response bytes %v", err)
 	}
 	log.Println(string([]byte(body)))
 
 	e := json.Unmarshal(body, &listCompany)
-	log.Println(e)
-
+	if e != nil {
+		return 0, e
+	}
+	if len(listCompany.Data.Companies) == 0 {
+		return 0, errors.New("Error no companies founded")
+	}
 	companyId := listCompany.Data.Companies[0].ID
-	log.Println("companyId:", companyId)
-	return int32(companyId)
+	return int32(companyId), nil
 }
-func (invoiceData InvoiceInc) Save(url string, path string) error {
+func (invoiceData InvoiceInc) save(url string, path string) error {
 	out, e := HttpFileToByte(url)
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), path, out.Bytes())
 	return e
@@ -377,7 +384,7 @@ func MapPolicyInvoiceInc(policy models.Policy, tr models.Transaction, desc strin
 		Name:       policy.Contractor.Name + " " + policy.Contractor.Surname,
 		VatNumber:  policy.Contractor.VatCode,
 		TaxCode:    policy.Contractor.FiscalCode,
-		Address:    policy.Contractor.Address,
+		Address:    policy.Contractor.Residence.StreetName + " " + policy.Contractor.Residence.StreetNumber,
 		PostalCode: policy.Contractor.PostalCode,
 		City:       policy.Contractor.City,
 		CityCode:   policy.Contractor.CityCode,
