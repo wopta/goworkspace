@@ -13,7 +13,7 @@ require (
 	github.com/wopta/goworkspace/network v1.0.103
 	github.com/wopta/goworkspace/policy v1.0.186
 	github.com/wopta/goworkspace/product v1.1.35
-	github.com/wopta/goworkspace/transaction v1.0.177
+	github.com/wopta/goworkspace/transaction v1.0.178
 )
 
 require (
