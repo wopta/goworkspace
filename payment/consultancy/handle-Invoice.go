@@ -2,7 +2,6 @@ package consultancy
 
 import (
 	"fmt"
-	"log"
 	"slices"
 
 	"github.com/wopta/goworkspace/accounting"

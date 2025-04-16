@@ -16,7 +16,7 @@ import (
 	plcRenew "github.com/wopta/goworkspace/policy/renew"
 	prd "github.com/wopta/goworkspace/product"
 	tr "github.com/wopta/goworkspace/transaction"
-	"github.com/wopta/goworkspace/transaction/consultancy"
+	"github.com/wopta/goworkspace/payment/consultancy"
 	trxRenew "github.com/wopta/goworkspace/transaction/renew"
 )
 

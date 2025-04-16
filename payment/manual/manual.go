@@ -15,10 +15,10 @@ import (
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/payment/common"
+	"github.com/wopta/goworkspace/payment/consultancy"
 	plc "github.com/wopta/goworkspace/policy"
 	prd "github.com/wopta/goworkspace/product"
 	trn "github.com/wopta/goworkspace/transaction"
-	"github.com/wopta/goworkspace/transaction/consultancy"
 )
 
 type ManualPaymentPayload struct {
