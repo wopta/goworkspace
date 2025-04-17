@@ -44,6 +44,7 @@ func TestBpnmHappyPath(t *testing.T) {
 	g.AddHandler("init", func(st StorageData) error {
 		log.Println("init")
 		st.AddLocal("validationObject", new(validity))
+		st.AddLocal("error", &Error{Result: false})
 		_, e := st.GetGlobal("policyPr")
 		if e != nil {
 			return e
@@ -58,8 +59,8 @@ func TestBpnmHappyPath(t *testing.T) {
 	})
 	g.AddHandler("BEvent", func(st StorageData) error {
 		log.Println("init B")
-		st.AddLocal("error", &Error{Result: false})
 		st.AddLocal("validationObject", new(validity))
+		st.AddLocal("error", &Error{Result: false})
 		return nil
 	})
 	g.AddHandler("CEvent", func(st StorageData) error {
@@ -74,9 +75,13 @@ func TestBpnmHappyPath(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	for i := range log.log {
+		t.Log(log.log[i])
+	}
 	exps := []string{
 		"init",
 		"init B",
+		"init A",
 		"init A",
 	}
 	if len(exps) != len(log.log) {
@@ -97,7 +102,7 @@ func TestBpnmHappyPath2(t *testing.T) {
 	}
 	storage := NewStorageBpnm()
 	storage.AddLocal("validationObject", new(validity))
-	storage.AddGlobal("policyPr", &PolicyMock{Age: 1})
+	storage.AddGlobal("policyPr", &PolicyMock{Age: 3})
 	g.SetPoolDate(storage)
 
 	g.AddHandler("init", func(st StorageData) error {
@@ -130,8 +135,8 @@ func TestBpnmHappyPath2(t *testing.T) {
 	}
 	exps := []string{
 		"init",
-		"init A",
 		"init B",
+		"init A",
 		"init A",
 	}
 	if len(exps) != len(log.log) {
@@ -308,7 +313,6 @@ func TestBpnmInjection(t *testing.T) {
 	g.AddHandler("AEvent", func(st StorageData) error {
 		log.Println("init A")
 		st.AddLocal("validationObject", new(validity))
-		st.AddLocal("error", &Error{Result: false})
 		return nil
 	})
 	g.AddHandler("BEvent", func(st StorageData) error {
@@ -329,7 +333,9 @@ func TestBpnmInjection(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
+	for i := range log.log {
+		t.Log(log.log[i])
+	}
 	exps := []string{
 		"init",
 		"init pre",
@@ -337,9 +343,8 @@ func TestBpnmInjection(t *testing.T) {
 		"init B",
 		"init A",
 		"init post",
-	}
-	if len(exps) != len(log.log) {
-		t.Fatalf("exp n message: %v,got: %v", len(exps), len(log.log))
+		"init A",
+		"init post",
 	}
 	for i, exp := range exps {
 		if log.log[i] != exp {

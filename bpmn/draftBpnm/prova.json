@@ -27,7 +27,8 @@
 						"gateways": [
 							{
 								"nextActivities": [
-									"BEvent"
+									"BEvent",
+									"AEvent"
 								],
 								"decision": "policyPr.age==3"
 							},
