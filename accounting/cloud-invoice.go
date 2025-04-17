@@ -83,6 +83,8 @@ func (invoiceData InvoiceInc) create(isPay bool, isProforma bool) (string, error
 		SetCurrency(*fattureincloud.NewCurrency().SetId("EUR")).
 		SetLanguage(*fattureincloud.NewLanguage().SetCode("it").SetName("italiano")).
 		SetItemsList(fcItems).
+		SetEInvoice(true).
+		SetEiData(*fattureincloud.NewIssuedDocumentEiData().SetPaymentMethod(invoiceData.PaymentMethod)).
 		SetPaymentsList([]fattureincloud.IssuedDocumentPaymentsListItem{
 			*fattureincloud.NewIssuedDocumentPaymentsListItem().
 				SetAmount(invoiceData.Amount).
@@ -355,6 +357,13 @@ type Data struct {
 	Companies []Companies `json:"companies,omitempty"`
 }
 
+var paymentMethodMap map[string]string = map[string]string{
+	"creditcard": "MP08",
+	"transfer":   "MP05",
+	"sdd":        "MP19",
+	"remittance": "MP05",
+}
+
 func MapPolicyInvoiceInc(policy models.Policy, tr models.Transaction, desc string) InvoiceInc {
 	var amount float32
 	for _, item := range tr.Items {
@@ -363,19 +372,19 @@ func MapPolicyInvoiceInc(policy models.Policy, tr models.Transaction, desc strin
 		}
 	}
 	inv := InvoiceInc{
-
-		Name:       policy.Contractor.Name + " " + policy.Contractor.Surname,
-		VatNumber:  policy.Contractor.VatCode,
-		TaxCode:    policy.Contractor.FiscalCode,
-		Address:    policy.Contractor.Residence.StreetName + " " + policy.Contractor.Residence.StreetNumber,
-		PostalCode: policy.Contractor.Residence.PostalCode,
-		City:       policy.Contractor.Residence.City,
-		CityCode:   policy.Contractor.Residence.CityCode,
-		Country:    "Italia",
-		Mail:       policy.Contractor.Mail,
-		Amount:     amount,
-		Date:       tr.CreationDate,
-		PayDate:    tr.PayDate,
+		Name:          policy.Contractor.Name + " " + policy.Contractor.Surname,
+		VatNumber:     policy.Contractor.VatCode,
+		TaxCode:       policy.Contractor.FiscalCode,
+		Address:       policy.Contractor.Residence.StreetName + " " + policy.Contractor.Residence.StreetNumber,
+		PostalCode:    policy.Contractor.Residence.PostalCode,
+		City:          policy.Contractor.Residence.City,
+		CityCode:      policy.Contractor.Residence.CityCode,
+		Country:       "Italia",
+		Mail:          policy.Contractor.Mail,
+		Amount:        amount,
+		Date:          tr.CreationDate,
+		PayDate:       tr.PayDate,
+		PaymentMethod: paymentMethodMap[tr.PaymentMethod],
 		Items: []Items{{
 			Desc:       desc,
 			Name:       policy.Name,

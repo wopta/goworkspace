@@ -5,20 +5,21 @@ import (
 )
 
 type InvoiceInc struct {
-	Name       string
-	Desc       string
-	VatNumber  string
-	TaxCode    string
-	Address    string
-	PostalCode string
-	City       string
-	CityCode   string
-	Country    string
-	Mail       string
-	Amount     float32
-	Date       time.Time
-	PayDate    time.Time
-	Items      []Items
+	Name          string
+	Desc          string
+	VatNumber     string
+	TaxCode       string
+	Address       string
+	PostalCode    string
+	City          string
+	CityCode      string
+	Country       string
+	Mail          string
+	Amount        float32
+	Date          time.Time
+	PayDate       time.Time
+	Items         []Items
+	PaymentMethod string
 }
 type Items struct {
 	Name       string
