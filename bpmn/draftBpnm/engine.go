@@ -11,33 +11,39 @@ import (
 )
 
 func (f *FlowBpnm) Run(processName string) error {
-	return f.RunAt(processName, "init")
+	process := f.Process[processName]
+	if process == nil {
+		return fmt.Errorf("Process '%v' not founded", processName)
+	}
+	return f.RunAt(processName, process.DefaultStart)
 }
-
 func (f *FlowBpnm) RunAt(processName, activityName string) error {
 	log.SetPrefix("Bpnm")
 	defer log.SetPrefix("")
 	log.Println("Run ", processName)
-	for _, process := range f.Process {
-		if process.Name == processName {
-			if e := checkValidityGlobalStorage(process.storageBpnm, process.RequiredGlobalData); e != nil {
-				return e
-			}
-		}
-
-		if e := process.Run(activityName); e != nil { //TODO: how to check if there is an infinite loop
-			return e
-		}
-		log.Println("Stop ", processName)
-		return nil
+	process := f.Process[processName]
+	if process == nil {
+		return fmt.Errorf("Process '%v' not founded", processName)
 	}
+	if e := checkValidityGlobalStorage(process.storageBpnm, process.RequiredGlobalData); e != nil {
+		return e
+	}
+
+	if e := process.run(activityName); e != nil { //TODO: how to check if there is an infinite loop
+		return e
+	}
+	log.Println("Stop ", processName)
+	return nil
 	return fmt.Errorf("Process '%v' with activity '%v' not founded", processName, activityName)
 }
 
-func (f *ProcessBpnm) Run(nameActivity string) error {
+func (f *ProcessBpnm) run(nameActivity string) error {
 	f.activeActivity = f.Activities[nameActivity]
 	if f.storageBpnm == nil {
 		return errors.New("miss storage")
+	}
+	if f.activeActivity == nil {
+		return fmt.Errorf("Process '%v' has no activity '%v'", f.Name, nameActivity)
 	}
 	for {
 		if f.activeActivity.handler == nil {
@@ -46,7 +52,7 @@ func (f *ProcessBpnm) Run(nameActivity string) error {
 
 		if pre := f.activeActivity.PreActivity; pre != nil {
 			pre.storageBpnm.Merge(f.storageBpnm)
-			if e := pre.Run("init"); e != nil {
+			if e := pre.run(pre.DefaultStart); e != nil {
 				return e
 			}
 		}
@@ -61,7 +67,7 @@ func (f *ProcessBpnm) Run(nameActivity string) error {
 
 		if post := f.activeActivity.PostActivity; post != nil {
 			post.storageBpnm.Merge(f.storageBpnm)
-			if e := post.Run("init"); e != nil {
+			if e := post.run(post.DefaultStart); e != nil {
 				return e
 			}
 		}

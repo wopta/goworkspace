@@ -13,10 +13,11 @@
 				"inWhatActivityBeInjected": "AEvent",
 				"order": "Post"
 			},
+			"defaultStart": "initPost",
 			"description": "",
 			"activities": [
 				{
-					"name": "init",
+					"name": "initPost",
 					"branch": {
 						"inputData": [],
 						"outputData": [
@@ -43,10 +44,11 @@
 					"type": "policy"
 				}
 			],
+			"defaultStart": "initPre",
 			"description": "",
 			"activities": [
 				{
-					"name": "init",
+					"name": "initPre",
 					"branch": {
 						"inputData": [
 							{

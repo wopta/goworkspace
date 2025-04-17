@@ -22,12 +22,14 @@ type TypeData struct {
 	Name string
 	Type string
 }
+
 type ProcessBuilder struct {
 	GlobalDataRequired []TypeData        `json:"globalData"`
 	Order              Order             `json:"order"`
 	Description        string            `json:"description"`
 	Name               string            `json:"name"`
 	Activities         []ActivityBuilder `json:"activities"`
+	DefaultStart       string            `json:"defaultStart"`
 }
 
 type ActivityBuilder struct {
@@ -112,6 +114,7 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 		process.Name = p.Name
 		process.RequiredGlobalData = p.GlobalDataRequired
 		builtActivities, err := b.BuildActivity(p.Activities, p.Name)
+		process.DefaultStart = p.DefaultStart
 		if err != nil {
 			return nil, err
 		}
@@ -136,14 +139,14 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 	return flow, nil
 }
 
-func (b *BpnmBuilder) AddHandler(nameProcess, nameHandler string, handler ActivityHandler) error {
+func (b *BpnmBuilder) AddHandler(nameHandler string, handler ActivityHandler) error {
 	if b.handlers == nil {
 		b.handlers = make(map[string]ActivityHandler)
 	}
-	if _, ok := b.handlers[nameProcess+nameHandler]; ok {
+	if _, ok := b.handlers[nameHandler]; ok {
 		return errors.New("Handler's been already defined")
 	}
-	b.handlers[nameProcess+nameHandler] = handler
+	b.handlers[nameHandler] = handler
 	return nil
 }
 
@@ -158,7 +161,7 @@ func (a *BpnmBuilder) BuildActivity(activities []ActivityBuilder, processName st
 			return nil, fmt.Errorf("Double event with same name %v", activity.Name)
 		}
 		newActivity := new(Activity)
-		handler, ok := a.handlers[processName+activity.Name]
+		handler, ok := a.handlers[activity.Name]
 		if !ok {
 			return nil, fmt.Errorf("No handler registered for the activity: %v", activity.Name)
 		}
