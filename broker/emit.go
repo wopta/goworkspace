@@ -19,6 +19,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/payment"
+	"github.com/wopta/goworkspace/payment/consultancy"
 	plc "github.com/wopta/goworkspace/policy"
 	"github.com/wopta/goworkspace/question"
 	"github.com/wopta/goworkspace/transaction"
@@ -224,12 +225,12 @@ func brokerUpdatePolicy(policy *models.Policy, request BrokerBaseRequest) {
 
 	if policy.TaxAmount == 0 {
 		log.Println("[brokerUpdatePolicy] calculate tax amount")
-		policy.TaxAmount = lib.RoundFloat(policy.PriceGross - policy.PriceNett, 2)
+		policy.TaxAmount = lib.RoundFloat(policy.PriceGross-policy.PriceNett, 2)
 	}
 
 	if policy.TaxAmountMonthly == 0 {
 		log.Println("[brokerUpdatePolicy] calculate tax amount monthly")
-		policy.TaxAmountMonthly = lib.RoundFloat(policy.PriceGrossMonthly - policy.PriceNettMonthly, 2)
+		policy.TaxAmountMonthly = lib.RoundFloat(policy.PriceGrossMonthly-policy.PriceNettMonthly, 2)
 	}
 
 	calculatePaymentComponents(policy)
@@ -329,6 +330,9 @@ func createPolicyTransactions(policy *models.Policy) (string, error) {
 			if err != nil {
 				log.Printf("error creating network transactions: %s", err.Error())
 				return "", err
+			}
+			if err := consultancy.GenerateInvoice(*policy, tr); err != nil {
+				log.Printf("error handling consultancy: %s", err.Error())
 			}
 		}
 	}
