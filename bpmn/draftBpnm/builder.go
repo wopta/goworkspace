@@ -114,7 +114,6 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 		process.Name = p.Name
 		process.RequiredGlobalData = p.GlobalDataRequired
 		builtActivities, err := b.BuildActivity(p.Activities, p.Name)
-		process.DefaultStart = p.DefaultStart
 		if err != nil {
 			return nil, err
 		}
@@ -126,6 +125,10 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 			return nil, fmt.Errorf("Process %v's been already defined", process.Name)
 		}
 
+		if _, ok := builtActivities[p.DefaultStart]; !ok {
+			return nil, fmt.Errorf("Process '%v' has no activity named '%v' that can be used as default start", process.Name, p.DefaultStart)
+		}
+		process.DefaultStart = p.DefaultStart
 		flow.Process[process.Name] = process
 	}
 	//Return error if some processes isnt injected, when a process is injected it's removed from b.toInject
