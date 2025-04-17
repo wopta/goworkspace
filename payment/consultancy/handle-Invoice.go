@@ -22,7 +22,10 @@ func GenerateInvoice(p models.Policy, t models.Transaction) error {
 
 	if lib.GetBoolEnv("GENERATE_INVOICE") {
 		invoice := accounting.MapPolicyInvoiceInc(p, t, "Contributo per intermediazione")
-		if err := accounting.DoInvoicePaid(invoice, ""); err != nil {
+		documentName := fmt.Sprintf("assets/users/%s/polizza_%s_%d_invoice.pdf",
+			p.Contractor.Uid, p.CodeCompany, p.StartDate.AddDate(p.Annuity, 0, 0).Year())
+		_, err := accounting.DoInvoicePaid(invoice, documentName)
+		if err != nil {
 			return err
 		}
 	}

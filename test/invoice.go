@@ -25,14 +25,14 @@ func createInvoice(w http.ResponseWriter, r *http.Request) (string, interface{},
 		Date:       time.Now(),
 		PayDate:    time.Now(),
 		Items: []accounting.Items{{
-			Desc:      "Contributo per intermediazione",
-			Name:      "",
-			Code:      "Vita",
-			Qty:       1,
-			ProductId: 0,
-			NetPrice:  0,
-			Category:  "Vita",
-			Date:      time.Now()}}}
+			Desc:       "Contributo per intermediazione",
+			Name:       "",
+			Code:       "Vita",
+			Qty:        1,
+			ProductId:  0,
+			GrossPrice: 0,
+			Category:   "Vita",
+			Date:       time.Now()}}}
 
 	//"inv.CreateInvoice(false, true)
 	accounting.DoInvoicePaid(inv, "test/test.pdf")

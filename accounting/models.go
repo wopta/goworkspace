@@ -21,12 +21,12 @@ type InvoiceInc struct {
 	Items      []Items
 }
 type Items struct {
-	Name      string
-	Desc      string
-	Code      string
-	ProductId int32
-	Qty       int32
-	NetPrice  float32
-	Category  string
-	Date      time.Time
+	Name       string
+	Desc       string
+	Code       string
+	ProductId  int32
+	Qty        int32
+	GrossPrice float32
+	Category   string
+	Date       time.Time
 }
