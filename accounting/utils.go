@@ -10,9 +10,12 @@ func HttpFileToByte( url string) (buffer bytes.Buffer, err error) {
 	var buf bytes.Buffer
 	// Get the data
 	resp, err := http.Get(url)
+	if err != nil {
+		return buf, err
+	}
 	
 	if err := resp.Write(&buf); err != nil {
-		panic(err)
+		return buf, err
 	}
 	defer resp.Body.Close()
 	// Writer the body to file
