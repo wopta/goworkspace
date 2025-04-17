@@ -19,8 +19,6 @@ func (f *FlowBpnm) Run(processName string) error {
 }
 
 func (f *FlowBpnm) RunAt(processName, activityName string) error {
-	log.SetPrefix("Bpnm")
-	defer log.SetPrefix("")
 	log.Println("Run ", processName)
 	process := f.Process[processName]
 	if process == nil {
@@ -50,6 +48,7 @@ func (f *ProcessBpnm) run(nameActivity string) error {
 			return fmt.Errorf("Process '%v' has no handler defined for activity '%v'", f.Name, f.activeActivity.Name)
 		}
 
+		log.Printf("Run process '%v', activity '%v'", f.Name, f.activeActivity.Name)
 		if pre := f.activeActivity.PreActivity; pre != nil {
 			pre.storageBpnm.Merge(f.storageBpnm)
 			if e := pre.run(pre.DefaultStart); e != nil {
@@ -133,8 +132,8 @@ func checkAndCleanLocalStorage(st StorageData, req []TypeData) error {
 		if !ok {
 			return fmt.Errorf("Resource required is not found '%v'", dR.Name)
 		}
-		if d.(DataBpnm).Type() != dR.Type {
-			return fmt.Errorf("Resource '%v' has a difference type, exp: '%v', got: '%v'", dR.Name, dR.Type, d.(DataBpnm).Type())
+		if d.(DataBpnm).GetType() != dR.Type {
+			return fmt.Errorf("Resource '%v' has a difference type, exp: '%v', got: '%v'", dR.Name, dR.Type, d.(DataBpnm).GetType())
 		}
 		if e := st.AddLocal(dR.Name, d.(DataBpnm)); e != nil {
 			return e
@@ -149,8 +148,8 @@ func checkValidityGlobalStorage(st StorageData, req []TypeData) error {
 		if err != nil {
 			return fmt.Errorf("Required global resource is not found '%v'", d.Name)
 		}
-		if v.Type() != d.Type {
-			return fmt.Errorf("Global sesource '%v' has a difference type, exp: '%v', got: '%v'", d.Name, d.Type, v.Type())
+		if v.GetType() != d.Type {
+			return fmt.Errorf("Global sesource '%v' has a difference type, exp: '%v', got: '%v'", d.Name, d.Type, v.GetType())
 		}
 	}
 	return nil

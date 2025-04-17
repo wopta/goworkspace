@@ -9,7 +9,7 @@ type validity struct {
 	Step   int
 }
 
-func (v *validity) Type() string {
+func (v *validity) GetType() string {
 	return "validity"
 }
 
@@ -18,7 +18,7 @@ type PolicyMock struct {
 	Name string
 }
 
-func (v *PolicyMock) Type() string {
+func (v *PolicyMock) GetType() string {
 	return "policy"
 }
 

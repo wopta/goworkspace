@@ -2,7 +2,7 @@ package draftbpnm
 
 type ActivityHandler func(StorageData) error
 type DataBpnm interface {
-	Type() string
+	GetType() string
 }
 
 type Error struct {
@@ -11,7 +11,7 @@ type Error struct {
 	Result      bool
 }
 
-func (e *Error) Type() string {
+func (e *Error) GetType() string {
 	return "error"
 }
 
