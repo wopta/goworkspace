@@ -18,6 +18,7 @@ type StorageData interface {
 	// move/overwrite all data from source -> base
 	Merge(StorageData) error
 }
+
 type StorageBpnm struct {
 	local  map[string]any
 	global map[string]any
@@ -29,15 +30,19 @@ func NewStorageBpnm() *StorageBpnm {
 	res.global = make(map[string]any)
 	return res
 }
+
 func (p *StorageBpnm) ResetLocal() {
 	p.local = make(map[string]any)
 }
+
 func (p *StorageBpnm) ResetGlobal() {
 	p.global = make(map[string]any)
 }
+
 func (p *StorageBpnm) GetAllLocal() map[string]any {
 	return p.local
 }
+
 func (p *StorageBpnm) GetAllGlobal() map[string]any {
 	return p.global
 }
@@ -84,7 +89,7 @@ func (p *StorageBpnm) GetLocal(name string) (DataBpnm, error) {
 	return nil, fmt.Errorf("no data founded %v", name)
 }
 
-// move/overwrite all data from source -> base
+// copy(and overwrite) all data from source -> base
 func (base *StorageBpnm) Merge(source StorageData) error {
 	if source == nil {
 		return nil
