@@ -93,3 +93,17 @@ func (base *StorageBpnm) Merge(source StorageData) error {
 	base.local = mergeMaps(base.local, source.GetAllLocal())
 	return nil
 }
+
+func GetData[t DataBpnm](name string, storage StorageData) (t, error) {
+	data, err := storage.GetGlobal("policy")
+	var result t
+	if err != nil {
+		return *new(t), err
+	}
+
+	result = data.(t)
+	if data.Type() == result.Type() {
+		return *new(t), fmt.Errorf("Data '%v' with type %v founded has a different type than '%v'", name, result.Type(), data.Type())
+	}
+	return result, nil
+}
