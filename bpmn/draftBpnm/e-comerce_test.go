@@ -69,5 +69,58 @@ func TestEmit(t *testing.T) {
 			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
 		}
 	}
+}
+func TestLead(t *testing.T) {
+	log := mockLog{}
+	flow, e := getBuilder(&log)
+	if e != nil {
+		t.Fatal(e)
+	}
+	flow.Run("lead")
+	for _, m := range log.log {
+		t.Log(m)
+	}
 
+	exps := []string{
+		"setLeadData",
+		"sendLeadMail",
+		"emitData",
+		"sign",
+		"pay",
+		"sendEmitProposalMail",
+		"sendMailSign",
+	}
+	if len(exps) != len(log.log) {
+		t.Fatalf("exp n message: %v,got: %v", len(exps), len(log.log))
+	}
+	for i, exp := range exps {
+		if log.log[i] != exp {
+			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
+		}
+	}
+}
+func TestPay(t *testing.T) {
+	log := mockLog{}
+	flow, e := getBuilder(&log)
+	if e != nil {
+		t.Fatal(e)
+	}
+	flow.Run("pay")
+	for _, m := range log.log {
+		t.Log(m)
+	}
+
+	exps := []string{
+		"updatePolicy",
+		"payTransaction",
+		"sign",
+	}
+	if len(exps) != len(log.log) {
+		t.Fatalf("exp n message: %v,got: %v", len(exps), len(log.log))
+	}
+	for i, exp := range exps {
+		if log.log[i] != exp {
+			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
+		}
+	}
 }
