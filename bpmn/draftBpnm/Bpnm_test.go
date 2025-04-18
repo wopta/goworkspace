@@ -1,6 +1,7 @@
 package draftbpnm
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -44,6 +45,9 @@ func TestBpnmHappyPath(t *testing.T) {
 	g.AddHandler("init", func(st StorageData) error {
 		log.Println("init")
 		st.AddLocal("validationObject", new(validity))
+		st.AddLocal("garbage1", new(validity))
+		st.AddLocal("garbage2", new(validity))
+		st.AddLocal("garbage3", new(validity))
 		st.AddLocal("error", &Error{Result: false})
 		_, e := st.GetGlobal("policyPr")
 		if e != nil {
@@ -105,6 +109,9 @@ func TestBpnmHappyPath2(t *testing.T) {
 	g.AddHandler("init", func(st StorageData) error {
 		log.Println("init")
 		st.AddLocal("validationObject", &validity{Result: true, Step: 3})
+		st.AddLocal("garbage1", new(validity))
+		st.AddLocal("garbage2", new(validity))
+		st.AddLocal("garbage3", new(validity))
 		return nil
 	})
 	g.AddHandler("AEvent", func(st StorageData) error {
@@ -203,6 +210,9 @@ func TestBpnmMissingInput(t *testing.T) {
 	g.AddHandler("init", func(st StorageData) error {
 		log.Println("init")
 		st.AddLocal("validationObject", new(validity))
+		st.AddLocal("garbage1", new(validity))
+		st.AddLocal("garbage2", new(validity))
+		st.AddLocal("garbage3", new(validity))
 		return nil
 	})
 	g.AddHandler("AEvent", func(st StorageData) error {
@@ -246,6 +256,9 @@ func TestBpnmMissingHandler(t *testing.T) {
 	g.AddHandler("init", func(st StorageData) error {
 		log.Println("init")
 		st.AddLocal("validationObject", new(validity))
+		st.AddLocal("garbage1", new(validity))
+		st.AddLocal("garbage2", new(validity))
+		st.AddLocal("garbage3", new(validity))
 		return nil
 	})
 	g.AddHandler("BEvent", func(st StorageData) error {
@@ -301,6 +314,9 @@ func TestBpnmInjection(t *testing.T) {
 	g.AddHandler("init", func(st StorageData) error {
 		log.Println("init")
 		st.AddLocal("validationObject", new(validity))
+		st.AddLocal("garbage1", new(validity))
+		st.AddLocal("garbage2", new(validity))
+		st.AddLocal("garbage3", new(validity))
 		_, e := st.GetGlobal("policyPr")
 		if e != nil {
 			return e
@@ -387,6 +403,9 @@ func TestRunFromSpecificActivity(t *testing.T) {
 	g.AddHandler("init", func(st StorageData) error {
 		log.Println("init")
 		st.AddLocal("validationObject", new(validity))
+		st.AddLocal("garbage1", new(validity))
+		st.AddLocal("garbage2", new(validity))
+		st.AddLocal("garbage3", new(validity))
 		_, e := st.GetGlobal("policyPr")
 		if e != nil {
 			return e
@@ -433,4 +452,80 @@ func TestRunFromSpecificActivity(t *testing.T) {
 			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
 		}
 	}
+}
+func TestBpnmStoreClean(t *testing.T) {
+	g, err := NewBpnmBuilder("prova.json")
+	log := mockLog{}
+	if err != nil {
+		t.Fatal(err)
+	}
+	storage := NewStorageBpnm()
+	storage.AddLocal("validationObject", new(validity))
+	storage.AddGlobal("policyPr", &PolicyMock{Age: 2})
+	g.SetStorage(storage)
+
+	g.AddHandler("init", func(st StorageData) error {
+		log.Println("init")
+		st.AddLocal("validationObject", new(validity))
+		st.AddLocal("garbage1", new(validity))
+		st.AddLocal("garbage2", new(validity))
+		st.AddLocal("garbage3", new(validity))
+		st.AddLocal("error", &Error{Result: false})
+		_, e := st.GetGlobal("policyPr")
+		if e != nil {
+			return e
+		}
+		if len(st.GetAllLocal()) != 5 { //output of init
+			return fmt.Errorf("store hasn't been cleaned right, n resource %v", len(st.GetAllLocal()))
+		}
+		return nil
+	})
+	g.AddHandler("AEvent", func(st StorageData) error {
+		log.Println("init A")
+		st.AddLocal("error", &Error{Result: false})
+		d, e := GetData[*validity]("validationObject", st)
+		if e != nil {
+			return e
+		}
+		d.Step = 3
+		p, e := GetData[*Error]("error", st)
+		if e != nil {
+			return e
+		}
+		p.Result = true
+		return nil
+	})
+	g.AddHandler("BEvent", func(st StorageData) error {
+		log.Println("init B")
+		if len(st.GetAllLocal()) != 2 { //output of AEvent
+			return fmt.Errorf("Expected 2 resource from AEvent, got: %v", len(st.GetAllLocal()))
+		}
+		return nil
+	})
+	g.AddHandler("CEvent", func(st StorageData) error {
+		log.Println("init C")
+		return nil
+	})
+	flow, err := g.Build()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = flow.RunAt("emit", "init")
+	if err != nil {
+		t.Fatal(err)
+	}
+	exps := []string{
+		"init",
+		"init A",
+		"init B",
+	}
+	if len(exps) != len(log.log) {
+		t.Fatalf("exp n message: %v,got: %v", len(exps), len(log.log))
+	}
+	for i, exp := range exps {
+		if log.log[i] != exp {
+			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
+		}
+	}
+
 }

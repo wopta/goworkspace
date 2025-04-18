@@ -3,6 +3,7 @@ package draftbpnm
 import (
 	"errors"
 	"fmt"
+	"maps"
 )
 
 type InitializeDataType func() DataBpnm
@@ -17,11 +18,16 @@ type StorageData interface {
 	GetAllGlobal() map[string]any
 	// move/overwrite all data from source -> base
 	Merge(StorageData) error
+	// mark what local resource keep when clean is called
+	markWhatNeeded([]TypeData)
+	// delete the resource that aren't needed(aren't marked)
+	clean()
 }
 
 type StorageBpnm struct {
-	local  map[string]any
-	global map[string]any
+	local   map[string]any
+	global  map[string]any
+	touched []string
 }
 
 func NewStorageBpnm() *StorageBpnm {
@@ -37,6 +43,21 @@ func (p *StorageBpnm) ResetLocal() {
 
 func (p *StorageBpnm) ResetGlobal() {
 	p.global = make(map[string]any)
+}
+
+func (p *StorageBpnm) markWhatNeeded(toTouch []TypeData) {
+	for _, t := range toTouch {
+		p.touched = append(p.touched, t.Name)
+	}
+}
+
+func (p *StorageBpnm) clean() {
+	backup := maps.Clone(p.local)
+	p.ResetLocal()
+	for i, toSave := range p.touched {
+		p.AddLocal(p.touched[i], backup[toSave].(DataBpnm))
+	}
+	p.touched = nil
 }
 
 func (p *StorageBpnm) GetAllLocal() map[string]any {
@@ -100,8 +121,11 @@ func (base *StorageBpnm) Merge(source StorageData) error {
 }
 
 func GetData[t DataBpnm](name string, storage StorageData) (t, error) {
-	data, err := storage.GetGlobal(name)
+	data, err := storage.GetLocal(name)
 	var result t
+	if err != nil {
+		data, err = storage.GetGlobal(name)
+	}
 	if err != nil {
 		return *new(t), err
 	}

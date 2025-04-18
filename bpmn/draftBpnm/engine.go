@@ -54,7 +54,6 @@ func (p *ProcessBpnm) run(nameActivity string) error {
 			jsonMap := make(map[string]any)
 			b, _ := json.Marshal(m)
 			_ = json.Unmarshal(b, &jsonMap)
-
 			list, e := p.activeActivities[i].evaluateDecisions(p.Name, p.storageBpnm, jsonMap)
 			if e != nil {
 				return e
@@ -65,6 +64,7 @@ func (p *ProcessBpnm) run(nameActivity string) error {
 			return nil
 		}
 		p.activeActivities = nextActivities
+		p.storageBpnm.clean()
 	}
 }
 
@@ -121,6 +121,7 @@ func (act *Activity) evaluateDecisions(processName string, storage StorageData, 
 			if e := checkLocalStorage(storage, act.Branch.RequiredOutputData); e != nil {
 				return nil, fmt.Errorf("Process '%v' with activity '%v' has error: %v", processName, act.Name, e.Error())
 			}
+			storage.markWhatNeeded(act.Branch.RequiredOutputData)
 			res = append(res, ga.NextActivities...)
 			break
 		}
