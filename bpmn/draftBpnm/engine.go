@@ -47,7 +47,7 @@ func (f *ProcessBpnm) run(nameActivity string) error {
 	for {
 		var nextActivities []*Activity
 		for i := range f.activeActivities {
-			if err := f.runActivity(f.activeActivities[i]); err != nil {
+			if err := f.runActivity(f.activeActivities[i], f.storageBpnm); err != nil {
 				return err
 			}
 			//TODO: to improve
@@ -67,24 +67,23 @@ func (f *ProcessBpnm) run(nameActivity string) error {
 			return nil
 		}
 		f.activeActivities = nextActivities
-
 	}
 }
 
-func (f *ProcessBpnm) runActivity(act *Activity) error {
+func (f *ProcessBpnm) runActivity(act *Activity, storage StorageData) error {
 	if act.handler == nil {
 		return fmt.Errorf("Process '%v' has no handler defined for activity '%v'", f.Name, act.Name)
 	}
 
 	log.Printf("Run process '%v', activity '%v'", f.Name, act.Name)
 	if pre := act.PreActivity; pre != nil {
-		pre.storageBpnm.Merge(f.storageBpnm)
+		pre.storageBpnm.Merge(storage)
 		if e := pre.run(pre.DefaultStart); e != nil {
 			return e
 		}
 	}
 
-	if e := checkLocalStorage(f.storageBpnm, act.Branch.RequiredInputData); e != nil {
+	if e := checkLocalStorage(storage, act.Branch.RequiredInputData); e != nil {
 		return fmt.Errorf("Process '%v' with activity '%v' has an input error: %v", f.Name, act.Name, e.Error())
 	}
 
@@ -93,7 +92,7 @@ func (f *ProcessBpnm) runActivity(act *Activity) error {
 	}
 
 	if post := act.PostActivity; post != nil {
-		post.storageBpnm.Merge(f.storageBpnm)
+		post.storageBpnm.Merge(storage)
 		if e := post.run(post.DefaultStart); e != nil {
 			return e
 		}
