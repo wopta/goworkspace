@@ -75,9 +75,6 @@ func TestBpnmHappyPath(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for i := range log.log {
-		t.Log(log.log[i])
-	}
 	exps := []string{
 		"init",
 		"init B",
@@ -89,7 +86,7 @@ func TestBpnmHappyPath(t *testing.T) {
 	}
 	for i, exp := range exps {
 		if log.log[i] != exp {
-			t.Fatalf("exp: %v,got: %v", exp[i], log.log[i])
+			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
 		}
 	}
 
@@ -144,7 +141,7 @@ func TestBpnmHappyPath2(t *testing.T) {
 	}
 	for i, exp := range exps {
 		if log.log[i] != exp {
-			t.Fatalf("exp: %v,got: %v", exp[i], log.log[i])
+			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
 		}
 	}
 
@@ -333,9 +330,6 @@ func TestBpnmInjection(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for i := range log.log {
-		t.Log(log.log[i])
-	}
 	exps := []string{
 		"init",
 		"init pre",
@@ -348,7 +342,7 @@ func TestBpnmInjection(t *testing.T) {
 	}
 	for i, exp := range exps {
 		if log.log[i] != exp {
-			t.Fatalf("exp: %v,got: %v", exp[i], log.log[i])
+			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
 		}
 	}
 }
@@ -424,10 +418,6 @@ func TestRunFromSpecificActivity(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for _, exp := range log.log {
-		t.Logf("%v", string(exp))
-	}
-
 	exps := []string{
 		"init pre",
 		"init pre-B",
@@ -440,7 +430,7 @@ func TestRunFromSpecificActivity(t *testing.T) {
 	}
 	for i, exp := range exps {
 		if log.log[i] != exp {
-			t.Fatalf("exp: %v,got: %v", exp[i], log.log[i])
+			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
 		}
 	}
 }

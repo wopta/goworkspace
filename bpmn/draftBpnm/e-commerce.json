@@ -1,0 +1,252 @@
+{
+	"processes": [
+		{
+			"name": "emit",
+			"defaultStart": "setProposalData",
+			"globalData": [
+				{
+					"name": "policy",
+					"type": "policy"
+				},
+				{
+					"name": "network",
+					"type": "networkNode"
+				},
+				{
+					"name": "product",
+					"type": "product"
+				},
+				{
+					"name": "mgaProduct",
+					"type": "product"
+				}
+			],
+			"description": "Emit process for e-commerce",
+			"activities": [
+				{
+					"name": "setProposalData",
+					"branch": {
+						"gateways": [
+							{
+								"nextActivities": [
+									"emitData"
+								]
+							}
+						]
+					}
+				},
+				{
+					"name": "emitData",
+					"branch": {
+						"gateways": [
+							{
+								"nextActivities": [
+									"sign"
+								]
+							}
+						]
+					}
+				},
+				{
+					"name": "sign",
+					"branch": {
+						"gateways": [
+							{
+								"nextActivities": [
+									"pay"
+								]
+							}
+						]
+					}
+				},
+				{
+					"name": "pay",
+					"branch": {
+						"gateways": [
+							{
+								"nextActivities": [
+									"sendEmitProposalMail"
+								]
+							}
+						]
+					}
+				},
+				{
+					"name": "sendEmitProposalMail",
+					"branch": {
+						"gateways": [
+							{
+								"nextActivities": [
+									"sendMailSign"
+								]
+							}
+						]
+					}
+				},
+				{
+					"name": "sendMailSign"
+				}
+			]
+		},
+		{
+			"name": "lead",
+			"defaultStart": "setLeadData",
+			"globalData": [
+				{
+					"name": "policy",
+					"type": "policy"
+				},
+				{
+					"name": "network",
+					"type": "networkNode"
+				},
+				{
+					"name": "product",
+					"type": "product"
+				},
+				{
+					"name": "mgaProduct",
+					"type": "product"
+				}
+			],
+			"description": "Lead process for e-commerce",
+			"activities": [
+				{
+					"name": "setLeadData",
+					"branch": {
+						"inputData": [],
+						"outputData": [],
+						"gateways": [
+							{
+								"nextActivities": [
+									"sendLeadMail"
+								]
+							}
+						]
+					}
+				},
+				{
+					"name": "sendLeadMail",
+					"branch": {
+						"inputData": [],
+						"outputData": [],
+						"gateways": [
+							{
+								"nextActivities": [
+									"emitData"
+								]
+							}
+						]
+					}
+				},
+				{
+					"name": "emitData",
+					"branch": {
+						"inputData": [],
+						"outputData": [],
+						"gateways": [
+							{
+								"nextActivities": [
+									"sign"
+								]
+							}
+						]
+					}
+				},
+				{
+					"name": "sign",
+					"branch": {
+						"inputData": [],
+						"outputData": [],
+						"gateways": [
+							{
+								"nextActivities": [
+									"pay"
+								]
+							}
+						]
+					}
+				},
+				{
+					"name": "pay",
+					"branch": {
+						"inputData": [],
+						"outputData": [],
+						"gateways": [
+							{
+								"nextActivities": [
+									"sendEmitProposalMail"
+								]
+							}
+						]
+					}
+				},
+				{
+					"name": "sendEmitProposalMail",
+					"branch": {
+						"inputData": [],
+						"outputData": [],
+						"gateways": [
+							{
+								"nextActivities": [
+									"sendMailSign"
+								]
+							}
+						]
+					}
+				},
+				{
+					"name": "sendMailSign",
+					"branch": {
+						"inputData": [],
+						"outputData": [],
+						"gateways": []
+					}
+				}
+			]
+		},
+		{
+			"name": "pay",
+			"globalData": [],
+			"description": "Payiment process for e-commerce",
+			"defaultStart": "updatePolicy",
+			"activities": [
+				{
+					"name": "updatePolicy",
+					"branch": {
+						"inputData": [],
+						"outputData": [],
+						"gateways": [
+							{
+								"nextActivities": [
+									"payTransaction"
+								]
+							}
+						]
+					}
+				},
+				{
+					"name": "payTransaction",
+					"branch": {
+						"inputData": [],
+						"outputData": [],
+						"gateways": [
+							{
+								"nextActivities": [
+									"sign"
+								]
+							}
+						]
+					}
+				},
+				{
+					"name": "sign",
+					"branch": {
+						"inputData": [],
+						"outputData": []
+					}
+				}
+			]
+		}
+	]
+}
