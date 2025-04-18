@@ -2,27 +2,33 @@
 	"processes": [
 		{
 			"name": "emit",
-			"defaultStart": "setProposalData",
+			"defaultStart": "initEmit",
 			"globalData": [
 				{
 					"name": "policy",
 					"type": "policy"
 				},
 				{
-					"name": "network",
-					"type": "networkNode"
-				},
-				{
 					"name": "product",
-					"type": "product"
-				},
-				{
-					"name": "mgaProduct",
 					"type": "product"
 				}
 			],
-			"description": "Emit process for e-commerce",
+			"description": "Emit process",
 			"activities": [
+				{
+					"name": "initEmit",
+					"handlerless": true,
+					"branch": {
+						"gateways": [
+							{
+								"nextActivities": [
+									"setProposalData"
+								],
+								"decision": "policy.channel!=`mga`"
+							}
+						]
+					}
+				},
 				{
 					"name": "setProposalData",
 					"branch": {
@@ -90,37 +96,37 @@
 		},
 		{
 			"name": "lead",
-			"defaultStart": "setLeadData",
+			"defaultStart": "initLead",
 			"globalData": [
 				{
 					"name": "policy",
 					"type": "policy"
-				},
-				{
-					"name": "network",
-					"type": "networkNode"
-				},
-				{
-					"name": "product",
-					"type": "product"
-				},
-				{
-					"name": "mgaProduct",
-					"type": "product"
 				}
 			],
 			"description": "Lead process for e-commerce",
 			"activities": [
 				{
+					"name": "initLead",
+					"handlerless": true,
+					"branch": {
+						"gateways": [
+							{
+								"nextActivities": [
+									"setLeadData"
+								]
+							}
+						]
+					}
+				},
+				{
 					"name": "setLeadData",
 					"branch": {
-						"inputData": [],
-						"outputData": [],
 						"gateways": [
 							{
 								"nextActivities": [
 									"sendLeadMail"
-								]
+								],
+								"decision": "policy.channel!=`mga`"
 							}
 						]
 					}
@@ -128,8 +134,6 @@
 				{
 					"name": "sendLeadMail",
 					"branch": {
-						"inputData": [],
-						"outputData": [],
 						"gateways": [
 							{
 								"nextActivities": [
@@ -142,8 +146,6 @@
 				{
 					"name": "emitData",
 					"branch": {
-						"inputData": [],
-						"outputData": [],
 						"gateways": [
 							{
 								"nextActivities": [
@@ -156,8 +158,6 @@
 				{
 					"name": "sign",
 					"branch": {
-						"inputData": [],
-						"outputData": [],
 						"gateways": [
 							{
 								"nextActivities": [
@@ -170,8 +170,6 @@
 				{
 					"name": "pay",
 					"branch": {
-						"inputData": [],
-						"outputData": [],
 						"gateways": [
 							{
 								"nextActivities": [
@@ -184,8 +182,6 @@
 				{
 					"name": "sendEmitProposalMail",
 					"branch": {
-						"inputData": [],
-						"outputData": [],
 						"gateways": [
 							{
 								"nextActivities": [
@@ -196,19 +192,14 @@
 					}
 				},
 				{
-					"name": "sendMailSign",
-					"branch": {
-						"inputData": [],
-						"outputData": [],
-						"gateways": []
-					}
+					"name": "sendMailSign"
 				}
 			]
 		},
 		{
 			"name": "pay",
 			"globalData": [],
-			"description": "Payiment process for e-commerce",
+			"description": "Payiment process",
 			"defaultStart": "updatePolicy",
 			"activities": [
 				{
@@ -234,17 +225,104 @@
 							{
 								"nextActivities": [
 									"sign"
+								],
+								"decision": "policy.channel!=`mga`"
+							}
+						]
+					}
+				},
+				{
+					"name": "sign"
+				}
+			]
+		},
+		{
+			"name": "proposal",
+			"globalData": [
+				{
+					"name": "policy",
+					"type": "policy"
+				}
+			],
+			"description": "Proposal process",
+			"defaultStart": "initProposal",
+			"activities": [
+				{
+					"name": "initProposal",
+					"handlerless": true,
+					"branch": {
+						"gateways": [
+							{
+								"nextActivities": [
+									"setProposalData"
+								],
+								"decision": "policy.channel!=`e-commerce`"
+							}
+						]
+					}
+				},
+				{
+					"name": "setProposalData"
+				}
+			]
+		},
+		{
+			"name": "requestApproval",
+			"globalData": [],
+			"description": "Request approcal process",
+			"defaultStart": "initRequestApproval",
+			"activities": [
+				{
+					"name": "initRequestApproval",
+					"handlerless": true
+				}
+			]
+		},
+		{
+			"name": "sign",
+			"globalData": [],
+			"description": "Sign process",
+			"defaultStart": "fillAttachments",
+			"activities": [
+				{
+					"name": "fillAttachments",
+					"branch": {
+						"gateways": [
+							{
+								"nextActivities": [
+									"setSign"
 								]
 							}
 						]
 					}
 				},
 				{
-					"name": "sign",
+					"name": "setSign",
 					"branch": {
-						"inputData": [],
-						"outputData": []
+						"gateways": [
+							{
+								"nextActivities": [
+									"setToPay"
+								]
+							}
+						]
 					}
+				},
+				{
+					"name": "setToPay",
+					"branch": {
+						"gateways": [
+							{
+								"nextActivities": [
+									"sendMailPay"
+								],
+								"decision": "policy.channel!=`mga`"
+							}
+						]
+					}
+				},
+				{
+					"name": "sendMailPay"
 				}
 			]
 		}
