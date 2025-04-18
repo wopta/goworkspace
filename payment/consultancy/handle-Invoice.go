@@ -33,7 +33,7 @@ func GenerateInvoice(p models.Policy, t models.Transaction) error {
 	// create proforma document
 	if proformaResp, err := document.Proforma(p); err == nil {
 		proformatAtt := models.Attachment{
-			Name:      fmt.Sprintf("Nota informativa %d", p.StartDate.Year()),
+			Name:      fmt.Sprintf("Nota informativa %d", p.StartDate.AddDate(p.Annuity, 0,0).Year()),
 			FileName:  proformaResp.Filename,
 			MimeType:  "application/pdf",
 			IsPrivate: false,
