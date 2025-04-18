@@ -96,7 +96,7 @@ func addLeadHandlers(state *bpmn.State) {
 
 func setLeadBpmn(state *bpmn.State) error {
 	policy := state.Data
-	setLeadData(policy, *mgaProduct)
+	SetLeadData(policy, *mgaProduct)
 	return nil
 }
 
@@ -142,7 +142,7 @@ func setProposalBpm(state *bpmn.State) error {
 		return nil
 	}
 
-	setProposalData(policy)
+	SetProposalData(policy)
 
 	log.Printf("[setProposalData] saving proposal n. %d to firestore...", policy.ProposalNumber)
 
@@ -245,7 +245,7 @@ func addEmitHandlers(state *bpmn.State) {
 func emitData(state *bpmn.State) error {
 	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 	policy := state.Data
-	emitBase(policy, origin)
+	EmitBase(policy, origin)
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
@@ -277,13 +277,13 @@ func sendMailSign(state *bpmn.State) error {
 
 func sign(state *bpmn.State) error {
 	policy := state.Data
-	emitSign(policy, origin)
+	EmitSign(policy, origin)
 	return nil
 }
 
 func pay(state *bpmn.State) error {
 	policy := state.Data
-	emitPay(policy, origin)
+	EmitPay(policy, origin)
 	if policy.PayUrl == "" {
 		return fmt.Errorf("missing payment url")
 	}
@@ -292,7 +292,7 @@ func pay(state *bpmn.State) error {
 
 func setAdvanceBpm(state *bpmn.State) error {
 	policy := state.Data
-	setAdvance(policy, origin)
+	SetAdvance(policy, origin)
 	return nil
 }
 

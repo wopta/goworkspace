@@ -144,7 +144,7 @@ func proposal(policy *models.Policy) error {
 	return nil
 }
 
-func setProposalData(policy *models.Policy) {
+func SetProposalData(policy *models.Policy) {
 	log.Println("[setProposalData]")
 
 	setProposalNumber(policy)

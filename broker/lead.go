@@ -151,7 +151,7 @@ func checkIfPolicyIsLead(policy *models.Policy) error {
 	return nil
 }
 
-func setLeadData(policy *models.Policy, product models.Product) {
+func SetLeadData(policy *models.Policy, product models.Product) {
 	log.Println("[setLeadData] start -----------------------------------------")
 
 	now := time.Now().UTC()

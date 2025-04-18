@@ -224,12 +224,12 @@ func brokerUpdatePolicy(policy *models.Policy, request BrokerBaseRequest) {
 
 	if policy.TaxAmount == 0 {
 		log.Println("[brokerUpdatePolicy] calculate tax amount")
-		policy.TaxAmount = lib.RoundFloat(policy.PriceGross - policy.PriceNett, 2)
+		policy.TaxAmount = lib.RoundFloat(policy.PriceGross-policy.PriceNett, 2)
 	}
 
 	if policy.TaxAmountMonthly == 0 {
 		log.Println("[brokerUpdatePolicy] calculate tax amount monthly")
-		policy.TaxAmountMonthly = lib.RoundFloat(policy.PriceGrossMonthly - policy.PriceNettMonthly, 2)
+		policy.TaxAmountMonthly = lib.RoundFloat(policy.PriceGrossMonthly-policy.PriceNettMonthly, 2)
 	}
 
 	calculatePaymentComponents(policy)
@@ -239,7 +239,7 @@ func brokerUpdatePolicy(policy *models.Policy, request BrokerBaseRequest) {
 	log.Println("[brokerUpdatePolicy] end --------------------------------------")
 }
 
-func emitBase(policy *models.Policy, origin string) {
+func EmitBase(policy *models.Policy, origin string) {
 	log.Printf("[emitBase] Policy Uid %s", policy.Uid)
 	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 	now := time.Now().UTC()
@@ -259,7 +259,7 @@ func emitBase(policy *models.Policy, origin string) {
 	policy.BigRenewDate = civil.DateTimeOf(policy.RenewDate)
 }
 
-func emitSign(policy *models.Policy, origin string) {
+func EmitSign(policy *models.Policy, origin string) {
 	log.Printf("[emitSign] Policy Uid %s", policy.Uid)
 
 	policy.IsSign = false
@@ -274,7 +274,7 @@ func emitSign(policy *models.Policy, origin string) {
 	policy.SignUrl = signResponse.Url
 }
 
-func emitPay(policy *models.Policy, origin string) {
+func EmitPay(policy *models.Policy, origin string) {
 	log.Printf("[emitPay] Policy Uid %s", policy.Uid)
 
 	policy.IsPay = false
@@ -285,7 +285,20 @@ func emitPay(policy *models.Policy, origin string) {
 	policy.PayUrl = payUrl
 }
 
-func setAdvance(policy *models.Policy, origin string) {
+func EmitPayCustom(policy *models.Policy, origin string, productP, mgaProductP *models.Product) {
+	log.Printf("[emitPay] Policy Uid %s", policy.Uid)
+
+	policy.IsPay = false
+	mgaProduct = mgaProductP
+	product = productP
+	payUrl, err := createPolicyTransactions(policy)
+	if err != nil {
+		return
+	}
+	policy.PayUrl = payUrl
+}
+
+func SetAdvance(policy *models.Policy, origin string) {
 	policy.Payment = models.ManualPaymentProvider
 	policy.IsPay = true
 	policy.Status = models.PolicyStatusPay
