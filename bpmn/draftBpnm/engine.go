@@ -4,10 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
-	"os"
-
 	"github.com/maja42/goval"
+	"log"
 )
 
 func (f *FlowBpnm) Run(processName string) error {
@@ -57,7 +55,7 @@ func (f *ProcessBpnm) run(nameActivity string) error {
 			b, _ := json.Marshal(m)
 			_ = json.Unmarshal(b, &jsonMap)
 
-			list, e := f.EvaluateDecisions(f.activeActivities[i], jsonMap)
+			list, e := f.evaluateDecisions(f.activeActivities[i], jsonMap)
 			if e != nil {
 				return e
 			}
@@ -101,7 +99,7 @@ func (f *ProcessBpnm) runActivity(act *Activity, storage StorageData) error {
 	return nil
 }
 
-func (f *ProcessBpnm) EvaluateDecisions(act *Activity, date map[string]any) ([]*Activity, error) {
+func (f *ProcessBpnm) evaluateDecisions(act *Activity, date map[string]any) ([]*Activity, error) {
 	var res []*Activity
 	if act.Branch == nil {
 		return nil, nil
@@ -128,16 +126,6 @@ func (f *ProcessBpnm) EvaluateDecisions(act *Activity, date map[string]any) ([]*
 		}
 	}
 	return res, nil
-}
-
-func NewBpnmBuilder(path string) (*BpnmBuilder, error) {
-	var Bpnm BpnmBuilder
-	jsonProva, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-	json.Unmarshal(jsonProva, &Bpnm)
-	return &Bpnm, nil
 }
 
 func checkLocalStorage(st StorageData, req []TypeData) error {

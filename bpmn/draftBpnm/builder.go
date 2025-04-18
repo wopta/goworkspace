@@ -1,8 +1,10 @@
 package draftbpnm
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -77,26 +79,14 @@ func getKeyInjectedProcess(targetPro, targetAct string, order OrderActivity) Key
 	}
 }
 
-func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
-	if b.handlers == nil {
-		b.handlers = make(map[string]ActivityHandler)
-	}
-	if b.toInject == nil {
-		b.toInject = make(map[KeyInject]*ProcessBpnm)
-	}
-	process, err := bpnmToInject.Build()
+func NewBpnmBuilder(path string) (*BpnmBuilder, error) {
+	var Bpnm BpnmBuilder
+	jsonProva, err := os.ReadFile(path)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	var order Order
-	for i, p := range bpnmToInject.Processes {
-		order = bpnmToInject.Processes[i].Order
-		if _, ok := b.toInject[getKeyInjectedProcess(order.InWhatProcessBeInjected, order.InWhatActivityBeInjected, order.Order)]; ok {
-			return fmt.Errorf("Injection's been already done: target process: %v, process: injected %v", order.InWhatProcessBeInjected, p.Name)
-		}
-		b.toInject[getKeyInjectedProcess(order.InWhatProcessBeInjected, order.InWhatActivityBeInjected, order.Order)] = process.Process[p.Name]
-	}
-	return nil
+	json.Unmarshal(jsonProva, &Bpnm)
+	return &Bpnm, nil
 }
 
 func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
@@ -140,6 +130,28 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 		return nil, fmt.Errorf("Following injections went bad:\n  %v", keyNoInjected)
 	}
 	return flow, nil
+}
+
+func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
+	if b.handlers == nil {
+		b.handlers = make(map[string]ActivityHandler)
+	}
+	if b.toInject == nil {
+		b.toInject = make(map[KeyInject]*ProcessBpnm)
+	}
+	process, err := bpnmToInject.Build()
+	if err != nil {
+		return err
+	}
+	var order Order
+	for i, p := range bpnmToInject.Processes {
+		order = bpnmToInject.Processes[i].Order
+		if _, ok := b.toInject[getKeyInjectedProcess(order.InWhatProcessBeInjected, order.InWhatActivityBeInjected, order.Order)]; ok {
+			return fmt.Errorf("Injection's been already done: target process: %v, process: injected %v", order.InWhatProcessBeInjected, p.Name)
+		}
+		b.toInject[getKeyInjectedProcess(order.InWhatProcessBeInjected, order.InWhatActivityBeInjected, order.Order)] = process.Process[p.Name]
+	}
+	return nil
 }
 
 func (b *BpnmBuilder) AddHandler(nameHandler string, handler ActivityHandler) error {
