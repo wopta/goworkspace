@@ -190,7 +190,7 @@ func (a *BpnmBuilder) buildActivities(activities []ActivityBuilder, processName 
 		newActivity.Description = activity.Description
 		newActivity.handler = handler
 		if activity.Branch != nil {
-			builtBranch, e := activity.Branch.buildBranchBuilder()
+			builtBranch, e := activity.Branch.buildBranch()
 			if e != nil {
 				return nil, e
 			}
@@ -201,7 +201,7 @@ func (a *BpnmBuilder) buildActivities(activities []ActivityBuilder, processName 
 	return result, nil
 }
 
-func (b *BranchBuilder) buildBranchBuilder() (*Branch, error) {
+func (b *BranchBuilder) buildBranch() (*Branch, error) {
 	if b == nil {
 		return nil, nil
 	}
