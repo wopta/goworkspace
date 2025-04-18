@@ -49,9 +49,6 @@ func TestEmit(t *testing.T) {
 		t.Fatal(e)
 	}
 	flow.Run("emit")
-	for _, m := range log.log {
-		t.Log(m)
-	}
 
 	exps := []string{
 		"setProposalData",
@@ -77,9 +74,6 @@ func TestLead(t *testing.T) {
 		t.Fatal(e)
 	}
 	flow.Run("lead")
-	for _, m := range log.log {
-		t.Log(m)
-	}
 
 	exps := []string{
 		"setLeadData",
@@ -106,9 +100,6 @@ func TestPay(t *testing.T) {
 		t.Fatal(e)
 	}
 	flow.Run("pay")
-	for _, m := range log.log {
-		t.Log(m)
-	}
 
 	exps := []string{
 		"updatePolicy",
