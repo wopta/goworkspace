@@ -358,9 +358,10 @@ type Data struct {
 }
 
 var paymentMethodMap map[string]string = map[string]string{
+	// codes from https://www.fatturapa.gov.it/export/documenti/fatturapa/v1.3/Rappresentazione-tabellare-fattura-ordinaria.pdf
 	"creditcard": "MP08",
 	"transfer":   "MP05",
-	"sdd":        "MP19",
+	"sdd":        "MP20",
 	"remittance": "MP05",
 }
 
