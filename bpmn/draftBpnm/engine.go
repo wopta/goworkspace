@@ -54,6 +54,7 @@ func (p *ProcessBpnm) run(nameActivity string) error {
 			jsonMap := make(map[string]any)
 			b, _ := json.Marshal(m)
 			_ = json.Unmarshal(b, &jsonMap)
+
 			list, e := p.activeActivities[i].evaluateDecisions(p.Name, p.storageBpnm, jsonMap)
 			if e != nil {
 				return e
@@ -69,9 +70,6 @@ func (p *ProcessBpnm) run(nameActivity string) error {
 }
 
 func (act *Activity) runActivity(nameProcess string, storage StorageData) error {
-	if act.handler == nil {
-		return fmt.Errorf("Process '%v' has no handler defined for activity '%v'", nameProcess, act.Name)
-	}
 	log.Printf("Run process '%v', activity '%v'", nameProcess, act.Name)
 	if pre := act.PreActivity; pre != nil {
 		pre.storageBpnm.Merge(storage)
@@ -86,8 +84,10 @@ func (act *Activity) runActivity(nameProcess string, storage StorageData) error 
 		}
 	}
 
-	if e := act.handler(storage); e != nil {
-		return e
+	if act.handler != nil {
+		if e := act.handler(storage); e != nil {
+			return e
+		}
 	}
 
 	if post := act.PostActivity; post != nil {

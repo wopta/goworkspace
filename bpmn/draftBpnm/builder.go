@@ -38,6 +38,7 @@ type ActivityBuilder struct {
 	Name        string         `json:"name"`
 	Description string         `json:"description"`
 	Branch      *BranchBuilder `json:"branch"`
+	HandlerLess bool           `json:"handlerless"`
 }
 
 type BranchBuilder struct {
@@ -176,8 +177,9 @@ func (a *BpnmBuilder) buildActivities(activities []ActivityBuilder, processName 
 			return nil, fmt.Errorf("Double event with same name %v", activity.Name)
 		}
 		newActivity := new(Activity)
+
 		handler, ok := a.handlers[activity.Name]
-		if !ok {
+		if !activity.HandlerLess && !ok {
 			return nil, fmt.Errorf("No handler registered for the activity: %v", activity.Name)
 		}
 		newActivity.PreActivity = a.toInject[getKeyInjectedProcess(processName, activity.Name, PreActivity)]
