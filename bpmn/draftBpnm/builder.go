@@ -103,12 +103,12 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 		process.storageBpnm = b.storage
 		process.Name = p.Name
 		process.RequiredGlobalData = p.GlobalDataRequired
-		builtActivities, err := b.buildActivity(p.Activities, p.Name)
+		builtActivities, err := b.buildActivities(p.Activities, p.Name)
 		if err != nil {
 			return nil, err
 		}
 		process.Activities = builtActivities
-		if err := b.buildGatewayBlock(p, process); err != nil {
+		if err := process.hydrateGateways(p.Activities); err != nil {
 			return nil, err
 		}
 		if flow.Process[process.Name] != nil {
@@ -169,7 +169,7 @@ func (b *BpnmBuilder) SetStorage(pool StorageData) {
 	b.storage = pool
 }
 
-func (a *BpnmBuilder) buildActivity(activities []ActivityBuilder, processName string) (map[string]*Activity, error) {
+func (a *BpnmBuilder) buildActivities(activities []ActivityBuilder, processName string) (map[string]*Activity, error) {
 	result := make(map[string]*Activity)
 	for _, activity := range activities {
 		if _, ok := result[activity.Name]; ok {
@@ -189,29 +189,31 @@ func (a *BpnmBuilder) buildActivity(activities []ActivityBuilder, processName st
 		newActivity.Name = activity.Name
 		newActivity.Description = activity.Description
 		newActivity.handler = handler
-		builtBranch, e := a.buildBranchBuilder(activity.Branch)
-		if e != nil {
-			return nil, e
+		if activity.Branch != nil {
+			builtBranch, e := activity.Branch.buildBranchBuilder()
+			if e != nil {
+				return nil, e
+			}
+			newActivity.Branch = builtBranch
 		}
-		newActivity.Branch = builtBranch
 		result[newActivity.Name] = newActivity
 	}
 	return result, nil
 }
 
-func (a *BpnmBuilder) buildBranchBuilder(gatewayDto *BranchBuilder) (*Branch, error) {
-	if gatewayDto == nil {
+func (b *BranchBuilder) buildBranchBuilder() (*Branch, error) {
+	if b == nil {
 		return nil, nil
 	}
 	activity := new(Branch)
-	activity.GatewayType = gatewayDto.GatewayType
-	activity.RequiredInputData = gatewayDto.InputDataRequired
-	activity.RequiredOutputData = gatewayDto.OutputDataRequired
+	activity.GatewayType = b.GatewayType
+	activity.RequiredInputData = b.InputDataRequired
+	activity.RequiredOutputData = b.OutputDataRequired
 	return activity, nil
 }
 
-func (a *BpnmBuilder) buildGatewayBlock(processBuilder *ProcessBuilder, process *ProcessBpnm) error {
-	for _, builderActivity := range processBuilder.Activities {
+func (p *ProcessBpnm) hydrateGateways(activities []ActivityBuilder) error {
+	for _, builderActivity := range activities {
 		if builderActivity.Branch == nil {
 			continue
 		}
@@ -222,14 +224,14 @@ func (a *BpnmBuilder) buildGatewayBlock(processBuilder *ProcessBuilder, process 
 				Decision:       builderGateway.Decision,
 			}
 			for _, nextJump := range builderGateway.NextActivities {
-				if _, ok := process.Activities[nextJump]; !ok {
+				if _, ok := p.Activities[nextJump]; !ok {
 					return fmt.Errorf("No event named %v", nextJump)
 				}
-				gateway.NextActivities = append(gateway.NextActivities, process.Activities[nextJump])
+				gateway.NextActivities = append(gateway.NextActivities, p.Activities[nextJump])
 			}
 			gateways = append(gateways, gateway)
 		}
-		process.Activities[builderActivity.Name].Branch.Gateway = gateways
+		p.Activities[builderActivity.Name].Branch.Gateway = gateways
 	}
 	return nil
 }
