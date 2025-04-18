@@ -177,9 +177,6 @@ func (a *BpnmBuilder) BuildActivity(activities []ActivityBuilder, processName st
 		newActivity.Name = activity.Name
 		newActivity.Description = activity.Description
 		newActivity.handler = handler
-		if activity.Branch == nil {
-			return nil, fmt.Errorf("No branch founded for activity: %v", activity.Name)
-		}
 		builtBranch, e := a.BuildBranchBuilder(activity.Branch)
 		if e != nil {
 			return nil, e
@@ -191,6 +188,9 @@ func (a *BpnmBuilder) BuildActivity(activities []ActivityBuilder, processName st
 }
 
 func (a *BpnmBuilder) BuildBranchBuilder(gatewayDto *BranchBuilder) (*Branch, error) {
+	if gatewayDto == nil {
+		return nil, nil
+	}
 	activity := new(Branch)
 	activity.GatewayType = gatewayDto.GatewayType
 	activity.RequiredInputData = gatewayDto.InputDataRequired
@@ -200,6 +200,9 @@ func (a *BpnmBuilder) BuildBranchBuilder(gatewayDto *BranchBuilder) (*Branch, er
 
 func (a *BpnmBuilder) BuildGatewayBlock(processBuilder *ProcessBuilder, process *ProcessBpnm) error {
 	for _, builderActivity := range processBuilder.Activities {
+		if builderActivity.Branch == nil {
+			continue
+		}
 		var gateways []*Gateway = make([]*Gateway, 0)
 		for _, builderGateway := range builderActivity.Branch.Gateways {
 			gateway := &Gateway{

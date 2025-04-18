@@ -74,7 +74,9 @@ func (f *ProcessBpnm) runActivity(act *Activity, storage StorageData) error {
 	if act.handler == nil {
 		return fmt.Errorf("Process '%v' has no handler defined for activity '%v'", f.Name, act.Name)
 	}
-
+	if act.Branch == nil {
+		return nil
+	}
 	log.Printf("Run process '%v', activity '%v'", f.Name, act.Name)
 	if pre := act.PreActivity; pre != nil {
 		pre.storageBpnm.Merge(storage)
@@ -102,6 +104,9 @@ func (f *ProcessBpnm) runActivity(act *Activity, storage StorageData) error {
 
 func (f *ProcessBpnm) EvaluateDecisions(act *Activity, date map[string]any) ([]*Activity, error) {
 	var res []*Activity
+	if act.Branch == nil {
+		return nil, nil
+	}
 	for _, ga := range act.Branch.Gateway { //é xor attualmente
 		if ga.Decision == "" {
 			return ga.NextActivities, nil

@@ -111,17 +111,11 @@
 					"name": "CEvent",
 					"description": "emit policy",
 					"branch": {
-						"outputData": [],
 						"inputData": [
 							{
 								"name": "error",
 								"type": "error"
 							}
-						],
-						"gatewayType": "AND",
-						"mergingType": "AND",
-						"gateways": [
-							{}
 						]
 					}
 				}
