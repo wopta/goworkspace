@@ -171,6 +171,9 @@ func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod string) e
 		log.Printf("error handling consultancy: %s", err.Error())
 	}
 
+	policy.BigQueryParse()
+	transaction.BigQueryParse()
+
 	firestoreBatch := map[string]map[string]interface{}{
 		policyCollection: {
 			policy.Uid: policy,
@@ -182,8 +185,12 @@ func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod string) e
 	if err = lib.SetBatchFirestoreErr(firestoreBatch); err != nil {
 		return err
 	}
-	policy.BigquerySave("")
-	transaction.BigQuerySave("")
+	if err = lib.InsertRowsBigQuery(lib.WoptaDataset, policyCollection, policy); err != nil {
+		return err
+	}
+	if err = lib.InsertRowsBigQuery(lib.WoptaDataset, transactionsCollection, transaction); err != nil {
+		return err
+	}
 
 	mgaProduct = prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 
