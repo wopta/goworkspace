@@ -33,29 +33,29 @@ func (f *FlowBpnm) RunAt(processName, activityName string) error {
 	return nil
 }
 
-func (f *ProcessBpnm) run(nameActivity string) error {
-	f.activeActivities = append(f.activeActivities, f.Activities[nameActivity])
-	if f.storageBpnm == nil {
+func (p *ProcessBpnm) run(nameActivity string) error {
+	p.activeActivities = append(p.activeActivities, p.Activities[nameActivity])
+	if p.storageBpnm == nil {
 		return errors.New("miss storage")
 	}
-	if f.activeActivities == nil {
-		return fmt.Errorf("Process '%v' has no activity '%v'", f.Name, nameActivity)
+	if p.activeActivities == nil {
+		return fmt.Errorf("Process '%v' has no activity '%v'", p.Name, nameActivity)
 	}
 	//TODO: implement at garbange collector with a counter, to remove old element not used in the next branch
 	for {
 		var nextActivities []*Activity
-		for i := range f.activeActivities {
-			if err := f.runActivity(f.activeActivities[i], f.storageBpnm); err != nil {
+		for i := range p.activeActivities {
+			if err := p.activeActivities[i].runActivity(p.Name, p.storageBpnm); err != nil {
 				return err
 			}
 			//TODO: to improve
 
-			m := mergeMaps(f.storageBpnm.GetAllGlobal(), f.storageBpnm.GetAllLocal())
+			m := mergeMaps(p.storageBpnm.GetAllGlobal(), p.storageBpnm.GetAllLocal())
 			jsonMap := make(map[string]any)
 			b, _ := json.Marshal(m)
 			_ = json.Unmarshal(b, &jsonMap)
 
-			list, e := f.evaluateDecisions(f.activeActivities[i], jsonMap)
+			list, e := p.activeActivities[i].evaluateDecisions(p.Name, p.storageBpnm, jsonMap)
 			if e != nil {
 				return e
 			}
@@ -64,15 +64,15 @@ func (f *ProcessBpnm) run(nameActivity string) error {
 		if len(nextActivities) == 0 {
 			return nil
 		}
-		f.activeActivities = nextActivities
+		p.activeActivities = nextActivities
 	}
 }
 
-func (f *ProcessBpnm) runActivity(act *Activity, storage StorageData) error {
+func (act *Activity) runActivity(nameProcess string, storage StorageData) error {
 	if act.handler == nil {
-		return fmt.Errorf("Process '%v' has no handler defined for activity '%v'", f.Name, act.Name)
+		return fmt.Errorf("Process '%v' has no handler defined for activity '%v'", nameProcess, act.Name)
 	}
-	log.Printf("Run process '%v', activity '%v'", f.Name, act.Name)
+	log.Printf("Run process '%v', activity '%v'", nameProcess, act.Name)
 	if pre := act.PreActivity; pre != nil {
 		pre.storageBpnm.Merge(storage)
 		if e := pre.run(pre.DefaultStart); e != nil {
@@ -82,11 +82,11 @@ func (f *ProcessBpnm) runActivity(act *Activity, storage StorageData) error {
 
 	if act.Branch != nil {
 		if e := checkLocalStorage(storage, act.Branch.RequiredInputData); e != nil {
-			return fmt.Errorf("Process '%v' with activity '%v' has an input error: %v", f.Name, act.Name, e.Error())
+			return fmt.Errorf("Process '%v' with activity '%v' has an input error: %v", nameProcess, act.Name, e.Error())
 		}
 	}
 
-	if e := act.handler(f.storageBpnm); e != nil {
+	if e := act.handler(storage); e != nil {
 		return e
 	}
 
@@ -99,7 +99,7 @@ func (f *ProcessBpnm) runActivity(act *Activity, storage StorageData) error {
 	return nil
 }
 
-func (f *ProcessBpnm) evaluateDecisions(act *Activity, date map[string]any) ([]*Activity, error) {
+func (act *Activity) evaluateDecisions(processName string, storage StorageData, date map[string]any) ([]*Activity, error) {
 	var res []*Activity
 	if act.Branch == nil {
 		return nil, nil
@@ -109,17 +109,17 @@ func (f *ProcessBpnm) evaluateDecisions(act *Activity, date map[string]any) ([]*
 			return ga.NextActivities, nil
 		}
 		if len(ga.NextActivities) == 0 {
-			log.Printf("Process '%v' has not activities", f.Name)
+			log.Printf("Process '%v' has not activities", processName)
 			return []*Activity{}, nil
 		}
 		eval := goval.NewEvaluator()
 		result, e := eval.Evaluate(ga.Decision, date, nil)
 		if e != nil {
-			return nil, fmt.Errorf("Process '%v' with activity '%v' has an eval error: %v", f.Name, act.Name, e.Error())
+			return nil, fmt.Errorf("Process '%v' with activity '%v' has an eval error: %v", processName, act.Name, e.Error())
 		}
 		if result.(bool) {
-			if e := checkLocalStorage(f.storageBpnm, act.Branch.RequiredOutputData); e != nil {
-				return nil, fmt.Errorf("Process '%v' with activity '%v' has error: %v", f.Name, act.Name, e.Error())
+			if e := checkLocalStorage(storage, act.Branch.RequiredOutputData); e != nil {
+				return nil, fmt.Errorf("Process '%v' with activity '%v' has error: %v", processName, act.Name, e.Error())
 			}
 			res = append(res, ga.NextActivities...)
 			break
