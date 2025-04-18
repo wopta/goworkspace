@@ -26,7 +26,7 @@ func getBuilder(log *mockLog) (*FlowBpnm, error) {
 	if e != nil {
 		return nil, e
 	}
-	builder.SetPoolDate(storage)
+	builder.SetStorage(storage)
 
 	builder.AddHandler("setProposalData", funcTest("setProposalData", log))
 	builder.AddHandler("emitData", funcTest("emitData", log))

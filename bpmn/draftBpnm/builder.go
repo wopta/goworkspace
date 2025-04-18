@@ -113,12 +113,12 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 		process.storageBpnm = b.storage
 		process.Name = p.Name
 		process.RequiredGlobalData = p.GlobalDataRequired
-		builtActivities, err := b.BuildActivity(p.Activities, p.Name)
+		builtActivities, err := b.buildActivity(p.Activities, p.Name)
 		if err != nil {
 			return nil, err
 		}
 		process.Activities = builtActivities
-		if err := b.BuildGatewayBlock(p, process); err != nil {
+		if err := b.buildGatewayBlock(p, process); err != nil {
 			return nil, err
 		}
 		if flow.Process[process.Name] != nil {
@@ -153,11 +153,11 @@ func (b *BpnmBuilder) AddHandler(nameHandler string, handler ActivityHandler) er
 	return nil
 }
 
-func (b *BpnmBuilder) SetPoolDate(pool StorageData) {
+func (b *BpnmBuilder) SetStorage(pool StorageData) {
 	b.storage = pool
 }
 
-func (a *BpnmBuilder) BuildActivity(activities []ActivityBuilder, processName string) (map[string]*Activity, error) {
+func (a *BpnmBuilder) buildActivity(activities []ActivityBuilder, processName string) (map[string]*Activity, error) {
 	result := make(map[string]*Activity)
 	for _, activity := range activities {
 		if _, ok := result[activity.Name]; ok {
@@ -177,7 +177,7 @@ func (a *BpnmBuilder) BuildActivity(activities []ActivityBuilder, processName st
 		newActivity.Name = activity.Name
 		newActivity.Description = activity.Description
 		newActivity.handler = handler
-		builtBranch, e := a.BuildBranchBuilder(activity.Branch)
+		builtBranch, e := a.buildBranchBuilder(activity.Branch)
 		if e != nil {
 			return nil, e
 		}
@@ -187,7 +187,7 @@ func (a *BpnmBuilder) BuildActivity(activities []ActivityBuilder, processName st
 	return result, nil
 }
 
-func (a *BpnmBuilder) BuildBranchBuilder(gatewayDto *BranchBuilder) (*Branch, error) {
+func (a *BpnmBuilder) buildBranchBuilder(gatewayDto *BranchBuilder) (*Branch, error) {
 	if gatewayDto == nil {
 		return nil, nil
 	}
@@ -198,7 +198,7 @@ func (a *BpnmBuilder) BuildBranchBuilder(gatewayDto *BranchBuilder) (*Branch, er
 	return activity, nil
 }
 
-func (a *BpnmBuilder) BuildGatewayBlock(processBuilder *ProcessBuilder, process *ProcessBpnm) error {
+func (a *BpnmBuilder) buildGatewayBlock(processBuilder *ProcessBuilder, process *ProcessBpnm) error {
 	for _, builderActivity := range processBuilder.Activities {
 		if builderActivity.Branch == nil {
 			continue

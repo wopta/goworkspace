@@ -39,7 +39,7 @@ func TestBpnmHappyPath(t *testing.T) {
 	storage := NewStorageBpnm()
 	storage.AddLocal("validationObject", new(validity))
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 3})
-	g.SetPoolDate(storage)
+	g.SetStorage(storage)
 
 	g.AddHandler("init", func(st StorageData) error {
 		log.Println("init")
@@ -100,7 +100,7 @@ func TestBpnmHappyPath2(t *testing.T) {
 	storage := NewStorageBpnm()
 	storage.AddLocal("validationObject", new(validity))
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 3})
-	g.SetPoolDate(storage)
+	g.SetStorage(storage)
 
 	g.AddHandler("init", func(st StorageData) error {
 		log.Println("init")
@@ -154,7 +154,7 @@ func TestBpnmMissingOutput(t *testing.T) {
 	}
 	storage := NewStorageBpnm()
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 1})
-	g.SetPoolDate(storage)
+	g.SetStorage(storage)
 
 	g.AddHandler("init", func(st StorageData) error {
 		log.Println("init")
@@ -198,7 +198,7 @@ func TestBpnmMissingInput(t *testing.T) {
 	}
 	storage := NewStorageBpnm()
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 10})
-	g.SetPoolDate(storage)
+	g.SetStorage(storage)
 
 	g.AddHandler("init", func(st StorageData) error {
 		log.Println("init")
@@ -241,7 +241,7 @@ func TestBpnmMissingHandler(t *testing.T) {
 	}
 	storage := NewStorageBpnm()
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 10})
-	g.SetPoolDate(storage)
+	g.SetStorage(storage)
 
 	g.AddHandler("init", func(st StorageData) error {
 		log.Println("init")
@@ -267,7 +267,7 @@ func TestBpnmMissingHandler(t *testing.T) {
 
 func getFlowcatnat(log *mockLog) (*BpnmBuilder, error) {
 	injectedFlow, err := NewBpnmBuilder("provaInjection.json")
-	injectedFlow.SetPoolDate(NewStorageBpnm())
+	injectedFlow.SetStorage(NewStorageBpnm())
 	injectedFlow.AddHandler("initPost", func(st StorageData) error {
 		log.Println("init post")
 		return nil
@@ -292,7 +292,7 @@ func TestBpnmInjection(t *testing.T) {
 	}
 	storage := NewStorageBpnm()
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 3})
-	g.SetPoolDate(storage)
+	g.SetStorage(storage)
 	flowCatnat, err := getFlowcatnat(&log)
 	if err := g.Inject(flowCatnat); err != nil {
 		t.Fatal(err)
@@ -355,7 +355,7 @@ func TestBpnmWithMultipleInjection(t *testing.T) {
 	}
 	storage := NewStorageBpnm()
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 3})
-	g.SetPoolDate(storage)
+	g.SetStorage(storage)
 	flowCatnat, err := getFlowcatnat(&log)
 	if err := g.Inject(flowCatnat); err != nil {
 		t.Fatal(err)
@@ -378,7 +378,7 @@ func TestRunFromSpecificActivity(t *testing.T) {
 	storage := NewStorageBpnm()
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 3})
 	storage.AddLocal("validationObject", new(validity))
-	g.SetPoolDate(storage)
+	g.SetStorage(storage)
 	flowCatnat, err := getFlowcatnat(&log)
 	if err := g.Inject(flowCatnat); err != nil {
 		t.Fatal(err)
