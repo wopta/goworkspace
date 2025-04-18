@@ -74,9 +74,6 @@ func (f *ProcessBpnm) runActivity(act *Activity, storage StorageData) error {
 	if act.handler == nil {
 		return fmt.Errorf("Process '%v' has no handler defined for activity '%v'", f.Name, act.Name)
 	}
-	if act.Branch == nil {
-		return nil
-	}
 	log.Printf("Run process '%v', activity '%v'", f.Name, act.Name)
 	if pre := act.PreActivity; pre != nil {
 		pre.storageBpnm.Merge(storage)
@@ -85,8 +82,10 @@ func (f *ProcessBpnm) runActivity(act *Activity, storage StorageData) error {
 		}
 	}
 
-	if e := checkLocalStorage(storage, act.Branch.RequiredInputData); e != nil {
-		return fmt.Errorf("Process '%v' with activity '%v' has an input error: %v", f.Name, act.Name, e.Error())
+	if act.Branch != nil {
+		if e := checkLocalStorage(storage, act.Branch.RequiredInputData); e != nil {
+			return fmt.Errorf("Process '%v' with activity '%v' has an input error: %v", f.Name, act.Name, e.Error())
+		}
 	}
 
 	if e := act.handler(f.storageBpnm); e != nil {

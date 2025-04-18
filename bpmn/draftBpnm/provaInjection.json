@@ -73,17 +73,7 @@
 				},
 				{
 					"name": "pre-B",
-					"description": "download doc policy",
-					"branch": {
-						"outputData": [
-							{
-								"name": "error",
-								"type": "error"
-							}
-						],
-						"inputData": [],
-						"gateways": []
-					}
+					"description": "download doc policy"
 				}
 			]
 		}
