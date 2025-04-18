@@ -16,11 +16,11 @@ type StorageData interface {
 	GetGlobal(string) (DataBpnm, error)
 	GetAllLocal() map[string]any
 	GetAllGlobal() map[string]any
-	// move/overwrite all data from source -> base
+	//move/overwrite all data from source -> base
 	Merge(StorageData) error
-	// mark what local resource keep when clean is called
+	//Mark what local resource keep when clean is called
 	markWhatNeeded([]TypeData)
-	// delete the resource that aren't needed(aren't marked)
+	//Delete the resource that aren't needed(aren't marked)
 	clean()
 }
 
@@ -30,6 +30,9 @@ type StorageBpnm struct {
 	touched []string
 }
 
+// The storage manages his own resources:
+// At each cycles:
+// It cleans itself leaving only the output resources DECLARED
 func NewStorageBpnm() *StorageBpnm {
 	res := new(StorageBpnm)
 	res.local = make(map[string]any)

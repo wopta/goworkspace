@@ -454,6 +454,9 @@ func TestRunFromSpecificActivity(t *testing.T) {
 	}
 }
 func TestBpnmStoreClean(t *testing.T) {
+	//this case test how the framework manage memory
+	//at each cycles
+	//it marks every output resource of each activities (T), after all activities(T) have finished, it clean the store leaving only the marked ones
 	g, err := NewBpnmBuilder("prova.json")
 	log := mockLog{}
 	if err != nil {
