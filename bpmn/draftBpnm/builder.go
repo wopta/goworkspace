@@ -89,6 +89,7 @@ func NewBpnmBuilder(path string) (*BpnmBuilder, error) {
 	json.Unmarshal(jsonProva, &Bpnm)
 	return &Bpnm, nil
 }
+
 func (b *BpnmBuilder) AddProcesses(toMerge *BpnmBuilder) error {
 	var e error
 	if e = b.storage.MergeUnique(toMerge.storage); e != nil {
@@ -106,6 +107,7 @@ func (b *BpnmBuilder) AddProcesses(toMerge *BpnmBuilder) error {
 	}
 	return nil
 }
+
 func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 	flow := new(FlowBpnm)
 	flow.Process = make(map[string]*ProcessBpnm)

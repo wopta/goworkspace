@@ -22,6 +22,7 @@ type Activity struct {
 	PostActivity *ProcessBpnm
 	Branch       *Branch
 }
+
 type GatewayType string
 
 const (
@@ -35,6 +36,7 @@ type Branch struct {
 	GatewayType        GatewayType
 	Gateway            []*Gateway
 }
+
 type Gateway struct {
 	NextActivities []*Activity
 	Decision       string

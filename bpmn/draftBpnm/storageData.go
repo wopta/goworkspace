@@ -143,6 +143,7 @@ func (base *StorageBpnm) MergeUnique(source StorageData) error {
 	}
 	return nil
 }
+
 func GetData[t DataBpnm](name string, storage StorageData) (t, error) {
 	data, err := storage.GetLocal(name)
 	var result t

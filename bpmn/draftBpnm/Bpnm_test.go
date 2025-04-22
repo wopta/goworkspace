@@ -95,6 +95,7 @@ func TestBpnmHappyPath(t *testing.T) {
 	}
 
 }
+
 func TestBpnmHappyPath2(t *testing.T) {
 	g, err := NewBpnmBuilder("prova.json")
 	log := mockLog{}
@@ -153,6 +154,7 @@ func TestBpnmHappyPath2(t *testing.T) {
 	}
 
 }
+
 func TestBpnmMissingOutput(t *testing.T) {
 	g, err := NewBpnmBuilder("prova.json")
 	log := mockLog{}
@@ -197,6 +199,7 @@ func TestBpnmMissingOutput(t *testing.T) {
 		t.Fatalf("should have 1 log")
 	}
 }
+
 func TestBpnmMissingInput(t *testing.T) {
 	g, err := NewBpnmBuilder("prova.json")
 	log := mockLog{}
@@ -243,6 +246,7 @@ func TestBpnmMissingInput(t *testing.T) {
 		t.Fatalf("should have 1 log")
 	}
 }
+
 func TestBpnmMissingHandler(t *testing.T) {
 	g, err := NewBpnmBuilder("prova.json")
 	log := mockLog{}
@@ -385,6 +389,7 @@ func TestBpnmWithMultipleInjection(t *testing.T) {
 		t.Fatalf("Should have the error,exp: Injection's been already done: target process: emit, process: injected provaPost, got: %v", err.Error())
 	}
 }
+
 func TestRunFromSpecificActivity(t *testing.T) {
 	g, err := NewBpnmBuilder("prova.json")
 	log := mockLog{}
@@ -453,6 +458,7 @@ func TestRunFromSpecificActivity(t *testing.T) {
 		}
 	}
 }
+
 func TestBpnmStoreClean(t *testing.T) {
 	//this case test how the framework manage memory
 	//at each cycles
@@ -532,6 +538,7 @@ func TestBpnmStoreClean(t *testing.T) {
 	}
 
 }
+
 func TestMergeBuilder(t *testing.T) {
 	log := &mockLog{}
 	g, err := NewBpnmBuilder("prova.json")

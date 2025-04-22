@@ -94,6 +94,7 @@ func TestEmitForEcommerce(t *testing.T) {
 	}
 	testFlow(t, "emit", exps, store)
 }
+
 func TestLeadForEcommerce(t *testing.T) {
 	store := NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
@@ -110,6 +111,7 @@ func TestLeadForEcommerce(t *testing.T) {
 	}
 	testFlow(t, "lead", exps, store)
 }
+
 func TestProposalForEcommerce(t *testing.T) {
 	store := NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
@@ -118,6 +120,7 @@ func TestProposalForEcommerce(t *testing.T) {
 	exps := []string{}
 	testFlow(t, "proposal", exps, store)
 }
+
 func TestSignForEcommerce(t *testing.T) {
 	store := NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
@@ -153,6 +156,7 @@ func TestEmitForMga(t *testing.T) {
 	exps := []string{}
 	testFlow(t, "emit", exps, store)
 }
+
 func TestLeadForMga(t *testing.T) {
 	store := NewStorageBpnm()
 	store.AddGlobal("policy", &policyMga)
@@ -163,6 +167,7 @@ func TestLeadForMga(t *testing.T) {
 	}
 	testFlow(t, "lead", exps, store)
 }
+
 func TestProposalForMga(t *testing.T) {
 	store := NewStorageBpnm()
 	store.AddGlobal("policy", &policyMga)
@@ -173,6 +178,7 @@ func TestProposalForMga(t *testing.T) {
 	}
 	testFlow(t, "proposal", exps, store)
 }
+
 func TestApprovalForMga(t *testing.T) {
 	store := NewStorageBpnm()
 	store.AddGlobal("policy", &policyMga)
@@ -181,6 +187,7 @@ func TestApprovalForMga(t *testing.T) {
 	exps := []string{}
 	testFlow(t, "requestApproval", exps, store)
 }
+
 func TestPayForMga(t *testing.T) {
 	store := NewStorageBpnm()
 	store.AddGlobal("policy", &policyMga)
@@ -192,6 +199,7 @@ func TestPayForMga(t *testing.T) {
 	}
 	testFlow(t, "pay", exps, store)
 }
+
 func TestSignForMga(t *testing.T) {
 	store := NewStorageBpnm()
 	store.AddGlobal("policy", &policyMga)
@@ -220,6 +228,7 @@ func TestEmitForProviderMga(t *testing.T) {
 	}
 	testFlow(t, "emit", exps, store)
 }
+
 func TestLeadForProviderMga(t *testing.T) {
 	store := NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
@@ -230,6 +239,7 @@ func TestLeadForProviderMga(t *testing.T) {
 	}
 	testFlow(t, "lead", exps, store)
 }
+
 func TestProposalForProviderMga(t *testing.T) {
 	store := NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
@@ -241,6 +251,7 @@ func TestProposalForProviderMga(t *testing.T) {
 	}
 	testFlow(t, "proposal", exps, store)
 }
+
 func TestApprovalForProviderMga(t *testing.T) {
 	store := NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
@@ -252,6 +263,7 @@ func TestApprovalForProviderMga(t *testing.T) {
 	}
 	testFlow(t, "requestApproval", exps, store)
 }
+
 func TestPayForProviderMga(t *testing.T) {
 	store := NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
@@ -263,6 +275,7 @@ func TestPayForProviderMga(t *testing.T) {
 	}
 	testFlow(t, "pay", exps, store)
 }
+
 func TestSignForProviderMga(t *testing.T) {
 	store := NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
@@ -302,6 +315,7 @@ func TestLeadForRemittanceMga(t *testing.T) {
 	}
 	testFlow(t, "lead", exps, store)
 }
+
 func TestProposalForRemittanceMga(t *testing.T) {
 	store := NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
@@ -313,6 +327,7 @@ func TestProposalForRemittanceMga(t *testing.T) {
 	}
 	testFlow(t, "proposal", exps, store)
 }
+
 func TestApprovalForRemittanceMga(t *testing.T) {
 	store := NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
@@ -324,6 +339,7 @@ func TestApprovalForRemittanceMga(t *testing.T) {
 	}
 	testFlow(t, "requestApproval", exps, store)
 }
+
 func TestPayForRemittanceMga(t *testing.T) {
 	store := NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
@@ -332,6 +348,7 @@ func TestPayForRemittanceMga(t *testing.T) {
 	exps := []string{}
 	testFlow(t, "pay", exps, store)
 }
+
 func TestSignForRemittanceMga(t *testing.T) {
 	store := NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
