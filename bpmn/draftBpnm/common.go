@@ -1,6 +1,9 @@
 package draftbpnm
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type ActivityHandler func(StorageData) error
 type DataBpnm interface {
@@ -50,4 +53,21 @@ func mergeUniqueMaps[key comparable, out any](m1 map[key]out, m2 map[key]out) (m
 		merged[k] = v
 	}
 	return merged, nil
+}
+
+func GetData[t DataBpnm](name string, storage StorageData) (t, error) {
+	data, err := storage.GetLocal(name)
+	var result t
+	if err != nil {
+		data, err = storage.GetGlobal(name)
+	}
+	if err != nil {
+		return *new(t), err
+	}
+
+	result = data.(t)
+	if data.GetType() != result.GetType() {
+		return *new(t), fmt.Errorf("Data '%v' with type %v founded has a different type than '%v'", name, result.GetType(), data.GetType())
+	}
+	return result, nil
 }
