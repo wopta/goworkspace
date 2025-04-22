@@ -42,6 +42,7 @@ func NewStorageBpnm() *StorageBpnm {
 	res := new(StorageBpnm)
 	res.local = make(map[string]any)
 	res.global = make(map[string]any)
+	res.higherStore = nil
 	return res
 }
 

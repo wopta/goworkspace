@@ -160,7 +160,6 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 	if b.toInject == nil {
 		b.toInject = make(map[KeyInject]*ProcessBpnm)
 	}
-	bpnmToInject.storage.setHigherStorage(b.storage)
 	process, err := bpnmToInject.Build()
 	if err != nil {
 		return err
@@ -203,8 +202,14 @@ func (a *BpnmBuilder) buildActivities(activities []ActivityBuilder, processName 
 		if !activity.HandlerLess && !ok {
 			return nil, fmt.Errorf("No handler registered for the activity: %v", activity.Name)
 		}
-		newActivity.PreActivity = a.toInject[getKeyInjectedProcess(processName, activity.Name, PreActivity)]
-		newActivity.PostActivity = a.toInject[getKeyInjectedProcess(processName, activity.Name, PostActivity)]
+		if pr := a.toInject[getKeyInjectedProcess(processName, activity.Name, PreActivity)]; pr != nil {
+			newActivity.PreActivity = pr
+			newActivity.PreActivity.storageBpnm.setHigherStorage(a.storage)
+		}
+		if pr := a.toInject[getKeyInjectedProcess(processName, activity.Name, PostActivity)]; pr != nil {
+			newActivity.PostActivity = pr
+			newActivity.PostActivity.storageBpnm.setHigherStorage(a.storage)
+		}
 		//To check eventually if the some injection isnt possible
 		delete(a.toInject, getKeyInjectedProcess(processName, activity.Name, PreActivity))
 		delete(a.toInject, getKeyInjectedProcess(processName, activity.Name, PostActivity))
