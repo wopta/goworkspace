@@ -160,6 +160,7 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 	if b.toInject == nil {
 		b.toInject = make(map[KeyInject]*ProcessBpnm)
 	}
+	bpnmToInject.storage.setHigherStorage(b.storage)
 	process, err := bpnmToInject.Build()
 	if err != nil {
 		return err

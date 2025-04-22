@@ -16,9 +16,9 @@ type StorageData interface {
 	GetGlobal(string) (DataBpnm, error)
 	GetAllLocal() map[string]any
 	GetAllGlobal() map[string]any
-	// It merges two storage
-	// If both storage contain the same key, values from source will overwrite those from base.
-	Merge(StorageData) error
+	// setHigherStorage sets a higher-level storage,
+	// which will be used as a fallback when a local/global key is not found in the current storage.
+	setHigherStorage(StorageData) error
 	// It merges two unique storage
 	// If both storage contain the same key, return error
 	MergeUnique(StorageData) error
@@ -29,9 +29,10 @@ type StorageData interface {
 }
 
 type StorageBpnm struct {
-	local   map[string]any
-	global  map[string]any
-	touched []string
+	local       map[string]any
+	global      map[string]any
+	touched     []string
+	higherStore StorageData
 }
 
 // The storage manages his own resources:
@@ -104,6 +105,9 @@ func (p *StorageBpnm) GetGlobal(name string) (DataBpnm, error) {
 	if data, ok := p.global[name]; ok {
 		return data.(DataBpnm), nil
 	}
+	if p.higherStore != nil {
+		return p.higherStore.GetGlobal(name)
+	}
 	return nil, fmt.Errorf("no data founded %v", name)
 }
 
@@ -114,16 +118,17 @@ func (p *StorageBpnm) GetLocal(name string) (DataBpnm, error) {
 	if data, ok := p.local[name]; ok {
 		return data.(DataBpnm), nil
 	}
+	if p.higherStore != nil {
+		return p.higherStore.GetLocal(name)
+	}
 	return nil, fmt.Errorf("no data founded %v", name)
 }
 
-// copy(and overwrite) all data from source -> base
-func (base *StorageBpnm) Merge(source StorageData) error {
-	if source == nil {
-		return nil
+func (base *StorageBpnm) setHigherStorage(higher StorageData) error {
+	if base.higherStore != nil {
+		return fmt.Errorf("Higher storage has been already set")
 	}
-	base.global = mergeMaps(base.global, source.GetAllGlobal())
-	base.local = mergeMaps(base.local, source.GetAllLocal())
+	base.higherStore = higher
 	return nil
 }
 
