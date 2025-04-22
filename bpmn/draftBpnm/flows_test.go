@@ -103,11 +103,6 @@ func TestLeadForEcommerce(t *testing.T) {
 	exps := []string{
 		"setLeadData",
 		"sendLeadMail",
-		"emitData",
-		"sign",
-		"pay",
-		"sendEmitProposalMail",
-		"sendMailSign",
 	}
 	testFlow(t, "lead", exps, store)
 }
@@ -119,6 +114,18 @@ func TestProposalForEcommerce(t *testing.T) {
 
 	exps := []string{}
 	testFlow(t, "proposal", exps, store)
+}
+
+func TestPayForEcommerce(t *testing.T) {
+	store := NewStorageBpnm()
+	store.AddGlobal("policy", &policyEcommerce)
+	store.AddGlobal("product", &productEcommerce)
+
+	exps := []string{
+		"updatePolicy",
+		"payTransaction",
+	}
+	testFlow(t, "pay", exps, store)
 }
 
 func TestSignForEcommerce(t *testing.T) {
@@ -133,19 +140,6 @@ func TestSignForEcommerce(t *testing.T) {
 		"sendMailPay",
 	}
 	testFlow(t, "sign", exps, store)
-}
-
-func TestPayForEcommerce(t *testing.T) {
-	store := NewStorageBpnm()
-	store.AddGlobal("policy", &policyEcommerce)
-	store.AddGlobal("product", &productEcommerce)
-
-	exps := []string{
-		"updatePolicy",
-		"payTransaction",
-		"sign",
-	}
-	testFlow(t, "pay", exps, store)
 }
 
 func TestEmitForMga(t *testing.T) {

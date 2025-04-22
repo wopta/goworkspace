@@ -173,7 +173,8 @@
 							{
 								"nextActivities": [
 									"emitData"
-								]
+								],
+								"decision": "policy.channel!=`e-commerce`"
 							}
 						]
 					}
@@ -285,7 +286,7 @@
 								"nextActivities": [
 									"sign"
 								],
-								"decision": "policy.channel!=`mga` && policy.channel!=`network`"
+								"decision": "policy.channel!=`mga` && policy.channel!=`network`&& policy.channel!=`e-commerce`"
 							}
 						]
 					}
