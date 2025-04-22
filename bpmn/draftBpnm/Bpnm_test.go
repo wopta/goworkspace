@@ -575,7 +575,7 @@ func TestMergeBuilder(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = g.MergeProcess(b2)
+	err = g.AddProcesses(b2)
 	if err != nil {
 		t.Fatal(err)
 	}

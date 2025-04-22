@@ -89,9 +89,9 @@ func NewBpnmBuilder(path string) (*BpnmBuilder, error) {
 	json.Unmarshal(jsonProva, &Bpnm)
 	return &Bpnm, nil
 }
-func (b *BpnmBuilder) MergeProcess(toMerge *BpnmBuilder) error {
+func (b *BpnmBuilder) AddProcesses(toMerge *BpnmBuilder) error {
 	var e error
-	if e = b.storage.Merge(toMerge.storage); e != nil {
+	if e = b.storage.MergeUnique(toMerge.storage); e != nil {
 		return e
 	}
 	toMerge.storage = b.storage

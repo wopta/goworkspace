@@ -17,8 +17,11 @@ type StorageData interface {
 	GetAllLocal() map[string]any
 	GetAllGlobal() map[string]any
 	// It merges two storage
-	// If both maps contain the same key, values from source will overwrite those from base.
+	// If both storage contain the same key, values from source will overwrite those from base.
 	Merge(StorageData) error
+	// It merges two unique storage
+	// If both storage contain the same key, return error
+	MergeUnique(StorageData) error
 	//Mark what local resource keep when clean is called
 	markWhatNeeded([]TypeData)
 	//Delete the resource that aren't needed(aren't marked)
@@ -124,6 +127,22 @@ func (base *StorageBpnm) Merge(source StorageData) error {
 	return nil
 }
 
+// copy all data from source -> base, if both have same key return error
+func (base *StorageBpnm) MergeUnique(source StorageData) error {
+	var err error
+	if source == nil {
+		return nil
+	}
+	base.global, err = mergeUniqueMaps(base.global, source.GetAllGlobal())
+	if err != nil {
+		return err
+	}
+	base.local, err = mergeUniqueMaps(base.local, source.GetAllLocal())
+	if err != nil {
+		return err
+	}
+	return nil
+}
 func GetData[t DataBpnm](name string, storage StorageData) (t, error) {
 	data, err := storage.GetLocal(name)
 	var result t
