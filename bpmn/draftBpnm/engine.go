@@ -41,7 +41,7 @@ func (p *ProcessBpnm) run(nameActivity string) error {
 	if p.activeActivities == nil {
 		return fmt.Errorf("Process '%v' has no activity '%v'", p.Name, nameActivity)
 	}
-	//TODO: implement at garbange collector with a counter, to remove old element not used in the next branch
+
 	for {
 		var nextActivities []*Activity
 		for i := range p.activeActivities {
@@ -49,7 +49,6 @@ func (p *ProcessBpnm) run(nameActivity string) error {
 				return err
 			}
 			//TODO: to improve
-
 			m := mergeMaps(p.storageBpnm.getAllGlobal(), p.storageBpnm.getAllLocal())
 			jsonMap := make(map[string]any)
 			b, _ := json.Marshal(m)
