@@ -16,7 +16,8 @@ type StorageData interface {
 	GetGlobal(string) (DataBpnm, error)
 	GetAllLocal() map[string]any
 	GetAllGlobal() map[string]any
-	//move/overwrite all data from source -> base
+	// It merges two storage
+	// If both maps contain the same key, values from source will overwrite those from base.
 	Merge(StorageData) error
 	//Mark what local resource keep when clean is called
 	markWhatNeeded([]TypeData)

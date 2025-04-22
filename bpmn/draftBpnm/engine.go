@@ -72,9 +72,11 @@ func (p *ProcessBpnm) run(nameActivity string) error {
 func (act *Activity) runActivity(nameProcess string, storage StorageData) error {
 	log.Printf("Run process '%v', activity '%v'", nameProcess, act.Name)
 	if pre := act.PreActivity; pre != nil {
-		pre.storageBpnm.Merge(storage)
-		if e := pre.run(pre.DefaultStart); e != nil {
-			return e
+		if err := pre.storageBpnm.Merge(storage); err != nil {
+			return err
+		}
+		if err := pre.run(pre.DefaultStart); err != nil {
+			return err
 		}
 	}
 

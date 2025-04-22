@@ -89,7 +89,23 @@ func NewBpnmBuilder(path string) (*BpnmBuilder, error) {
 	json.Unmarshal(jsonProva, &Bpnm)
 	return &Bpnm, nil
 }
-
+func (b *BpnmBuilder) MergeProcess(toMerge *BpnmBuilder) error {
+	var e error
+	if e = b.storage.Merge(toMerge.storage); e != nil {
+		return e
+	}
+	toMerge.storage = b.storage
+	b.toInject, e = mergeUniqueMaps(b.toInject, toMerge.toInject)
+	if e != nil {
+		return fmt.Errorf("The merging process of injections went bad: %v", e)
+	}
+	b.Processes = append(b.Processes, toMerge.Processes...)
+	b.handlers, e = mergeUniqueMaps(b.handlers, toMerge.handlers)
+	if e != nil {
+		return fmt.Errorf("The merging process of handlers went bad: %v", e)
+	}
+	return nil
+}
 func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 	flow := new(FlowBpnm)
 	flow.Process = make(map[string]*ProcessBpnm)
@@ -133,6 +149,7 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 	return flow, nil
 }
 
+// Inject a processes that will be called before or after activities, it depends on the configuration Order
 func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 	if b.handlers == nil {
 		b.handlers = make(map[string]ActivityHandler)

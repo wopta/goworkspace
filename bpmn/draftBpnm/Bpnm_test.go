@@ -532,3 +532,71 @@ func TestBpnmStoreClean(t *testing.T) {
 	}
 
 }
+func TestMergeBuilder(t *testing.T) {
+	log := &mockLog{}
+	g, err := NewBpnmBuilder("prova.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	storage := NewStorageBpnm()
+	g.AddHandler("init", func(st StorageData) error {
+		log.Println("init")
+		st.AddLocal("validationObject", new(validity))
+		st.AddLocal("garbage1", new(validity))
+		st.AddLocal("garbage2", new(validity))
+		st.AddLocal("garbage3", new(validity))
+		st.AddLocal("error", &Error{Result: false})
+		_, e := st.GetGlobal("policyPr")
+		if e != nil {
+			return e
+		}
+		return nil
+	})
+	g.AddHandler("AEvent", func(st StorageData) error {
+		log.Println("init A")
+		st.AddLocal("validationObject", new(validity))
+		st.AddLocal("error", &Error{Result: false})
+		return nil
+	})
+	g.AddHandler("BEvent", func(st StorageData) error {
+		log.Println("init B")
+		st.AddLocal("validationObject", new(validity))
+		st.AddLocal("error", &Error{Result: false})
+		return nil
+	})
+	g.AddHandler("CEvent", func(st StorageData) error {
+		log.Println("init C")
+		return nil
+	})
+	storage.AddLocal("validationObject", new(validity))
+	storage.AddGlobal("policyPr", &PolicyMock{Age: 2})
+	g.SetStorage(storage)
+	b2, err := getFlowcatnat(log)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = g.MergeProcess(b2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	f, err := g.Build()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = f.Run("provaPre")
+	if err != nil {
+		t.Fatal(err)
+	}
+	exps := []string{
+		"init pre",
+		"init pre-B",
+	}
+	if len(exps) != len(log.log) {
+		t.Fatalf("exp n message: %v,got: %v", len(exps), len(log.log))
+	}
+	for i, exp := range exps {
+		if log.log[i] != exp {
+			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
+		}
+	}
+}
