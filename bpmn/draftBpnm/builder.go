@@ -44,9 +44,10 @@ type ActivityBuilder struct {
 type BranchBuilder struct {
 	OutputDataRequired []TypeData     `json:"outputData,omitempty"`
 	InputDataRequired  []TypeData     `json:"inputData,omitempty"`
-	GatewayType        GatewayType    `json:"gatewayType,omitempty"`
 	Gateways           []GatewayBlock `json:"gateways"`
-	Recorver           string         `json:"recorver,omitempty"`
+	//unused field
+	//GatewayType        GatewayType    `json:"gatewayType,omitempty"`
+	//Recorver           string         `json:"recorver,omitempty"`
 }
 
 type GatewayBlock struct {
@@ -227,7 +228,7 @@ func (b *BranchBuilder) buildBranch() (*Branch, error) {
 		return nil, nil
 	}
 	activity := new(Branch)
-	activity.GatewayType = b.GatewayType
+	//	activity.GatewayType = b.GatewayType
 	activity.RequiredInputData = b.InputDataRequired
 	activity.RequiredOutputData = b.OutputDataRequired
 	return activity, nil

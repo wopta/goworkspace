@@ -33,8 +33,8 @@ const (
 type Branch struct {
 	RequiredOutputData []TypeData
 	RequiredInputData  []TypeData
-	GatewayType        GatewayType
-	Gateway            []*Gateway
+	//	GatewayType        GatewayType
+	Gateway []*Gateway
 }
 
 type Gateway struct {

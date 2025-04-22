@@ -33,8 +33,6 @@
 								"type": "validity"
 							}
 						],
-						"gatewayType": "XOR",
-						"mergingType": "OR",
 						"recorver": "",
 						"gateways": [
 							{
@@ -79,8 +77,6 @@
 								"type": "validity"
 							}
 						],
-						"gatewayType": "XOR",
-						"mergingType": "OR",
 						"recorver": "",
 						"gateways": [
 							{
