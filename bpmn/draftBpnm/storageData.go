@@ -14,14 +14,15 @@ type StorageData interface {
 	AddGlobal(string, DataBpnm) error
 	GetLocal(string) (DataBpnm, error)
 	GetGlobal(string) (DataBpnm, error)
-	GetAllLocal() map[string]any
-	GetAllGlobal() map[string]any
+
+	getAllLocal() map[string]any
+	getAllGlobal() map[string]any
 	// setHigherStorage sets a higher-level storage,
 	// which will be used as a fallback when a local/global key is not found in the current storage.
 	setHigherStorage(StorageData) error
 	// It merges two unique storage
 	// If both storage contain the same key, return error
-	MergeUnique(StorageData) error
+	mergeUnique(StorageData) error
 	//Mark what local resource keep when clean is called
 	markWhatNeeded([]TypeData)
 	//Delete the resource that aren't needed(aren't marked)
@@ -69,11 +70,11 @@ func (p *StorageBpnm) clean() {
 	p.touched = nil
 }
 
-func (p *StorageBpnm) GetAllLocal() map[string]any {
+func (p *StorageBpnm) getAllLocal() map[string]any {
 	return p.local
 }
 
-func (p *StorageBpnm) GetAllGlobal() map[string]any {
+func (p *StorageBpnm) getAllGlobal() map[string]any {
 	return p.global
 }
 
@@ -134,16 +135,16 @@ func (base *StorageBpnm) setHigherStorage(higher StorageData) error {
 }
 
 // copy all data from source -> base, if both have same key return error
-func (base *StorageBpnm) MergeUnique(source StorageData) error {
+func (base *StorageBpnm) mergeUnique(source StorageData) error {
 	var err error
 	if source == nil {
 		return nil
 	}
-	base.global, err = mergeUniqueMaps(base.global, source.GetAllGlobal())
+	base.global, err = mergeUniqueMaps(base.global, source.getAllGlobal())
 	if err != nil {
 		return err
 	}
-	base.local, err = mergeUniqueMaps(base.local, source.GetAllLocal())
+	base.local, err = mergeUniqueMaps(base.local, source.getAllLocal())
 	if err != nil {
 		return err
 	}
