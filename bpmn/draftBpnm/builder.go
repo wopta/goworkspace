@@ -93,7 +93,7 @@ func NewBpnmBuilder(path string) (*BpnmBuilder, error) {
 
 func (b *BpnmBuilder) AddProcesses(toMerge *BpnmBuilder) error {
 	var e error
-	if e = b.storage.MergeUnique(toMerge.storage); e != nil {
+	if e = b.storage.mergeUnique(toMerge.storage); e != nil {
 		return e
 	}
 	toMerge.storage = b.storage

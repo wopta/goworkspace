@@ -50,7 +50,7 @@ func (p *ProcessBpnm) run(nameActivity string) error {
 			}
 			//TODO: to improve
 
-			m := mergeMaps(p.storageBpnm.GetAllGlobal(), p.storageBpnm.GetAllLocal())
+			m := mergeMaps(p.storageBpnm.getAllGlobal(), p.storageBpnm.getAllLocal())
 			jsonMap := make(map[string]any)
 			b, _ := json.Marshal(m)
 			_ = json.Unmarshal(b, &jsonMap)
@@ -141,7 +141,7 @@ func checkLocalStorage(st StorageData, req []TypeData) error {
 }
 
 func checkValidityGlobalStorage(st StorageData, req []TypeData) error {
-	global := st.GetAllGlobal()
+	global := st.getAllGlobal()
 	if len(global) != len(req) {
 		return fmt.Errorf("Stored values (%v) and declared data (in globalData field) (%v) are different", len(global), len(req))
 	}

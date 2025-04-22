@@ -484,8 +484,8 @@ func TestBpnmStoreClean(t *testing.T) {
 		if e != nil {
 			return e
 		}
-		if len(st.GetAllLocal()) != 5 { //output of init
-			return fmt.Errorf("store hasn't been cleaned right, n resource %v", len(st.GetAllLocal()))
+		if len(st.getAllLocal()) != 5 { //output of init
+			return fmt.Errorf("store hasn't been cleaned right, n resource %v", len(st.getAllLocal()))
 		}
 		return nil
 	})
@@ -506,8 +506,8 @@ func TestBpnmStoreClean(t *testing.T) {
 	})
 	g.AddHandler("BEvent", func(st StorageData) error {
 		log.Println("init B")
-		if len(st.GetAllLocal()) != 2 { //output of AEvent
-			return fmt.Errorf("Expected 2 resource from AEvent, got: %v", len(st.GetAllLocal()))
+		if len(st.getAllLocal()) != 2 { //output of AEvent
+			return fmt.Errorf("Expected 2 resource from AEvent, got: %v", len(st.getAllLocal()))
 		}
 		return nil
 	})
