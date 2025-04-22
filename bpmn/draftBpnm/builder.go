@@ -154,6 +154,9 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 
 // Inject a processes that will be called before or after activities, it depends on the configuration Order
 func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
+	if b.storage == nil {
+		return errors.New("No storage defined")
+	}
 	if b.handlers == nil {
 		b.handlers = make(map[string]ActivityHandler)
 	}
@@ -171,6 +174,9 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 			return fmt.Errorf("Injection's been already done: target process: %v, process: injected %v", order.InWhatProcessBeInjected, p.Name)
 		}
 		b.toInject[getKeyInjectedProcess(order.InWhatProcessBeInjected, order.InWhatActivityBeInjected, order.Order)] = process.Process[p.Name]
+	}
+	if err = bpnmToInject.storage.setHigherStorage(b.storage); err != nil {
+		return err
 	}
 	return nil
 }
@@ -204,11 +210,9 @@ func (a *BpnmBuilder) buildActivities(activities []ActivityBuilder, processName 
 		}
 		if pr := a.toInject[getKeyInjectedProcess(processName, activity.Name, PreActivity)]; pr != nil {
 			newActivity.PreActivity = pr
-			newActivity.PreActivity.storageBpnm.setHigherStorage(a.storage)
 		}
 		if pr := a.toInject[getKeyInjectedProcess(processName, activity.Name, PostActivity)]; pr != nil {
 			newActivity.PostActivity = pr
-			newActivity.PostActivity.storageBpnm.setHigherStorage(a.storage)
 		}
 		//To check eventually if the some injection isnt possible
 		delete(a.toInject, getKeyInjectedProcess(processName, activity.Name, PreActivity))
