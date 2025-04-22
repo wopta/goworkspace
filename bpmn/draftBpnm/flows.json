@@ -132,6 +132,10 @@
 				{
 					"name": "policy",
 					"type": "policy"
+				},
+				{
+					"name": "product",
+					"type": "product"
 				}
 			],
 			"description": "Lead process for e-commerce",
@@ -231,6 +235,10 @@
 			"name": "pay",
 			"globalData": [
 				{
+					"name": "policy",
+					"type": "policy"
+				},
+				{
 					"name": "product",
 					"type": "product"
 				}
@@ -293,6 +301,10 @@
 				{
 					"name": "policy",
 					"type": "policy"
+				},
+				{
+					"name": "product",
+					"type": "product"
 				}
 			],
 			"description": "Proposal process",
@@ -332,7 +344,16 @@
 		},
 		{
 			"name": "requestApproval",
-			"globalData": [],
+			"globalData": [
+				{
+					"name": "policy",
+					"type": "policy"
+				},
+				{
+					"name": "product",
+					"type": "product"
+				}
+			],
 			"description": "Request approcal process",
 			"defaultStart": "initRequestApproval",
 			"activities": [
@@ -370,6 +391,10 @@
 		{
 			"name": "sign",
 			"globalData": [
+				{
+					"name": "policy",
+					"type": "policy"
+				},
 				{
 					"name": "product",
 					"type": "product"

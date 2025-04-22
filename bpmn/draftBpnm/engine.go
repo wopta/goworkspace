@@ -145,13 +145,17 @@ func checkLocalStorage(st StorageData, req []TypeData) error {
 }
 
 func checkValidityGlobalStorage(st StorageData, req []TypeData) error {
+	global := st.GetAllGlobal()
+	if len(global) != len(req) {
+		return fmt.Errorf("Stored values (%v) and declared data (in globalData field) (%v) are different", len(global), len(req))
+	}
 	for _, d := range req {
-		v, err := st.GetGlobal(d.Name)
-		if err != nil {
+		v, ok := global[d.Name]
+		if !ok {
 			return fmt.Errorf("Required global resource is not found '%v'", d.Name)
 		}
-		if v.GetType() != d.Type {
-			return fmt.Errorf("Global sesource '%v' has a difference type, exp: '%v', got: '%v'", d.Name, d.Type, v.GetType())
+		if v.(DataBpnm).GetType() != d.Type {
+			return fmt.Errorf("Global sesource '%v' has a difference type, exp: '%v', got: '%v'", d.Name, d.Type, v.(DataBpnm).GetType())
 		}
 	}
 	return nil

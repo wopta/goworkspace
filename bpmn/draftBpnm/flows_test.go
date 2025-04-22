@@ -13,6 +13,7 @@ func funcTest(message string, log *mockLog) func(StorageData) error {
 		return nil
 	}
 }
+
 func getBuilder(log *mockLog, store StorageData) (*FlowBpnm, error) {
 
 	builder, e := NewBpnmBuilder("flows.json")
@@ -73,6 +74,7 @@ var policyEcommerce = models.Policy{Channel: lib.ECommerceChannel}
 var policyMga = models.Policy{Channel: lib.MgaChannel}
 var policyNetwork = models.Policy{Channel: lib.NetworkChannel}
 
+// network
 var productEcommerce = models.Product{Flow: models.ECommerceFlow}
 var productMga = models.Product{Flow: models.MgaFlow}
 var productProviderMga = models.Product{Flow: models.ProviderMgaFlow}
