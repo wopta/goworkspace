@@ -19,7 +19,7 @@ type TypeData struct {
 
 type ProcessBuilder struct {
 	GlobalDataRequired []TypeData        `json:"globalData"`
-	Order              Order             `json:"order"`
+	Order              *Order            `json:"order"`
 	Description        string            `json:"description"`
 	Name               string            `json:"name"`
 	Activities         []ActivityBuilder `json:"activities"`

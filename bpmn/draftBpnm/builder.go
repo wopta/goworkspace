@@ -100,11 +100,14 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 	if b.toInject == nil {
 		b.toInject = make(map[KeyInject]*ProcessBpnm)
 	}
-	var order Order
+	var order *Order
 	for i, p := range bpnmToInject.Processes { //to have a better error
 		order = bpnmToInject.Processes[i].Order
+		if order == nil {
+			return fmt.Errorf("No order defined, the 'order' field isnt filled")
+		}
 		if order.InWhatActivityBeInjected == "end" {
-			bpnmToInject.Processes[i].Order.InWhatActivityBeInjected = fmt.Sprintf("%v_end", order.InWhatProcessBeInjected)
+			order.InWhatActivityBeInjected = fmt.Sprintf("%v_end", order.InWhatProcessBeInjected)
 		}
 		if _, ok := b.toInject[getKeyInjectedProcess(order.InWhatProcessBeInjected, order.InWhatActivityBeInjected, order.Order)]; ok {
 			return fmt.Errorf("Injection's been already done: target process: '%v', process: injected '%v'", order.InWhatProcessBeInjected, p.Name)
