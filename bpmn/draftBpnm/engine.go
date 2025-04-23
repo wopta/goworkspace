@@ -35,6 +35,7 @@ func (f *FlowBpnm) RunAt(processName, activityName string) error {
 }
 
 func (p *ProcessBpnm) run(nameActivity string) error {
+	p.activeActivities = nil
 	if act := p.Activities[nameActivity]; act != nil {
 		p.activeActivities = append(p.activeActivities, p.Activities[nameActivity])
 	}
