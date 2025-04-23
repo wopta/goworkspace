@@ -18,18 +18,6 @@
 							{
 								"name": "validationObject",
 								"type": "validity"
-							},
-							{
-								"name": "garbage1",
-								"type": "validity"
-							},
-							{
-								"name": "garbage2",
-								"type": "validity"
-							},
-							{
-								"name": "garbage3",
-								"type": "validity"
 							}
 						],
 						"gateways": [
