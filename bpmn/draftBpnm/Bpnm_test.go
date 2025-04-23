@@ -32,7 +32,7 @@ func (m *mockLog) Println(mes string) {
 	m.log = append(m.log, mes)
 }
 func addDefaultHandlersForTest(g *BpnmBuilder, log *mockLog) error {
-	return isError(
+	return IsError(
 		g.AddHandler("init", func(st StorageData) error {
 			log.Println("init")
 			st.AddLocal("validationObject", new(validity))

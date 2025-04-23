@@ -73,7 +73,7 @@ func GetData[t DataBpnm](name string, storage StorageData) (t, error) {
 	return result, nil
 }
 
-func isError(errs ...error) error {
+func IsError(errs ...error) error {
 	var res = strings.Builder{}
 	for i := range errs {
 		if errs[i] != nil {
