@@ -23,9 +23,9 @@ type StorageData interface {
 	// It merges two unique storage
 	// If both storage contain the same key, return error
 	mergeUnique(StorageData) error
-	//Mark what local resource keep when clean is called
+	//Mark what local resources keep when clean is called
 	markWhatNeeded([]TypeData)
-	//Delete the resource that aren't needed(aren't marked)
+	//Delete the resources that aren't needed(aren't marked)
 	clean()
 }
 
