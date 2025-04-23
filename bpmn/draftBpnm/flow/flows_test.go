@@ -1,4 +1,4 @@
-package draftbpnm
+package flow
 
 import (
 	"testing"
