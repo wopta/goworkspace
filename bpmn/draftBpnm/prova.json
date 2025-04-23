@@ -14,7 +14,6 @@
 				{
 					"name": "init",
 					"branch": {
-						"inputData": [],
 						"outputData": [
 							{
 								"name": "validationObject",
@@ -100,9 +99,6 @@
 								"type": "validity"
 							}
 						],
-						"inputData": [],
-						"gatewayType": "AND",
-						"mergingType": "AND",
 						"gateways": [
 							{
 								"nextActivities": [

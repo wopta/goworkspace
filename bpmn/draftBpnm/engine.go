@@ -59,6 +59,7 @@ func (p *ProcessBpnm) run(nameActivity string) error {
 			_ = json.Unmarshal(b, &jsonMap)
 
 			listNewActivities, e := p.activeActivities[i].evaluateDecisions(p.Name, p.storageBpnm, jsonMap)
+
 			if e != nil {
 				return e
 			}
@@ -80,8 +81,8 @@ func (act *Activity) runActivity(nameProcess string, storage StorageData) error 
 			return err
 		}
 	}
-
 	if act.Branch != nil {
+		fmt.Printf("process name %v, len %v\n", nameProcess, len(act.Branch.RequiredInputData))
 		if e := checkLocalStorage(storage, act.Branch.RequiredInputData); e != nil {
 			return fmt.Errorf("Process '%v' with activity '%v' has an input error: %v", nameProcess, act.Name, e.Error())
 		}
@@ -122,6 +123,10 @@ func (act *Activity) evaluateDecisions(processName string, storage StorageData, 
 	}
 	for _, ga := range act.Branch.Gateway { //é xor attualmente
 		if ga.Decision == "" {
+			if e := checkLocalStorage(storage, act.Branch.RequiredOutputData); e != nil {
+				return nil, fmt.Errorf("Process '%v' with activity '%v' has an output error: %v", processName, act.Name, e.Error())
+			}
+			storage.markWhatNeeded(act.Branch.RequiredOutputData)
 			return ga.NextActivities, nil
 		}
 		if len(ga.NextActivities) == 0 {
@@ -135,7 +140,7 @@ func (act *Activity) evaluateDecisions(processName string, storage StorageData, 
 		}
 		if result.(bool) {
 			if e := checkLocalStorage(storage, act.Branch.RequiredOutputData); e != nil {
-				return nil, fmt.Errorf("Process '%v' with activity '%v' has error: %v", processName, act.Name, e.Error())
+				return nil, fmt.Errorf("Process '%v' with activity '%v' has an output error: %v", processName, act.Name, e.Error())
 			}
 			storage.markWhatNeeded(act.Branch.RequiredOutputData)
 			res = append(res, ga.NextActivities...)

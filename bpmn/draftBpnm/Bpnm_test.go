@@ -6,6 +6,7 @@ import (
 	"testing"
 )
 
+// TODO: do more test about input and output !!!
 type validity struct {
 	Result bool
 	Step   int
@@ -191,7 +192,7 @@ func TestBpnmMissingOutput(t *testing.T) {
 	if err == nil {
 		t.Fatalf("should have error")
 	}
-	if err.Error() != "Process 'emit' with activity 'init' has error: Required local resource is not found 'validationObject'" {
+	if err.Error() != "Process 'emit' with activity 'init' has an output error: Required local resource is not found 'validationObject'" {
 		t.Fatalf("should have another error, got: %v", err.Error())
 	}
 	if len(log.log) != 1 {
@@ -311,6 +312,7 @@ func getFlowcatnat(log *mockLog) (*BpnmBuilder, error) {
 	})
 	injectedFlow.AddHandler("initPre", func(st StorageData) error {
 		log.Println("init pre")
+		st.AddLocal("error", &Error{})
 		return nil
 	})
 	injectedFlow.AddHandler("save", func(st StorageData) error {
