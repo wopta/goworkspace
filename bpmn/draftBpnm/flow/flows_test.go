@@ -22,7 +22,7 @@ func funcTest(message string, log *mockLog) func(bpnm.StorageData) error {
 	}
 }
 
-func getBuilder(log *mockLog, store bpnm.StorageData) (*bpnm.FlowBpnm, error) {
+func builderFlowChannel(log *mockLog, store bpnm.StorageData) (*bpnm.FlowBpnm, error) {
 
 	builder, e := bpnm.NewBpnmBuilder("channel_flows.json")
 	if e != nil {
@@ -59,9 +59,11 @@ func getBuilder(log *mockLog, store bpnm.StorageData) (*bpnm.FlowBpnm, error) {
 	return builder.Build()
 }
 
-func testFlow(t *testing.T, process string, expectedACtivities []string, store bpnm.StorageData) {
+type builderFlow func(*mockLog, bpnm.StorageData) (*bpnm.FlowBpnm, error)
+
+func testFlow(t *testing.T, process string, expectedACtivities []string, store bpnm.StorageData, builbuilderFlow builderFlow) {
 	log := mockLog{}
-	flow, e := getBuilder(&log, store)
+	flow, e := builbuilderFlow(&log, store)
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -103,7 +105,7 @@ func TestEmitForEcommerce(t *testing.T) {
 		"sendEmitProposalMail",
 		"sendMailSign",
 	}
-	testFlow(t, "emit", exps, store)
+	testFlow(t, "emit", exps, store, builderFlowChannel)
 }
 
 func TestLeadForEcommerce(t *testing.T) {
@@ -115,7 +117,7 @@ func TestLeadForEcommerce(t *testing.T) {
 		"setLeadData",
 		"sendLeadMail",
 	}
-	testFlow(t, "lead", exps, store)
+	testFlow(t, "lead", exps, store, builderFlowChannel)
 }
 
 func TestProposalForEcommerce(t *testing.T) {
@@ -124,7 +126,7 @@ func TestProposalForEcommerce(t *testing.T) {
 	store.AddGlobal("product", &productEcommerce)
 
 	exps := []string{}
-	testFlow(t, "proposal", exps, store)
+	testFlow(t, "proposal", exps, store, builderFlowChannel)
 }
 
 func TestPayForEcommerce(t *testing.T) {
@@ -136,7 +138,7 @@ func TestPayForEcommerce(t *testing.T) {
 		"updatePolicy",
 		"payTransaction",
 	}
-	testFlow(t, "pay", exps, store)
+	testFlow(t, "pay", exps, store, builderFlowChannel)
 }
 
 func TestSignForEcommerce(t *testing.T) {
@@ -150,7 +152,7 @@ func TestSignForEcommerce(t *testing.T) {
 		"setToPay",
 		"sendMailPay",
 	}
-	testFlow(t, "sign", exps, store)
+	testFlow(t, "sign", exps, store, builderFlowChannel)
 }
 
 func TestEmitForMga(t *testing.T) {
@@ -159,7 +161,7 @@ func TestEmitForMga(t *testing.T) {
 	store.AddGlobal("product", &productMga)
 
 	exps := []string{}
-	testFlow(t, "emit", exps, store)
+	testFlow(t, "emit", exps, store, builderFlowChannel)
 }
 
 func TestLeadForMga(t *testing.T) {
@@ -170,7 +172,7 @@ func TestLeadForMga(t *testing.T) {
 	exps := []string{
 		"setLeadData",
 	}
-	testFlow(t, "lead", exps, store)
+	testFlow(t, "lead", exps, store, builderFlowChannel)
 }
 
 func TestProposalForMga(t *testing.T) {
@@ -181,7 +183,7 @@ func TestProposalForMga(t *testing.T) {
 	exps := []string{
 		"setProposalData",
 	}
-	testFlow(t, "proposal", exps, store)
+	testFlow(t, "proposal", exps, store, builderFlowChannel)
 }
 
 func TestApprovalForMga(t *testing.T) {
@@ -190,7 +192,7 @@ func TestApprovalForMga(t *testing.T) {
 	store.AddGlobal("product", &productMga)
 
 	exps := []string{}
-	testFlow(t, "requestApproval", exps, store)
+	testFlow(t, "requestApproval", exps, store, builderFlowChannel)
 }
 
 func TestPayForMga(t *testing.T) {
@@ -202,7 +204,7 @@ func TestPayForMga(t *testing.T) {
 		"updatePolicy",
 		"payTransaction",
 	}
-	testFlow(t, "pay", exps, store)
+	testFlow(t, "pay", exps, store, builderFlowChannel)
 }
 
 func TestSignForMga(t *testing.T) {
@@ -215,7 +217,7 @@ func TestSignForMga(t *testing.T) {
 		"setSign",
 		"setToPay",
 	}
-	testFlow(t, "sign", exps, store)
+	testFlow(t, "sign", exps, store, builderFlowChannel)
 }
 
 func TestEmitForProviderMga(t *testing.T) {
@@ -231,7 +233,7 @@ func TestEmitForProviderMga(t *testing.T) {
 		"sendEmitProposalMail",
 		"sendMailSign",
 	}
-	testFlow(t, "emit", exps, store)
+	testFlow(t, "emit", exps, store, builderFlowChannel)
 }
 
 func TestLeadForProviderMga(t *testing.T) {
@@ -242,7 +244,7 @@ func TestLeadForProviderMga(t *testing.T) {
 	exps := []string{
 		"setLeadData",
 	}
-	testFlow(t, "lead", exps, store)
+	testFlow(t, "lead", exps, store, builderFlowChannel)
 }
 
 func TestProposalForProviderMga(t *testing.T) {
@@ -254,7 +256,7 @@ func TestProposalForProviderMga(t *testing.T) {
 		"setProposalData",
 		"sendProposalMail",
 	}
-	testFlow(t, "proposal", exps, store)
+	testFlow(t, "proposal", exps, store, builderFlowChannel)
 }
 
 func TestApprovalForProviderMga(t *testing.T) {
@@ -266,7 +268,7 @@ func TestApprovalForProviderMga(t *testing.T) {
 		"setRequestApprovalData",
 		"sendRequestApprovalMail",
 	}
-	testFlow(t, "requestApproval", exps, store)
+	testFlow(t, "requestApproval", exps, store, builderFlowChannel)
 }
 
 func TestPayForProviderMga(t *testing.T) {
@@ -278,7 +280,7 @@ func TestPayForProviderMga(t *testing.T) {
 		"updatePolicy",
 		"payTransaction",
 	}
-	testFlow(t, "pay", exps, store)
+	testFlow(t, "pay", exps, store, builderFlowChannel)
 }
 
 func TestSignForProviderMga(t *testing.T) {
@@ -292,7 +294,7 @@ func TestSignForProviderMga(t *testing.T) {
 		"setToPay",
 		"sendMailPay",
 	}
-	testFlow(t, "sign", exps, store)
+	testFlow(t, "sign", exps, store, builderFlowChannel)
 }
 
 func TestEmitForRemittanceMga(t *testing.T) {
@@ -307,7 +309,7 @@ func TestEmitForRemittanceMga(t *testing.T) {
 		"setAdvice",
 		"putUser",
 	}
-	testFlow(t, "emit", exps, store)
+	testFlow(t, "emit", exps, store, builderFlowChannel)
 }
 
 func TestLeadForRemittanceMga(t *testing.T) {
@@ -318,7 +320,7 @@ func TestLeadForRemittanceMga(t *testing.T) {
 	exps := []string{
 		"setLeadData",
 	}
-	testFlow(t, "lead", exps, store)
+	testFlow(t, "lead", exps, store, builderFlowChannel)
 }
 
 func TestProposalForRemittanceMga(t *testing.T) {
@@ -330,7 +332,7 @@ func TestProposalForRemittanceMga(t *testing.T) {
 		"setProposalData",
 		"sendProposalMail",
 	}
-	testFlow(t, "proposal", exps, store)
+	testFlow(t, "proposal", exps, store, builderFlowChannel)
 }
 
 func TestApprovalForRemittanceMga(t *testing.T) {
@@ -342,7 +344,7 @@ func TestApprovalForRemittanceMga(t *testing.T) {
 		"setRequestApprovalData",
 		"sendRequestApprovalMail",
 	}
-	testFlow(t, "requestApproval", exps, store)
+	testFlow(t, "requestApproval", exps, store, builderFlowChannel)
 }
 
 func TestPayForRemittanceMga(t *testing.T) {
@@ -351,7 +353,7 @@ func TestPayForRemittanceMga(t *testing.T) {
 	store.AddGlobal("product", &productRemittanceMga)
 
 	exps := []string{}
-	testFlow(t, "pay", exps, store)
+	testFlow(t, "pay", exps, store, builderFlowChannel)
 }
 
 func TestSignForRemittanceMga(t *testing.T) {
@@ -364,5 +366,5 @@ func TestSignForRemittanceMga(t *testing.T) {
 		"addContract",
 		"sendMailContract",
 	}
-	testFlow(t, "sign", exps, store)
+	testFlow(t, "sign", exps, store, builderFlowChannel)
 }
