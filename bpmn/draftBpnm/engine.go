@@ -23,7 +23,7 @@ func (f *FlowBpnm) RunAt(processName, activityName string) error {
 	if process == nil {
 		return fmt.Errorf("Process '%v' not founded", processName)
 	}
-	if e := checkValidityGlobalStorage(process.storageBpnm, process.RequiredGlobalData); e != nil {
+	if e := checkGlobalResources(process.storageBpnm, process.RequiredGlobalData); e != nil {
 		return e
 	}
 
@@ -83,7 +83,7 @@ func (act *Activity) runActivity(nameProcess string, storage StorageData) error 
 	}
 	if act.Branch != nil {
 		fmt.Printf("process name %v, len %v\n", nameProcess, len(act.Branch.RequiredInputData))
-		if e := checkLocalStorage(storage, act.Branch.RequiredInputData); e != nil {
+		if e := checkLocalResources(storage, act.Branch.RequiredInputData); e != nil {
 			return fmt.Errorf("Process '%v' with activity '%v' has an input error: %v", nameProcess, act.Name, e.Error())
 		}
 	}
@@ -123,7 +123,7 @@ func (act *Activity) evaluateDecisions(processName string, storage StorageData, 
 	}
 	for _, ga := range act.Branch.Gateway { //é xor attualmente
 		if ga.Decision == "" {
-			if e := checkLocalStorage(storage, act.Branch.RequiredOutputData); e != nil {
+			if e := checkLocalResources(storage, act.Branch.RequiredOutputData); e != nil {
 				return nil, fmt.Errorf("Process '%v' with activity '%v' has an output error: %v", processName, act.Name, e.Error())
 			}
 			storage.markWhatNeeded(act.Branch.RequiredOutputData)
@@ -139,7 +139,7 @@ func (act *Activity) evaluateDecisions(processName string, storage StorageData, 
 			return nil, fmt.Errorf("Process '%v' with activity '%v' has an eval error: %v", processName, act.Name, e.Error())
 		}
 		if result.(bool) {
-			if e := checkLocalStorage(storage, act.Branch.RequiredOutputData); e != nil {
+			if e := checkLocalResources(storage, act.Branch.RequiredOutputData); e != nil {
 				return nil, fmt.Errorf("Process '%v' with activity '%v' has an output error: %v", processName, act.Name, e.Error())
 			}
 			storage.markWhatNeeded(act.Branch.RequiredOutputData)
@@ -150,7 +150,7 @@ func (act *Activity) evaluateDecisions(processName string, storage StorageData, 
 	return res, nil
 }
 
-func checkLocalStorage(st StorageData, req []TypeData) error {
+func checkLocalResources(st StorageData, req []TypeData) error {
 	local := st.getAllLocal()
 	for _, d := range req {
 		v, ok := local[d.Name]
@@ -164,7 +164,7 @@ func checkLocalStorage(st StorageData, req []TypeData) error {
 	return nil
 }
 
-func checkValidityGlobalStorage(st StorageData, req []TypeData) error {
+func checkGlobalResources(st StorageData, req []TypeData) error {
 	global := st.getAllGlobal()
 	for _, d := range req {
 		v, ok := global[d.Name]
