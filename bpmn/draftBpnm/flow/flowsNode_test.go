@@ -1,11 +1,32 @@
 package flow
 
 import (
+	"errors"
+	"net/http"
 	"testing"
 
 	bpnm "github.com/wopta/goworkspace/bpmn/draftBpnm"
 	"github.com/wopta/goworkspace/models"
 )
+
+type callbackInfo struct {
+	Request     *http.Request
+	RequestBody []byte
+	Response    *http.Response
+	Error       error
+}
+
+func (c *callbackInfo) GetType() string {
+	return "callbackInfo"
+}
+
+func funcTestWithInfo(message string, log *mockLog) func(bpnm.StorageData) error {
+	return func(st bpnm.StorageData) error {
+		log.Println(message)
+		st.AddLocal("callbackInfo", &callbackInfo{})
+		return nil
+	}
+}
 
 func builderFlowNode(log *mockLog, store bpnm.StorageData) (*bpnm.FlowBpnm, error) {
 
@@ -15,9 +36,9 @@ func builderFlowNode(log *mockLog, store bpnm.StorageData) (*bpnm.FlowBpnm, erro
 	}
 	builder.SetStorage(store)
 	e = bpnm.IsError(
-		builder.AddHandler("WinEmit", funcTest("WinEmit", log)),
-		builder.AddHandler("BaseCallback", funcTest("BaseCallback", log)),
-		builder.AddHandler("ErrorCallbackConfig", funcTest("ErrorCallbackConfig", log)),
+		builder.AddHandler("WinEmit", funcTestWithInfo("WinEmit", log)),
+		builder.AddHandler("BaseCallback", funcTestWithInfo("BaseCallback", log)),
+		builder.AddHandler("ErrorCallbackConfig", func(sd bpnm.StorageData) error { return errors.New("callback client not set") }),
 		builder.AddHandler("SaveAudit", funcTest("SaveAudit", log)),
 	)
 	if e != nil {
@@ -58,8 +79,14 @@ func TestEmitForBrokenNode(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("node", &brokenNode)
-	exps := []string{
-		"ErrorCallbackConfig",
+
+	log := mockLog{}
+	flow, err := builderFlowNode(&log, store)
+	if err != nil {
+		t.Fatal(err)
 	}
-	testFlow(t, "emit", exps, store, builderFlowNode)
+	err = flow.Run("emit")
+	if err == nil {
+		t.Fatal("Should have an error")
+	}
 }
