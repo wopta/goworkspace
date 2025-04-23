@@ -83,15 +83,19 @@ func testFlow(t *testing.T, process string, expectedACtivities []string, store b
 	}
 }
 
-var policyEcommerce = models.Policy{Channel: lib.ECommerceChannel}
-var policyMga = models.Policy{Channel: lib.MgaChannel}
-var policyNetwork = models.Policy{Channel: lib.NetworkChannel}
+var (
+	policyEcommerce = models.Policy{Channel: lib.ECommerceChannel}
+	policyMga       = models.Policy{Channel: lib.MgaChannel}
+	policyNetwork   = models.Policy{Channel: lib.NetworkChannel}
+)
 
 // network
-var productEcommerce = models.Product{Flow: models.ECommerceFlow}
-var productMga = models.Product{Flow: models.MgaFlow}
-var productProviderMga = models.Product{Flow: models.ProviderMgaFlow}
-var productRemittanceMga = models.Product{Flow: models.RemittanceMgaFlow}
+var (
+	productEcommerce     = models.Product{Flow: models.ECommerceFlow}
+	productMga           = models.Product{Flow: models.MgaFlow}
+	productProviderMga   = models.Product{Flow: models.ProviderMgaFlow}
+	productRemittanceMga = models.Product{Flow: models.RemittanceMgaFlow}
+)
 
 func TestEmitForEcommerce(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
