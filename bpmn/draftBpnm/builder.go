@@ -59,6 +59,7 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 		process.storageBpnm = b.storage
 		process.Name = p.Name
 		process.RequiredGlobalData = p.GlobalDataRequired
+		p.Activities = append(p.Activities, buildEndingActivity(p.Name))
 		builtActivities, err := b.buildActivities(p.Activities, p.Name)
 		if err != nil {
 			return nil, err
@@ -99,18 +100,26 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 	if b.toInject == nil {
 		b.toInject = make(map[KeyInject]*ProcessBpnm)
 	}
+	var order Order
+	for i, p := range bpnmToInject.Processes { //to have a better error
+		order = bpnmToInject.Processes[i].Order
+		if order.InWhatActivityBeInjected == "end" {
+			bpnmToInject.Processes[i].Order.InWhatActivityBeInjected = fmt.Sprintf("%v_end", order.InWhatProcessBeInjected)
+		}
+		if _, ok := b.toInject[getKeyInjectedProcess(order.InWhatProcessBeInjected, order.InWhatActivityBeInjected, order.Order)]; ok {
+			return fmt.Errorf("Injection's been already done: target process: '%v', process: injected '%v'", order.InWhatProcessBeInjected, p.Name)
+		}
+	}
 	process, err := bpnmToInject.Build()
 	if err != nil {
 		return err
 	}
-	var order Order
+
 	for i, p := range bpnmToInject.Processes {
 		order = bpnmToInject.Processes[i].Order
-		if _, ok := b.toInject[getKeyInjectedProcess(order.InWhatProcessBeInjected, order.InWhatActivityBeInjected, order.Order)]; ok {
-			return fmt.Errorf("Injection's been already done: target process: %v, process: injected %v", order.InWhatProcessBeInjected, p.Name)
-		}
 		b.toInject[getKeyInjectedProcess(order.InWhatProcessBeInjected, order.InWhatActivityBeInjected, order.Order)] = process.Process[p.Name]
 	}
+
 	if err = bpnmToInject.storage.setHigherStorage(b.storage); err != nil {
 		return err
 	}
@@ -136,13 +145,13 @@ func (a *BpnmBuilder) buildActivities(activities []ActivityBuilder, processName 
 	result := make(map[string]*Activity)
 	for _, activity := range activities {
 		if _, ok := result[activity.Name]; ok {
-			return nil, fmt.Errorf("Double event with same name %v", activity.Name)
+			return nil, fmt.Errorf("Double event with same name '%v'", activity.Name)
 		}
 		newActivity := new(Activity)
 
 		handler, ok := a.handlers[activity.Name]
 		if !activity.HandlerLess && !ok {
-			return nil, fmt.Errorf("No handler registered for the activity: %v", activity.Name)
+			return nil, fmt.Errorf("No handler registered for the activity: '%v'", activity.Name)
 		}
 		if pr := a.toInject[getKeyInjectedProcess(processName, activity.Name, PreActivity)]; pr != nil {
 			newActivity.PreActivity = pr
@@ -211,4 +220,13 @@ func (p *ProcessBpnm) hydrateGateways(activities []ActivityBuilder) error {
 		p.Activities[builderActivity.Name].Branch.Gateway = gateways
 	}
 	return nil
+}
+
+func buildEndingActivity(processName string) ActivityBuilder {
+	return ActivityBuilder{
+		Name:        fmt.Sprintf("%v_end", processName),
+		Description: fmt.Sprint("end activity for ", processName),
+		Branch:      nil,
+		HandlerLess: true,
+	}
 }

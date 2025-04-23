@@ -65,6 +65,7 @@ func (p *ProcessBpnm) run(nameActivity string) error {
 			nextActivities = append(nextActivities, listNewActivities...)
 		}
 		if len(nextActivities) == 0 {
+			p.Activities[fmt.Sprintf("%v_end", p.Name)].runActivity(p.Name, p.storageBpnm)
 			return nil
 		}
 		p.activeActivities = nextActivities

@@ -289,7 +289,7 @@ func TestBpnmMissingHandler(t *testing.T) {
 		return nil
 	})
 	_, err = g.Build()
-	if err.Error() != "No handler registered for the activity: AEvent" {
+	if err.Error() != "No handler registered for the activity: 'AEvent'" {
 		t.Fatalf("should have another error, got: %v", err.Error())
 	}
 	if len(log.log) != 0 {
@@ -311,6 +311,10 @@ func getFlowcatnat(log *mockLog) (*BpnmBuilder, error) {
 	})
 	injectedFlow.AddHandler("initPre", func(st StorageData) error {
 		log.Println("init pre")
+		return nil
+	})
+	injectedFlow.AddHandler("save", func(st StorageData) error {
+		log.Println("end process")
 		return nil
 	})
 	return injectedFlow, err
@@ -351,6 +355,10 @@ func TestBpnmInjection(t *testing.T) {
 		"init post",
 		"init A",
 		"init post",
+		"end process",
+	}
+	if len(exps) != len(log.log) {
+		t.Fatalf("exp n message: %v,got: %v", len(exps), len(log.log))
 	}
 	for i, exp := range exps {
 		if log.log[i] != exp {
@@ -377,7 +385,7 @@ func TestBpnmWithMultipleInjection(t *testing.T) {
 		t.Fatalf("Should have an error")
 	}
 
-	if err.Error() != "Injection's been already done: target process: emit, process: injected provaPost" {
+	if err.Error() != "Injection's been already done: target process: 'emit', process: injected 'provaPost'" {
 		t.Fatalf("Should have the error,exp: Injection's been already done: target process: emit, process: injected provaPost, got: %v", err.Error())
 	}
 }
@@ -413,6 +421,7 @@ func TestRunFromSpecificActivity(t *testing.T) {
 		"init B",
 		"init A",
 		"init post",
+		"end process",
 	}
 	if len(exps) != len(log.log) {
 		t.Fatalf("exp n message: %v,got: %v", len(exps), len(log.log))
