@@ -15,7 +15,7 @@ func funcTest(message string, log *mockLog) func(StorageData) error {
 
 func getBuilder(log *mockLog, store StorageData) (*FlowBpnm, error) {
 
-	builder, e := NewBpnmBuilder("flows.json")
+	builder, e := NewBpnmBuilder("channel_flows.json")
 	if e != nil {
 		return nil, e
 	}
