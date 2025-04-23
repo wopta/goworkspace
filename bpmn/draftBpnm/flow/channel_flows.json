@@ -2,7 +2,7 @@
 	"processes": [
 		{
 			"name": "emit",
-			"defaultStart": "initEmit",
+			"defaultStart": "init",
 			"globalData": [
 				{
 					"name": "policy",
@@ -16,7 +16,7 @@
 			"description": "Emit process",
 			"activities": [
 				{
-					"name": "initEmit",
+					"name": "init",
 					"handlerless": true,
 					"branch": {
 						"gateways": [
@@ -127,7 +127,7 @@
 		},
 		{
 			"name": "lead",
-			"defaultStart": "initLead",
+			"defaultStart": "init",
 			"globalData": [
 				{
 					"name": "policy",
@@ -141,7 +141,7 @@
 			"description": "Lead process for e-commerce",
 			"activities": [
 				{
-					"name": "initLead",
+					"name": "init",
 					"handlerless": true,
 					"branch": {
 						"gateways": [
@@ -245,10 +245,10 @@
 				}
 			],
 			"description": "Payiment process",
-			"defaultStart": "initPay",
+			"defaultStart": "init",
 			"activities": [
 				{
-					"name": "initPay",
+					"name": "init",
 					"handlerless": true,
 					"branch": {
 						"inputData": [],
@@ -309,10 +309,10 @@
 				}
 			],
 			"description": "Proposal process",
-			"defaultStart": "initProposal",
+			"defaultStart": "init",
 			"activities": [
 				{
-					"name": "initProposal",
+					"name": "init",
 					"handlerless": true,
 					"branch": {
 						"gateways": [
@@ -357,10 +357,10 @@
 				}
 			],
 			"description": "Request approcal process",
-			"defaultStart": "initRequestApproval",
+			"defaultStart": "init",
 			"activities": [
 				{
-					"name": "initRequestApproval",
+					"name": "init",
 					"handlerless": true,
 					"branch": {
 						"gateways": [
@@ -403,10 +403,10 @@
 				}
 			],
 			"description": "Sign process",
-			"defaultStart": "initSign",
+			"defaultStart": "init",
 			"activities": [
 				{
-					"name": "initSign",
+					"name": "init",
 					"handlerless": true,
 					"branch": {
 						"gateways": [
