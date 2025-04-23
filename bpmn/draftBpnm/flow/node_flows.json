@@ -1,0 +1,82 @@
+{
+	"processes": [
+		{
+			"name": "emit",
+			"description": "Callback for emit process",
+			"globalData": [
+				{
+					"name": "policy",
+					"type": "policy"
+				},
+				{
+					"name": "node",
+					"type": "networkNode"
+				}
+			],
+			"order": {
+				"inWhatProcessInject": "emit",
+				"inWhatActivityInject": "end",
+				"order": "post"
+			},
+			"defaultStart": "init",
+			"activities": [
+				{
+					"name": "init",
+					"handlerless": true,
+					"branch": {
+						"gateways": [
+							{
+								"nextActivities": [
+									"WinEmit"
+								],
+								"decision": "node.callbackConfig.name==`winClient`"
+							},
+							{
+								"nextActivities": [
+									"BaseCallback"
+								],
+								"decision": "node.callbackConfig.name==`facileBrokerClient`"
+							},
+							{
+								"nextActivities": [
+									"ErrorCallbackConfig"
+								]
+							}
+						]
+					}
+				},
+				{
+					"name": "BaseCallback",
+					"branch": {
+						"gateways": [
+							{
+								"nextActivities": [
+									"SaveAudit"
+								]
+							}
+						]
+					}
+				},
+				{
+					"name": "WinEmit",
+					"branch": {
+						"gateways": [
+							{
+								"nextActivities": [
+									"SaveAudit"
+								]
+							}
+						]
+					}
+				},
+				{
+					"name": "ErrorCallbackConfig",
+					"description": "Return error when callbackConfig.Name isn't right"
+				},
+				{
+					"name": "SaveAudit"
+				}
+			]
+		}
+	]
+}
