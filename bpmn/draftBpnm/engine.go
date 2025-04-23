@@ -127,30 +127,26 @@ func (act *Activity) evaluateDecisions(processName string, storage StorageData, 
 }
 
 func checkLocalStorage(st StorageData, req []TypeData) error {
-	for _, dR := range req {
-		d, err := st.GetLocal(dR.Name)
+	for _, d := range req {
+		v, err := st.GetLocal(d.Name)
 		if err != nil {
-			return fmt.Errorf("Resource required is not found '%v'", dR.Name)
+			return fmt.Errorf("Required local resource is not found '%v'", d.Name)
 		}
-		if d.(DataBpnm).GetType() != dR.Type {
-			return fmt.Errorf("Resource '%v' has a difference type, exp: '%v', got: '%v'", dR.Name, dR.Type, d.(DataBpnm).GetType())
+		if v.GetType() != d.Type {
+			return fmt.Errorf("Local resource '%v' has a difference type, exp: '%v', got: '%v'", d.Name, d.Type, v.GetType())
 		}
 	}
 	return nil
 }
 
 func checkValidityGlobalStorage(st StorageData, req []TypeData) error {
-	global := st.getAllGlobal()
-	if len(global) != len(req) {
-		return fmt.Errorf("Stored values (%v) and declared data (in globalData field) (%v) are different", len(global), len(req))
-	}
 	for _, d := range req {
-		v, ok := global[d.Name]
-		if !ok {
+		v, err := st.GetGlobal(d.Name)
+		if err != nil {
 			return fmt.Errorf("Required global resource is not found '%v'", d.Name)
 		}
-		if v.(DataBpnm).GetType() != d.Type {
-			return fmt.Errorf("Global sesource '%v' has a difference type, exp: '%v', got: '%v'", d.Name, d.Type, v.(DataBpnm).GetType())
+		if v.GetType() != d.Type {
+			return fmt.Errorf("Global resource '%v' has a difference type, exp: '%v', got: '%v'", d.Name, d.Type, v.GetType())
 		}
 	}
 	return nil

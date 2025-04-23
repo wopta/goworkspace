@@ -192,7 +192,7 @@ func TestBpnmMissingOutput(t *testing.T) {
 	if err == nil {
 		t.Fatalf("should have error")
 	}
-	if err.Error() != "Process 'emit' with activity 'init' has error: Resource required is not found 'validationObject'" {
+	if err.Error() != "Process 'emit' with activity 'init' has error: Required local resource is not found 'validationObject'" {
 		t.Fatalf("should have another error, got: %v", err.Error())
 	}
 	if len(log.log) != 1 {
@@ -239,7 +239,7 @@ func TestBpnmMissingInput(t *testing.T) {
 	if err == nil {
 		t.Fatalf("should have error")
 	}
-	if err.Error() != "Process 'emit' with activity 'CEvent' has an input error: Resource required is not found 'error'" {
+	if err.Error() != "Process 'emit' with activity 'CEvent' has an input error: Required local resource is not found 'error'" {
 		t.Fatalf("should have another error, got: %v", err.Error())
 	}
 	if len(log.log) != 1 {
