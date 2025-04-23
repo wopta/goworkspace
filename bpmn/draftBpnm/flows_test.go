@@ -1,10 +1,9 @@
 package draftbpnm
 
 import (
-	"testing"
-
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"testing"
 )
 
 func funcTest(message string, log *mockLog) func(StorageData) error {
@@ -20,30 +19,33 @@ func getBuilder(log *mockLog, store StorageData) (*FlowBpnm, error) {
 	if e != nil {
 		return nil, e
 	}
-
 	builder.SetStorage(store)
-
-	builder.AddHandler("setProposalData", funcTest("setProposalData", log))
-	builder.AddHandler("emitData", funcTest("emitData", log))
-	builder.AddHandler("sendMailSign", funcTest("sendMailSign", log))
-	builder.AddHandler("pay", funcTest("pay", log))
-	builder.AddHandler("setAdvice", funcTest("setAdvice", log))
-	builder.AddHandler("putUser", funcTest("putUser", log))
-	builder.AddHandler("sendEmitProposalMail", funcTest("sendEmitProposalMail", log))
-	builder.AddHandler("setLeadData", funcTest("setLeadData", log))
-	builder.AddHandler("sendLeadMail", funcTest("sendLeadMail", log))
-	builder.AddHandler("updatePolicy", funcTest("updatePolicy", log))
-	builder.AddHandler("sign", funcTest("sign", log))
-	builder.AddHandler("payTransaction", funcTest("payTransaction", log))
-	builder.AddHandler("sendProposalMail", funcTest("sendProposalMail", log))
-	builder.AddHandler("fillAttachments", funcTest("fillAttachments", log))
-	builder.AddHandler("setToPay", funcTest("setToPay", log))
-	builder.AddHandler("setSign", funcTest("setSign", log))
-	builder.AddHandler("sendMailContract", funcTest("sendMailContract", log))
-	builder.AddHandler("sendMailPay", funcTest("sendMailPay", log))
-	builder.AddHandler("setRequestApprovalData", funcTest("setRequestApprovalData", log))
-	builder.AddHandler("sendRequestApprovalMail", funcTest("sendRequestApprovalMail", log))
-	builder.AddHandler("addContract", funcTest("addContract", log))
+	e = isError(
+		builder.AddHandler("setProposalData", funcTest("setProposalData", log)),
+		builder.AddHandler("emitData", funcTest("emitData", log)),
+		builder.AddHandler("sendMailSign", funcTest("sendMailSign", log)),
+		builder.AddHandler("pay", funcTest("pay", log)),
+		builder.AddHandler("setAdvice", funcTest("setAdvice", log)),
+		builder.AddHandler("putUser", funcTest("putUser", log)),
+		builder.AddHandler("sendEmitProposalMail", funcTest("sendEmitProposalMail", log)),
+		builder.AddHandler("setLeadData", funcTest("setLeadData", log)),
+		builder.AddHandler("sendLeadMail", funcTest("sendLeadMail", log)),
+		builder.AddHandler("updatePolicy", funcTest("updatePolicy", log)),
+		builder.AddHandler("sign", funcTest("sign", log)),
+		builder.AddHandler("payTransaction", funcTest("payTransaction", log)),
+		builder.AddHandler("sendProposalMail", funcTest("sendProposalMail", log)),
+		builder.AddHandler("fillAttachments", funcTest("fillAttachments", log)),
+		builder.AddHandler("setToPay", funcTest("setToPay", log)),
+		builder.AddHandler("setSign", funcTest("setSign", log)),
+		builder.AddHandler("sendMailContract", funcTest("sendMailContract", log)),
+		builder.AddHandler("sendMailPay", funcTest("sendMailPay", log)),
+		builder.AddHandler("setRequestApprovalData", funcTest("setRequestApprovalData", log)),
+		builder.AddHandler("sendRequestApprovalMail", funcTest("sendRequestApprovalMail", log)),
+		builder.AddHandler("addContract", funcTest("addContract", log)),
+	)
+	if e != nil {
+		return nil, e
+	}
 
 	return builder.Build()
 }

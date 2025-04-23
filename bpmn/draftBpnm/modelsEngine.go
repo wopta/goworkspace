@@ -21,6 +21,7 @@ type Activity struct {
 	PreActivity  *ProcessBpnm
 	PostActivity *ProcessBpnm
 	Branch       *Branch
+	recover      ActivityHandler
 }
 
 type GatewayType string

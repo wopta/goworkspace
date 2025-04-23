@@ -157,6 +157,15 @@ func (a *BpnmBuilder) buildActivities(activities []ActivityBuilder, processName 
 		newActivity.Name = activity.Name
 		newActivity.Description = activity.Description
 		newActivity.handler = handler
+
+		if activity.Recover != "" {
+			rec, ok := a.handlers[activity.Recover]
+			if !ok {
+				return nil, fmt.Errorf("No handler registered for recovery '%v' in activity: '%v'", activity.Recover, activity.Name)
+			}
+			newActivity.recover = rec
+		}
+
 		if activity.Branch != nil {
 			builtBranch, e := activity.Branch.buildBranch()
 			if e != nil {

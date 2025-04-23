@@ -3,6 +3,7 @@ package draftbpnm
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 type ActivityHandler func(StorageData) error
@@ -70,4 +71,17 @@ func GetData[t DataBpnm](name string, storage StorageData) (t, error) {
 		return *new(t), fmt.Errorf("Data '%v' with type %v founded has a different type than '%v'", name, result.GetType(), data.GetType())
 	}
 	return result, nil
+}
+
+func isError(errs ...error) error {
+	var res = strings.Builder{}
+	for i := range errs {
+		if errs[i] != nil {
+			res.WriteString(errs[i].Error() + ",")
+		}
+	}
+	if res.Len() == 0 {
+		return nil
+	}
+	return errors.New(res.String())
 }

@@ -31,6 +31,7 @@ type ActivityBuilder struct {
 	Description string         `json:"description"`
 	Branch      *BranchBuilder `json:"branch"`
 	HandlerLess bool           `json:"handlerless"`
+	Recover     string         `json:"recover"`
 }
 
 type BranchBuilder struct {

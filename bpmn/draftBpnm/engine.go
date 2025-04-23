@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/maja42/goval"
 	"log"
+
+	"github.com/maja42/goval"
 )
 
 func (f *FlowBpnm) Run(processName string) error {
@@ -34,11 +35,13 @@ func (f *FlowBpnm) RunAt(processName, activityName string) error {
 }
 
 func (p *ProcessBpnm) run(nameActivity string) error {
-	p.activeActivities = append(p.activeActivities, p.Activities[nameActivity])
+	if act := p.Activities[nameActivity]; act != nil {
+		p.activeActivities = append(p.activeActivities, p.Activities[nameActivity])
+	}
 	if p.storageBpnm == nil {
 		return errors.New("Miss storage")
 	}
-	if p.activeActivities == nil {
+	if p.activeActivities == nil || len(p.activeActivities) == 0 {
 		return fmt.Errorf("Process '%v' has no activity '%v'", p.Name, nameActivity)
 	}
 
@@ -83,8 +86,22 @@ func (act *Activity) runActivity(nameProcess string, storage StorageData) error 
 	}
 
 	if act.handler != nil {
-		if e := act.handler(storage); e != nil {
-			return e
+		var err error
+		func() {
+			defer func() {
+				if act.recover == nil {
+					return
+				}
+				if r := recover(); r != nil || err != nil {
+					log.Printf("Run recorver process '%v', activity '%v'", nameProcess, act.Name)
+					err = act.recover(storage)
+				}
+				err = nil
+			}()
+			err = act.handler(storage)
+		}()
+		if err != nil {
+			return err
 		}
 	}
 
