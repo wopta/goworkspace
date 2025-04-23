@@ -1,9 +1,9 @@
 package draftbpnm
 
 type Order struct {
-	InWhatProcessBeInjected  string        `json:"inWhatProcessBeInjected"`
-	InWhatActivityBeInjected string        `json:"inWhatActivityBeInjected"`
-	Order                    OrderActivity `json:"order"`
+	InWhatProcessInjected  string        `json:"inWhatProcessInjected"`
+	InWhatActivityInjected string        `json:"inWhatActivityInjected"`
+	Order                  OrderActivity `json:"order"`
 }
 type BpnmBuilder struct {
 	handlers  map[string]ActivityHandler

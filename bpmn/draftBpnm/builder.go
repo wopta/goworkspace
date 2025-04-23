@@ -106,11 +106,11 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 		if order == nil {
 			return fmt.Errorf("No order defined, the 'order' field isnt filled")
 		}
-		if order.InWhatActivityBeInjected == "end" {
-			order.InWhatActivityBeInjected = fmt.Sprintf("%v_end", order.InWhatProcessBeInjected)
+		if order.InWhatActivityInjected == "end" {
+			order.InWhatActivityInjected = fmt.Sprintf("%v_end", order.InWhatProcessInjected)
 		}
-		if _, ok := b.toInject[getKeyInjectedProcess(order.InWhatProcessBeInjected, order.InWhatActivityBeInjected, order.Order)]; ok {
-			return fmt.Errorf("Injection's been already done: target process: '%v', process: injected '%v'", order.InWhatProcessBeInjected, p.Name)
+		if _, ok := b.toInject[getKeyInjectedProcess(order.InWhatProcessInjected, order.InWhatActivityInjected, order.Order)]; ok {
+			return fmt.Errorf("Injection's been already done: target process: '%v', process: injected '%v'", order.InWhatProcessInjected, p.Name)
 		}
 	}
 	process, err := bpnmToInject.Build()
@@ -120,7 +120,7 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 
 	for i, p := range bpnmToInject.Processes {
 		order = bpnmToInject.Processes[i].Order
-		b.toInject[getKeyInjectedProcess(order.InWhatProcessBeInjected, order.InWhatActivityBeInjected, order.Order)] = process.Process[p.Name]
+		b.toInject[getKeyInjectedProcess(order.InWhatProcessInjected, order.InWhatActivityInjected, order.Order)] = process.Process[p.Name]
 	}
 
 	if err = bpnmToInject.storage.setHigherStorage(b.storage); err != nil {

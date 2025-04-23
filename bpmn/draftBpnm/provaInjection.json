@@ -9,8 +9,8 @@
 				}
 			],
 			"order": {
-				"inWhatProcessBeInjected": "emit",
-				"inWhatActivityBeInjected": "AEvent",
+				"inWhatProcessInjected": "emit",
+				"inWhatActivityInjected": "AEvent",
 				"order": "Post"
 			},
 			"defaultStart": "initPost",
@@ -34,8 +34,8 @@
 		{
 			"name": "provaPre",
 			"order": {
-				"inWhatProcessBeInjected": "emit",
-				"inWhatActivityBeInjected": "BEvent",
+				"inWhatProcessInjected": "emit",
+				"inWhatActivityInjected": "BEvent",
 				"order": "pre"
 			},
 			"globalData": [
@@ -80,8 +80,8 @@
 		{
 			"name": "provaEndProcess",
 			"order": {
-				"inWhatProcessBeInjected": "emit",
-				"inWhatActivityBeInjected": "end",
+				"inWhatProcessInjected": "emit",
+				"inWhatActivityInjected": "end",
 				"order": "post"
 			},
 			"defaultStart": "save",
