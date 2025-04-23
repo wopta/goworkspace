@@ -71,11 +71,23 @@ func (p *StorageBpnm) clean() {
 }
 
 func (p *StorageBpnm) getAllLocal() map[string]any {
-	return p.local
+	var res map[string]any = make(map[string]any)
+	res = p.local
+	if p.higherStore == nil {
+		return res
+	}
+	res = mergeMaps(p.higherStore.getAllLocal(), res)
+	return res
 }
 
 func (p *StorageBpnm) getAllGlobal() map[string]any {
-	return p.global
+	var res map[string]any = make(map[string]any)
+	res = p.global
+	if p.higherStore == nil {
+		return res
+	}
+	res = mergeMaps(p.higherStore.getAllGlobal(), res)
+	return res
 }
 
 func (p *StorageBpnm) AddLocal(name string, data DataBpnm) error {

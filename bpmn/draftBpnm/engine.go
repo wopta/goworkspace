@@ -36,7 +36,7 @@ func (f *FlowBpnm) RunAt(processName, activityName string) error {
 func (p *ProcessBpnm) run(nameActivity string) error {
 	p.activeActivities = append(p.activeActivities, p.Activities[nameActivity])
 	if p.storageBpnm == nil {
-		return errors.New("miss storage")
+		return errors.New("Miss storage")
 	}
 	if p.activeActivities == nil {
 		return fmt.Errorf("Process '%v' has no activity '%v'", p.Name, nameActivity)
@@ -54,11 +54,11 @@ func (p *ProcessBpnm) run(nameActivity string) error {
 			b, _ := json.Marshal(m)
 			_ = json.Unmarshal(b, &jsonMap)
 
-			list, e := p.activeActivities[i].evaluateDecisions(p.Name, p.storageBpnm, jsonMap)
+			listNewActivities, e := p.activeActivities[i].evaluateDecisions(p.Name, p.storageBpnm, jsonMap)
 			if e != nil {
 				return e
 			}
-			nextActivities = append(nextActivities, list...)
+			nextActivities = append(nextActivities, listNewActivities...)
 		}
 		if len(nextActivities) == 0 {
 			return nil
@@ -127,26 +127,28 @@ func (act *Activity) evaluateDecisions(processName string, storage StorageData, 
 }
 
 func checkLocalStorage(st StorageData, req []TypeData) error {
+	local := st.getAllLocal()
 	for _, d := range req {
-		v, err := st.GetLocal(d.Name)
-		if err != nil {
+		v, ok := local[d.Name]
+		if !ok {
 			return fmt.Errorf("Required local resource is not found '%v'", d.Name)
 		}
-		if v.GetType() != d.Type {
-			return fmt.Errorf("Local resource '%v' has a difference type, exp: '%v', got: '%v'", d.Name, d.Type, v.GetType())
+		if v.(DataBpnm).GetType() != d.Type {
+			return fmt.Errorf("Local resource '%v' has a difference type, exp: '%v', got: '%v'", d.Name, d.Type, v.(DataBpnm).GetType())
 		}
 	}
 	return nil
 }
 
 func checkValidityGlobalStorage(st StorageData, req []TypeData) error {
+	global := st.getAllGlobal()
 	for _, d := range req {
-		v, err := st.GetGlobal(d.Name)
-		if err != nil {
+		v, ok := global[d.Name]
+		if !ok {
 			return fmt.Errorf("Required global resource is not found '%v'", d.Name)
 		}
-		if v.GetType() != d.Type {
-			return fmt.Errorf("Global resource '%v' has a difference type, exp: '%v', got: '%v'", d.Name, d.Type, v.GetType())
+		if v.(DataBpnm).GetType() != d.Type {
+			return fmt.Errorf("Global resource '%v' has a difference type, exp: '%v', got: '%v'", d.Name, d.Type, v.(DataBpnm).GetType())
 		}
 	}
 	return nil
