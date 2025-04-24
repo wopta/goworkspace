@@ -131,10 +131,13 @@ func (act *activity) runActivity(nameProcess string, storage StorageData) error 
 
 func (act *activity) evaluateDecisions(processName string, storage StorageData, date map[string]any) ([]*activity, error) {
 	var res []*activity
+	var resultEvaluation any
+	var err error
+	eval := goval.NewEvaluator()
 	for _, ga := range act.gateway {
 		if ga.decision == "" {
-			if e := checkLocalResources(storage, act.requiredOutputData); e != nil {
-				return nil, fmt.Errorf("Process '%v' with activity '%v' has an output error: %v", processName, act.name, e.Error())
+			if err = checkLocalResources(storage, act.requiredOutputData); err != nil {
+				return nil, fmt.Errorf("Process '%v' with activity '%v' has an output error: %v", processName, act.name, err.Error())
 			}
 			storage.markWhatNeeded(act.requiredOutputData)
 			return ga.nextActivities, nil
@@ -143,14 +146,13 @@ func (act *activity) evaluateDecisions(processName string, storage StorageData, 
 			log.Printf("Process '%v' has not activities", processName)
 			return []*activity{}, nil
 		}
-		eval := goval.NewEvaluator()
-		result, e := eval.Evaluate(ga.decision, date, nil)
-		if e != nil {
-			return nil, fmt.Errorf("Process '%v' with activity '%v' has an eval error: %v", processName, act.name, e.Error())
+		resultEvaluation, err = eval.Evaluate(ga.decision, date, nil)
+		if err != nil {
+			return nil, fmt.Errorf("Process '%v' with activity '%v' has an eval error: %v", processName, act.name, err.Error())
 		}
-		if result.(bool) {
-			if e := checkLocalResources(storage, act.requiredOutputData); e != nil {
-				return nil, fmt.Errorf("Process '%v' with activity '%v' has an output error: %v", processName, act.name, e.Error())
+		if resultEvaluation.(bool) {
+			if err = checkLocalResources(storage, act.requiredOutputData); err != nil {
+				return nil, fmt.Errorf("Process '%v' with activity '%v' has an output error: %v", processName, act.name, err.Error())
 			}
 			storage.markWhatNeeded(act.requiredOutputData)
 			res = append(res, ga.nextActivities...)

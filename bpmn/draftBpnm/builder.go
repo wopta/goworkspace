@@ -53,7 +53,13 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 	if b.storage == nil {
 		return nil, errors.New("miss storage")
 	}
+	var builtActivities map[string]*activity
+	var builtEndActivity map[string]*activity
+	var err error
+	var isInMap bool
+
 	for _, p := range b.Processes {
+		builtActivities = map[string]*activity{}
 		if flow.process[p.Name] != nil {
 			return nil, fmt.Errorf("Process %v's been already defined", newProcess.name)
 		}
@@ -62,24 +68,24 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 		newProcess.storageBpnm = b.storage
 		newProcess.name = p.Name
 		newProcess.requiredGlobalData = p.GlobalDataRequired
-		builtActivities, err := b.buildActivities(p.Name, p.Activities...)
+		builtActivities, err = b.buildActivities(p.Name, p.Activities...)
 		if err != nil {
 			return nil, err
 		}
 		if builtActivities[getNameEndActivity(p.Name)] != nil {
 			return nil, fmt.Errorf("Cant use '%v' as name for an activity", getNameEndActivity(p.Name))
 		}
-		builtEndActivity, err := b.buildActivities(p.Name, getEndingActivityBuilder(p.Name)) //build the end activity
+		builtEndActivity, err = b.buildActivities(p.Name, getEndingActivityBuilder(p.Name)) //build the end activity
 		if err != nil {
 			return nil, err
 		}
 		builtActivities[getNameEndActivity(p.Name)] = builtEndActivity[getNameEndActivity(p.Name)]
 
-		if _, ok := builtActivities[p.DefaultStart]; !ok {
+		if _, isInMap = builtActivities[p.DefaultStart]; !isInMap {
 			return nil, fmt.Errorf("Process '%v' has no activity named '%v' that can be used as default start", newProcess.name, p.DefaultStart)
 		}
 		newProcess.activities = builtActivities
-		if err := newProcess.hydrateGateways(p.Activities); err != nil {
+		if err = newProcess.hydrateGateways(p.Activities); err != nil {
 			return nil, err
 		}
 		newProcess.defaultStart = p.DefaultStart
