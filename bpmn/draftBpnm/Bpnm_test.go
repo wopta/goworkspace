@@ -94,9 +94,9 @@ func addDefaultHandlersForTest(g *BpnmBuilder, log *mockLog) error {
 			log.Println("init C")
 			return nil
 		}),
-		g.AddHandler("DEventRec", func(st StorageData) error {
+		g.AddHandler("DEventWithRec", func(st StorageData) error {
 			log.Println("init D rec")
-			return errors.New("error with recover")
+			return nil
 		}),
 		g.AddHandler("DRec", func(st StorageData) error {
 			log.Println("recover D")
@@ -446,7 +446,7 @@ func TestMergeBuilder(t *testing.T) {
 	testLog(log, exps, t)
 }
 
-func TestRecoverWithoutFunction(t *testing.T) {
+func TestErrorWithoutRecover(t *testing.T) {
 	log := &mockLog{}
 	g, err := NewBpnmBuilder("prova.json")
 	if err != nil {
@@ -483,18 +483,21 @@ func TestRecoverWithFunction(t *testing.T) {
 	storage.AddLocal("validationObject", new(validity))
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 2})
 	addDefaultHandlersForTest(g, log)
-
+	g.setHandler("DEventWithRec", func(st StorageData) error {
+		log.Println("init D")
+		return errors.New("fjklsd")
+	})
 	g.SetStorage(storage)
 	f, err := g.Build()
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = f.RunAt("emit", "DEventRec")
+	err = f.RunAt("emit", "DEventWithRec")
 	if err != nil {
 		t.Fatalf("should have error")
 	}
 	exps := []string{
-		"init D rec",
+		"init D",
 		"recover D",
 	}
 	testLog(log, exps, t)
@@ -508,7 +511,7 @@ func TestRecoverFromPanic(t *testing.T) {
 	}
 	storage := NewStorageBpnm()
 	addDefaultHandlersForTest(g, log)
-	g.setHandler("DEventRec", func(st StorageData) error {
+	g.setHandler("DEventWithRec", func(st StorageData) error {
 		log.Println("init D rec")
 		panic("fjsdklfjd")
 	})
@@ -519,7 +522,7 @@ func TestRecoverFromPanic(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = f.RunAt("emit", "DEventRec")
+	err = f.RunAt("emit", "DEventWithRec")
 	if err != nil {
 		t.Fatalf("should have error")
 	}

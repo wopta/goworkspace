@@ -102,7 +102,7 @@
 					]
 				},
 				{
-					"name": "DEventRec",
+					"name": "DEventWithRec",
 					"description": "emit policy",
 					"recover": "DRec"
 				}
