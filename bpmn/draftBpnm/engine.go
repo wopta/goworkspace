@@ -23,9 +23,6 @@ func (f *FlowBpnm) RunAt(processName, activityName string) error {
 	if process == nil {
 		return fmt.Errorf("Process '%v' not founded", processName)
 	}
-	if e := checkGlobalResources(process.storageBpnm, process.requiredGlobalData); e != nil {
-		return e
-	}
 
 	if e := process.loop(activityName); e != nil { //TODO: how to check if there is an infinite loop
 		return e
@@ -35,6 +32,9 @@ func (f *FlowBpnm) RunAt(processName, activityName string) error {
 }
 
 func (p *processBpnm) loop(nameActivity string) error {
+	if e := checkGlobalResources(p.storageBpnm, p.requiredGlobalData); e != nil {
+		return e
+	}
 	p.activeActivities = nil
 	if act := p.activities[nameActivity]; act != nil {
 		p.activeActivities = []*activity{p.activities[nameActivity]}
