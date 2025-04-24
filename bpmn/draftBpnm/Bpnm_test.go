@@ -43,28 +43,33 @@ func testLog(log *mockLog, exps []string, t *testing.T) {
 		}
 	}
 }
+
 func getInjectableFlow(log *mockLog) (*BpnmBuilder, error) {
 	injectedFlow, err := NewBpnmBuilder("provaInjection.json")
+	if err != nil {
+		return nil, err
+	}
 	injectedFlow.SetStorage(NewStorageBpnm())
-	injectedFlow.AddHandler("initPost", func(st StorageData) error {
-		log.Println("init post")
-		return nil
-	})
+	return injectedFlow, IsError(
+		injectedFlow.AddHandler("initPost", func(st StorageData) error {
+			log.Println("init post")
+			return nil
+		}),
 
-	injectedFlow.AddHandler("pre-B", func(st StorageData) error {
-		log.Println("init pre-B")
-		return nil
-	})
-	injectedFlow.AddHandler("initPre", func(st StorageData) error {
-		log.Println("init pre")
-		st.AddLocal("error", &Error{})
-		return nil
-	})
-	injectedFlow.AddHandler("save", func(st StorageData) error {
-		log.Println("end process")
-		return nil
-	})
-	return injectedFlow, err
+		injectedFlow.AddHandler("pre-B", func(st StorageData) error {
+			log.Println("init pre-B")
+			return nil
+		}),
+		injectedFlow.AddHandler("initPre", func(st StorageData) error {
+			log.Println("init pre")
+			st.AddLocal("error", &Error{})
+			return nil
+		}),
+		injectedFlow.AddHandler("save", func(st StorageData) error {
+			log.Println("end process")
+			return nil
+		}),
+	)
 }
 func addDefaultHandlersForTest(g *BpnmBuilder, log *mockLog) error {
 	return IsError(
@@ -440,6 +445,7 @@ func TestMergeBuilder(t *testing.T) {
 	}
 	testLog(log, exps, t)
 }
+
 func TestRecoverWithoutFunction(t *testing.T) {
 	log := &mockLog{}
 	g, err := NewBpnmBuilder("prova.json")
@@ -493,6 +499,7 @@ func TestRecoverWithFunction(t *testing.T) {
 	}
 	testLog(log, exps, t)
 }
+
 func TestRecoverFromPanic(t *testing.T) {
 	log := &mockLog{}
 	g, err := NewBpnmBuilder("prova.json")
