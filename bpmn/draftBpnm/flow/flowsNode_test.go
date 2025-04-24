@@ -23,28 +23,38 @@ func (c *callbackInfo) GetType() string {
 func funcTestWithInfo(message string, log *mockLog) func(bpnm.StorageData) error {
 	return func(st bpnm.StorageData) error {
 		log.Println(message)
-		st.AddLocal("callbackInfo", &callbackInfo{})
+		st.AddLocal("callbackInfo", &callbackInfo{RequestBody: []byte("ciao")})
 		return nil
 	}
 }
 
-func builderFlowNode(log *mockLog, store bpnm.StorageData) (*bpnm.FlowBpnm, error) {
+func getBuilderFlowNode(log *mockLog, store bpnm.StorageData) *bpnm.BpnmBuilder {
 
 	builder, e := bpnm.NewBpnmBuilder("node_flows.json")
 	if e != nil {
-		return nil, e
+		return nil
 	}
 	builder.SetStorage(store)
 	e = bpnm.IsError(
-		builder.AddHandler("WinEmit", funcTestWithInfo("WinEmit", log)),
-		builder.AddHandler("BaseCallback", funcTestWithInfo("BaseCallback", log)),
-		builder.AddHandler("ErrorCallbackConfig", func(sd bpnm.StorageData) error { return errors.New("callback client not set") }),
-		builder.AddHandler("SaveAudit", funcTest("SaveAudit", log)),
+		builder.AddHandler("winEmit", funcTestWithInfo("winEmit", log)),
+		builder.AddHandler("baseCallback", funcTestWithInfo("baseCallback", log)),
+		builder.AddHandler("errorCallbackConfig", func(sd bpnm.StorageData) error { return errors.New("callback client not set") }),
+		builder.AddHandler("saveAudit", func(sd bpnm.StorageData) error {
+			d, e := bpnm.GetData[*callbackInfo]("callbackInfo", sd)
+			if e != nil {
+				return e
+			}
+			if string(d.RequestBody) != "ciao" {
+				return errors.New("no correct body request")
+			}
+			log.Println("saveAudit " + string(d.RequestBody))
+			return nil
+		}),
 	)
 	if e != nil {
-		return nil, e
+		return nil
 	}
-	return builder.Build()
+	return builder
 }
 
 var (
@@ -55,33 +65,34 @@ var (
 
 func TestEmitForWinNode(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
-	store.AddGlobal("policy", &policyEcommerce)
-	store.AddGlobal("node", &winNode)
+	store.AddLocal("policy", &policyEcommerce)
+	store.AddLocal("node", &winNode)
 	exps := []string{
-		"WinEmit",
-		"SaveAudit",
+		"winEmit",
+		"saveAudit ciao",
 	}
-	testFlow(t, "emit", exps, store, builderFlowNode)
+	testFlow(t, "emit", exps, store, getBuilderFlowNode)
 }
 
 func TestEmitForBaseNode(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
-	store.AddGlobal("policy", &policyEcommerce)
-	store.AddGlobal("node", &baseNode)
+	store.AddLocal("policy", &policyEcommerce)
+	store.AddLocal("node", &baseNode)
 	exps := []string{
-		"BaseCallback",
-		"SaveAudit",
+		"baseCallback",
+		"saveAudit ciao",
 	}
-	testFlow(t, "emit", exps, store, builderFlowNode)
+	testFlow(t, "emit", exps, store, getBuilderFlowNode)
 }
 
 func TestEmitForBrokenNode(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
-	store.AddGlobal("policy", &policyEcommerce)
-	store.AddGlobal("node", &brokenNode)
+	store.AddLocal("policy", &policyEcommerce)
+	store.AddLocal("node", &brokenNode)
 
 	log := mockLog{}
-	flow, err := builderFlowNode(&log, store)
+	build := getBuilderFlowNode(&log, store)
+	flow, err := build.Build()
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -3,64 +3,58 @@ package draftbpnm
 type Order struct {
 	InWhatProcessInjected  string        `json:"inWhatProcessInjected"`
 	InWhatActivityInjected string        `json:"inWhatActivityInjected"`
-	Order                  OrderActivity `json:"order"`
+	Order                  orderActivity `json:"order"`
 }
 type BpnmBuilder struct {
-	handlers  map[string]ActivityHandler
-	storage   StorageData
-	Processes []*ProcessBuilder `json:"processes"`
-	toInject  map[KeyInject]*ProcessBpnm
+	Processes []*processBuilder `json:"processes"`
+
+	handlers map[string]ActivityHandler
+	storage  StorageData
+	toInject map[keyInjected]*ProcessBpnm
 }
 
-type TypeData struct {
-	Name string
-	Type string
-}
-
-type ProcessBuilder struct {
-	GlobalDataRequired []TypeData        `json:"globalData"`
+type processBuilder struct {
+	GlobalDataRequired []typeData        `json:"globalData"`
 	Order              *Order            `json:"order"`
 	Description        string            `json:"description"`
 	Name               string            `json:"name"`
-	Activities         []ActivityBuilder `json:"activities"`
+	Activities         []activityBuilder `json:"activities"`
 	DefaultStart       string            `json:"defaultStart"`
 }
 
-type ActivityBuilder struct {
+type activityBuilder struct {
 	Name        string         `json:"name"`
 	Description string         `json:"description"`
-	Branch      *BranchBuilder `json:"branch"`
+	Branch      *branchBuilder `json:"branch"`
 	HandlerLess bool           `json:"handlerless"`
 	Recover     string         `json:"recover"`
 }
 
-type BranchBuilder struct {
-	OutputDataRequired []TypeData     `json:"outputData,omitempty"`
-	InputDataRequired  []TypeData     `json:"inputData,omitempty"`
-	Gateways           []GatewayBlock `json:"gateways"`
-	//unused field
-	//GatewayType        GatewayType    `json:"gatewayType,omitempty"`
-	//Recorver           string         `json:"recorver,omitempty"`
+type branchBuilder struct {
+	OutputDataRequired []typeData     `json:"outputData,omitempty"`
+	InputDataRequired  []typeData     `json:"inputData,omitempty"`
+	Gateways           []gatewayBlock `json:"gateways"`
 }
 
-type GatewayBlock struct {
+type gatewayBlock struct {
 	NextActivities []string `json:"nextActivities"`
 	Decision       string   `json:"decision,omitempty"`
 }
 
-type OrderActivity string
+type orderActivity string
 
 const (
-	PreActivity  OrderActivity = "pre"
-	PostActivity OrderActivity = "post"
+	preActivity  orderActivity = "pre"
+	postActivity orderActivity = "post"
 )
 
-type InjectActivity struct {
-	Order              OrderActivity
-	ActivitiesToInject []ActivityBuilder
+type keyInjected struct {
+	targetProcess  string
+	targetActivity string
+	orderActivity
 }
-type KeyInject struct {
-	TargetProcess  string
-	TargetActivity string
-	OrderActivity
+
+type typeData struct {
+	Name string
+	Type string
 }

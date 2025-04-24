@@ -11,6 +11,10 @@
 				{
 					"name": "product",
 					"type": "product"
+				},
+				{
+					"name": "node",
+					"type": "networkNode"
 				}
 			],
 			"description": "Emit process",

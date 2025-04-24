@@ -22,11 +22,11 @@ func funcTest(message string, log *mockLog) func(bpnm.StorageData) error {
 	}
 }
 
-func builderFlowChannel(log *mockLog, store bpnm.StorageData) (*bpnm.FlowBpnm, error) {
+func getBuilderFlowChannel(log *mockLog, store bpnm.StorageData) *bpnm.BpnmBuilder {
 
 	builder, e := bpnm.NewBpnmBuilder("channel_flows.json")
 	if e != nil {
-		return nil, e
+		return nil
 	}
 	builder.SetStorage(store)
 	e = bpnm.IsError(
@@ -53,17 +53,18 @@ func builderFlowChannel(log *mockLog, store bpnm.StorageData) (*bpnm.FlowBpnm, e
 		builder.AddHandler("addContract", funcTest("addContract", log)),
 	)
 	if e != nil {
-		return nil, e
+		return nil
 	}
 
-	return builder.Build()
+	return builder
 }
 
-type builderFlow func(*mockLog, bpnm.StorageData) (*bpnm.FlowBpnm, error)
+type builderFlow func(*mockLog, bpnm.StorageData) *bpnm.BpnmBuilder
 
 func testFlow(t *testing.T, process string, expectedACtivities []string, store bpnm.StorageData, builbuilderFlow builderFlow) {
 	log := mockLog{}
-	flow, e := builbuilderFlow(&log, store)
+	build := builbuilderFlow(&log, store)
+	flow, e := build.Build()
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -89,7 +90,7 @@ var (
 	policyNetwork   = models.Policy{Channel: lib.NetworkChannel}
 )
 
-// network
+// product
 var (
 	productEcommerce     = models.Product{Flow: models.ECommerceFlow}
 	productMga           = models.Product{Flow: models.MgaFlow}
@@ -101,6 +102,7 @@ func TestEmitForEcommerce(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("product", &productEcommerce)
+	store.AddGlobal("node", &winNode)
 	exps := []string{
 		"setProposalData",
 		"emitData",
@@ -109,46 +111,49 @@ func TestEmitForEcommerce(t *testing.T) {
 		"sendEmitProposalMail",
 		"sendMailSign",
 	}
-	testFlow(t, "emit", exps, store, builderFlowChannel)
+	testFlow(t, "emit", exps, store, getBuilderFlowChannel)
 }
 
 func TestLeadForEcommerce(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("product", &productEcommerce)
-
+	store.AddGlobal("node", &winNode)
 	exps := []string{
 		"setLeadData",
 		"sendLeadMail",
 	}
-	testFlow(t, "lead", exps, store, builderFlowChannel)
+	testFlow(t, "lead", exps, store, getBuilderFlowChannel)
 }
 
 func TestProposalForEcommerce(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("product", &productEcommerce)
+	store.AddGlobal("node", &winNode)
 
 	exps := []string{}
-	testFlow(t, "proposal", exps, store, builderFlowChannel)
+	testFlow(t, "proposal", exps, store, getBuilderFlowChannel)
 }
 
 func TestPayForEcommerce(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("product", &productEcommerce)
+	store.AddGlobal("node", &winNode)
 
 	exps := []string{
 		"updatePolicy",
 		"payTransaction",
 	}
-	testFlow(t, "pay", exps, store, builderFlowChannel)
+	testFlow(t, "pay", exps, store, getBuilderFlowChannel)
 }
 
 func TestSignForEcommerce(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("product", &productEcommerce)
+	store.AddGlobal("node", &winNode)
 
 	exps := []string{
 		"fillAttachments",
@@ -156,78 +161,85 @@ func TestSignForEcommerce(t *testing.T) {
 		"setToPay",
 		"sendMailPay",
 	}
-	testFlow(t, "sign", exps, store, builderFlowChannel)
+	testFlow(t, "sign", exps, store, getBuilderFlowChannel)
 }
 
 func TestEmitForMga(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyMga)
 	store.AddGlobal("product", &productMga)
+	store.AddGlobal("node", &winNode)
 
 	exps := []string{}
-	testFlow(t, "emit", exps, store, builderFlowChannel)
+	testFlow(t, "emit", exps, store, getBuilderFlowChannel)
 }
 
 func TestLeadForMga(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyMga)
 	store.AddGlobal("product", &productMga)
+	store.AddGlobal("node", &winNode)
 
 	exps := []string{
 		"setLeadData",
 	}
-	testFlow(t, "lead", exps, store, builderFlowChannel)
+	testFlow(t, "lead", exps, store, getBuilderFlowChannel)
 }
 
 func TestProposalForMga(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyMga)
 	store.AddGlobal("product", &productMga)
+	store.AddGlobal("node", &winNode)
 
 	exps := []string{
 		"setProposalData",
 	}
-	testFlow(t, "proposal", exps, store, builderFlowChannel)
+	testFlow(t, "proposal", exps, store, getBuilderFlowChannel)
 }
 
 func TestApprovalForMga(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyMga)
 	store.AddGlobal("product", &productMga)
+	store.AddGlobal("node", &winNode)
 
 	exps := []string{}
-	testFlow(t, "requestApproval", exps, store, builderFlowChannel)
+	testFlow(t, "requestApproval", exps, store, getBuilderFlowChannel)
 }
 
 func TestPayForMga(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyMga)
 	store.AddGlobal("product", &productMga)
+	store.AddGlobal("node", &winNode)
 
 	exps := []string{
 		"updatePolicy",
 		"payTransaction",
 	}
-	testFlow(t, "pay", exps, store, builderFlowChannel)
+	testFlow(t, "pay", exps, store, getBuilderFlowChannel)
 }
 
 func TestSignForMga(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyMga)
 	store.AddGlobal("product", &productMga)
+	store.AddGlobal("node", &winNode)
 
 	exps := []string{
 		"fillAttachments",
 		"setSign",
 		"setToPay",
 	}
-	testFlow(t, "sign", exps, store, builderFlowChannel)
+	testFlow(t, "sign", exps, store, getBuilderFlowChannel)
 }
 
 func TestEmitForProviderMga(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productProviderMga)
+	store.AddGlobal("node", &winNode)
 
 	exps := []string{
 		"setProposalData",
@@ -237,60 +249,65 @@ func TestEmitForProviderMga(t *testing.T) {
 		"sendEmitProposalMail",
 		"sendMailSign",
 	}
-	testFlow(t, "emit", exps, store, builderFlowChannel)
+	testFlow(t, "emit", exps, store, getBuilderFlowChannel)
 }
 
 func TestLeadForProviderMga(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productProviderMga)
+	store.AddGlobal("node", &winNode)
 
 	exps := []string{
 		"setLeadData",
 	}
-	testFlow(t, "lead", exps, store, builderFlowChannel)
+	testFlow(t, "lead", exps, store, getBuilderFlowChannel)
 }
 
 func TestProposalForProviderMga(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productProviderMga)
+	store.AddGlobal("node", &winNode)
 
 	exps := []string{
 		"setProposalData",
 		"sendProposalMail",
 	}
-	testFlow(t, "proposal", exps, store, builderFlowChannel)
+	testFlow(t, "proposal", exps, store, getBuilderFlowChannel)
 }
 
 func TestApprovalForProviderMga(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productProviderMga)
+	store.AddGlobal("node", &winNode)
 
 	exps := []string{
 		"setRequestApprovalData",
 		"sendRequestApprovalMail",
 	}
-	testFlow(t, "requestApproval", exps, store, builderFlowChannel)
+	testFlow(t, "requestApproval", exps, store, getBuilderFlowChannel)
 }
 
 func TestPayForProviderMga(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productProviderMga)
+	store.AddGlobal("node", &winNode)
 
 	exps := []string{
 		"updatePolicy",
 		"payTransaction",
 	}
-	testFlow(t, "pay", exps, store, builderFlowChannel)
+	testFlow(t, "pay", exps, store, getBuilderFlowChannel)
 }
 
 func TestSignForProviderMga(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("product", &productProviderMga)
+	store.AddGlobal("node", &winNode)
 
 	exps := []string{
 		"fillAttachments",
@@ -298,13 +315,15 @@ func TestSignForProviderMga(t *testing.T) {
 		"setToPay",
 		"sendMailPay",
 	}
-	testFlow(t, "sign", exps, store, builderFlowChannel)
+	testFlow(t, "sign", exps, store, getBuilderFlowChannel)
 }
 
 func TestEmitForRemittanceMga(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productRemittanceMga)
+	store.AddGlobal("node", &winNode)
+
 	exps := []string{
 		"setProposalData",
 		"emitData",
@@ -313,62 +332,96 @@ func TestEmitForRemittanceMga(t *testing.T) {
 		"setAdvice",
 		"putUser",
 	}
-	testFlow(t, "emit", exps, store, builderFlowChannel)
+	testFlow(t, "emit", exps, store, getBuilderFlowChannel)
 }
 
 func TestLeadForRemittanceMga(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productRemittanceMga)
+	store.AddGlobal("node", &winNode)
 
 	exps := []string{
 		"setLeadData",
 	}
-	testFlow(t, "lead", exps, store, builderFlowChannel)
+	testFlow(t, "lead", exps, store, getBuilderFlowChannel)
 }
 
 func TestProposalForRemittanceMga(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productRemittanceMga)
+	store.AddGlobal("node", &winNode)
 
 	exps := []string{
 		"setProposalData",
 		"sendProposalMail",
 	}
-	testFlow(t, "proposal", exps, store, builderFlowChannel)
+	testFlow(t, "proposal", exps, store, getBuilderFlowChannel)
 }
 
 func TestApprovalForRemittanceMga(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productRemittanceMga)
+	store.AddGlobal("node", &winNode)
 
 	exps := []string{
 		"setRequestApprovalData",
 		"sendRequestApprovalMail",
 	}
-	testFlow(t, "requestApproval", exps, store, builderFlowChannel)
+	testFlow(t, "requestApproval", exps, store, getBuilderFlowChannel)
 }
 
 func TestPayForRemittanceMga(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productRemittanceMga)
+	store.AddGlobal("node", &winNode)
 
 	exps := []string{}
-	testFlow(t, "pay", exps, store, builderFlowChannel)
+	testFlow(t, "pay", exps, store, getBuilderFlowChannel)
 }
 
 func TestSignForRemittanceMga(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productRemittanceMga)
+	store.AddGlobal("node", &winNode)
 
 	exps := []string{
 		"setSign",
 		"addContract",
 		"sendMailContract",
 	}
-	testFlow(t, "sign", exps, store, builderFlowChannel)
+	testFlow(t, "sign", exps, store, getBuilderFlowChannel)
+}
+
+// With node flow
+func TestEmitForEcommerceWithNodeFlow(t *testing.T) {
+	storeFlowChannel := bpnm.NewStorageBpnm()
+	storeFlowChannel.AddGlobal("policy", &policyEcommerce)
+	storeFlowChannel.AddGlobal("product", &productEcommerce)
+	storeFlowChannel.AddGlobal("node", &winNode)
+
+	exps := []string{
+		"setProposalData",
+		"emitData",
+		"sign",
+		"pay",
+		"sendEmitProposalMail",
+		"sendMailSign",
+		"winEmit",
+		"saveAudit ciao",
+	}
+	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpnm.StorageData) *bpnm.BpnmBuilder {
+		build := getBuilderFlowChannel(log, storeFlowChannel)
+
+		nodeBuild := getBuilderFlowNode(log, bpnm.NewStorageBpnm())
+		if e := build.Inject(nodeBuild); e != nil {
+			t.Fatal(e)
+		}
+
+		return build
+	})
 }

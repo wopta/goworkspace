@@ -3,19 +3,9 @@
 		{
 			"name": "emit",
 			"description": "Callback for emit process",
-			"globalData": [
-				{
-					"name": "policy",
-					"type": "policy"
-				},
-				{
-					"name": "node",
-					"type": "networkNode"
-				}
-			],
 			"order": {
-				"inWhatProcessInject": "emit",
-				"inWhatActivityInject": "end",
+				"inWhatProcessInjected": "emit",
+				"inWhatActivityInjected": "end",
 				"order": "post"
 			},
 			"defaultStart": "init",
@@ -27,26 +17,26 @@
 						"gateways": [
 							{
 								"nextActivities": [
-									"WinEmit"
+									"winEmit"
 								],
 								"decision": "node.callbackConfig.name==`winClient`"
 							},
 							{
 								"nextActivities": [
-									"BaseCallback"
+									"baseCallback"
 								],
 								"decision": "node.callbackConfig.name==`facileBrokerClient`"
 							},
 							{
 								"nextActivities": [
-									"ErrorCallbackConfig"
+									"errorCallbackConfig"
 								]
 							}
 						]
 					}
 				},
 				{
-					"name": "BaseCallback",
+					"name": "baseCallback",
 					"branch": {
 						"outputData": [
 							{
@@ -57,14 +47,14 @@
 						"gateways": [
 							{
 								"nextActivities": [
-									"SaveAudit"
+									"saveAudit"
 								]
 							}
 						]
 					}
 				},
 				{
-					"name": "WinEmit",
+					"name": "winEmit",
 					"branch": {
 						"outputData": [
 							{
@@ -75,18 +65,18 @@
 						"gateways": [
 							{
 								"nextActivities": [
-									"SaveAudit"
+									"saveAudit"
 								]
 							}
 						]
 					}
 				},
 				{
-					"name": "ErrorCallbackConfig",
+					"name": "errorCallbackConfig",
 					"description": "Return error when callbackConfig.Name isn't right"
 				},
 				{
-					"name": "SaveAudit",
+					"name": "saveAudit",
 					"branch": {
 						"inputData": [
 							{

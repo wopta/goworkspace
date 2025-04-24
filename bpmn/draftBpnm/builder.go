@@ -8,12 +8,12 @@ import (
 	"strings"
 )
 
-func getKeyInjectedProcess(targetPro, targetAct string, order OrderActivity) KeyInject {
-	order = OrderActivity(strings.ToLower(string(order)))
-	return KeyInject{
-		TargetProcess:  targetPro,
-		TargetActivity: targetAct,
-		OrderActivity:  order,
+func getKeyInjectedProcess(targetPro, targetAct string, order orderActivity) keyInjected {
+	order = orderActivity(strings.ToLower(string(order)))
+	return keyInjected{
+		targetProcess:  targetPro,
+		targetActivity: targetAct,
+		orderActivity:  order,
 	}
 }
 
@@ -82,7 +82,7 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 	if len(b.toInject) != 0 {
 		var keyNoInjected string
 		for i := range b.toInject {
-			keyNoInjected += fmt.Sprintf("process: %v, activity: %v, order: %v\n", i.TargetProcess, i.TargetActivity, i.OrderActivity)
+			keyNoInjected += fmt.Sprintf("process: %v, activity: %v, order: %v\n", i.targetProcess, i.targetActivity, i.orderActivity)
 		}
 		return nil, fmt.Errorf("Following injections went bad:\n  %v", keyNoInjected)
 	}
@@ -98,7 +98,7 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 		b.handlers = make(map[string]ActivityHandler)
 	}
 	if b.toInject == nil {
-		b.toInject = make(map[KeyInject]*ProcessBpnm)
+		b.toInject = make(map[keyInjected]*ProcessBpnm)
 	}
 	var order *Order
 	for i, p := range bpnmToInject.Processes { //to have a better error
@@ -140,11 +140,23 @@ func (b *BpnmBuilder) AddHandler(nameHandler string, handler ActivityHandler) er
 	return nil
 }
 
+// only use it for test!!
+func (b *BpnmBuilder) setHandler(nameHandler string, handler ActivityHandler) error {
+	if b.handlers == nil {
+		return errors.New("No handlers has been defined")
+	}
+	if _, ok := b.handlers[nameHandler]; !ok {
+		return errors.New("Handler isn't defined")
+	}
+	b.handlers[nameHandler] = handler
+	return nil
+}
+
 func (b *BpnmBuilder) SetStorage(pool StorageData) {
 	b.storage = pool
 }
 
-func (a *BpnmBuilder) buildActivities(activities []ActivityBuilder, processName string) (map[string]*Activity, error) {
+func (a *BpnmBuilder) buildActivities(activities []activityBuilder, processName string) (map[string]*Activity, error) {
 	result := make(map[string]*Activity)
 	for _, activity := range activities {
 		if _, ok := result[activity.Name]; ok {
@@ -156,15 +168,15 @@ func (a *BpnmBuilder) buildActivities(activities []ActivityBuilder, processName 
 		if !activity.HandlerLess && !ok {
 			return nil, fmt.Errorf("No handler registered for the activity: '%v'", activity.Name)
 		}
-		if pr := a.toInject[getKeyInjectedProcess(processName, activity.Name, PreActivity)]; pr != nil {
+		if pr := a.toInject[getKeyInjectedProcess(processName, activity.Name, preActivity)]; pr != nil {
 			newActivity.PreActivity = pr
 			//To check eventually if the some injection isnt possible
-			delete(a.toInject, getKeyInjectedProcess(processName, activity.Name, PreActivity))
+			delete(a.toInject, getKeyInjectedProcess(processName, activity.Name, preActivity))
 		}
-		if pr := a.toInject[getKeyInjectedProcess(processName, activity.Name, PostActivity)]; pr != nil {
+		if pr := a.toInject[getKeyInjectedProcess(processName, activity.Name, postActivity)]; pr != nil {
 			newActivity.PostActivity = pr
 			//To check eventually if the some injection isnt possible
-			delete(a.toInject, getKeyInjectedProcess(processName, activity.Name, PostActivity))
+			delete(a.toInject, getKeyInjectedProcess(processName, activity.Name, postActivity))
 		}
 		newActivity.Name = activity.Name
 		newActivity.Description = activity.Description
@@ -190,7 +202,7 @@ func (a *BpnmBuilder) buildActivities(activities []ActivityBuilder, processName 
 	return result, nil
 }
 
-func (b *BranchBuilder) buildBranch() (*Branch, error) {
+func (b *branchBuilder) buildBranch() (*Branch, error) {
 	if b == nil {
 		return nil, nil
 	}
@@ -201,7 +213,7 @@ func (b *BranchBuilder) buildBranch() (*Branch, error) {
 	return activity, nil
 }
 
-func (p *ProcessBpnm) hydrateGateways(activities []ActivityBuilder) error {
+func (p *ProcessBpnm) hydrateGateways(activities []activityBuilder) error {
 	for _, builderActivity := range activities {
 		if builderActivity.Branch == nil {
 			continue
@@ -225,8 +237,8 @@ func (p *ProcessBpnm) hydrateGateways(activities []ActivityBuilder) error {
 	return nil
 }
 
-func buildEndingActivity(processName string) ActivityBuilder {
-	return ActivityBuilder{
+func buildEndingActivity(processName string) activityBuilder {
+	return activityBuilder{
 		Name:        fmt.Sprintf("%v_end", processName),
 		Description: fmt.Sprint("end activity for ", processName),
 		Branch:      nil,

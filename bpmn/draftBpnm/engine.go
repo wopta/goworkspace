@@ -148,7 +148,7 @@ func (act *Activity) evaluateDecisions(processName string, storage StorageData, 
 	return res, nil
 }
 
-func checkLocalResources(st StorageData, req []TypeData) error {
+func checkLocalResources(st StorageData, req []typeData) error {
 	local := st.getAllLocal()
 	for _, d := range req {
 		v, ok := local[d.Name]
@@ -162,7 +162,7 @@ func checkLocalResources(st StorageData, req []TypeData) error {
 	return nil
 }
 
-func checkGlobalResources(st StorageData, req []TypeData) error {
+func checkGlobalResources(st StorageData, req []typeData) error {
 	global := st.getAllGlobal()
 	for _, d := range req {
 		v, ok := global[d.Name]

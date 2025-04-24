@@ -8,7 +8,7 @@ type ProcessBpnm struct {
 	Name               string
 	activeActivities   []*Activity
 	DefaultStart       string
-	RequiredGlobalData []TypeData
+	RequiredGlobalData []typeData
 	Description        string
 	Activities         map[string]*Activity
 	storageBpnm        StorageData
@@ -32,8 +32,8 @@ const (
 )
 
 type Branch struct {
-	RequiredOutputData []TypeData
-	RequiredInputData  []TypeData
+	RequiredOutputData []typeData
+	RequiredInputData  []typeData
 	//	GatewayType        GatewayType
 	Gateway []*Gateway
 }

@@ -24,7 +24,7 @@ type StorageData interface {
 	// If both storage contain the same key, return error
 	mergeUnique(StorageData) error
 	//Mark what local resources keep when clean is called
-	markWhatNeeded([]TypeData)
+	markWhatNeeded([]typeData)
 	//Delete the resources that aren't needed(aren't marked)
 	clean()
 }
@@ -55,7 +55,7 @@ func (p *StorageBpnm) ResetGlobal() {
 	p.global = make(map[string]any)
 }
 
-func (p *StorageBpnm) markWhatNeeded(toTouch []TypeData) {
+func (p *StorageBpnm) markWhatNeeded(toTouch []typeData) {
 	for _, t := range toTouch {
 		p.touched = append(p.touched, t.Name)
 	}
