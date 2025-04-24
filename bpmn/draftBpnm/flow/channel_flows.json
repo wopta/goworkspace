@@ -227,7 +227,6 @@
 					"name": "init",
 					"callEndIfStop": false,
 					"handlerless": true,
-					"inputData": [],
 					"gateways": [
 						{
 							"nextActivities": [
@@ -239,8 +238,6 @@
 				},
 				{
 					"name": "updatePolicy",
-					"inputData": [],
-					"outputData": [],
 					"gateways": [
 						{
 							"nextActivities": [
@@ -251,8 +248,6 @@
 				},
 				{
 					"name": "payTransaction",
-					"inputData": [],
-					"outputData": [],
 					"gateways": [
 						{
 							"nextActivities": [
