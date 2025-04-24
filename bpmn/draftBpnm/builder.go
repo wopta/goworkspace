@@ -220,19 +220,19 @@ func (a *BpnmBuilder) buildActivities(processName string, activitiesToBuild ...a
 // Returns an error if any referenced activity is missing.
 func (p *processBpnm) hydrateGateways(activities []activityBuilder) error {
 	for _, builderActivity := range activities {
-		var gateways []*gateway = make([]*gateway, 0)
-		for _, builderGateway := range builderActivity.Gateways {
+		var gateways []*gateway = make([]*gateway, len(builderActivity.Gateways))
+		for igat, builderGateway := range builderActivity.Gateways {
 			gateway := &gateway{
-				nextActivities: make([]*activity, 0),
+				nextActivities: make([]*activity, len(builderGateway.NextActivities)),
 				decision:       builderGateway.Decision,
 			}
-			for _, nextJump := range builderGateway.NextActivities {
+			for iact, nextJump := range builderGateway.NextActivities {
 				if _, ok := p.activities[nextJump]; !ok {
 					return fmt.Errorf("No event named %v", nextJump)
 				}
-				gateway.nextActivities = append(gateway.nextActivities, p.activities[nextJump])
+				gateway.nextActivities[iact] = p.activities[nextJump]
 			}
-			gateways = append(gateways, gateway)
+			gateways[igat] = gateway
 		}
 		p.activities[builderActivity.Name].gateway = gateways
 	}
