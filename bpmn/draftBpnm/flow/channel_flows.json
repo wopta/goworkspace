@@ -22,107 +22,91 @@
 				{
 					"name": "init",
 					"handlerless": true,
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"setProposalData"
-								],
-								"decision": "policy.channel!=`mga`"
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"setProposalData"
+							],
+							"decision": "policy.channel!=`mga`"
+						}
+					]
 				},
 				{
 					"name": "setProposalData",
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"emitData"
-								]
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"emitData"
+							]
+						}
+					]
 				},
 				{
 					"name": "emitData",
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"sign"
-								]
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"sign"
+							]
+						}
+					]
 				},
 				{
 					"name": "sign",
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"sendMailSign"
-								],
-								"decision": "product.flow==`remittance_mga`"
-							},
-							{
-								"nextActivities": [
-									"pay"
-								]
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"sendMailSign"
+							],
+							"decision": "product.flow==`remittance_mga`"
+						},
+						{
+							"nextActivities": [
+								"pay"
+							]
+						}
+					]
 				},
 				{
 					"name": "pay",
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"sendEmitProposalMail"
-								]
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"sendEmitProposalMail"
+							]
+						}
+					]
 				},
 				{
 					"name": "sendEmitProposalMail",
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"sendMailSign"
-								]
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"sendMailSign"
+							]
+						}
+					]
 				},
 				{
 					"name": "sendMailSign",
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"setAdvice"
-								],
-								"decision": "product.flow==`remittance_mga`"
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"setAdvice"
+							],
+							"decision": "product.flow==`remittance_mga`"
+						}
+					]
 				},
 				{
 					"name": "setAdvice",
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"putUser"
-								]
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"putUser"
+							]
+						}
+					]
 				},
 				{
 					"name": "putUser"
@@ -147,89 +131,75 @@
 				{
 					"name": "init",
 					"handlerless": true,
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"setLeadData"
-								]
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"setLeadData"
+							]
+						}
+					]
 				},
 				{
 					"name": "setLeadData",
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"sendLeadMail"
-								],
-								"decision": "policy.channel!=`mga` && policy.channel!=`network`"
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"sendLeadMail"
+							],
+							"decision": "policy.channel!=`mga` && policy.channel!=`network`"
+						}
+					]
 				},
 				{
 					"name": "sendLeadMail",
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"emitData"
-								],
-								"decision": "policy.channel!=`e-commerce`"
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"emitData"
+							],
+							"decision": "policy.channel!=`e-commerce`"
+						}
+					]
 				},
 				{
 					"name": "emitData",
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"sign"
-								]
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"sign"
+							]
+						}
+					]
 				},
 				{
 					"name": "sign",
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"pay"
-								]
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"pay"
+							]
+						}
+					]
 				},
 				{
 					"name": "pay",
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"sendEmitProposalMail"
-								]
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"sendEmitProposalMail"
+							]
+						}
+					]
 				},
 				{
 					"name": "sendEmitProposalMail",
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"sendMailSign"
-								]
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"sendMailSign"
+							]
+						}
+					]
 				},
 				{
 					"name": "sendMailSign"
@@ -254,46 +224,40 @@
 				{
 					"name": "init",
 					"handlerless": true,
-					"branch": {
-						"inputData": [],
-						"gateways": [
-							{
-								"nextActivities": [
-									"updatePolicy"
-								],
-								"decision": "product.flow!=`remittance_mga`"
-							}
-						]
-					}
+					"inputData": [],
+					"gateways": [
+						{
+							"nextActivities": [
+								"updatePolicy"
+							],
+							"decision": "product.flow!=`remittance_mga`"
+						}
+					]
 				},
 				{
 					"name": "updatePolicy",
-					"branch": {
-						"inputData": [],
-						"outputData": [],
-						"gateways": [
-							{
-								"nextActivities": [
-									"payTransaction"
-								]
-							}
-						]
-					}
+					"inputData": [],
+					"outputData": [],
+					"gateways": [
+						{
+							"nextActivities": [
+								"payTransaction"
+							]
+						}
+					]
 				},
 				{
 					"name": "payTransaction",
-					"branch": {
-						"inputData": [],
-						"outputData": [],
-						"gateways": [
-							{
-								"nextActivities": [
-									"sign"
-								],
-								"decision": "policy.channel!=`mga` && policy.channel!=`network`&& policy.channel!=`e-commerce`"
-							}
-						]
-					}
+					"inputData": [],
+					"outputData": [],
+					"gateways": [
+						{
+							"nextActivities": [
+								"sign"
+							],
+							"decision": "policy.channel!=`mga` && policy.channel!=`network`&& policy.channel!=`e-commerce`"
+						}
+					]
 				},
 				{
 					"name": "sign"
@@ -318,30 +282,26 @@
 				{
 					"name": "init",
 					"handlerless": true,
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"setProposalData"
-								],
-								"decision": "policy.channel!=`e-commerce`"
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"setProposalData"
+							],
+							"decision": "policy.channel!=`e-commerce`"
+						}
+					]
 				},
 				{
 					"name": "setProposalData",
 					"recover": "",
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"sendProposalMail"
-								],
-								"decision": "policy.channel==`network`"
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"sendProposalMail"
+							],
+							"decision": "policy.channel==`network`"
+						}
+					]
 				},
 				{
 					"name": "sendProposalMail"
@@ -366,28 +326,24 @@
 				{
 					"name": "init",
 					"handlerless": true,
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"setRequestApprovalData"
-								],
-								"decision": "policy.channel==`network`"
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"setRequestApprovalData"
+							],
+							"decision": "policy.channel==`network`"
+						}
+					]
 				},
 				{
 					"name": "setRequestApprovalData",
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"sendRequestApprovalMail"
-								]
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"sendRequestApprovalMail"
+							]
+						}
+					]
 				},
 				{
 					"name": "sendRequestApprovalMail"
@@ -412,80 +368,70 @@
 				{
 					"name": "init",
 					"handlerless": true,
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"setSign"
-								],
-								"decision": "product.flow==`remittance_mga`"
-							},
-							{
-								"nextActivities": [
-									"fillAttachments"
-								]
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"setSign"
+							],
+							"decision": "product.flow==`remittance_mga`"
+						},
+						{
+							"nextActivities": [
+								"fillAttachments"
+							]
+						}
+					]
 				},
 				{
 					"name": "fillAttachments",
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"setSign"
-								]
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"setSign"
+							]
+						}
+					]
 				},
 				{
 					"name": "setSign",
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"setToPay"
-								],
-								"decision": "product.flow!=`remittance_mga`"
-							},
-							{
-								"nextActivities": [
-									"addContract"
-								]
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"setToPay"
+							],
+							"decision": "product.flow!=`remittance_mga`"
+						},
+						{
+							"nextActivities": [
+								"addContract"
+							]
+						}
+					]
 				},
 				{
 					"name": "setToPay",
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"sendMailPay"
-								],
-								"decision": "policy.channel!=`mga`"
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"sendMailPay"
+							],
+							"decision": "policy.channel!=`mga`"
+						}
+					]
 				},
 				{
 					"name": "sendMailPay"
 				},
 				{
 					"name": "addContract",
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"sendMailContract"
-								],
-								"decision": "product.flow==`remittance_mga`"
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"sendMailContract"
+							],
+							"decision": "product.flow==`remittance_mga`"
+						}
+					]
 				},
 				{
 					"name": "sendMailContract"

@@ -15,13 +15,16 @@ type ProcessBpnm struct {
 }
 
 type Activity struct {
-	Name         string
-	handler      ActivityHandler
-	Description  string
-	PreActivity  *ProcessBpnm
-	PostActivity *ProcessBpnm
-	Branch       *Branch
-	recover      ActivityHandler
+	Name               string
+	handler            ActivityHandler
+	Description        string
+	PreActivity        *ProcessBpnm
+	PostActivity       *ProcessBpnm
+	recover            ActivityHandler
+	RequiredOutputData []typeData
+	RequiredInputData  []typeData
+	//	GatewayType        GatewayType
+	Gateway []*Gateway
 }
 
 type GatewayType string
@@ -30,13 +33,6 @@ const (
 	XOR GatewayType = "XOR"
 	AND GatewayType = "AND"
 )
-
-type Branch struct {
-	RequiredOutputData []typeData
-	RequiredInputData  []typeData
-	//	GatewayType        GatewayType
-	Gateway []*Gateway
-}
 
 type Gateway struct {
 	NextActivities []*Activity

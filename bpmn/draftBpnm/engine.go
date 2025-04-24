@@ -80,10 +80,8 @@ func (act *Activity) runActivity(nameProcess string, storage StorageData) error 
 			return err
 		}
 	}
-	if act.Branch != nil {
-		if e := checkLocalResources(storage, act.Branch.RequiredInputData); e != nil {
-			return fmt.Errorf("Process '%v' with activity '%v' has an input error: %v", nameProcess, act.Name, e.Error())
-		}
+	if e := checkLocalResources(storage, act.RequiredInputData); e != nil {
+		return fmt.Errorf("Process '%v' with activity '%v' has an input error: %v", nameProcess, act.Name, e.Error())
 	}
 
 	if act.handler != nil {
@@ -116,15 +114,12 @@ func (act *Activity) runActivity(nameProcess string, storage StorageData) error 
 
 func (act *Activity) evaluateDecisions(processName string, storage StorageData, date map[string]any) ([]*Activity, error) {
 	var res []*Activity
-	if act.Branch == nil {
-		return nil, nil
-	}
-	for _, ga := range act.Branch.Gateway { //é xor attualmente
+	for _, ga := range act.Gateway { //é xor attualmente
 		if ga.Decision == "" {
-			if e := checkLocalResources(storage, act.Branch.RequiredOutputData); e != nil {
+			if e := checkLocalResources(storage, act.RequiredOutputData); e != nil {
 				return nil, fmt.Errorf("Process '%v' with activity '%v' has an output error: %v", processName, act.Name, e.Error())
 			}
-			storage.markWhatNeeded(act.Branch.RequiredOutputData)
+			storage.markWhatNeeded(act.RequiredOutputData)
 			return ga.NextActivities, nil
 		}
 		if len(ga.NextActivities) == 0 {
@@ -137,10 +132,10 @@ func (act *Activity) evaluateDecisions(processName string, storage StorageData, 
 			return nil, fmt.Errorf("Process '%v' with activity '%v' has an eval error: %v", processName, act.Name, e.Error())
 		}
 		if result.(bool) {
-			if e := checkLocalResources(storage, act.Branch.RequiredOutputData); e != nil {
+			if e := checkLocalResources(storage, act.RequiredOutputData); e != nil {
 				return nil, fmt.Errorf("Process '%v' with activity '%v' has an output error: %v", processName, act.Name, e.Error())
 			}
-			storage.markWhatNeeded(act.Branch.RequiredOutputData)
+			storage.markWhatNeeded(act.RequiredOutputData)
 			res = append(res, ga.NextActivities...)
 			break
 		}

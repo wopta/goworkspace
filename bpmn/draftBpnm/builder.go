@@ -189,37 +189,18 @@ func (a *BpnmBuilder) buildActivities(activities []activityBuilder, processName 
 			}
 			newActivity.recover = rec
 		}
+		newActivity.RequiredInputData = activity.InputDataRequired
+		newActivity.RequiredOutputData = activity.OutputDataRequired
 
-		if activity.Branch != nil {
-			builtBranch, e := activity.Branch.buildBranch()
-			if e != nil {
-				return nil, e
-			}
-			newActivity.Branch = builtBranch
-		}
 		result[newActivity.Name] = newActivity
 	}
 	return result, nil
 }
 
-func (b *branchBuilder) buildBranch() (*Branch, error) {
-	if b == nil {
-		return nil, nil
-	}
-	activity := new(Branch)
-	//	activity.GatewayType = b.GatewayType
-	activity.RequiredInputData = b.InputDataRequired
-	activity.RequiredOutputData = b.OutputDataRequired
-	return activity, nil
-}
-
 func (p *ProcessBpnm) hydrateGateways(activities []activityBuilder) error {
 	for _, builderActivity := range activities {
-		if builderActivity.Branch == nil {
-			continue
-		}
 		var gateways []*Gateway = make([]*Gateway, 0)
-		for _, builderGateway := range builderActivity.Branch.Gateways {
+		for _, builderGateway := range builderActivity.Gateways {
 			gateway := &Gateway{
 				NextActivities: make([]*Activity, 0),
 				Decision:       builderGateway.Decision,
@@ -232,7 +213,7 @@ func (p *ProcessBpnm) hydrateGateways(activities []activityBuilder) error {
 			}
 			gateways = append(gateways, gateway)
 		}
-		p.Activities[builderActivity.Name].Branch.Gateway = gateways
+		p.Activities[builderActivity.Name].Gateway = gateways
 	}
 	return nil
 }
@@ -241,7 +222,6 @@ func buildEndingActivity(processName string) activityBuilder {
 	return activityBuilder{
 		Name:        fmt.Sprintf("%v_end", processName),
 		Description: fmt.Sprint("end activity for ", processName),
-		Branch:      nil,
 		HandlerLess: true,
 	}
 }

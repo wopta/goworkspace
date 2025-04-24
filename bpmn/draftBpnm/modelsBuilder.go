@@ -23,14 +23,10 @@ type processBuilder struct {
 }
 
 type activityBuilder struct {
-	Name        string         `json:"name"`
-	Description string         `json:"description"`
-	Branch      *branchBuilder `json:"branch"`
-	HandlerLess bool           `json:"handlerless"`
-	Recover     string         `json:"recover"`
-}
-
-type branchBuilder struct {
+	Name               string         `json:"name"`
+	Description        string         `json:"description"`
+	HandlerLess        bool           `json:"handlerless"`
+	Recover            string         `json:"recover"`
 	OutputDataRequired []typeData     `json:"outputData,omitempty"`
 	InputDataRequired  []typeData     `json:"inputData,omitempty"`
 	Gateways           []gatewayBlock `json:"gateways"`

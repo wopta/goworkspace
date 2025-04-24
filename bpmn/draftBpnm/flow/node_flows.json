@@ -13,63 +13,57 @@
 				{
 					"name": "init",
 					"handlerless": true,
-					"branch": {
-						"gateways": [
-							{
-								"nextActivities": [
-									"winEmit"
-								],
-								"decision": "node.callbackConfig.name==`winClient`"
-							},
-							{
-								"nextActivities": [
-									"baseCallback"
-								],
-								"decision": "node.callbackConfig.name==`facileBrokerClient`"
-							},
-							{
-								"nextActivities": [
-									"errorCallbackConfig"
-								]
-							}
-						]
-					}
+					"gateways": [
+						{
+							"nextActivities": [
+								"winEmit"
+							],
+							"decision": "node.callbackConfig.name==`winClient`"
+						},
+						{
+							"nextActivities": [
+								"baseCallback"
+							],
+							"decision": "node.callbackConfig.name==`facileBrokerClient`"
+						},
+						{
+							"nextActivities": [
+								"errorCallbackConfig"
+							]
+						}
+					]
 				},
 				{
 					"name": "baseCallback",
-					"branch": {
-						"outputData": [
-							{
-								"name": "callbackInfo",
-								"type": "callbackInfo"
-							}
-						],
-						"gateways": [
-							{
-								"nextActivities": [
-									"saveAudit"
-								]
-							}
-						]
-					}
+					"outputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					],
+					"gateways": [
+						{
+							"nextActivities": [
+								"saveAudit"
+							]
+						}
+					]
 				},
 				{
 					"name": "winEmit",
-					"branch": {
-						"outputData": [
-							{
-								"name": "callbackInfo",
-								"type": "callbackInfo"
-							}
-						],
-						"gateways": [
-							{
-								"nextActivities": [
-									"saveAudit"
-								]
-							}
-						]
-					}
+					"outputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					],
+					"gateways": [
+						{
+							"nextActivities": [
+								"saveAudit"
+							]
+						}
+					]
 				},
 				{
 					"name": "errorCallbackConfig",
@@ -77,14 +71,12 @@
 				},
 				{
 					"name": "saveAudit",
-					"branch": {
-						"inputData": [
-							{
-								"name": "callbackInfo",
-								"type": "callbackInfo"
-							}
-						]
-					}
+					"inputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					]
 				}
 			]
 		}

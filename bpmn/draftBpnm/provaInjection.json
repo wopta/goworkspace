@@ -18,15 +18,13 @@
 			"activities": [
 				{
 					"name": "initPost",
-					"branch": {
-						"inputData": [],
-						"outputData": [
-							{
-								"name": "error",
-								"type": "error"
-							}
-						]
-					}
+					"inputData": [],
+					"outputData": [
+						{
+							"name": "error",
+							"type": "error"
+						}
+					]
 				}
 			]
 		},
@@ -48,27 +46,25 @@
 			"activities": [
 				{
 					"name": "initPre",
-					"branch": {
-						"inputData": [
-							{
-								"name": "validationObject",
-								"type": "validity"
-							}
-						],
-						"outputData": [
-							{
-								"name": "error",
-								"type": "error"
-							}
-						],
-						"gateways": [
-							{
-								"nextActivities": [
-									"pre-B"
-								]
-							}
-						]
-					}
+					"inputData": [
+						{
+							"name": "validationObject",
+							"type": "validity"
+						}
+					],
+					"outputData": [
+						{
+							"name": "error",
+							"type": "error"
+						}
+					],
+					"gateways": [
+						{
+							"nextActivities": [
+								"pre-B"
+							]
+						}
+					]
 				},
 				{
 					"name": "pre-B",
