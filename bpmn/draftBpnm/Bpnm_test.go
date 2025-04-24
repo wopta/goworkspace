@@ -32,6 +32,40 @@ type mockLog struct {
 func (m *mockLog) Println(mes string) {
 	m.log = append(m.log, mes)
 }
+
+func testLog(log *mockLog, exps []string, t *testing.T) {
+	if len(exps) != len(log.log) {
+		t.Fatalf("exp n message: %v,got: %v", len(exps), len(log.log))
+	}
+	for i, exp := range exps {
+		if log.log[i] != exp {
+			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
+		}
+	}
+}
+func getInjectableFlow(log *mockLog) (*BpnmBuilder, error) {
+	injectedFlow, err := NewBpnmBuilder("provaInjection.json")
+	injectedFlow.SetStorage(NewStorageBpnm())
+	injectedFlow.AddHandler("initPost", func(st StorageData) error {
+		log.Println("init post")
+		return nil
+	})
+
+	injectedFlow.AddHandler("pre-B", func(st StorageData) error {
+		log.Println("init pre-B")
+		return nil
+	})
+	injectedFlow.AddHandler("initPre", func(st StorageData) error {
+		log.Println("init pre")
+		st.AddLocal("error", &Error{})
+		return nil
+	})
+	injectedFlow.AddHandler("save", func(st StorageData) error {
+		log.Println("end process")
+		return nil
+	})
+	return injectedFlow, err
+}
 func addDefaultHandlersForTest(g *BpnmBuilder, log *mockLog) error {
 	return IsError(
 		g.AddHandler("init", func(st StorageData) error {
@@ -68,7 +102,7 @@ func addDefaultHandlersForTest(g *BpnmBuilder, log *mockLog) error {
 
 func TestBpnmHappyPath(t *testing.T) {
 	g, err := NewBpnmBuilder("prova.json")
-	log := mockLog{}
+	log := &mockLog{}
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -76,7 +110,7 @@ func TestBpnmHappyPath(t *testing.T) {
 	storage.AddLocal("validationObject", new(validity))
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 3})
 	g.SetStorage(storage)
-	addDefaultHandlersForTest(g, &log)
+	addDefaultHandlersForTest(g, log)
 	flow, err := g.Build()
 	if err != nil {
 		t.Fatal(err)
@@ -91,20 +125,12 @@ func TestBpnmHappyPath(t *testing.T) {
 		"init A",
 		"init A",
 	}
-	if len(exps) != len(log.log) {
-		t.Fatalf("exp n message: %v,got: %v", len(exps), len(log.log))
-	}
-	for i, exp := range exps {
-		if log.log[i] != exp {
-			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
-		}
-	}
-
+	testLog(log, exps, t)
 }
 
 func TestBpnmHappyPath2(t *testing.T) {
 	g, err := NewBpnmBuilder("prova.json")
-	log := mockLog{}
+	log := &mockLog{}
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -113,7 +139,7 @@ func TestBpnmHappyPath2(t *testing.T) {
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 3})
 	g.SetStorage(storage)
 
-	addDefaultHandlersForTest(g, &log)
+	addDefaultHandlersForTest(g, log)
 	flow, err := g.Build()
 	if err != nil {
 		t.Fatal(err)
@@ -128,15 +154,7 @@ func TestBpnmHappyPath2(t *testing.T) {
 		"init A",
 		"init A",
 	}
-	if len(exps) != len(log.log) {
-		t.Fatalf("exp n message: %v,got: %v", len(exps), len(log.log))
-	}
-	for i, exp := range exps {
-		if log.log[i] != exp {
-			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
-		}
-	}
-
+	testLog(log, exps, t)
 }
 
 func TestBpnmMissingOutput(t *testing.T) {
@@ -148,34 +166,12 @@ func TestBpnmMissingOutput(t *testing.T) {
 	storage := NewStorageBpnm()
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 1})
 	g.SetStorage(storage)
-
-	g.AddHandler("init", func(st StorageData) error {
+	addDefaultHandlersForTest(g, &log)
+	g.setHandler("init", func(st StorageData) error {
 		log.Println("init")
 		return nil
 	})
-	g.AddHandler("AEvent", func(st StorageData) error {
-		log.Println("init A")
-		st.AddLocal("error", &Error{Result: true})
-		return nil
-	})
-	g.AddHandler("BEvent", func(st StorageData) error {
-		log.Println("init B")
-		st.AddLocal("error", &Error{Result: false})
-		st.AddLocal("validationObject", new(validity))
-		return nil
-	})
-	g.AddHandler("CEvent", func(st StorageData) error {
-		log.Println("init C")
-		return nil
-	})
-	g.AddHandler("DEventRec", func(st StorageData) error {
-		log.Println("init D rec")
-		return errors.New("error with recover")
-	})
-	g.AddHandler("DRec", func(st StorageData) error {
-		log.Println("recover D")
-		return nil
-	})
+
 	flow, err := g.Build()
 	if err != nil {
 		t.Fatal(err)
@@ -201,31 +197,9 @@ func TestBpnmMissingInput(t *testing.T) {
 	storage := NewStorageBpnm()
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 10})
 	g.SetStorage(storage)
-
-	g.AddHandler("init", func(st StorageData) error {
-		log.Println("init")
-		st.AddLocal("validationObject", new(validity))
-		return nil
-	})
-	g.AddHandler("AEvent", func(st StorageData) error {
-		log.Println("init A")
-		st.AddLocal("error", &Error{Result: true})
-		return nil
-	})
-	g.AddHandler("BEvent", func(st StorageData) error {
-		log.Println("init B")
-		return nil
-	})
-	g.AddHandler("CEvent", func(st StorageData) error {
+	addDefaultHandlersForTest(g, &log)
+	g.setHandler("CEvent", func(st StorageData) error {
 		log.Println("init C")
-		return nil
-	})
-	g.AddHandler("DEventRec", func(st StorageData) error {
-		log.Println("init D rec")
-		return errors.New("error with recover")
-	})
-	g.AddHandler("DRec", func(st StorageData) error {
-		log.Println("recover D")
 		return nil
 	})
 	flow, err := g.Build()
@@ -253,28 +227,8 @@ func TestBpnmMissingHandler(t *testing.T) {
 	storage := NewStorageBpnm()
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 10})
 	g.SetStorage(storage)
-
-	g.AddHandler("init", func(st StorageData) error {
-		log.Println("init")
-		st.AddLocal("validationObject", new(validity))
-		return nil
-	})
-	g.AddHandler("BEvent", func(st StorageData) error {
-		log.Println("init B")
-		return nil
-	})
-	g.AddHandler("CEvent", func(st StorageData) error {
-		log.Println("init C")
-		return nil
-	})
-	g.AddHandler("DEventRec", func(st StorageData) error {
-		log.Println("init D rec")
-		return errors.New("error with recover")
-	})
-	g.AddHandler("DRec", func(st StorageData) error {
-		log.Println("recover D")
-		return nil
-	})
+	addDefaultHandlersForTest(g, &log)
+	err = g.setHandler("AEvent", nil)
 	_, err = g.Build()
 	if err.Error() != "No handler registered for the activity: 'AEvent'" {
 		t.Fatalf("should have another error, got: %v", err.Error())
@@ -284,45 +238,21 @@ func TestBpnmMissingHandler(t *testing.T) {
 	}
 }
 
-func getInjectableFlow(log *mockLog) (*BpnmBuilder, error) {
-	injectedFlow, err := NewBpnmBuilder("provaInjection.json")
-	injectedFlow.SetStorage(NewStorageBpnm())
-	injectedFlow.AddHandler("initPost", func(st StorageData) error {
-		log.Println("init post")
-		return nil
-	})
-
-	injectedFlow.AddHandler("pre-B", func(st StorageData) error {
-		log.Println("init pre-B")
-		return nil
-	})
-	injectedFlow.AddHandler("initPre", func(st StorageData) error {
-		log.Println("init pre")
-		st.AddLocal("error", &Error{})
-		return nil
-	})
-	injectedFlow.AddHandler("save", func(st StorageData) error {
-		log.Println("end process")
-		return nil
-	})
-	return injectedFlow, err
-}
-
 func TestBpnmInjection(t *testing.T) {
 	g, err := NewBpnmBuilder("prova.json")
-	log := mockLog{}
+	log := &mockLog{}
 	if err != nil {
 		t.Fatal(err)
 	}
 	storage := NewStorageBpnm()
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 3})
 	g.SetStorage(storage)
-	flowCatnat, err := getInjectableFlow(&log)
+	flowCatnat, err := getInjectableFlow(log)
 	if err := g.Inject(flowCatnat); err != nil {
 		t.Fatal(err)
 	}
 
-	err = addDefaultHandlersForTest(g, &log)
+	err = addDefaultHandlersForTest(g, log)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -345,14 +275,7 @@ func TestBpnmInjection(t *testing.T) {
 		"init post",
 		"end process",
 	}
-	if len(exps) != len(log.log) {
-		t.Fatalf("exp n message: %v,got: %v", len(exps), len(log.log))
-	}
-	for i, exp := range exps {
-		if log.log[i] != exp {
-			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
-		}
-	}
+	testLog(log, exps, t)
 }
 
 func TestBpnmWithMultipleInjection(t *testing.T) {
@@ -380,7 +303,7 @@ func TestBpnmWithMultipleInjection(t *testing.T) {
 
 func TestRunFromSpecificActivity(t *testing.T) {
 	g, err := NewBpnmBuilder("prova.json")
-	log := mockLog{}
+	log := &mockLog{}
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -388,12 +311,12 @@ func TestRunFromSpecificActivity(t *testing.T) {
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 3})
 	storage.AddLocal("validationObject", new(validity))
 	g.SetStorage(storage)
-	flowCatnat, err := getInjectableFlow(&log)
+	flowCatnat, err := getInjectableFlow(log)
 	if err := g.Inject(flowCatnat); err != nil {
 		t.Fatal(err)
 	}
 
-	addDefaultHandlersForTest(g, &log)
+	addDefaultHandlersForTest(g, log)
 	flow, err := g.Build()
 	if err != nil {
 		t.Fatal(err)
@@ -411,14 +334,7 @@ func TestRunFromSpecificActivity(t *testing.T) {
 		"init post",
 		"end process",
 	}
-	if len(exps) != len(log.log) {
-		t.Fatalf("exp n message: %v,got: %v", len(exps), len(log.log))
-	}
-	for i, exp := range exps {
-		if log.log[i] != exp {
-			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
-		}
-	}
+	testLog(log, exps, t)
 }
 
 func TestBpnmStoreClean(t *testing.T) {
@@ -426,7 +342,7 @@ func TestBpnmStoreClean(t *testing.T) {
 	//at each cycles
 	//it marks every output resource of each activities (T), after all activities(T) have finished, it clean the store leaving only the marked ones
 	g, err := NewBpnmBuilder("prova.json")
-	log := mockLog{}
+	log := &mockLog{}
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -434,8 +350,9 @@ func TestBpnmStoreClean(t *testing.T) {
 	storage.AddLocal("validationObject", new(validity))
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 2})
 	g.SetStorage(storage)
+	addDefaultHandlersForTest(g, log)
 
-	g.AddHandler("init", func(st StorageData) error {
+	g.setHandler("init", func(st StorageData) error {
 		log.Println("init")
 		st.AddLocal("validationObject", new(validity))
 		st.AddLocal("error", &Error{Result: false})
@@ -451,7 +368,7 @@ func TestBpnmStoreClean(t *testing.T) {
 		}
 		return nil
 	})
-	g.AddHandler("AEvent", func(st StorageData) error {
+	g.setHandler("AEvent", func(st StorageData) error {
 		log.Println("init A")
 		st.AddLocal("error", &Error{Result: false})
 		d, e := GetData[*validity]("validationObject", st)
@@ -466,25 +383,14 @@ func TestBpnmStoreClean(t *testing.T) {
 		p.Result = true
 		return nil
 	})
-	g.AddHandler("BEvent", func(st StorageData) error {
+	g.setHandler("BEvent", func(st StorageData) error {
 		log.Println("init B")
 		if len(st.getAllLocal()) != 2 { //output of AEvent
 			return fmt.Errorf("Expected 2 resource from AEvent, got: %v", len(st.getAllLocal()))
 		}
 		return nil
 	})
-	g.AddHandler("CEvent", func(st StorageData) error {
-		log.Println("init C")
-		return nil
-	})
-	g.AddHandler("DEventRec", func(st StorageData) error {
-		log.Println("init D rec")
-		return errors.New("error with recover")
-	})
-	g.AddHandler("DRec", func(st StorageData) error {
-		log.Println("recover D")
-		return nil
-	})
+
 	flow, err := g.Build()
 	if err != nil {
 		t.Fatal(err)
@@ -498,15 +404,7 @@ func TestBpnmStoreClean(t *testing.T) {
 		"init A",
 		"init B",
 	}
-	if len(exps) != len(log.log) {
-		t.Fatalf("exp n message: %v,got: %v", len(exps), len(log.log))
-	}
-	for i, exp := range exps {
-		if log.log[i] != exp {
-			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
-		}
-	}
-
+	testLog(log, exps, t)
 }
 
 func TestMergeBuilder(t *testing.T) {
@@ -540,14 +438,7 @@ func TestMergeBuilder(t *testing.T) {
 		"init pre",
 		"init pre-B",
 	}
-	if len(exps) != len(log.log) {
-		t.Fatalf("exp n message: %v,got: %v", len(exps), len(log.log))
-	}
-	for i, exp := range exps {
-		if log.log[i] != exp {
-			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
-		}
-	}
+	testLog(log, exps, t)
 }
 func TestRecoverWithoutFunction(t *testing.T) {
 	log := &mockLog{}
@@ -556,34 +447,9 @@ func TestRecoverWithoutFunction(t *testing.T) {
 		t.Fatal(err)
 	}
 	storage := NewStorageBpnm()
-	g.AddHandler("init", func(st StorageData) error {
-		log.Println("init")
-		st.AddLocal("validationObject", new(validity))
-		return nil
-	})
-	g.AddHandler("AEvent", func(st StorageData) error {
-		log.Println("init A")
-		st.AddLocal("validationObject", new(validity))
-		st.AddLocal("error", &Error{Result: false})
-		return errors.New("scoppio male")
-	})
-	g.AddHandler("BEvent", func(st StorageData) error {
-		log.Println("init B")
-		st.AddLocal("validationObject", new(validity))
-		st.AddLocal("error", &Error{Result: false})
-		return nil
-	})
-	g.AddHandler("CEvent", func(st StorageData) error {
-		log.Println("init C")
-		return nil
-	})
-	g.AddHandler("DEventRec", func(st StorageData) error {
-		log.Println("init D rec")
-		return errors.New("error with recover")
-	})
-	g.AddHandler("DRec", func(st StorageData) error {
-		log.Println("recover D")
-		return nil
+	addDefaultHandlersForTest(g, log)
+	g.setHandler("AEvent", func(sd StorageData) error {
+		return errors.New("error")
 	})
 	storage.AddLocal("validationObject", new(validity))
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 2})
@@ -596,7 +462,7 @@ func TestRecoverWithoutFunction(t *testing.T) {
 	if err == nil {
 		t.Fatalf("should have error")
 	}
-	if err.Error() != "scoppio male" {
+	if err.Error() != "error" {
 		t.Fatalf("should have another error, got: %v", err.Error())
 	}
 }
@@ -608,37 +474,10 @@ func TestRecoverWithFunction(t *testing.T) {
 		t.Fatal(err)
 	}
 	storage := NewStorageBpnm()
-	g.AddHandler("init", func(st StorageData) error {
-		log.Println("init")
-		st.AddLocal("validationObject", new(validity))
-		return nil
-	})
-	g.AddHandler("AEvent", func(st StorageData) error {
-		log.Println("init A")
-		st.AddLocal("validationObject", new(validity))
-		st.AddLocal("error", &Error{Result: false})
-		return errors.New("error without recover")
-	})
-	g.AddHandler("BEvent", func(st StorageData) error {
-		log.Println("init B")
-		st.AddLocal("validationObject", new(validity))
-		st.AddLocal("error", &Error{Result: false})
-		return nil
-	})
-	g.AddHandler("CEvent", func(st StorageData) error {
-		log.Println("init C")
-		return nil
-	})
-	g.AddHandler("DEventRec", func(st StorageData) error {
-		log.Println("init D rec")
-		return errors.New("error with recover")
-	})
-	g.AddHandler("DRec", func(st StorageData) error {
-		log.Println("recover D")
-		return nil
-	})
 	storage.AddLocal("validationObject", new(validity))
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 2})
+	addDefaultHandlersForTest(g, log)
+
 	g.SetStorage(storage)
 	f, err := g.Build()
 	if err != nil {
@@ -652,14 +491,7 @@ func TestRecoverWithFunction(t *testing.T) {
 		"init D rec",
 		"recover D",
 	}
-	if len(exps) != len(log.log) {
-		t.Fatalf("exp n message: %v,got: %v", len(exps), len(log.log))
-	}
-	for i, exp := range exps {
-		if log.log[i] != exp {
-			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
-		}
-	}
+	testLog(log, exps, t)
 }
 func TestRecoverFromPanic(t *testing.T) {
 	log := &mockLog{}
@@ -668,34 +500,10 @@ func TestRecoverFromPanic(t *testing.T) {
 		t.Fatal(err)
 	}
 	storage := NewStorageBpnm()
-	g.AddHandler("init", func(st StorageData) error {
-		log.Println("init")
-		st.AddLocal("validationObject", new(validity))
-		return nil
-	})
-	g.AddHandler("AEvent", func(st StorageData) error {
-		log.Println("init A")
-		st.AddLocal("validationObject", new(validity))
-		st.AddLocal("error", &Error{Result: false})
-		return nil
-	})
-	g.AddHandler("BEvent", func(st StorageData) error {
-		log.Println("init B")
-		st.AddLocal("validationObject", new(validity))
-		st.AddLocal("error", &Error{Result: false})
-		return nil
-	})
-	g.AddHandler("CEvent", func(st StorageData) error {
-		log.Println("init C")
-		return nil
-	})
-	g.AddHandler("DEventRec", func(st StorageData) error {
+	addDefaultHandlersForTest(g, log)
+	g.setHandler("DEventRec", func(st StorageData) error {
 		log.Println("init D rec")
 		panic("fjsdklfjd")
-	})
-	g.AddHandler("DRec", func(st StorageData) error {
-		log.Println("recover D")
-		return nil
 	})
 	storage.AddLocal("validationObject", new(validity))
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 2})
@@ -712,12 +520,5 @@ func TestRecoverFromPanic(t *testing.T) {
 		"init D rec",
 		"recover D",
 	}
-	if len(exps) != len(log.log) {
-		t.Fatalf("exp n message: %v,got: %v", len(exps), len(log.log))
-	}
-	for i, exp := range exps {
-		if log.log[i] != exp {
-			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
-		}
-	}
+	testLog(log, exps, t)
 }

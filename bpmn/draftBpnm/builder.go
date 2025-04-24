@@ -156,6 +156,10 @@ func (b *BpnmBuilder) setHandler(nameHandler string, handler activityHandler) er
 	if _, ok := b.handlers[nameHandler]; !ok {
 		return errors.New("Handler isn't defined")
 	}
+	if handler == nil {
+		delete(b.handlers, nameHandler)
+		return nil
+	}
 	b.handlers[nameHandler] = handler
 	return nil
 }
