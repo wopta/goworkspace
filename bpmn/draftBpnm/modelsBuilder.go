@@ -1,10 +1,5 @@
 package draftbpnm
 
-type Order struct {
-	InWhatProcessInjected  string        `json:"inWhatProcessInjected"`
-	InWhatActivityInjected string        `json:"inWhatActivityInjected"`
-	Order                  orderActivity `json:"order"`
-}
 type BpnmBuilder struct {
 	Processes []*processBuilder `json:"processes"`
 
@@ -15,11 +10,17 @@ type BpnmBuilder struct {
 
 type processBuilder struct {
 	GlobalDataRequired []typeData        `json:"globalData"`
-	Order              *Order            `json:"order"`
+	Order              *order            `json:"order"`
 	Description        string            `json:"description"`
 	Name               string            `json:"name"`
 	Activities         []activityBuilder `json:"activities"`
 	DefaultStart       string            `json:"defaultStart"`
+}
+
+type order struct {
+	InWhatProcessInjected  string        `json:"inWhatProcessInjected"`
+	InWhatActivityInjected string        `json:"inWhatActivityInjected"`
+	Order                  orderActivity `json:"order"`
 }
 
 type activityBuilder struct {

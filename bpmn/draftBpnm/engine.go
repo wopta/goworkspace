@@ -10,7 +10,7 @@ import (
 )
 
 func (f *FlowBpnm) Run(processName string) error {
-	process := f.Process[processName]
+	process := f.process[processName]
 	if process == nil {
 		return fmt.Errorf("Process '%v' not founded", processName)
 	}
@@ -19,7 +19,7 @@ func (f *FlowBpnm) Run(processName string) error {
 
 func (f *FlowBpnm) RunAt(processName, activityName string) error {
 	log.Println("Run ", processName)
-	process := f.Process[processName]
+	process := f.process[processName]
 	if process == nil {
 		return fmt.Errorf("Process '%v' not founded", processName)
 	}
@@ -45,35 +45,48 @@ func (p *processBpnm) loop(nameActivity string) error {
 	if p.activeActivities == nil || len(p.activeActivities) == 0 {
 		return fmt.Errorf("Process '%v' has no activity '%v'", p.name, nameActivity)
 	}
+	var err error
+	var byte []byte
+	var listNewActivities []*activity
+	var nextActivities []*activity
+	var callEndIfStop bool
+	var mapsMerged map[string]any
 	for {
-		callEndIfStop := true
-		var nextActivities []*activity
+		nextActivities = make([]*activity, 0)
+		callEndIfStop = true
 		for i := range p.activeActivities {
-			if err := p.activeActivities[i].runActivity(p.name, p.storageBpnm); err != nil {
+			if err = p.activeActivities[i].runActivity(p.name, p.storageBpnm); err != nil {
 				return err
 			}
 			callEndIfStop = callEndIfStop && p.activeActivities[i].callEndIfStop
 			//TODO: to improve
-			m := mergeMaps(p.storageBpnm.getAllGlobal(), p.storageBpnm.getAllLocal())
-			jsonMap := make(map[string]any)
-			b, _ := json.Marshal(m)
-			_ = json.Unmarshal(b, &jsonMap)
-
-			listNewActivities, e := p.activeActivities[i].evaluateDecisions(p.name, p.storageBpnm, jsonMap)
-
-			if e != nil {
-				return e
+			mapsMerged = mergeMaps(p.storageBpnm.getAllGlobal(), p.storageBpnm.getAllLocal())
+			byte, err = json.Marshal(mapsMerged)
+			if err != nil {
+				return err
 			}
+			err = json.Unmarshal(byte, &mapsMerged)
+			if err != nil {
+				return err
+			}
+
+			listNewActivities, err = p.activeActivities[i].evaluateDecisions(p.name, p.storageBpnm, mapsMerged)
+			if err != nil {
+				return err
+			}
+
 			nextActivities = append(nextActivities, listNewActivities...)
 		}
 		if len(nextActivities) == 0 {
-			if callEndIfStop {
-				return p.activities[getNameEndActivity(p.name)].runActivity(p.name, p.storageBpnm)
+			if !callEndIfStop {
+				return nil
 			}
-			return nil
+			return p.activities[getNameEndActivity(p.name)].runActivity(p.name, p.storageBpnm)
 		}
 		p.activeActivities = nextActivities
-		p.storageBpnm.clean()
+		if err = p.storageBpnm.clean(); err != nil {
+			return err
+		}
 	}
 }
 
@@ -118,7 +131,7 @@ func (act *activity) runActivity(nameProcess string, storage StorageData) error 
 
 func (act *activity) evaluateDecisions(processName string, storage StorageData, date map[string]any) ([]*activity, error) {
 	var res []*activity
-	for _, ga := range act.gateway { //é xor attualmente
+	for _, ga := range act.gateway {
 		if ga.decision == "" {
 			if e := checkLocalResources(storage, act.requiredOutputData); e != nil {
 				return nil, fmt.Errorf("Process '%v' with activity '%v' has an output error: %v", processName, act.name, e.Error())

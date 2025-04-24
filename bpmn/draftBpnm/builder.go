@@ -47,14 +47,14 @@ func (b *BpnmBuilder) AddProcesses(toMerge *BpnmBuilder) error {
 
 func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 	flow := new(FlowBpnm)
-	flow.Process = make(map[string]*processBpnm)
+	flow.process = make(map[string]*processBpnm)
 
 	var newProcess *processBpnm
 	if b.storage == nil {
 		return nil, errors.New("miss storage")
 	}
 	for _, p := range b.Processes {
-		if flow.Process[p.Name] != nil {
+		if flow.process[p.Name] != nil {
 			return nil, fmt.Errorf("Process %v's been already defined", newProcess.name)
 		}
 		newProcess = new(processBpnm)
@@ -83,7 +83,7 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 			return nil, err
 		}
 		newProcess.defaultStart = p.DefaultStart
-		flow.Process[newProcess.name] = newProcess
+		flow.process[newProcess.name] = newProcess
 	}
 
 	//Return error if some processes isnt injected, when a process is injected it's removed from b.toInject
@@ -108,7 +108,7 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 	if b.toInject == nil {
 		b.toInject = make(map[keyInjected]*processBpnm)
 	}
-	var order *Order
+	var order *order
 	for i, p := range bpnmToInject.Processes { //to have a better error
 		order = bpnmToInject.Processes[i].Order
 		if order == nil {
@@ -128,7 +128,7 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 
 	for i, p := range bpnmToInject.Processes {
 		order = bpnmToInject.Processes[i].Order
-		b.toInject[getKeyInjectedProcess(order.InWhatProcessInjected, order.InWhatActivityInjected, order.Order)] = process.Process[p.Name]
+		b.toInject[getKeyInjectedProcess(order.InWhatProcessInjected, order.InWhatActivityInjected, order.Order)] = process.process[p.Name]
 	}
 
 	if err = bpnmToInject.storage.setHigherStorage(b.storage); err != nil {
@@ -152,9 +152,6 @@ func (b *BpnmBuilder) AddHandler(nameHandler string, handler activityHandler) er
 func (b *BpnmBuilder) setHandler(nameHandler string, handler activityHandler) error {
 	if b.handlers == nil {
 		return errors.New("No handlers has been defined")
-	}
-	if _, ok := b.handlers[nameHandler]; !ok {
-		return errors.New("Handler isn't defined")
 	}
 	if handler == nil {
 		delete(b.handlers, nameHandler)

@@ -26,7 +26,7 @@ type StorageData interface {
 	//Mark what local resources keep when clean is called
 	markWhatNeeded([]typeData)
 	//Delete the resources that aren't needed(aren't marked)
-	clean()
+	clean() error
 }
 
 type StorageBpnm struct {
@@ -61,13 +61,16 @@ func (p *StorageBpnm) markWhatNeeded(toTouch []typeData) {
 	}
 }
 
-func (p *StorageBpnm) clean() {
+func (p *StorageBpnm) clean() error {
 	backup := maps.Clone(p.local)
 	p.ResetLocal()
 	for i, toSave := range p.touched {
-		p.AddLocal(p.touched[i], backup[toSave].(DataBpnm))
+		if err := p.AddLocal(p.touched[i], backup[toSave].(DataBpnm)); err != nil {
+			return err
+		}
 	}
 	p.touched = nil
+	return nil
 }
 
 func (p *StorageBpnm) getAllLocal() map[string]any {

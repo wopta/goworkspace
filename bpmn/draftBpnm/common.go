@@ -11,16 +11,6 @@ type DataBpnm interface {
 	GetType() string
 }
 
-type Error struct {
-	Step        string
-	Description string
-	Result      bool
-}
-
-func (e *Error) GetType() string {
-	return "error"
-}
-
 // mergeMaps merges two maps of the same key and value types.
 // If both maps contain the same key, values from m2 will overwrite those from m1.
 func mergeMaps[key comparable, out any](m1 map[key]out, m2 map[key]out) map[key]out {
