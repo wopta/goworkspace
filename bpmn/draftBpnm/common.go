@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-type ActivityHandler func(StorageData) error
+type activityHandler func(StorageData) error
 type DataBpnm interface {
 	GetType() string
 }

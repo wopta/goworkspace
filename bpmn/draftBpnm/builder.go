@@ -47,21 +47,21 @@ func (b *BpnmBuilder) AddProcesses(toMerge *BpnmBuilder) error {
 
 func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 	flow := new(FlowBpnm)
-	flow.Process = make(map[string]*ProcessBpnm)
+	flow.Process = make(map[string]*processBpnm)
 
-	var newProcess *ProcessBpnm
+	var newProcess *processBpnm
 	if b.storage == nil {
 		return nil, errors.New("miss storage")
 	}
 	for _, p := range b.Processes {
 		if flow.Process[p.Name] != nil {
-			return nil, fmt.Errorf("Process %v's been already defined", newProcess.Name)
+			return nil, fmt.Errorf("Process %v's been already defined", newProcess.name)
 		}
-		newProcess = new(ProcessBpnm)
-		newProcess.Description = p.Description
+		newProcess = new(processBpnm)
+		newProcess.description = p.Description
 		newProcess.storageBpnm = b.storage
-		newProcess.Name = p.Name
-		newProcess.RequiredGlobalData = p.GlobalDataRequired
+		newProcess.name = p.Name
+		newProcess.requiredGlobalData = p.GlobalDataRequired
 		builtActivities, err := b.buildActivities(p.Name, p.Activities...)
 		if err != nil {
 			return nil, err
@@ -76,14 +76,14 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 		builtActivities["end"] = builtEndActivity["end"]
 
 		if _, ok := builtActivities[p.DefaultStart]; !ok {
-			return nil, fmt.Errorf("Process '%v' has no activity named '%v' that can be used as default start", newProcess.Name, p.DefaultStart)
+			return nil, fmt.Errorf("Process '%v' has no activity named '%v' that can be used as default start", newProcess.name, p.DefaultStart)
 		}
-		newProcess.Activities = builtActivities
+		newProcess.activities = builtActivities
 		if err := newProcess.hydrateGateways(p.Activities); err != nil {
 			return nil, err
 		}
-		newProcess.DefaultStart = p.DefaultStart
-		flow.Process[newProcess.Name] = newProcess
+		newProcess.defaultStart = p.DefaultStart
+		flow.Process[newProcess.name] = newProcess
 	}
 
 	//Return error if some processes isnt injected, when a process is injected it's removed from b.toInject
@@ -103,10 +103,10 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 		return errors.New("No storage defined")
 	}
 	if b.handlers == nil {
-		b.handlers = make(map[string]ActivityHandler)
+		b.handlers = make(map[string]activityHandler)
 	}
 	if b.toInject == nil {
-		b.toInject = make(map[keyInjected]*ProcessBpnm)
+		b.toInject = make(map[keyInjected]*processBpnm)
 	}
 	var order *Order
 	for i, p := range bpnmToInject.Processes { //to have a better error
@@ -137,9 +137,9 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 	return nil
 }
 
-func (b *BpnmBuilder) AddHandler(nameHandler string, handler ActivityHandler) error {
+func (b *BpnmBuilder) AddHandler(nameHandler string, handler activityHandler) error {
 	if b.handlers == nil {
-		b.handlers = make(map[string]ActivityHandler)
+		b.handlers = make(map[string]activityHandler)
 	}
 	if _, ok := b.handlers[nameHandler]; ok {
 		return errors.New("Handler's been already defined")
@@ -149,7 +149,7 @@ func (b *BpnmBuilder) AddHandler(nameHandler string, handler ActivityHandler) er
 }
 
 // only use it for test!!
-func (b *BpnmBuilder) setHandler(nameHandler string, handler ActivityHandler) error {
+func (b *BpnmBuilder) setHandler(nameHandler string, handler activityHandler) error {
 	if b.handlers == nil {
 		return errors.New("No handlers has been defined")
 	}
@@ -164,73 +164,73 @@ func (b *BpnmBuilder) SetStorage(pool StorageData) {
 	b.storage = pool
 }
 
-func (a *BpnmBuilder) buildActivities(processName string, activities ...activityBuilder) (map[string]*Activity, error) {
-	result := make(map[string]*Activity)
-	for _, activity := range activities {
-		if _, ok := result[activity.Name]; ok {
-			return nil, fmt.Errorf("Double event with same name '%v'", activity.Name)
+func (a *BpnmBuilder) buildActivities(processName string, activitiesToBuild ...activityBuilder) (map[string]*activity, error) {
+	result := make(map[string]*activity)
+	for _, activityToBuild := range activitiesToBuild {
+		if _, ok := result[activityToBuild.Name]; ok {
+			return nil, fmt.Errorf("Double event with same name '%v'", activityToBuild.Name)
 		}
-		newActivity := new(Activity)
+		newActivity := new(activity)
 
-		handler, ok := a.handlers[activity.Name]
-		if !activity.HandlerLess && !ok {
-			return nil, fmt.Errorf("No handler registered for the activity: '%v'", activity.Name)
+		handler, ok := a.handlers[activityToBuild.Name]
+		if !activityToBuild.HandlerLess && !ok {
+			return nil, fmt.Errorf("No handler registered for the activity: '%v'", activityToBuild.Name)
 		}
-		if pr := a.toInject[getKeyInjectedProcess(processName, activity.Name, preActivity)]; pr != nil {
-			newActivity.PreActivity = pr
+		if pr := a.toInject[getKeyInjectedProcess(processName, activityToBuild.Name, preActivity)]; pr != nil {
+			newActivity.preActivity = pr
 			//To check eventually if the some injection isnt possible
-			delete(a.toInject, getKeyInjectedProcess(processName, activity.Name, preActivity))
+			delete(a.toInject, getKeyInjectedProcess(processName, activityToBuild.Name, preActivity))
 		}
-		if pr := a.toInject[getKeyInjectedProcess(processName, activity.Name, postActivity)]; pr != nil {
-			newActivity.PostActivity = pr
+		if pr := a.toInject[getKeyInjectedProcess(processName, activityToBuild.Name, postActivity)]; pr != nil {
+			newActivity.postActivity = pr
 			//To check eventually if the some injection isnt possible
-			delete(a.toInject, getKeyInjectedProcess(processName, activity.Name, postActivity))
+			delete(a.toInject, getKeyInjectedProcess(processName, activityToBuild.Name, postActivity))
 		}
-		newActivity.Name = activity.Name
-		newActivity.Description = activity.Description
+		newActivity.name = activityToBuild.Name
+		newActivity.description = activityToBuild.Description
 		newActivity.handler = handler
-		if activity.CallEndIfStop == nil {
+		if activityToBuild.CallEndIfStop == nil {
 			boolPtr := func(b bool) *bool {
 				return &b
 			}
-			activity.CallEndIfStop = boolPtr(true)
+			activityToBuild.CallEndIfStop = boolPtr(true)
 		}
-		newActivity.CallEndIfStop = *activity.CallEndIfStop
+		newActivity.callEndIfStop = *activityToBuild.CallEndIfStop
 
-		if activity.Recover != "" {
-			rec, ok := a.handlers[activity.Recover]
+		if activityToBuild.Recover != "" {
+			rec, ok := a.handlers[activityToBuild.Recover]
 			if !ok {
-				return nil, fmt.Errorf("No handler registered for recovery '%v' in activity: '%v'", activity.Recover, activity.Name)
+				return nil, fmt.Errorf("No handler registered for recovery '%v' in activity: '%v'", activityToBuild.Recover, activityToBuild.Name)
 			}
 			newActivity.recover = rec
 		}
-		newActivity.RequiredInputData = activity.InputDataRequired
-		newActivity.RequiredOutputData = activity.OutputDataRequired
+		newActivity.requiredInputData = activityToBuild.InputDataRequired
+		newActivity.requiredOutputData = activityToBuild.OutputDataRequired
 
-		result[newActivity.Name] = newActivity
+		result[newActivity.name] = newActivity
 	}
 	return result, nil
 }
 
 // hydrateGateways links each activity's gateways to their corresponding next activities.
 // Returns an error if any referenced activity is missing.
-func (p *ProcessBpnm) hydrateGateways(activities []activityBuilder) error {
+func (p *processBpnm) hydrateGateways(activities []activityBuilder) error {
 	for _, builderActivity := range activities {
-		var gateways []*Gateway = make([]*Gateway, 0)
+		var gateways []*gateway = make([]*gateway, 0)
 		for _, builderGateway := range builderActivity.Gateways {
-			gateway := &Gateway{
-				NextActivities: make([]*Activity, 0),
-				Decision:       builderGateway.Decision,
+			gateway := &gateway{
+				nextActivities: make([]*activity, 0),
+				decision:       builderGateway.Decision,
 			}
 			for _, nextJump := range builderGateway.NextActivities {
-				if _, ok := p.Activities[nextJump]; !ok {
+				if _, ok := p.activities[nextJump]; !ok {
 					return fmt.Errorf("No event named %v", nextJump)
 				}
-				gateway.NextActivities = append(gateway.NextActivities, p.Activities[nextJump])
+				gateway.nextActivities = append(gateway.nextActivities, p.activities[nextJump])
 			}
 			gateways = append(gateways, gateway)
 		}
-		p.Activities[builderActivity.Name].Gateway = gateways
+		p.activities[builderActivity.Name].gateway = gateways
 	}
 	return nil
 }

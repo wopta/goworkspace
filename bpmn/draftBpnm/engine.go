@@ -14,7 +14,7 @@ func (f *FlowBpnm) Run(processName string) error {
 	if process == nil {
 		return fmt.Errorf("Process '%v' not founded", processName)
 	}
-	return f.RunAt(processName, process.DefaultStart)
+	return f.RunAt(processName, process.defaultStart)
 }
 
 func (f *FlowBpnm) RunAt(processName, activityName string) error {
@@ -23,7 +23,7 @@ func (f *FlowBpnm) RunAt(processName, activityName string) error {
 	if process == nil {
 		return fmt.Errorf("Process '%v' not founded", processName)
 	}
-	if e := checkGlobalResources(process.storageBpnm, process.RequiredGlobalData); e != nil {
+	if e := checkGlobalResources(process.storageBpnm, process.requiredGlobalData); e != nil {
 		return e
 	}
 
@@ -34,32 +34,32 @@ func (f *FlowBpnm) RunAt(processName, activityName string) error {
 	return nil
 }
 
-func (p *ProcessBpnm) loop(nameActivity string) error {
+func (p *processBpnm) loop(nameActivity string) error {
 	p.activeActivities = nil
-	if act := p.Activities[nameActivity]; act != nil {
-		p.activeActivities = append(p.activeActivities, p.Activities[nameActivity])
+	if act := p.activities[nameActivity]; act != nil {
+		p.activeActivities = append(p.activeActivities, p.activities[nameActivity])
 	}
 	if p.storageBpnm == nil {
 		return errors.New("Miss storage")
 	}
 	if p.activeActivities == nil || len(p.activeActivities) == 0 {
-		return fmt.Errorf("Process '%v' has no activity '%v'", p.Name, nameActivity)
+		return fmt.Errorf("Process '%v' has no activity '%v'", p.name, nameActivity)
 	}
 	for {
 		callEndIfStop := true
-		var nextActivities []*Activity
+		var nextActivities []*activity
 		for i := range p.activeActivities {
-			if err := p.activeActivities[i].runActivity(p.Name, p.storageBpnm); err != nil {
+			if err := p.activeActivities[i].runActivity(p.name, p.storageBpnm); err != nil {
 				return err
 			}
-			callEndIfStop = callEndIfStop && p.activeActivities[i].CallEndIfStop
+			callEndIfStop = callEndIfStop && p.activeActivities[i].callEndIfStop
 			//TODO: to improve
 			m := mergeMaps(p.storageBpnm.getAllGlobal(), p.storageBpnm.getAllLocal())
 			jsonMap := make(map[string]any)
 			b, _ := json.Marshal(m)
 			_ = json.Unmarshal(b, &jsonMap)
 
-			listNewActivities, e := p.activeActivities[i].evaluateDecisions(p.Name, p.storageBpnm, jsonMap)
+			listNewActivities, e := p.activeActivities[i].evaluateDecisions(p.name, p.storageBpnm, jsonMap)
 
 			if e != nil {
 				return e
@@ -68,7 +68,7 @@ func (p *ProcessBpnm) loop(nameActivity string) error {
 		}
 		if len(nextActivities) == 0 {
 			if callEndIfStop {
-				return p.Activities["end"].runActivity(p.Name, p.storageBpnm)
+				return p.activities["end"].runActivity(p.name, p.storageBpnm)
 			}
 			return nil
 		}
@@ -77,15 +77,15 @@ func (p *ProcessBpnm) loop(nameActivity string) error {
 	}
 }
 
-func (act *Activity) runActivity(nameProcess string, storage StorageData) error {
-	log.Printf("Run process '%v', activity '%v'", nameProcess, act.Name)
-	if pre := act.PreActivity; pre != nil {
-		if err := pre.loop(pre.DefaultStart); err != nil {
+func (act *activity) runActivity(nameProcess string, storage StorageData) error {
+	log.Printf("Run process '%v', activity '%v'", nameProcess, act.name)
+	if pre := act.preActivity; pre != nil {
+		if err := pre.loop(pre.defaultStart); err != nil {
 			return err
 		}
 	}
-	if e := checkLocalResources(storage, act.RequiredInputData); e != nil {
-		return fmt.Errorf("Process '%v' with activity '%v' has an input error: %v", nameProcess, act.Name, e.Error())
+	if e := checkLocalResources(storage, act.requiredInputData); e != nil {
+		return fmt.Errorf("Process '%v' with activity '%v' has an input error: %v", nameProcess, act.name, e.Error())
 	}
 
 	if act.handler != nil {
@@ -96,7 +96,7 @@ func (act *Activity) runActivity(nameProcess string, storage StorageData) error 
 					return
 				}
 				if r := recover(); r != nil || err != nil {
-					log.Printf("Run recorver process '%v', activity '%v'", nameProcess, act.Name)
+					log.Printf("Run recorver process '%v', activity '%v'", nameProcess, act.name)
 					err = act.recover(storage)
 				}
 				err = nil
@@ -108,39 +108,39 @@ func (act *Activity) runActivity(nameProcess string, storage StorageData) error 
 		}
 	}
 
-	if post := act.PostActivity; post != nil {
-		if e := post.loop(post.DefaultStart); e != nil {
+	if post := act.postActivity; post != nil {
+		if e := post.loop(post.defaultStart); e != nil {
 			return e
 		}
 	}
 	return nil
 }
 
-func (act *Activity) evaluateDecisions(processName string, storage StorageData, date map[string]any) ([]*Activity, error) {
-	var res []*Activity
-	for _, ga := range act.Gateway { //é xor attualmente
-		if ga.Decision == "" {
-			if e := checkLocalResources(storage, act.RequiredOutputData); e != nil {
-				return nil, fmt.Errorf("Process '%v' with activity '%v' has an output error: %v", processName, act.Name, e.Error())
+func (act *activity) evaluateDecisions(processName string, storage StorageData, date map[string]any) ([]*activity, error) {
+	var res []*activity
+	for _, ga := range act.gateway { //é xor attualmente
+		if ga.decision == "" {
+			if e := checkLocalResources(storage, act.requiredOutputData); e != nil {
+				return nil, fmt.Errorf("Process '%v' with activity '%v' has an output error: %v", processName, act.name, e.Error())
 			}
-			storage.markWhatNeeded(act.RequiredOutputData)
-			return ga.NextActivities, nil
+			storage.markWhatNeeded(act.requiredOutputData)
+			return ga.nextActivities, nil
 		}
-		if len(ga.NextActivities) == 0 {
+		if len(ga.nextActivities) == 0 {
 			log.Printf("Process '%v' has not activities", processName)
-			return []*Activity{}, nil
+			return []*activity{}, nil
 		}
 		eval := goval.NewEvaluator()
-		result, e := eval.Evaluate(ga.Decision, date, nil)
+		result, e := eval.Evaluate(ga.decision, date, nil)
 		if e != nil {
-			return nil, fmt.Errorf("Process '%v' with activity '%v' has an eval error: %v", processName, act.Name, e.Error())
+			return nil, fmt.Errorf("Process '%v' with activity '%v' has an eval error: %v", processName, act.name, e.Error())
 		}
 		if result.(bool) {
-			if e := checkLocalResources(storage, act.RequiredOutputData); e != nil {
-				return nil, fmt.Errorf("Process '%v' with activity '%v' has an output error: %v", processName, act.Name, e.Error())
+			if e := checkLocalResources(storage, act.requiredOutputData); e != nil {
+				return nil, fmt.Errorf("Process '%v' with activity '%v' has an output error: %v", processName, act.name, e.Error())
 			}
-			storage.markWhatNeeded(act.RequiredOutputData)
-			res = append(res, ga.NextActivities...)
+			storage.markWhatNeeded(act.requiredOutputData)
+			res = append(res, ga.nextActivities...)
 			break
 		}
 	}

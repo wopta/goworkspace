@@ -8,9 +8,9 @@ type Order struct {
 type BpnmBuilder struct {
 	Processes []*processBuilder `json:"processes"`
 
-	handlers map[string]ActivityHandler
+	handlers map[string]activityHandler
 	storage  StorageData
-	toInject map[keyInjected]*ProcessBpnm
+	toInject map[keyInjected]*processBpnm
 }
 
 type processBuilder struct {
