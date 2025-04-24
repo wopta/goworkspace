@@ -37,7 +37,7 @@ func (f *FlowBpnm) RunAt(processName, activityName string) error {
 func (p *processBpnm) loop(nameActivity string) error {
 	p.activeActivities = nil
 	if act := p.activities[nameActivity]; act != nil {
-		p.activeActivities = append(p.activeActivities, p.activities[nameActivity])
+		p.activeActivities = []*activity{p.activities[nameActivity]}
 	}
 	if p.storageBpnm == nil {
 		return errors.New("Miss storage")
