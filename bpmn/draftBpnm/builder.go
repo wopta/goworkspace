@@ -158,14 +158,14 @@ func (a *BpnmBuilder) buildActivities(activities []ActivityBuilder, processName 
 		}
 		if pr := a.toInject[getKeyInjectedProcess(processName, activity.Name, PreActivity)]; pr != nil {
 			newActivity.PreActivity = pr
+			//To check eventually if the some injection isnt possible
+			delete(a.toInject, getKeyInjectedProcess(processName, activity.Name, PreActivity))
 		}
 		if pr := a.toInject[getKeyInjectedProcess(processName, activity.Name, PostActivity)]; pr != nil {
 			newActivity.PostActivity = pr
+			//To check eventually if the some injection isnt possible
+			delete(a.toInject, getKeyInjectedProcess(processName, activity.Name, PostActivity))
 		}
-		//To check eventually if the some injection isnt possible
-		delete(a.toInject, getKeyInjectedProcess(processName, activity.Name, PreActivity))
-		delete(a.toInject, getKeyInjectedProcess(processName, activity.Name, PostActivity))
-
 		newActivity.Name = activity.Name
 		newActivity.Description = activity.Description
 		newActivity.handler = handler

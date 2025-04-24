@@ -66,8 +66,7 @@ func (p *ProcessBpnm) run(nameActivity string) error {
 			nextActivities = append(nextActivities, listNewActivities...)
 		}
 		if len(nextActivities) == 0 {
-			p.Activities[fmt.Sprintf("%v_end", p.Name)].runActivity(p.Name, p.storageBpnm)
-			return nil
+			return p.Activities[fmt.Sprintf("%v_end", p.Name)].runActivity(p.Name, p.storageBpnm)
 		}
 		p.activeActivities = nextActivities
 		p.storageBpnm.clean()
@@ -82,7 +81,6 @@ func (act *Activity) runActivity(nameProcess string, storage StorageData) error 
 		}
 	}
 	if act.Branch != nil {
-		fmt.Printf("process name %v, len %v\n", nameProcess, len(act.Branch.RequiredInputData))
 		if e := checkLocalResources(storage, act.Branch.RequiredInputData); e != nil {
 			return fmt.Errorf("Process '%v' with activity '%v' has an input error: %v", nameProcess, act.Name, e.Error())
 		}
