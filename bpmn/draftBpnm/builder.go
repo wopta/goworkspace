@@ -181,6 +181,13 @@ func (a *BpnmBuilder) buildActivities(activities []activityBuilder, processName 
 		newActivity.Name = activity.Name
 		newActivity.Description = activity.Description
 		newActivity.handler = handler
+		if activity.CallEndIfStop == nil {
+			boolPtr := func(b bool) *bool {
+				return &b
+			}
+			activity.CallEndIfStop = boolPtr(true)
+		}
+		newActivity.CallEndIfStop = *activity.CallEndIfStop
 
 		if activity.Recover != "" {
 			rec, ok := a.handlers[activity.Recover]

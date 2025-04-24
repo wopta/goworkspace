@@ -27,14 +27,14 @@ func (f *FlowBpnm) RunAt(processName, activityName string) error {
 		return e
 	}
 
-	if e := process.run(activityName); e != nil { //TODO: how to check if there is an infinite loop
+	if e := process.loop(activityName); e != nil { //TODO: how to check if there is an infinite loop
 		return e
 	}
 	log.Println("Stop ", processName)
 	return nil
 }
 
-func (p *ProcessBpnm) run(nameActivity string) error {
+func (p *ProcessBpnm) loop(nameActivity string) error {
 	p.activeActivities = nil
 	if act := p.Activities[nameActivity]; act != nil {
 		p.activeActivities = append(p.activeActivities, p.Activities[nameActivity])
@@ -45,13 +45,14 @@ func (p *ProcessBpnm) run(nameActivity string) error {
 	if p.activeActivities == nil || len(p.activeActivities) == 0 {
 		return fmt.Errorf("Process '%v' has no activity '%v'", p.Name, nameActivity)
 	}
-
 	for {
+		callEndIfStop := true
 		var nextActivities []*Activity
 		for i := range p.activeActivities {
 			if err := p.activeActivities[i].runActivity(p.Name, p.storageBpnm); err != nil {
 				return err
 			}
+			callEndIfStop = callEndIfStop && p.activeActivities[i].CallEndIfStop
 			//TODO: to improve
 			m := mergeMaps(p.storageBpnm.getAllGlobal(), p.storageBpnm.getAllLocal())
 			jsonMap := make(map[string]any)
@@ -66,7 +67,10 @@ func (p *ProcessBpnm) run(nameActivity string) error {
 			nextActivities = append(nextActivities, listNewActivities...)
 		}
 		if len(nextActivities) == 0 {
-			return p.Activities[fmt.Sprintf("%v_end", p.Name)].runActivity(p.Name, p.storageBpnm)
+			if callEndIfStop {
+				return p.Activities[fmt.Sprintf("%v_end", p.Name)].runActivity(p.Name, p.storageBpnm)
+			}
+			return nil
 		}
 		p.activeActivities = nextActivities
 		p.storageBpnm.clean()
@@ -76,7 +80,7 @@ func (p *ProcessBpnm) run(nameActivity string) error {
 func (act *Activity) runActivity(nameProcess string, storage StorageData) error {
 	log.Printf("Run process '%v', activity '%v'", nameProcess, act.Name)
 	if pre := act.PreActivity; pre != nil {
-		if err := pre.run(pre.DefaultStart); err != nil {
+		if err := pre.loop(pre.DefaultStart); err != nil {
 			return err
 		}
 	}
@@ -105,7 +109,7 @@ func (act *Activity) runActivity(nameProcess string, storage StorageData) error 
 	}
 
 	if post := act.PostActivity; post != nil {
-		if e := post.run(post.DefaultStart); e != nil {
+		if e := post.loop(post.DefaultStart); e != nil {
 			return e
 		}
 	}

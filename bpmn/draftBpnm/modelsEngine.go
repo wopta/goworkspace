@@ -24,7 +24,8 @@ type Activity struct {
 	RequiredOutputData []typeData
 	RequiredInputData  []typeData
 	//	GatewayType        GatewayType
-	Gateway []*Gateway
+	Gateway       []*Gateway
+	CallEndIfStop bool
 }
 
 type GatewayType string

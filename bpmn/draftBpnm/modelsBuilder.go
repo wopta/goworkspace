@@ -30,6 +30,7 @@ type activityBuilder struct {
 	OutputDataRequired []typeData     `json:"outputData,omitempty"`
 	InputDataRequired  []typeData     `json:"inputData,omitempty"`
 	Gateways           []gatewayBlock `json:"gateways"`
+	CallEndIfStop      *bool          `json:"callEndIfStop"`
 }
 
 type gatewayBlock struct {

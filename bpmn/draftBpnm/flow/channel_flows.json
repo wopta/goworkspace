@@ -21,6 +21,7 @@
 			"activities": [
 				{
 					"name": "init",
+					"callEndIfStop": false,
 					"handlerless": true,
 					"gateways": [
 						{
@@ -130,6 +131,7 @@
 			"activities": [
 				{
 					"name": "init",
+					"callEndIfStop": false,
 					"handlerless": true,
 					"gateways": [
 						{
@@ -223,6 +225,7 @@
 			"activities": [
 				{
 					"name": "init",
+					"callEndIfStop": false,
 					"handlerless": true,
 					"inputData": [],
 					"gateways": [
@@ -281,6 +284,7 @@
 			"activities": [
 				{
 					"name": "init",
+					"callEndIfStop": false,
 					"handlerless": true,
 					"gateways": [
 						{
@@ -326,6 +330,7 @@
 				{
 					"name": "init",
 					"handlerless": true,
+					"callEndIfStop": false,
 					"gateways": [
 						{
 							"nextActivities": [
@@ -368,6 +373,7 @@
 				{
 					"name": "init",
 					"handlerless": true,
+					"callEndIfStop": false,
 					"gateways": [
 						{
 							"nextActivities": [
