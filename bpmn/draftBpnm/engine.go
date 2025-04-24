@@ -68,7 +68,7 @@ func (p *ProcessBpnm) loop(nameActivity string) error {
 		}
 		if len(nextActivities) == 0 {
 			if callEndIfStop {
-				return p.Activities[fmt.Sprintf("%v_end", p.Name)].runActivity(p.Name, p.storageBpnm)
+				return p.Activities["end"].runActivity(p.Name, p.storageBpnm)
 			}
 			return nil
 		}

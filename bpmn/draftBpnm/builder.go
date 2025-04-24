@@ -49,35 +49,43 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 	flow := new(FlowBpnm)
 	flow.Process = make(map[string]*ProcessBpnm)
 
-	var process *ProcessBpnm
+	var newProcess *ProcessBpnm
 	if b.storage == nil {
 		return nil, errors.New("miss storage")
 	}
 	for _, p := range b.Processes {
-		process = new(ProcessBpnm)
-		process.Description = p.Description
-		process.storageBpnm = b.storage
-		process.Name = p.Name
-		process.RequiredGlobalData = p.GlobalDataRequired
-		p.Activities = append(p.Activities, buildEndingActivity(p.Name))
-		builtActivities, err := b.buildActivities(p.Activities, p.Name)
+		if flow.Process[p.Name] != nil {
+			return nil, fmt.Errorf("Process %v's been already defined", newProcess.Name)
+		}
+		newProcess = new(ProcessBpnm)
+		newProcess.Description = p.Description
+		newProcess.storageBpnm = b.storage
+		newProcess.Name = p.Name
+		newProcess.RequiredGlobalData = p.GlobalDataRequired
+		builtActivities, err := b.buildActivities(p.Name, p.Activities...)
 		if err != nil {
 			return nil, err
 		}
-		process.Activities = builtActivities
-		if err := process.hydrateGateways(p.Activities); err != nil {
+		if builtActivities["end"] != nil {
+			return nil, errors.New("Cant use 'end' as name for an activity")
+		}
+		builtEndActivity, err := b.buildActivities(p.Name, getEndingActivityBuilder()) //build the end activity
+		if err != nil {
 			return nil, err
 		}
-		if flow.Process[process.Name] != nil {
-			return nil, fmt.Errorf("Process %v's been already defined", process.Name)
-		}
+		builtActivities["end"] = builtEndActivity["end"]
 
 		if _, ok := builtActivities[p.DefaultStart]; !ok {
-			return nil, fmt.Errorf("Process '%v' has no activity named '%v' that can be used as default start", process.Name, p.DefaultStart)
+			return nil, fmt.Errorf("Process '%v' has no activity named '%v' that can be used as default start", newProcess.Name, p.DefaultStart)
 		}
-		process.DefaultStart = p.DefaultStart
-		flow.Process[process.Name] = process
+		newProcess.Activities = builtActivities
+		if err := newProcess.hydrateGateways(p.Activities); err != nil {
+			return nil, err
+		}
+		newProcess.DefaultStart = p.DefaultStart
+		flow.Process[newProcess.Name] = newProcess
 	}
+
 	//Return error if some processes isnt injected, when a process is injected it's removed from b.toInject
 	if len(b.toInject) != 0 {
 		var keyNoInjected string
@@ -107,7 +115,7 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 			return fmt.Errorf("No order defined, the 'order' field isnt filled")
 		}
 		if order.InWhatActivityInjected == "end" {
-			order.InWhatActivityInjected = fmt.Sprintf("%v_end", order.InWhatProcessInjected)
+			order.InWhatActivityInjected = "end"
 		}
 		if _, ok := b.toInject[getKeyInjectedProcess(order.InWhatProcessInjected, order.InWhatActivityInjected, order.Order)]; ok {
 			return fmt.Errorf("Injection's been already done: target process: '%v', process: injected '%v'", order.InWhatProcessInjected, p.Name)
@@ -156,7 +164,7 @@ func (b *BpnmBuilder) SetStorage(pool StorageData) {
 	b.storage = pool
 }
 
-func (a *BpnmBuilder) buildActivities(activities []activityBuilder, processName string) (map[string]*Activity, error) {
+func (a *BpnmBuilder) buildActivities(processName string, activities ...activityBuilder) (map[string]*Activity, error) {
 	result := make(map[string]*Activity)
 	for _, activity := range activities {
 		if _, ok := result[activity.Name]; ok {
@@ -204,6 +212,8 @@ func (a *BpnmBuilder) buildActivities(activities []activityBuilder, processName 
 	return result, nil
 }
 
+// hydrateGateways links each activity's gateways to their corresponding next activities.
+// Returns an error if any referenced activity is missing.
 func (p *ProcessBpnm) hydrateGateways(activities []activityBuilder) error {
 	for _, builderActivity := range activities {
 		var gateways []*Gateway = make([]*Gateway, 0)
@@ -225,10 +235,10 @@ func (p *ProcessBpnm) hydrateGateways(activities []activityBuilder) error {
 	return nil
 }
 
-func buildEndingActivity(processName string) activityBuilder {
+func getEndingActivityBuilder() activityBuilder {
 	return activityBuilder{
-		Name:        fmt.Sprintf("%v_end", processName),
-		Description: fmt.Sprint("end activity for ", processName),
+		Name:        "end",
+		Description: fmt.Sprint("end activity"),
 		HandlerLess: true,
 	}
 }
