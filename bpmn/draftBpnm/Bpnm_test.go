@@ -7,12 +7,12 @@ import (
 )
 
 // TODO: do more test about input and output !!!
-type validity struct {
+type randomObjectToTest struct {
 	Result bool
 	Step   int
 }
 
-func (v *validity) GetType() string {
+func (v *randomObjectToTest) GetType() string {
 	return "validity"
 }
 
@@ -75,18 +75,18 @@ func addDefaultHandlersForTest(g *BpnmBuilder, log *mockLog) error {
 	return IsError(
 		g.AddHandler("init", func(st StorageData) error {
 			log.Println("init")
-			st.AddLocal("validationObject", new(validity))
+			st.AddLocal("validationObject", new(randomObjectToTest))
 			return nil
 		}),
 		g.AddHandler("AEvent", func(st StorageData) error {
 			log.Println("init A")
-			st.AddLocal("validationObject", new(validity))
+			st.AddLocal("validationObject", new(randomObjectToTest))
 			st.AddLocal("error", &Error{Result: false})
 			return nil
 		}),
 		g.AddHandler("BEvent", func(st StorageData) error {
 			log.Println("init B")
-			st.AddLocal("validationObject", new(validity))
+			st.AddLocal("validationObject", new(randomObjectToTest))
 			st.AddLocal("error", &Error{Result: false})
 			return nil
 		}),
@@ -112,7 +112,7 @@ func TestBpnmHappyPath(t *testing.T) {
 		t.Fatal(err)
 	}
 	storage := NewStorageBpnm()
-	storage.AddLocal("validationObject", new(validity))
+	storage.AddLocal("validationObject", new(randomObjectToTest))
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 3})
 	g.SetStorage(storage)
 	addDefaultHandlersForTest(g, log)
@@ -140,7 +140,7 @@ func TestBpnmHappyPath2(t *testing.T) {
 		t.Fatal(err)
 	}
 	storage := NewStorageBpnm()
-	storage.AddLocal("validationObject", new(validity))
+	storage.AddLocal("validationObject", new(randomObjectToTest))
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 3})
 	g.SetStorage(storage)
 
@@ -284,7 +284,7 @@ func TestRunFromSpecificActivity(t *testing.T) {
 	}
 	storage := NewStorageBpnm()
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 3})
-	storage.AddLocal("validationObject", new(validity))
+	storage.AddLocal("validationObject", new(randomObjectToTest))
 	g.SetStorage(storage)
 	flowCatnat, err := getInjectableFlow(log)
 	if err := g.Inject(flowCatnat); err != nil {
@@ -322,14 +322,14 @@ func TestBpnmStoreClean(t *testing.T) {
 		t.Fatal(err)
 	}
 	storage := NewStorageBpnm()
-	storage.AddLocal("validationObject", new(validity))
+	storage.AddLocal("validationObject", new(randomObjectToTest))
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 2})
 	g.SetStorage(storage)
 	addDefaultHandlersForTest(g, log)
 
 	g.setHandler("init", func(st StorageData) error {
 		log.Println("init")
-		st.AddLocal("validationObject", new(validity))
+		st.AddLocal("validationObject", new(randomObjectToTest))
 		st.AddLocal("error", &Error{Result: false})
 		st.AddLocal("error1", &Error{Result: false})
 		st.AddLocal("error2", &Error{Result: false})
@@ -346,7 +346,7 @@ func TestBpnmStoreClean(t *testing.T) {
 	g.setHandler("AEvent", func(st StorageData) error {
 		log.Println("init A")
 		st.AddLocal("error", &Error{Result: false})
-		d, e := GetData[*validity]("validationObject", st)
+		d, e := GetData[*randomObjectToTest]("validationObject", st)
 		if e != nil {
 			return e
 		}
@@ -394,7 +394,7 @@ func TestMergeBuilder(t *testing.T) {
 		log.Println("end")
 		return nil
 	})
-	storage.AddLocal("validationObject", new(validity))
+	storage.AddLocal("validationObject", new(randomObjectToTest))
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 2})
 	g.SetStorage(storage)
 	b2, err := getInjectableFlow(log)
@@ -431,7 +431,7 @@ func TestErrorWithoutRecover(t *testing.T) {
 	g.setHandler("AEvent", func(sd StorageData) error {
 		return errors.New("error")
 	})
-	storage.AddLocal("validationObject", new(validity))
+	storage.AddLocal("validationObject", new(randomObjectToTest))
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 2})
 	g.SetStorage(storage)
 	f, err := g.Build()
@@ -454,7 +454,7 @@ func TestRecoverWithFunction(t *testing.T) {
 		t.Fatal(err)
 	}
 	storage := NewStorageBpnm()
-	storage.AddLocal("validationObject", new(validity))
+	storage.AddLocal("validationObject", new(randomObjectToTest))
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 2})
 	addDefaultHandlersForTest(g, log)
 	g.setHandler("DEventWithRec", func(st StorageData) error {
@@ -489,7 +489,7 @@ func TestRecoverFromPanic(t *testing.T) {
 		log.Println("init D rec")
 		panic("fjsdklfjd")
 	})
-	storage.AddLocal("validationObject", new(validity))
+	storage.AddLocal("validationObject", new(randomObjectToTest))
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 2})
 	g.SetStorage(storage)
 	f, err := g.Build()
@@ -514,7 +514,7 @@ func TestEndActivity(t *testing.T) {
 	}
 	storage := NewStorageBpnm()
 	addDefaultHandlersForTest(g, log)
-	storage.AddLocal("validationObject", new(validity))
+	storage.AddLocal("validationObject", new(randomObjectToTest))
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 2})
 	g.SetStorage(storage)
 	g.AddHandler("end_emit", func(sd StorageData) error {
