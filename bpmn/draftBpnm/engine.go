@@ -68,7 +68,7 @@ func (p *processBpnm) loop(nameActivity string) error {
 		}
 		if len(nextActivities) == 0 {
 			if callEndIfStop {
-				return p.activities["end"].runActivity(p.name, p.storageBpnm)
+				return p.activities[getNameEndActivity(p.name)].runActivity(p.name, p.storageBpnm)
 			}
 			return nil
 		}

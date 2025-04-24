@@ -390,6 +390,10 @@ func TestMergeBuilder(t *testing.T) {
 	}
 	storage := NewStorageBpnm()
 	addDefaultHandlersForTest(g, log)
+	g.AddHandler("end", func(sd StorageData) error {
+		log.Println("end")
+		return nil
+	})
 	storage.AddLocal("validationObject", new(validity))
 	storage.AddGlobal("policyPr", &PolicyMock{Age: 2})
 	g.SetStorage(storage)
@@ -499,6 +503,36 @@ func TestRecoverFromPanic(t *testing.T) {
 	exps := []string{
 		"init D rec",
 		"recover D",
+	}
+	testLog(log, exps, t)
+}
+func TestEndActivity(t *testing.T) {
+	log := &mockLog{}
+	g, err := NewBpnmBuilder("prova.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	storage := NewStorageBpnm()
+	addDefaultHandlersForTest(g, log)
+	storage.AddLocal("validationObject", new(validity))
+	storage.AddGlobal("policyPr", &PolicyMock{Age: 2})
+	g.SetStorage(storage)
+	g.AddHandler("end_emit", func(sd StorageData) error {
+		log.Println("end")
+		return nil
+	})
+	f, err := g.Build()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = f.RunAt("emit", "init")
+	if err != nil {
+		t.Fatalf("should have error")
+	}
+	exps := []string{
+		"init",
+		"init A",
+		"end",
 	}
 	testLog(log, exps, t)
 }

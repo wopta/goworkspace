@@ -66,14 +66,14 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 		if err != nil {
 			return nil, err
 		}
-		if builtActivities["end"] != nil {
-			return nil, errors.New("Cant use 'end' as name for an activity")
+		if builtActivities[getNameEndActivity(p.Name)] != nil {
+			return nil, fmt.Errorf("Cant use '%v' as name for an activity", getNameEndActivity(p.Name))
 		}
-		builtEndActivity, err := b.buildActivities(p.Name, getEndingActivityBuilder()) //build the end activity
+		builtEndActivity, err := b.buildActivities(p.Name, getEndingActivityBuilder(p.Name)) //build the end activity
 		if err != nil {
 			return nil, err
 		}
-		builtActivities["end"] = builtEndActivity["end"]
+		builtActivities[getNameEndActivity(p.Name)] = builtEndActivity[getNameEndActivity(p.Name)]
 
 		if _, ok := builtActivities[p.DefaultStart]; !ok {
 			return nil, fmt.Errorf("Process '%v' has no activity named '%v' that can be used as default start", newProcess.name, p.DefaultStart)
@@ -115,7 +115,7 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 			return fmt.Errorf("No order defined, the 'order' field isnt filled")
 		}
 		if order.InWhatActivityInjected == "end" {
-			order.InWhatActivityInjected = "end"
+			order.InWhatActivityInjected = getNameEndActivity(order.InWhatProcessInjected)
 		}
 		if _, ok := b.toInject[getKeyInjectedProcess(order.InWhatProcessInjected, order.InWhatActivityInjected, order.Order)]; ok {
 			return fmt.Errorf("Injection's been already done: target process: '%v', process: injected '%v'", order.InWhatProcessInjected, p.Name)
@@ -239,10 +239,14 @@ func (p *processBpnm) hydrateGateways(activities []activityBuilder) error {
 	return nil
 }
 
-func getEndingActivityBuilder() activityBuilder {
+func getEndingActivityBuilder(nameProcess string) activityBuilder {
 	return activityBuilder{
-		Name:        "end",
+		Name:        getNameEndActivity(nameProcess),
 		Description: fmt.Sprint("end activity"),
 		HandlerLess: true,
 	}
+}
+
+func getNameEndActivity(nameProcess string) string {
+	return "end_" + nameProcess
 }
