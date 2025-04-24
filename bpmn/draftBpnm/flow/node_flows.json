@@ -8,6 +8,16 @@
 				"inWhatActivityInjected": "end",
 				"order": "post"
 			},
+			"globalData": [
+				{
+					"name": "policy",
+					"type": "policy"
+				},
+				{
+					"name": "node",
+					"type": "networkNode"
+				}
+			],
 			"defaultStart": "init",
 			"activities": [
 				{
@@ -51,6 +61,456 @@
 				},
 				{
 					"name": "winEmit",
+					"outputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					],
+					"gateways": [
+						{
+							"nextActivities": [
+								"saveAudit"
+							]
+						}
+					]
+				},
+				{
+					"name": "errorCallbackConfig",
+					"description": "Return error when callbackConfig.Name isn't right"
+				},
+				{
+					"name": "saveAudit",
+					"inputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "lead",
+			"description": "Callback for lead process",
+			"order": {
+				"inWhatProcessInjected": "pay",
+				"inWhatActivityInjected": "end",
+				"order": "post"
+			},
+			"globalData": [
+				{
+					"name": "policy",
+					"type": "policy"
+				},
+				{
+					"name": "node",
+					"type": "networkNode"
+				}
+			],
+			"defaultStart": "init",
+			"activities": [
+				{
+					"name": "init",
+					"handlerless": true,
+					"gateways": [
+						{
+							"nextActivities": [
+								"winLead"
+							],
+							"decision": "node.callbackConfig.name==`winClient`"
+						},
+						{
+							"nextActivities": [
+								"baseCallback"
+							],
+							"decision": "node.callbackConfig.name==`facileBrokerClient`"
+						},
+						{
+							"nextActivities": [
+								"errorCallbackConfig"
+							]
+						}
+					]
+				},
+				{
+					"name": "baseCallback",
+					"outputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					],
+					"gateways": [
+						{
+							"nextActivities": [
+								"saveAudit"
+							]
+						}
+					]
+				},
+				{
+					"name": "winLead",
+					"outputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					],
+					"gateways": [
+						{
+							"nextActivities": [
+								"saveAudit"
+							]
+						}
+					]
+				},
+				{
+					"name": "errorCallbackConfig",
+					"description": "Return error when callbackConfig.Name isn't right"
+				},
+				{
+					"name": "saveAudit",
+					"inputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "pay",
+			"description": "Callback for pay process",
+			"order": {
+				"inWhatProcessInjected": "pay",
+				"inWhatActivityInjected": "end",
+				"order": "post"
+			},
+			"globalData": [
+				{
+					"name": "policy",
+					"type": "policy"
+				},
+				{
+					"name": "node",
+					"type": "networkNode"
+				}
+			],
+			"defaultStart": "init",
+			"activities": [
+				{
+					"name": "init",
+					"handlerless": true,
+					"gateways": [
+						{
+							"nextActivities": [
+								"winPay"
+							],
+							"decision": "node.callbackConfig.name==`winClient`"
+						},
+						{
+							"nextActivities": [
+								"baseCallback"
+							],
+							"decision": "node.callbackConfig.name==`facileBrokerClient`"
+						},
+						{
+							"nextActivities": [
+								"errorCallbackConfig"
+							]
+						}
+					]
+				},
+				{
+					"name": "baseCallback",
+					"outputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					],
+					"gateways": [
+						{
+							"nextActivities": [
+								"saveAudit"
+							]
+						}
+					]
+				},
+				{
+					"name": "winPay",
+					"outputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					],
+					"gateways": [
+						{
+							"nextActivities": [
+								"saveAudit"
+							]
+						}
+					]
+				},
+				{
+					"name": "errorCallbackConfig",
+					"description": "Return error when callbackConfig.Name isn't right"
+				},
+				{
+					"name": "saveAudit",
+					"inputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "proposal",
+			"description": "Callback for proposal process",
+			"order": {
+				"inWhatProcessInjected": "proposal",
+				"inWhatActivityInjected": "end",
+				"order": "post"
+			},
+			"globalData": [
+				{
+					"name": "policy",
+					"type": "policy"
+				},
+				{
+					"name": "node",
+					"type": "networkNode"
+				}
+			],
+			"defaultStart": "init",
+			"activities": [
+				{
+					"name": "init",
+					"handlerless": true,
+					"gateways": [
+						{
+							"nextActivities": [
+								"winProposal"
+							],
+							"decision": "node.callbackConfig.name==`winClient`"
+						},
+						{
+							"nextActivities": [
+								"baseCallback"
+							],
+							"decision": "node.callbackConfig.name==`facileBrokerClient`"
+						},
+						{
+							"nextActivities": [
+								"errorCallbackConfig"
+							]
+						}
+					]
+				},
+				{
+					"name": "baseCallback",
+					"outputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					],
+					"gateways": [
+						{
+							"nextActivities": [
+								"saveAudit"
+							]
+						}
+					]
+				},
+				{
+					"name": "winProposal",
+					"outputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					],
+					"gateways": [
+						{
+							"nextActivities": [
+								"saveAudit"
+							]
+						}
+					]
+				},
+				{
+					"name": "errorCallbackConfig",
+					"description": "Return error when callbackConfig.Name isn't right"
+				},
+				{
+					"name": "saveAudit",
+					"inputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "requestApproval",
+			"description": "Callback for requestApproval process",
+			"order": {
+				"inWhatProcessInjected": "requestApproval",
+				"inWhatActivityInjected": "end",
+				"order": "post"
+			},
+			"globalData": [
+				{
+					"name": "policy",
+					"type": "policy"
+				},
+				{
+					"name": "node",
+					"type": "networkNode"
+				}
+			],
+			"defaultStart": "init",
+			"activities": [
+				{
+					"name": "init",
+					"handlerless": true,
+					"gateways": [
+						{
+							"nextActivities": [
+								"winRequestApproval"
+							],
+							"decision": "node.callbackConfig.name==`winClient`"
+						},
+						{
+							"nextActivities": [
+								"baseCallback"
+							],
+							"decision": "node.callbackConfig.name==`facileBrokerClient`"
+						},
+						{
+							"nextActivities": [
+								"errorCallbackConfig"
+							]
+						}
+					]
+				},
+				{
+					"name": "baseCallback",
+					"outputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					],
+					"gateways": [
+						{
+							"nextActivities": [
+								"saveAudit"
+							]
+						}
+					]
+				},
+				{
+					"name": "winRequestApproval",
+					"outputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					],
+					"gateways": [
+						{
+							"nextActivities": [
+								"saveAudit"
+							]
+						}
+					]
+				},
+				{
+					"name": "errorCallbackConfig",
+					"description": "Return error when callbackConfig.Name isn't right"
+				},
+				{
+					"name": "saveAudit",
+					"inputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					]
+				}
+			]
+		},
+		{
+			"description": "Callback for sign process",
+			"name": "sign",
+			"order": {
+				"inWhatProcessInjected": "sign",
+				"inWhatActivityInjected": "end",
+				"order": "post"
+			},
+			"globalData": [
+				{
+					"name": "policy",
+					"type": "policy"
+				},
+				{
+					"name": "node",
+					"type": "networkNode"
+				}
+			],
+			"defaultStart": "init",
+			"activities": [
+				{
+					"name": "init",
+					"handlerless": true,
+					"gateways": [
+						{
+							"nextActivities": [
+								"winSign"
+							],
+							"decision": "node.callbackConfig.name==`winClient`"
+						},
+						{
+							"nextActivities": [
+								"baseCallback"
+							],
+							"decision": "node.callbackConfig.name==`facileBrokerClient`"
+						},
+						{
+							"nextActivities": [
+								"errorCallbackConfig"
+							]
+						}
+					]
+				},
+				{
+					"name": "baseCallback",
+					"outputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					],
+					"gateways": [
+						{
+							"nextActivities": [
+								"saveAudit"
+							]
+						}
+					]
+				},
+				{
+					"name": "winSign",
 					"outputData": [
 						{
 							"name": "callbackInfo",

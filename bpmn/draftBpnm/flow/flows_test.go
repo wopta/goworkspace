@@ -425,3 +425,21 @@ func TestEmitForEcommerceWithNodeFlow(t *testing.T) {
 		return build
 	})
 }
+func TestEmitForWgaWithNodeFlow(t *testing.T) {
+	storeFlowChannel := bpnm.NewStorageBpnm()
+	storeFlowChannel.AddGlobal("policy", &policyMga)
+	storeFlowChannel.AddGlobal("product", &productEcommerce)
+	storeFlowChannel.AddGlobal("node", &winNode)
+
+	exps := []string{}
+	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpnm.StorageData) *bpnm.BpnmBuilder {
+		build := getBuilderFlowChannel(log, storeFlowChannel)
+
+		nodeBuild := getBuilderFlowNode(log, bpnm.NewStorageBpnm())
+		if e := build.Inject(nodeBuild); e != nil {
+			t.Fatal(e)
+		}
+
+		return build
+	})
+}

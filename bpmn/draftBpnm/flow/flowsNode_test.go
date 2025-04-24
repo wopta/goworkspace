@@ -3,6 +3,7 @@ package flow
 import (
 	"errors"
 	"net/http"
+	"strings"
 	"testing"
 
 	bpnm "github.com/wopta/goworkspace/bpmn/draftBpnm"
@@ -37,6 +38,11 @@ func getBuilderFlowNode(log *mockLog, store bpnm.StorageData) *bpnm.BpnmBuilder 
 	builder.SetStorage(store)
 	e = bpnm.IsError(
 		builder.AddHandler("winEmit", funcTestWithInfo("winEmit", log)),
+		builder.AddHandler("winLead", funcTestWithInfo("winLead", log)),
+		builder.AddHandler("winPay", funcTestWithInfo("winPay", log)),
+		builder.AddHandler("winProposal", funcTestWithInfo("winProposal", log)),
+		builder.AddHandler("winRequestApproval", funcTestWithInfo("winRequestApproval", log)),
+		builder.AddHandler("winSign", funcTestWithInfo("winSign", log)),
 		builder.AddHandler("baseCallback", funcTestWithInfo("baseCallback", log)),
 		builder.AddHandler("errorCallbackConfig", func(sd bpnm.StorageData) error { return errors.New("callback client not set") }),
 		builder.AddHandler("saveAudit", func(sd bpnm.StorageData) error {
@@ -63,32 +69,39 @@ var (
 	brokenNode = models.NetworkNode{CallbackConfig: &models.CallbackConfig{Name: "booo"}}
 )
 
+var processesToTest = [...]string{"emit", "lead", "pay", "proposal", "requestApproval", "sign"}
+
 func TestEmitForWinNode(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
-	store.AddLocal("policy", &policyEcommerce)
-	store.AddLocal("node", &winNode)
-	exps := []string{
-		"winEmit",
-		"saveAudit ciao",
+	store.AddGlobal("policy", &policyEcommerce)
+	store.AddGlobal("node", &winNode)
+	for _, process := range processesToTest {
+		namelog := strings.Replace(process, string(process[0]), string(process[0]-32), 1) //upper case first letter
+		exps := []string{
+			"win" + namelog,
+			"saveAudit ciao",
+		}
+		testFlow(t, process, exps, store, getBuilderFlowNode)
 	}
-	testFlow(t, "emit", exps, store, getBuilderFlowNode)
 }
 
-func TestEmitForBaseNode(t *testing.T) {
+func TestBaseNode(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
-	store.AddLocal("policy", &policyEcommerce)
-	store.AddLocal("node", &baseNode)
+	store.AddGlobal("policy", &policyEcommerce)
+	store.AddGlobal("node", &baseNode)
 	exps := []string{
 		"baseCallback",
 		"saveAudit ciao",
 	}
-	testFlow(t, "emit", exps, store, getBuilderFlowNode)
+	for _, process := range processesToTest {
+		testFlow(t, process, exps, store, getBuilderFlowNode)
+	}
 }
 
-func TestEmitForBrokenNode(t *testing.T) {
+func TestBrokenNode(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
-	store.AddLocal("policy", &policyEcommerce)
-	store.AddLocal("node", &brokenNode)
+	store.AddGlobal("policy", &policyEcommerce)
+	store.AddGlobal("node", &brokenNode)
 
 	log := mockLog{}
 	build := getBuilderFlowNode(&log, store)
@@ -96,8 +109,10 @@ func TestEmitForBrokenNode(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = flow.Run("emit")
-	if err == nil {
-		t.Fatal("Should have an error")
+	for _, process := range processesToTest {
+		err = flow.Run(process)
+		if err == nil {
+			t.Fatal("Should have an error")
+		}
 	}
 }
