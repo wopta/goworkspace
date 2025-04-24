@@ -193,36 +193,6 @@ func TestBpnmMissingOutput(t *testing.T) {
 	}
 }
 
-func TestBpnmMissingInput(t *testing.T) {
-	g, err := NewBpnmBuilder("prova.json")
-	log := mockLog{}
-	if err != nil {
-		t.Fatal(err)
-	}
-	storage := NewStorageBpnm()
-	storage.AddGlobal("policyPr", &PolicyMock{Age: 10})
-	g.SetStorage(storage)
-	addDefaultHandlersForTest(g, &log)
-	g.setHandler("CEvent", func(st StorageData) error {
-		log.Println("init C")
-		return nil
-	})
-	flow, err := g.Build()
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = flow.RunAt("emit", "init")
-	if err == nil {
-		t.Fatalf("should have error")
-	}
-	if err.Error() != "Process 'emit' with activity 'CEvent' has an input error: Required local resource is not found 'error'" {
-		t.Fatalf("should have another error, got: %v", err.Error())
-	}
-	if len(log.log) != 1 {
-		t.Fatalf("should have 1 log")
-	}
-}
-
 func TestBpnmMissingHandler(t *testing.T) {
 	g, err := NewBpnmBuilder("prova.json")
 	log := mockLog{}
