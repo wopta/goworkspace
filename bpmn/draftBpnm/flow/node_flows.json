@@ -22,8 +22,20 @@
 			"activities": [
 				{
 					"name": "init",
+					"inputData": [
+						{
+							"name": "config",
+							"type": "callbackConfig"
+						}
+					],
 					"handlerless": true,
 					"gateways": [
+						{
+							"nextActivities": [
+								"end_emit"
+							],
+							"decision": "!config.events[`emit`]"
+						},
 						{
 							"nextActivities": [
 								"winEmit"
@@ -113,7 +125,19 @@
 				{
 					"name": "init",
 					"handlerless": true,
+					"inputData": [
+						{
+							"name": "config",
+							"type": "callbackConfig"
+						}
+					],
 					"gateways": [
+						{
+							"nextActivities": [
+								"end_lead"
+							],
+							"decision": "!config.events[`lead`]"
+						},
 						{
 							"nextActivities": [
 								"winLead"
@@ -203,7 +227,19 @@
 				{
 					"name": "init",
 					"handlerless": true,
+					"inputData": [
+						{
+							"name": "config",
+							"type": "callbackConfig"
+						}
+					],
 					"gateways": [
+						{
+							"nextActivities": [
+								"end_pay"
+							],
+							"decision": "!config.events[`pay`]"
+						},
 						{
 							"nextActivities": [
 								"winPay"
@@ -293,7 +329,19 @@
 				{
 					"name": "init",
 					"handlerless": true,
+					"inputData": [
+						{
+							"name": "config",
+							"type": "callbackConfig"
+						}
+					],
 					"gateways": [
+						{
+							"nextActivities": [
+								"end_proposal"
+							],
+							"decision": "!config.events[`proposal`]"
+						},
 						{
 							"nextActivities": [
 								"winProposal"
@@ -383,7 +431,19 @@
 				{
 					"name": "init",
 					"handlerless": true,
+					"inputData": [
+						{
+							"name": "config",
+							"type": "callbackConfig"
+						}
+					],
 					"gateways": [
+						{
+							"nextActivities": [
+								"end_requestApproval"
+							],
+							"decision": "!config.events[`requestApproval`]"
+						},
 						{
 							"nextActivities": [
 								"winRequestApproval"
@@ -473,7 +533,19 @@
 				{
 					"name": "init",
 					"handlerless": true,
+					"inputData": [
+						{
+							"name": "config",
+							"type": "callbackConfig"
+						}
+					],
 					"gateways": [
+						{
+							"nextActivities": [
+								"end_sign"
+							],
+							"decision": "!config.events[`sign`]"
+						},
 						{
 							"nextActivities": [
 								"winSign"

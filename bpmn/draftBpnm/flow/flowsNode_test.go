@@ -10,6 +10,14 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+type callbackConfig struct {
+	Events map[string]bool `json:"events"`
+}
+
+func (c *callbackConfig) GetType() string {
+	return "callbackConfig"
+}
+
 type callbackInfo struct {
 	Request     *http.Request
 	RequestBody []byte
@@ -30,7 +38,6 @@ func funcTestWithInfo(message string, log *mockLog) func(bpnm.StorageData) error
 }
 
 func getBuilderFlowNode(log *mockLog, store bpnm.StorageData) *bpnm.BpnmBuilder {
-
 	builder, e := bpnm.NewBpnmBuilder("node_flows.json")
 	if e != nil {
 		return nil
@@ -71,11 +78,15 @@ var (
 
 var processesToTest = [...]string{"emit", "lead", "pay", "proposal", "requestApproval", "sign"}
 
-func TestEmitForWinNode(t *testing.T) {
+func TestEmitForWinNodeWithConfigTrue(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("node", &winNode)
+
 	for _, process := range processesToTest {
+		store.ResetLocal()
+		store.AddLocal("config", &callbackConfig{Events: map[string]bool{process: true}})
+
 		namelog := strings.Replace(process, string(process[0]), string(process[0]-32), 1) //upper case first letter
 		exps := []string{
 			"win" + namelog,
@@ -85,20 +96,52 @@ func TestEmitForWinNode(t *testing.T) {
 	}
 }
 
-func TestBaseNode(t *testing.T) {
+func TestEmitForWinNodeWithConfigFalse(t *testing.T) {
+	store := bpnm.NewStorageBpnm()
+	store.AddGlobal("policy", &policyEcommerce)
+	store.AddGlobal("node", &winNode)
+
+	for _, process := range processesToTest {
+		store.ResetLocal()
+		store.AddLocal("config", &callbackConfig{Events: map[string]bool{process: false}})
+
+		exps := []string{}
+		testFlow(t, process, exps, store, getBuilderFlowNode)
+	}
+}
+
+func TestBaseNodeWithConfigTrue(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("node", &baseNode)
+
 	exps := []string{
 		"baseCallback",
 		"saveAudit ciao",
 	}
 	for _, process := range processesToTest {
+		store.ResetLocal()
+		store.AddLocal("config", &callbackConfig{Events: map[string]bool{process: true}})
+
 		testFlow(t, process, exps, store, getBuilderFlowNode)
 	}
 }
 
-func TestBrokenNode(t *testing.T) {
+func TestBaseNodeWithConfigFalse(t *testing.T) {
+	store := bpnm.NewStorageBpnm()
+	store.AddGlobal("policy", &policyEcommerce)
+	store.AddGlobal("node", &baseNode)
+
+	exps := []string{}
+	for _, process := range processesToTest {
+		store.ResetLocal()
+		store.AddLocal("config", &callbackConfig{Events: map[string]bool{process: false}})
+
+		testFlow(t, process, exps, store, getBuilderFlowNode)
+	}
+}
+
+func TestBrokenNodeWithConfTrue(t *testing.T) {
 	store := bpnm.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("node", &brokenNode)
@@ -110,9 +153,33 @@ func TestBrokenNode(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, process := range processesToTest {
+		store.ResetLocal()
+		store.AddLocal("config", &callbackConfig{Events: map[string]bool{process: true}})
 		err = flow.Run(process)
 		if err == nil {
 			t.Fatal("Should have an error")
+		}
+	}
+}
+
+func TestBrokenNodeWithConfFalse(t *testing.T) {
+	store := bpnm.NewStorageBpnm()
+	store.AddGlobal("policy", &policyEcommerce)
+	store.AddGlobal("node", &brokenNode)
+
+	log := mockLog{}
+	build := getBuilderFlowNode(&log, store)
+	flow, err := build.Build()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, process := range processesToTest {
+		store.ResetLocal()
+		store.AddLocal("config", &callbackConfig{Events: map[string]bool{process: false}})
+
+		err = flow.Run(process)
+		if err != nil {
+			t.Fatal("Should not have an error")
 		}
 	}
 }

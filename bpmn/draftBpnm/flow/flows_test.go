@@ -404,6 +404,9 @@ func TestEmitForEcommerceWithNodeFlow(t *testing.T) {
 	storeFlowChannel.AddGlobal("product", &productEcommerce)
 	storeFlowChannel.AddGlobal("node", &winNode)
 
+	storeNode := bpnm.NewStorageBpnm()
+	storeNode.AddLocal("config", &callbackConfig{Events: map[string]bool{"emit": true}})
+
 	exps := []string{
 		"setProposalData",
 		"emitData",
@@ -416,8 +419,7 @@ func TestEmitForEcommerceWithNodeFlow(t *testing.T) {
 	}
 	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpnm.StorageData) *bpnm.BpnmBuilder {
 		build := getBuilderFlowChannel(log, storeFlowChannel)
-
-		nodeBuild := getBuilderFlowNode(log, bpnm.NewStorageBpnm())
+		nodeBuild := getBuilderFlowNode(log, storeNode)
 		if e := build.Inject(nodeBuild); e != nil {
 			t.Fatal(e)
 		}
@@ -431,11 +433,40 @@ func TestEmitForWgaWithNodeFlow(t *testing.T) {
 	storeFlowChannel.AddGlobal("product", &productEcommerce)
 	storeFlowChannel.AddGlobal("node", &winNode)
 
+	storeNode := bpnm.NewStorageBpnm()
+	storeNode.AddLocal("config", &callbackConfig{Events: map[string]bool{"emit": true}})
+
 	exps := []string{}
 	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpnm.StorageData) *bpnm.BpnmBuilder {
 		build := getBuilderFlowChannel(log, storeFlowChannel)
+		nodeBuild := getBuilderFlowNode(log, storeNode)
+		if e := build.Inject(nodeBuild); e != nil {
+			t.Fatal(e)
+		}
 
-		nodeBuild := getBuilderFlowNode(log, bpnm.NewStorageBpnm())
+		return build
+	})
+}
+func TestEmitForEcommerceWithNodeFlowConfFalse(t *testing.T) {
+	storeFlowChannel := bpnm.NewStorageBpnm()
+	storeFlowChannel.AddGlobal("policy", &policyEcommerce)
+	storeFlowChannel.AddGlobal("product", &productEcommerce)
+	storeFlowChannel.AddGlobal("node", &winNode)
+
+	storeNode := bpnm.NewStorageBpnm()
+	storeNode.AddLocal("config", &callbackConfig{Events: map[string]bool{"emit": false}})
+
+	exps := []string{
+		"setProposalData",
+		"emitData",
+		"sign",
+		"pay",
+		"sendEmitProposalMail",
+		"sendMailSign",
+	}
+	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpnm.StorageData) *bpnm.BpnmBuilder {
+		build := getBuilderFlowChannel(log, storeFlowChannel)
+		nodeBuild := getBuilderFlowNode(log, storeNode)
 		if e := build.Inject(nodeBuild); e != nil {
 			t.Fatal(e)
 		}
