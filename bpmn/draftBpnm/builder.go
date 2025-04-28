@@ -98,7 +98,7 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 		for i := range b.toInject {
 			keyNoInjected += fmt.Sprintf("process: %v, activity: %v, order: %v\n", i.targetProcess, i.targetActivity, i.orderActivity)
 		}
-		return nil, fmt.Errorf("Following injections went bad:\n  %v", keyNoInjected)
+		return nil, fmt.Errorf("Following injections haven't been done:\n  %v", keyNoInjected)
 	}
 	return flow, nil
 }
