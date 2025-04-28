@@ -80,9 +80,6 @@ func testFlow(t *testing.T, process string, expectedACtivities []string, store b
 	}
 	if len(expectedACtivities) != len(log.log) {
 		log.printlnToTesting(t)
-		for _, mes := range log.log {
-			t.Log(mes)
-		}
 		t.Fatalf("exp n message: %v,got: %v", len(expectedACtivities), len(log.log))
 	}
 	for i, exp := range expectedACtivities {
@@ -414,7 +411,7 @@ func TestSignForRemittanceMgaWithNodeFlow(t *testing.T) {
 	storeFlowChannel.AddGlobal("node", &winNode)
 
 	storeNode := bpnm.NewStorageBpnm()
-	storeNode.AddLocal("config", &callbackConfig{Events: map[string]bool{"sign": true}})
+	storeNode.AddLocal("config", &callbackConfig{Events: map[string]bool{"sign": false}})
 
 	exps := []string{
 		"setSign",
