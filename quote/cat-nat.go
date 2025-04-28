@@ -9,118 +9,8 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/models/dto/net"
 )
-
-type contractor struct {
-	PersonalDataType          string `json:"tipoAnagrafica"`
-	CompanyName               string `json:"ragioneSociale"`
-	VatNumber                 string `json:"partitaIva"`
-	FiscalCode                string `json:"codiceFiscale"`
-	AtecoCode                 string `json:"codiceAteco"`
-	PostalCode                string `json:"cap"`
-	Address                   string `json:"indirizzo"`
-	Locality                  string `json:"comune"`
-	CityCode                  string `json:"provincia"`
-	Phone                     string `json:"telefonoCellulare"`
-	Email                     string `json:"email"`
-	PrivacyConsentDate        string `json:"dataConsensoPrivacy"`
-	ProcessingConsent         string `json:"consensoTrattamento"`
-	GenericMarketingConsent   string `json:"consensoMarketingGenerico"`
-	MarketingProfilingConsent string `json:"consensoProfilazioneMarketing"`
-	MarketingActivityConsent  string `json:"consensoAttivitaMarketing"`
-	DocumentationFormat       int    `json:"formatoDocumentazione"`
-}
-
-type legalRepresentative struct {
-	Name       string `json:"nome"`
-	Surname    string `json:"cognome"`
-	FiscalCode string `json:"codiceFiscale"`
-	PostalCode string `json:"cap"`
-	Address    string `json:"indirizzo"`
-	Locality   string `json:"comune"`
-	CityCode   string `json:"provincia"`
-	Phone      string `json:"telefonoCellulare"`
-	Email      string `json:"email"`
-}
-
-type guaranteeList struct {
-	GuaranteeCode string `json:"codGaranzia"`
-	CapitalAmount int    `json:"importoCapitale"`
-}
-
-type assetRequest struct {
-	ContractorAndTenant  string          `json:"contraenteProprietarioEConduttore"`
-	EarthquakeCoverage   string          `json:"presenzaCoperturaTerremoto"`
-	FloodCoverage        string          `json:"presenzaCoperturaAlluvione"`
-	EarthquakePurchase   string          `json:"acquistoTerremoto"`
-	FloodPurchase        string          `json:"acquistoAlluvione"`
-	LandSlidePurchase    string          `json:"acquistoFrane"`
-	PostalCode           string          `json:"cap"`
-	Address              string          `json:"indirizzo"`
-	Locality             string          `json:"comune"`
-	CityCode             string          `json:"provincia"`
-	ConstructionMaterial int             `json:"materialeDiCostruzione"`
-	ConstructionYear     int             `json:"annoDiCostruzione"`
-	FloorNumber          int             `json:"numeroPianiEdificio"`
-	LowestFloor          int             `json:"pianoPiuBassoOccupato"`
-	GuaranteeList        []guaranteeList `json:"elencoGaranzia"`
-}
-
-type catNatRequestDTO struct {
-	ProductCode         string              `json:"codiceProdotto"`
-	Date                string              `json:"dataEffetto"`
-	ExternalReference   string              `json:"riferimentoEsterno"`
-	DistributorCode     string              `json:"codiceDistributore"`
-	SecondLevelCode     string              `json:"codiceSecondoLivello"`
-	ThirdLevelCode      string              `json:"codiceTerzoLivello"`
-	Splitting           string              `json:"frazionamento"`
-	Emission            string              `json:"emissione"`
-	SalesChannel        string              `json:"canaleVendita"`
-	Contractor          contractor          `json:"contraente"`
-	LegalRepresentative legalRepresentative `json:"legaleRappresentante"`
-	Asset               assetRequest        `json:"bene"`
-}
-
-type catNatResponseDTO struct {
-	PolicyNumber   string          `json:"numeroPolizza,omitempty"`
-	ProposalNumber string          `json:"numeroProposta,omitempty"`
-	Result         string          `json:"esito,omitempty"`
-	AnnualGross    float64         `json:"imp_Lordo_Annuo,omitempty"`
-	AnnualNet      float64         `json:"imp_Netto_Annuo,omitempty"`
-	AnnualTax      float64         `json:"imp_Tasse_Annuo,omitempty"`
-	AssetDetail    []assetResponse `json:"dettaglioBeni,omitempty"`
-	Errors         []detail        `json:"errori,omitempty"`
-	Reports        []detail        `json:"segnalazioni,omitempty"`
-}
-
-type assetResponse struct {
-	ProgressiveNumber string            `json:"progressivoBene,omitempty"`
-	GrossAmount       float64           `json:"imp_Lordo_Bene,omitempty"`
-	NetAmount         float64           `json:"imp_Netto_Bene,omitempty"`
-	TaxAmount         float64           `json:"imp_Tasse_Bene,omitempty"`
-	GuaranteeDetail   []guaranteeDetail `json:"dettaglioGaranzie,omitempty"`
-}
-
-type guaranteeDetail struct {
-	GuaranteeCode  string  `json:"codiceGaranzia,omitempty"`
-	GuaranteeGross float64 `json:"imp_Lordo_Garanzia,omitempty"`
-	GuaranteeNet   float64 `json:"imp_Netto_Garanzia,omitempty"`
-	GuaranteeTax   float64 `json:"imp_Tasse_Garanzia,omitempty"`
-}
-
-type detail struct {
-	Code        string `json:"codice,omitempty"`
-	Description string `json:"descrizione,omitempty"`
-}
-
-type errorResponse struct {
-	Type     string         `json:"type"`
-	Title    string         `json:"title"`
-	Status   int            `json:"status"`
-	Detail   string         `json:"detail"`
-	Instance string         `json:"instance"`
-	Errors   map[string]any `json:"errors"`
-}
 
 func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
@@ -185,7 +75,7 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	return string(out), out, err
 }
 
-func appendQuotationToPolicy(pol *models.Policy, quot catNatResponseDTO) {
+func appendQuotationToPolicy(pol *models.Policy, quot net.CatNatResponseDTO) {
 	eOffer := make(map[string]*models.GuaranteValue)
 	fOffer := make(map[string]*models.GuaranteValue)
 	lOffer := make(map[string]*models.GuaranteValue)
@@ -235,8 +125,8 @@ func appendQuotationToPolicy(pol *models.Policy, quot catNatResponseDTO) {
 	}
 }
 
-func buildNetInsuranceDTO(policy *models.Policy) (catNatRequestDTO, error) {
-	dto := catNatRequestDTO{
+func buildNetInsuranceDTO(policy *models.Policy) (net.CatNatRequestDTO, error) {
+	dto := net.CatNatRequestDTO{
 		ProductCode:       "007",
 		Date:              policy.StartDate.Format("2006-01-02"),
 		ExternalReference: policy.Uid,
@@ -254,7 +144,7 @@ func buildNetInsuranceDTO(policy *models.Policy) (catNatRequestDTO, error) {
 			atecoCode = v.Building.Ateco
 		}
 	}
-	contr := contractor{
+	contr := net.Contractor{
 		PersonalDataType:          "2",
 		CompanyName:               policy.Contractor.Name,
 		VatNumber:                 policy.Contractor.VatCode,
@@ -277,7 +167,7 @@ func buildNetInsuranceDTO(policy *models.Policy) (catNatRequestDTO, error) {
 
 	dto.Contractor = contr
 
-	var legalRep legalRepresentative
+	var legalRep net.LegalRepresentative
 	if policy.Contractors != nil {
 		for _, v := range *policy.Contractors {
 			if v.IsSignatory {
@@ -299,7 +189,7 @@ func buildNetInsuranceDTO(policy *models.Policy) (catNatRequestDTO, error) {
 
 	dto.LegalRepresentative = legalRep
 
-	asset := assetRequest{
+	asset := net.AssetRequest{
 		ContractorAndTenant:  "si", // TODO
 		EarthquakeCoverage:   "no", // TODO
 		FloodCoverage:        "no", // TODO
@@ -310,7 +200,7 @@ func buildNetInsuranceDTO(policy *models.Policy) (catNatRequestDTO, error) {
 		ConstructionYear:     0, // TODO
 		FloorNumber:          0, // TODO
 		LowestFloor:          0, // TODO
-		GuaranteeList:        make([]guaranteeList, 0),
+		GuaranteeList:        make([]net.GuaranteeList, 0),
 	}
 
 	for _, v := range policy.Assets {
@@ -327,19 +217,19 @@ func buildNetInsuranceDTO(policy *models.Policy) (catNatRequestDTO, error) {
 				asset.EarthquakePurchase = "si"
 				if g.Value != nil {
 					if g.Value.SumInsuredLimitOfIndemnity != 0 {
-						var gL guaranteeList
+						var gL net.GuaranteeList
 						gL.GuaranteeCode = "211/00"
 						gL.CapitalAmount = int(g.Value.SumInsuredLimitOfIndemnity)
 						asset.GuaranteeList = append(asset.GuaranteeList, gL)
 					}
 					if g.Value.SumInsured != 0 {
-						var gL guaranteeList
+						var gL net.GuaranteeList
 						gL.GuaranteeCode = "211/01"
 						gL.CapitalAmount = int(g.Value.SumInsured)
 						asset.GuaranteeList = append(asset.GuaranteeList, gL)
 					}
 					if g.Value.LimitOfIndemnity != 0 {
-						var gL guaranteeList
+						var gL net.GuaranteeList
 						gL.GuaranteeCode = "211/02"
 						gL.CapitalAmount = int(g.Value.LimitOfIndemnity)
 						asset.GuaranteeList = append(asset.GuaranteeList, gL)
@@ -350,19 +240,19 @@ func buildNetInsuranceDTO(policy *models.Policy) (catNatRequestDTO, error) {
 				asset.FloodPurchase = "si"
 				if g.Value != nil {
 					if g.Value.SumInsuredLimitOfIndemnity != 0 {
-						var gL guaranteeList
+						var gL net.GuaranteeList
 						gL.GuaranteeCode = "212/00"
 						gL.CapitalAmount = int(g.Value.SumInsuredLimitOfIndemnity)
 						asset.GuaranteeList = append(asset.GuaranteeList, gL)
 					}
 					if g.Value.SumInsured != 0 {
-						var gL guaranteeList
+						var gL net.GuaranteeList
 						gL.GuaranteeCode = "212/01"
 						gL.CapitalAmount = int(g.Value.SumInsured)
 						asset.GuaranteeList = append(asset.GuaranteeList, gL)
 					}
 					if g.Value.LimitOfIndemnity != 0 {
-						var gL guaranteeList
+						var gL net.GuaranteeList
 						gL.GuaranteeCode = "212/02"
 						gL.CapitalAmount = int(g.Value.LimitOfIndemnity)
 						asset.GuaranteeList = append(asset.GuaranteeList, gL)
@@ -373,19 +263,19 @@ func buildNetInsuranceDTO(policy *models.Policy) (catNatRequestDTO, error) {
 				asset.LandSlidePurchase = "si"
 				if g.Value != nil {
 					if g.Value.SumInsuredLimitOfIndemnity != 0 {
-						var gL guaranteeList
+						var gL net.GuaranteeList
 						gL.GuaranteeCode = "209/00"
 						gL.CapitalAmount = int(g.Value.SumInsuredLimitOfIndemnity)
 						asset.GuaranteeList = append(asset.GuaranteeList, gL)
 					}
 					if g.Value.SumInsured != 0 {
-						var gL guaranteeList
+						var gL net.GuaranteeList
 						gL.GuaranteeCode = "209/01"
 						gL.CapitalAmount = int(g.Value.SumInsured)
 						asset.GuaranteeList = append(asset.GuaranteeList, gL)
 					}
 					if g.Value.LimitOfIndemnity != 0 {
-						var gL guaranteeList
+						var gL net.GuaranteeList
 						gL.GuaranteeCode = "209/02"
 						gL.CapitalAmount = int(g.Value.LimitOfIndemnity)
 						asset.GuaranteeList = append(asset.GuaranteeList, gL)
@@ -404,36 +294,36 @@ func formatAddress(addr *models.Address) string {
 	return res
 }
 
-func netInsuranceQuotation(cl *http.Client, dto catNatRequestDTO) (catNatResponseDTO, *errorResponse, error) {
+func netInsuranceQuotation(cl *http.Client, dto net.CatNatRequestDTO) (net.CatNatResponseDTO, *net.ErrorResponse, error) {
 	url := "https://apigatewaydigital.netinsurance.it/PolizzeGateway24/emettiPolizza/441-029-007"
 	reqBodyBytes := new(bytes.Buffer)
 	err := json.NewEncoder(reqBodyBytes).Encode(dto)
 	if err != nil {
-		return catNatResponseDTO{}, nil, err
+		return net.CatNatResponseDTO{}, nil, err
 	}
 	r := reqBodyBytes.Bytes()
 	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(r))
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := cl.Do(req)
 	if err != nil {
-		return catNatResponseDTO{}, nil, err
+		return net.CatNatResponseDTO{}, nil, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		errResp := errorResponse{
+		errResp := net.ErrorResponse{
 			Errors: make(map[string]any),
 		}
 		if err = json.NewDecoder(resp.Body).Decode(&errResp); err != nil {
 			log.Println("error decoding catnat error response")
-			return catNatResponseDTO{}, nil, err
+			return net.CatNatResponseDTO{}, nil, err
 		}
-		return catNatResponseDTO{}, &errResp, nil
+		return net.CatNatResponseDTO{}, &errResp, nil
 	}
-	cndto := catNatResponseDTO{}
+	cndto := net.CatNatResponseDTO{}
 	if err = json.NewDecoder(resp.Body).Decode(&cndto); err != nil {
 		log.Println("error decoding catnat response")
-		return catNatResponseDTO{}, nil, err
+		return net.CatNatResponseDTO{}, nil, err
 	}
 
 	return cndto, nil, nil
