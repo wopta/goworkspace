@@ -86,8 +86,8 @@ func testFlow(t *testing.T, process string, expectedACtivities []string, store b
 		t.Fatalf("exp n message: %v,got: %v", len(expectedACtivities), len(log.log))
 	}
 	for i, exp := range expectedACtivities {
-		log.printlnToTesting(t)
 		if log.log[i] != exp {
+			log.printlnToTesting(t)
 			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
 		}
 	}
