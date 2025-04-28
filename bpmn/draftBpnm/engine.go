@@ -104,22 +104,8 @@ func (act *activity) runActivity(nameProcess string, storage StorageData) error 
 	}
 
 	if act.handler != nil {
-		var err error
-		func() {
-			defer func() {
-				if act.recover == nil {
-					return
-				}
-				if r := recover(); r != nil || err != nil {
-					log.Printf("Run recorver process '%v', activity '%v'", nameProcess, act.name)
-					err = act.recover(storage)
-				}
-				err = nil
-			}()
-			err = act.handler(storage)
-		}()
-		if err != nil {
-			return err
+		if err := callWithRecover(nameProcess, storage, act); err != nil && *err != nil {
+			return *err
 		}
 	}
 
@@ -129,6 +115,22 @@ func (act *activity) runActivity(nameProcess string, storage StorageData) error 
 		}
 	}
 	return nil
+}
+
+func callWithRecover(nameProcess string, storage StorageData, act *activity) *error {
+	var err *error = new(error) //i used a pointer since defer in called after the return, so normally i cant change the value
+	defer func() {
+		if act.recover == nil {
+			return
+		}
+		if r := recover(); r != nil || (err != nil && *err != nil) {
+			log.Printf("Run recorver process '%v', activity '%v'", nameProcess, act.name)
+			*err = act.recover(storage)
+		}
+		*err = nil
+	}()
+	*err = act.handler(storage)
+	return err
 }
 
 func (act *activity) evaluateDecisions(processName string, storage StorageData, date map[string]any) ([]*activity, error) {

@@ -477,7 +477,7 @@ func TestRecoverWithFunction(t *testing.T) {
 	addDefaultHandlersForTest(g, log)
 	g.setHandler("DEventWithRec", func(st StorageData) error {
 		log.println("init D")
-		return errors.New("fjklsd")
+		return errors.New("error of DEvent")
 	})
 	g.SetStorage(storage)
 	f, err := g.Build()
