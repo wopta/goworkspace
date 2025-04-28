@@ -12,12 +12,19 @@ type mockLog struct {
 	log []string
 }
 
-func (m *mockLog) Println(mes string) {
+func (m *mockLog) println(mes string) {
 	m.log = append(m.log, mes)
+}
+
+func (m *mockLog) printlnToTesting(t *testing.T) {
+	t.Log("Actual log: ")
+	for _, mes := range m.log {
+		t.Log(" ", mes)
+	}
 }
 func funcTest(message string, log *mockLog) func(bpnm.StorageData) error {
 	return func(sd bpnm.StorageData) error {
-		log.Println(message)
+		log.println(message)
 		return nil
 	}
 }
@@ -72,12 +79,14 @@ func testFlow(t *testing.T, process string, expectedACtivities []string, store b
 		t.Fatal(err)
 	}
 	if len(expectedACtivities) != len(log.log) {
+		log.printlnToTesting(t)
 		for _, mes := range log.log {
 			t.Log(mes)
 		}
 		t.Fatalf("exp n message: %v,got: %v", len(expectedACtivities), len(log.log))
 	}
 	for i, exp := range expectedACtivities {
+		log.printlnToTesting(t)
 		if log.log[i] != exp {
 			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
 		}

@@ -13,6 +13,7 @@
 			"activities": [
 				{
 					"name": "init",
+					"callEndIfStop": false,
 					"outputData": [
 						{
 							"name": "validationObject",
@@ -71,6 +72,7 @@
 				},
 				{
 					"name": "BEvent",
+					"handlerless": true,
 					"description": "emit policy",
 					"outputData": [
 						{

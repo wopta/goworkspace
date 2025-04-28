@@ -42,12 +42,21 @@ func (m *mockLog) println(mes string) {
 	m.log = append(m.log, mes)
 }
 
+func (m *mockLog) printlnToTesting(t *testing.T) {
+	t.Log("Actual log: ")
+	for _, mes := range m.log {
+		t.Log(" ", mes)
+	}
+}
+
 func testLog(log *mockLog, exps []string, t *testing.T) {
 	if len(exps) != len(log.log) {
+		log.printlnToTesting(t)
 		t.Fatalf("exp n message: %v,got: %v", len(exps), len(log.log))
 	}
 	for i, exp := range exps {
 		if log.log[i] != exp {
+			log.printlnToTesting(t)
 			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
 		}
 	}
@@ -212,7 +221,7 @@ func TestBpnmMissingHandler(t *testing.T) {
 	storage.AddGlobal("policyPr", &policyMock{Age: 10})
 	g.SetStorage(storage)
 	addDefaultHandlersForTest(g, &log)
-	err = g.setHandler("AEvent", nil)
+	g.setHandler("AEvent", nil)
 	_, err = g.Build()
 	if err.Error() != "No handler registered for the activity: 'AEvent'" {
 		t.Fatalf("should have another error, got: %v", err.Error())
@@ -542,6 +551,69 @@ func TestEndActivity(t *testing.T) {
 		"init",
 		"init A",
 		"end",
+	}
+	testLog(log, exps, t)
+}
+
+func TestDontCallEndAfterInit(t *testing.T) {
+	//i've set "callEndIfStop": false,
+	log := &mockLog{}
+	g, err := NewBpnmBuilder("prova.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	storage := NewStorageBpnm()
+	addDefaultHandlersForTest(g, log)
+	storage.AddLocal("validationObject", &randomObjectToTest{})
+	storage.AddGlobal("policyPr", &policyMock{Age: 20})
+	g.SetStorage(storage)
+	g.AddHandler("end_emit", func(sd StorageData) error {
+		log.println("end")
+		return nil
+	})
+	f, err := g.Build()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = f.RunAt("emit", "init")
+	if err != nil {
+		t.Fatalf("should have error")
+	}
+	exps := []string{
+		"init",
+	}
+	testLog(log, exps, t)
+}
+
+func TestHandlerLessTrue(t *testing.T) {
+	//i've set "handlerless": true,
+	log := &mockLog{}
+	g, err := NewBpnmBuilder("prova.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	storage := NewStorageBpnm()
+	addDefaultHandlersForTest(g, log)
+	storage.AddLocal("validationObject", &randomObjectToTest{Step: 3})
+	storage.AddGlobal("policyPr", &policyMock{Age: 2})
+	g.setHandler("AEvent", func(sd StorageData) error {
+		sd.AddLocal("error", &errorRandomToTest{Result: true})
+		log.println("init A")
+		return nil
+	})
+	g.setHandler("BEvent", nil) //remove the BEvent's handler
+	g.SetStorage(storage)
+	f, err := g.Build()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = f.RunAt("emit", "init")
+	if err != nil {
+		t.Fatalf("should have error")
+	}
+	exps := []string{
+		"init",
+		"init A",
 	}
 	testLog(log, exps, t)
 }

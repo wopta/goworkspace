@@ -31,7 +31,7 @@ func (c *callbackInfo) GetType() string {
 
 func funcTestWithInfo(message string, log *mockLog) func(bpnm.StorageData) error {
 	return func(st bpnm.StorageData) error {
-		log.Println(message)
+		log.println(message)
 		st.AddLocal("callbackInfo", &callbackInfo{RequestBody: []byte("ciao")})
 		return nil
 	}
@@ -60,7 +60,7 @@ func getBuilderFlowNode(log *mockLog, store bpnm.StorageData) *bpnm.BpnmBuilder 
 			if string(d.RequestBody) != "ciao" {
 				return errors.New("no correct body request")
 			}
-			log.Println("saveAudit " + string(d.RequestBody))
+			log.println("saveAudit " + string(d.RequestBody))
 			return nil
 		}),
 	)

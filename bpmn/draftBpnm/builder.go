@@ -155,16 +155,12 @@ func (b *BpnmBuilder) AddHandler(nameHandler string, handler activityHandler) er
 }
 
 // only use it for test!!
-func (b *BpnmBuilder) setHandler(nameHandler string, handler activityHandler) error {
-	if b.handlers == nil {
-		return errors.New("No handlers has been defined")
-	}
+func (b *BpnmBuilder) setHandler(nameHandler string, handler activityHandler) {
 	if handler == nil {
 		delete(b.handlers, nameHandler)
-		return nil
+		return
 	}
 	b.handlers[nameHandler] = handler
-	return nil
 }
 
 func (b *BpnmBuilder) SetStorage(pool StorageData) {
