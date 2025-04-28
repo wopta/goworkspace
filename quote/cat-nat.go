@@ -47,8 +47,10 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		return "", nil, err
 	}
 
-	scope := "emettiPolizza_441-029-007"
-	tokenUrl := "https://apigatewaydigital.netinsurance.it/Identity/connect/token"
+	const scope = "emettiPolizza_441-029-007"
+	const basePath = "https://apigatewaydigital.netinsurance.it"
+	const authEndpoint = "/Identity/connect/token"
+	const tokenUrl = basePath + authEndpoint
 	client := lib.ClientCredentials(os.Getenv("NETINS_ID"), os.Getenv("NETINS_SECRET"), scope, tokenUrl)
 
 	resp, errResp, err := netInsuranceQuotation(client, cnReq)
