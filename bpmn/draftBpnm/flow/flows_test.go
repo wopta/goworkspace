@@ -407,7 +407,7 @@ func TestSignForRemittanceMga(t *testing.T) {
 }
 
 // With node flow
-func TestEmitForRemittanceMgaWithNodeFlow(t *testing.T) {
+func TestSignForRemittanceMgaWithNodeFlow(t *testing.T) {
 	storeFlowChannel := bpnm.NewStorageBpnm()
 	storeFlowChannel.AddGlobal("policy", &policyNetwork)
 	storeFlowChannel.AddGlobal("product", &productRemittanceMga)
