@@ -32,7 +32,7 @@ func (c *callbackInfo) GetType() string {
 func funcTestWithInfo(message string, log *mockLog) func(bpnm.StorageData) error {
 	return func(st bpnm.StorageData) error {
 		log.println(message)
-		st.AddLocal("callbackInfo", &callbackInfo{RequestBody: []byte("ciao")})
+		st.AddLocal("callbackInfo", &callbackInfo{RequestBody: []byte("prova request")})
 		return nil
 	}
 }
@@ -57,7 +57,7 @@ func getBuilderFlowNode(log *mockLog, store bpnm.StorageData) *bpnm.BpnmBuilder 
 			if e != nil {
 				return e
 			}
-			if string(d.RequestBody) != "ciao" {
+			if string(d.RequestBody) != "prova request" {
 				return errors.New("no correct body request")
 			}
 			log.println("saveAudit " + string(d.RequestBody))
@@ -90,7 +90,7 @@ func TestEmitForWinNodeWithConfigTrue(t *testing.T) {
 		namelog := strings.Replace(process, string(process[0]), string(process[0]-32), 1) //upper case first letter
 		exps := []string{
 			"win" + namelog,
-			"saveAudit ciao",
+			"saveAudit prova request",
 		}
 		testFlow(t, process, exps, store, getBuilderFlowNode)
 	}
@@ -117,7 +117,7 @@ func TestBaseNodeWithConfigTrue(t *testing.T) {
 
 	exps := []string{
 		"baseCallback",
-		"saveAudit ciao",
+		"saveAudit prova request",
 	}
 	for _, process := range processesToTest {
 		store.ResetLocal()
