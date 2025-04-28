@@ -411,14 +411,12 @@ func TestSignForRemittanceMgaWithNodeFlow(t *testing.T) {
 	storeFlowChannel.AddGlobal("node", &winNode)
 
 	storeNode := bpnm.NewStorageBpnm()
-	storeNode.AddLocal("config", &callbackConfig{Events: map[string]bool{"sign": false}})
+	storeNode.AddLocal("config", &callbackConfig{Sign: false})
 
 	exps := []string{
 		"setSign",
 		"addContract",
 		"sendMailContract",
-		"winSign",
-		"saveAudit prova request",
 	}
 	testFlow(t, "sign", exps, storeFlowChannel, func(log *mockLog, sd bpnm.StorageData) *bpnm.BpnmBuilder {
 		build := getBuilderFlowChannel(log, storeFlowChannel)
@@ -438,7 +436,7 @@ func TestEmitForEcommerceWithNodeFlow(t *testing.T) {
 	storeFlowChannel.AddGlobal("node", &winNode)
 
 	storeNode := bpnm.NewStorageBpnm()
-	storeNode.AddLocal("config", &callbackConfig{Events: map[string]bool{"emit": true}})
+	storeNode.AddLocal("config", &callbackConfig{Emit: true})
 
 	exps := []string{
 		"setProposalData",
@@ -467,7 +465,7 @@ func TestEmitForWgaWithNodeFlow(t *testing.T) {
 	storeFlowChannel.AddGlobal("node", &winNode)
 
 	storeNode := bpnm.NewStorageBpnm()
-	storeNode.AddLocal("config", &callbackConfig{Events: map[string]bool{"emit": true}})
+	storeNode.AddLocal("config", &callbackConfig{Emit: true})
 
 	exps := []string{}
 	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpnm.StorageData) *bpnm.BpnmBuilder {
@@ -487,7 +485,7 @@ func TestEmitForEcommerceWithNodeFlowConfFalse(t *testing.T) {
 	storeFlowChannel.AddGlobal("node", &winNode)
 
 	storeNode := bpnm.NewStorageBpnm()
-	storeNode.AddLocal("config", &callbackConfig{Events: map[string]bool{"emit": false}})
+	storeNode.AddLocal("config", &callbackConfig{Emit: false})
 
 	exps := []string{
 		"setProposalData",

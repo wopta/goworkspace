@@ -34,7 +34,7 @@
 							"nextActivities": [
 								"end_emit"
 							],
-							"decision": "!config.events[`emit`]"
+							"decision": "!config.emit"
 						},
 						{
 							"nextActivities": [
@@ -47,11 +47,6 @@
 								"baseCallback"
 							],
 							"decision": "node.callbackConfig.name==`facileBrokerClient`"
-						},
-						{
-							"nextActivities": [
-								"errorCallbackConfig"
-							]
 						}
 					]
 				},
@@ -86,112 +81,6 @@
 							]
 						}
 					]
-				},
-				{
-					"name": "errorCallbackConfig",
-					"description": "Return error when callbackConfig.Name isn't right"
-				},
-				{
-					"name": "saveAudit",
-					"inputData": [
-						{
-							"name": "callbackInfo",
-							"type": "callbackInfo"
-						}
-					]
-				}
-			]
-		},
-		{
-			"name": "lead",
-			"description": "Callback for lead process",
-			"order": {
-				"inWhatProcessInjected": "pay",
-				"inWhatActivityInjected": "end",
-				"order": "post"
-			},
-			"globalData": [
-				{
-					"name": "policy",
-					"type": "policy"
-				},
-				{
-					"name": "node",
-					"type": "networkNode"
-				}
-			],
-			"defaultStart": "init",
-			"activities": [
-				{
-					"name": "init",
-					"handlerless": true,
-					"inputData": [
-						{
-							"name": "config",
-							"type": "callbackConfig"
-						}
-					],
-					"gateways": [
-						{
-							"nextActivities": [
-								"end_lead"
-							],
-							"decision": "!config.events[`lead`]"
-						},
-						{
-							"nextActivities": [
-								"winLead"
-							],
-							"decision": "node.callbackConfig.name==`winClient`"
-						},
-						{
-							"nextActivities": [
-								"baseCallback"
-							],
-							"decision": "node.callbackConfig.name==`facileBrokerClient`"
-						},
-						{
-							"nextActivities": [
-								"errorCallbackConfig"
-							]
-						}
-					]
-				},
-				{
-					"name": "baseCallback",
-					"outputData": [
-						{
-							"name": "callbackInfo",
-							"type": "callbackInfo"
-						}
-					],
-					"gateways": [
-						{
-							"nextActivities": [
-								"saveAudit"
-							]
-						}
-					]
-				},
-				{
-					"name": "winLead",
-					"outputData": [
-						{
-							"name": "callbackInfo",
-							"type": "callbackInfo"
-						}
-					],
-					"gateways": [
-						{
-							"nextActivities": [
-								"saveAudit"
-							]
-						}
-					]
-				},
-				{
-					"name": "errorCallbackConfig",
-					"description": "Return error when callbackConfig.Name isn't right"
 				},
 				{
 					"name": "saveAudit",
@@ -238,7 +127,7 @@
 							"nextActivities": [
 								"end_pay"
 							],
-							"decision": "!config.events[`pay`]"
+							"decision": "!config.pay"
 						},
 						{
 							"nextActivities": [
@@ -251,11 +140,6 @@
 								"baseCallback"
 							],
 							"decision": "node.callbackConfig.name==`facileBrokerClient`"
-						},
-						{
-							"nextActivities": [
-								"errorCallbackConfig"
-							]
 						}
 					]
 				},
@@ -290,10 +174,6 @@
 							]
 						}
 					]
-				},
-				{
-					"name": "errorCallbackConfig",
-					"description": "Return error when callbackConfig.Name isn't right"
 				},
 				{
 					"name": "saveAudit",
@@ -340,7 +220,7 @@
 							"nextActivities": [
 								"end_proposal"
 							],
-							"decision": "!config.events[`proposal`]"
+							"decision": "!config.proposal"
 						},
 						{
 							"nextActivities": [
@@ -353,11 +233,6 @@
 								"baseCallback"
 							],
 							"decision": "node.callbackConfig.name==`facileBrokerClient`"
-						},
-						{
-							"nextActivities": [
-								"errorCallbackConfig"
-							]
 						}
 					]
 				},
@@ -392,10 +267,6 @@
 							]
 						}
 					]
-				},
-				{
-					"name": "errorCallbackConfig",
-					"description": "Return error when callbackConfig.Name isn't right"
 				},
 				{
 					"name": "saveAudit",
@@ -442,7 +313,7 @@
 							"nextActivities": [
 								"end_requestApproval"
 							],
-							"decision": "!config.events[`requestApproval`]"
+							"decision": "!config.requestApproval"
 						},
 						{
 							"nextActivities": [
@@ -455,11 +326,6 @@
 								"baseCallback"
 							],
 							"decision": "node.callbackConfig.name==`facileBrokerClient`"
-						},
-						{
-							"nextActivities": [
-								"errorCallbackConfig"
-							]
 						}
 					]
 				},
@@ -496,10 +362,6 @@
 					]
 				},
 				{
-					"name": "errorCallbackConfig",
-					"description": "Return error when callbackConfig.Name isn't right"
-				},
-				{
 					"name": "saveAudit",
 					"inputData": [
 						{
@@ -511,8 +373,8 @@
 			]
 		},
 		{
-			"description": "Callback for sign process",
 			"name": "sign",
+			"description": "Callback for sign process",
 			"order": {
 				"inWhatProcessInjected": "sign",
 				"inWhatActivityInjected": "end",
@@ -544,7 +406,7 @@
 							"nextActivities": [
 								"end_sign"
 							],
-							"decision": "!config.events[`sign`]"
+							"decision": "!config.sign"
 						},
 						{
 							"nextActivities": [
@@ -557,11 +419,6 @@
 								"baseCallback"
 							],
 							"decision": "node.callbackConfig.name==`facileBrokerClient`"
-						},
-						{
-							"nextActivities": [
-								"errorCallbackConfig"
-							]
 						}
 					]
 				},
@@ -596,10 +453,6 @@
 							]
 						}
 					]
-				},
-				{
-					"name": "errorCallbackConfig",
-					"description": "Return error when callbackConfig.Name isn't right"
 				},
 				{
 					"name": "saveAudit",
