@@ -28,19 +28,19 @@ func NewBpnmBuilder(path string) (*BpnmBuilder, error) {
 }
 
 func (b *BpnmBuilder) AddProcesses(toMerge *BpnmBuilder) error {
-	var e error
-	if e = b.storage.mergeUnique(toMerge.storage); e != nil {
-		return e
+	var err error
+	if err = b.storage.mergeUnique(toMerge.storage); err != nil {
+		return err
 	}
 	toMerge.storage = b.storage
-	b.toInject, e = mergeUniqueMaps(b.toInject, toMerge.toInject)
-	if e != nil {
-		return fmt.Errorf("The merging process of injections went bad: %v", e)
+	b.toInject, err = mergeUniqueMaps(b.toInject, toMerge.toInject)
+	if err != nil {
+		return fmt.Errorf("The merging process of injections went bad: %v", err)
 	}
 	b.Processes = append(b.Processes, toMerge.Processes...)
-	b.handlers, e = mergeUniqueMaps(b.handlers, toMerge.handlers)
-	if e != nil {
-		return fmt.Errorf("The merging process of handlers went bad: %v", e)
+	b.handlers, err = mergeUniqueMaps(b.handlers, toMerge.handlers)
+	if err != nil {
+		return fmt.Errorf("The merging process of handlers went bad: %v", err)
 	}
 	return nil
 }
@@ -118,18 +118,18 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 	for i, p := range bpnmToInject.Processes { //to have a better error
 		order = bpnmToInject.Processes[i].Order
 		if order == nil {
-			return fmt.Errorf("No order defined, the 'order' field isnt filled")
+			return fmt.Errorf("The 'order' field isn't filled")
 		}
 		if order.InWhatActivityInjected == "end" {
 			order.InWhatActivityInjected = getNameEndActivity(order.InWhatProcessInjected)
 		}
 		if _, ok := b.toInject[getKeyInjectedProcess(order.InWhatProcessInjected, order.InWhatActivityInjected, order.Order)]; ok {
-			return fmt.Errorf("Injection's been already done: target process: '%v', process: injected '%v'", order.InWhatProcessInjected, p.Name)
+			return fmt.Errorf("Injection's been already done for: target process: '%v', process: injected '%v' with order '%v'", order.InWhatProcessInjected, p.Name, order.Order)
 		}
 	}
 	process, err := bpnmToInject.Build()
 	if err != nil {
-		return err
+		return fmt.Errorf("The building of injected process went bad: %v", err)
 	}
 
 	for i, p := range bpnmToInject.Processes {

@@ -289,8 +289,8 @@ func TestBpnmWithMultipleInjection(t *testing.T) {
 		t.Fatalf("Should have an error")
 	}
 
-	if err.Error() != "Injection's been already done: target process: 'emit', process: injected 'provaPost'" {
-		t.Fatalf("Should have the error,exp: Injection's been already done: target process: emit, process: injected provaPost, got: %v", err.Error())
+	if err.Error() != "Injection's been already done for: target process: 'emit', process: injected 'provaPost' with order 'Post'" {
+		t.Fatalf("Injection's been already done for: target process: 'emit', process: injected 'provaPost' with order Post, got: %v'", err)
 	}
 }
 
