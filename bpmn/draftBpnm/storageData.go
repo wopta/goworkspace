@@ -149,7 +149,6 @@ func (base *StorageBpnm) setHigherStorage(higher StorageData) error {
 	return nil
 }
 
-// copy all data from source -> base, if both have same key return error
 func (base *StorageBpnm) mergeUnique(source StorageData) error {
 	var err error
 	if source == nil {

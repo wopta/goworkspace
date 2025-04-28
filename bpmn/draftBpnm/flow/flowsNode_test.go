@@ -101,11 +101,11 @@ func TestEmitForWinNodeWithConfigFalse(t *testing.T) {
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("node", &winNode)
 
+	exps := []string{}
 	for _, process := range processesToTest {
 		store.ResetLocal()
 		store.AddLocal("config", &callbackConfig{Events: map[string]bool{process: false}})
 
-		exps := []string{}
 		testFlow(t, process, exps, store, getBuilderFlowNode)
 	}
 }
@@ -167,19 +167,11 @@ func TestBrokenNodeWithConfFalse(t *testing.T) {
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("node", &brokenNode)
 
-	log := mockLog{}
-	build := getBuilderFlowNode(&log, store)
-	flow, err := build.Build()
-	if err != nil {
-		t.Fatal(err)
-	}
+	exps := []string{}
 	for _, process := range processesToTest {
 		store.ResetLocal()
 		store.AddLocal("config", &callbackConfig{Events: map[string]bool{process: false}})
 
-		err = flow.Run(process)
-		if err != nil {
-			t.Fatal("Should not have an error")
-		}
+		testFlow(t, process, exps, store, getBuilderFlowNode)
 	}
 }

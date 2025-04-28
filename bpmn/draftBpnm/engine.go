@@ -9,6 +9,7 @@ import (
 	"github.com/maja42/goval"
 )
 
+// Run a process, it starts from defaultActivity defined in json
 func (f *FlowBpnm) Run(processName string) error {
 	process := f.process[processName]
 	if process == nil {
@@ -17,14 +18,15 @@ func (f *FlowBpnm) Run(processName string) error {
 	return f.RunAt(processName, process.defaultStart)
 }
 
-func (f *FlowBpnm) RunAt(processName, activityName string) error {
+// Run a process, it starts from 'startingActivity'
+func (f *FlowBpnm) RunAt(processName, startingActivity string) error {
 	log.Println("Run ", processName)
 	process := f.process[processName]
 	if process == nil {
 		return fmt.Errorf("Process '%v' not founded", processName)
 	}
 
-	if e := process.loop(activityName); e != nil { //TODO: how to check if there is an infinite loop
+	if e := process.loop(startingActivity); e != nil { //TODO: how to check if there is an infinite loop
 		return e
 	}
 	log.Println("Stop ", processName)

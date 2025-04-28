@@ -92,7 +92,7 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 		flow.process[newProcess.name] = newProcess
 	}
 
-	//Return error if some processes isnt injected, when a process is injected it's removed from b.toInject
+	//Return error if some processes haven't been injected, when a process is injected it's removed from b.toInject
 	if len(b.toInject) != 0 {
 		var keyNoInjected string
 		for i := range b.toInject {

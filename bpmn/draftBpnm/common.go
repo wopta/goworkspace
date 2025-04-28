@@ -63,6 +63,7 @@ func GetData[t DataBpnm](name string, storage StorageData) (t, error) {
 	return result, nil
 }
 
+// IsError gathers all errors(whether there are) and return them, otherwise return nil
 func IsError(errs ...error) error {
 	var res = strings.Builder{}
 	for i := range errs {
