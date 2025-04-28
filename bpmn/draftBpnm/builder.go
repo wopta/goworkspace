@@ -123,7 +123,7 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 		if order.InWhatActivityInjected == "end" {
 			order.InWhatActivityInjected = getNameEndActivity(order.InWhatProcessInjected)
 		}
-		if _, ok := b.toInject[getKeyInjectedProcess(order.InWhatProcessInjected, order.InWhatActivityInjected, order.Order)]; ok {
+		if _, exist := b.toInject[getKeyInjectedProcess(order.InWhatProcessInjected, order.InWhatActivityInjected, order.Order)]; exist {
 			return fmt.Errorf("Injection's been already done for: target process: '%v', process: injected '%v' with order '%v'", order.InWhatProcessInjected, p.Name, order.Order)
 		}
 	}
@@ -147,7 +147,7 @@ func (b *BpnmBuilder) AddHandler(nameHandler string, handler activityHandler) er
 	if b.handlers == nil {
 		b.handlers = make(map[string]activityHandler)
 	}
-	if _, ok := b.handlers[nameHandler]; ok {
+	if _, exist := b.handlers[nameHandler]; exist {
 		return errors.New("Handler's been already defined")
 	}
 	b.handlers[nameHandler] = handler
@@ -170,13 +170,13 @@ func (b *BpnmBuilder) SetStorage(pool StorageData) {
 func (a *BpnmBuilder) buildActivities(processName string, activitiesToBuild ...activityBuilder) (map[string]*activity, error) {
 	result := make(map[string]*activity)
 	for _, activityToBuild := range activitiesToBuild {
-		if _, ok := result[activityToBuild.Name]; ok {
+		if _, exist := result[activityToBuild.Name]; exist {
 			return nil, fmt.Errorf("Double event with same name '%v'", activityToBuild.Name)
 		}
 		newActivity := new(activity)
 
-		handler, ok := a.handlers[activityToBuild.Name]
-		if !activityToBuild.HandlerLess && !ok {
+		handler, exist := a.handlers[activityToBuild.Name]
+		if !activityToBuild.HandlerLess && !exist {
 			return nil, fmt.Errorf("No handler registered for the activity: '%v'", activityToBuild.Name)
 		}
 		if pr := a.toInject[getKeyInjectedProcess(processName, activityToBuild.Name, preActivity)]; pr != nil {
@@ -201,8 +201,8 @@ func (a *BpnmBuilder) buildActivities(processName string, activitiesToBuild ...a
 		newActivity.callEndIfStop = *activityToBuild.CallEndIfStop
 
 		if activityToBuild.Recover != "" {
-			rec, ok := a.handlers[activityToBuild.Recover]
-			if !ok {
+			rec, exist := a.handlers[activityToBuild.Recover]
+			if !exist {
 				return nil, fmt.Errorf("No handler registered for recovery '%v' in activity: '%v'", activityToBuild.Recover, activityToBuild.Name)
 			}
 			newActivity.recover = rec
@@ -226,7 +226,7 @@ func (p *processBpnm) hydrateGateways(activities []activityBuilder) error {
 				decision:       builderGateway.Decision,
 			}
 			for iact, nextJump := range builderGateway.NextActivities {
-				if _, ok := p.activities[nextJump]; !ok {
+				if _, exist := p.activities[nextJump]; !exist {
 					return fmt.Errorf("No event named %v", nextJump)
 				}
 				gateway.nextActivities[iact] = p.activities[nextJump]
