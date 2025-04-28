@@ -40,7 +40,8 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		return "", nil, err
 	}
 
-	catNatRequest, err := buildNetInsuranceDTO(reqPolicy)
+	var cnReq net.RequestDTO
+	err = cnReq.FromPolicy(reqPolicy)
 	if err != nil {
 		log.Printf("error building NetInsurance DTO: %s", err.Error())
 		return "", nil, err
@@ -50,7 +51,7 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	tokenUrl := "https://apigatewaydigital.netinsurance.it/Identity/connect/token"
 	client := lib.ClientCredentials(os.Getenv("NETINS_ID"), os.Getenv("NETINS_SECRET"), scope, tokenUrl)
 
-	resp, errResp, err := netInsuranceQuotation(client, catNatRequest)
+	resp, errResp, err := netInsuranceQuotation(client, cnReq)
 	if err != nil {
 		log.Printf("error calling NetInsurance api: %s", err.Error())
 		return "", nil, err
@@ -60,7 +61,7 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		out, err = json.Marshal(errResp)
 	} else {
 		if resp.Result == "OK" {
-			appendQuotationToPolicy(reqPolicy, resp)
+			_ = resp.ToPolicy(reqPolicy)
 			out, err = json.Marshal(reqPolicy)
 		} else {
 			out, err = json.Marshal(resp)
@@ -75,238 +76,19 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	return string(out), out, err
 }
 
-func appendQuotationToPolicy(pol *models.Policy, quot net.CatNatResponseDTO) {
-	eOffer := make(map[string]*models.GuaranteValue)
-	fOffer := make(map[string]*models.GuaranteValue)
-	lOffer := make(map[string]*models.GuaranteValue)
-	for _, a := range quot.AssetDetail {
-		for _, g := range a.GuaranteeDetail {
-			if g.GuaranteeCode == "211/00" {
-				eOffer["default"].SumInsuredLimitOfIndemnity = g.GuaranteeGross
-			}
-			if g.GuaranteeCode == "211/01" {
-				eOffer["default"].SumInsured = g.GuaranteeGross
-			}
-			if g.GuaranteeCode == "211/02" {
-				eOffer["default"].LimitOfIndemnity = g.GuaranteeGross
-			}
-			if g.GuaranteeCode == "212/00" {
-				fOffer["default"].SumInsuredLimitOfIndemnity = g.GuaranteeGross
-			}
-			if g.GuaranteeCode == "212/01" {
-				fOffer["default"].SumInsured = g.GuaranteeGross
-			}
-			if g.GuaranteeCode == "212/02" {
-				fOffer["default"].LimitOfIndemnity = g.GuaranteeGross
-			}
-			if g.GuaranteeCode == "209/00" {
-				lOffer["default"].SumInsuredLimitOfIndemnity = g.GuaranteeGross
-			}
-			if g.GuaranteeCode == "209/01" {
-				lOffer["default"].SumInsured = g.GuaranteeGross
-			}
-			if g.GuaranteeCode == "209/02" {
-				lOffer["default"].LimitOfIndemnity = g.GuaranteeGross
-			}
-		}
-	}
-	for _, a := range pol.Assets {
-		for _, g := range a.Guarantees {
-			if g.Slug == "earthquake" {
-				g.Offer = eOffer
-			}
-			if g.Slug == "flood" {
-				g.Offer = fOffer
-			}
-			if g.Slug == "landslide" {
-				g.Offer = lOffer
-			}
-		}
-	}
-}
-
-func buildNetInsuranceDTO(policy *models.Policy) (net.CatNatRequestDTO, error) {
-	dto := net.CatNatRequestDTO{
-		ProductCode:       "007",
-		Date:              policy.StartDate.Format("2006-01-02"),
-		ExternalReference: policy.Uid,
-		DistributorCode:   "0155",
-		SecondLevelCode:   "0001",
-		ThirdLevelCode:    "00180",
-		Splitting:         "01",
-		Emission:          "no",
-		SalesChannel:      "3",
-	}
-
-	var atecoCode string
-	for _, v := range policy.Assets {
-		if v.Building != nil {
-			atecoCode = v.Building.Ateco
-		}
-	}
-	contr := net.Contractor{
-		PersonalDataType:          "2",
-		CompanyName:               policy.Contractor.Name,
-		VatNumber:                 policy.Contractor.VatCode,
-		FiscalCode:                policy.Contractor.FiscalCode,
-		AtecoCode:                 atecoCode,
-		Phone:                     policy.Contractor.Phone,
-		Email:                     policy.Contractor.Mail,
-		PrivacyConsentDate:        policy.StartDate.Format("2006-01-02"),
-		ProcessingConsent:         "no",
-		GenericMarketingConsent:   "no",
-		MarketingProfilingConsent: "no",
-		MarketingActivityConsent:  "no",
-		DocumentationFormat:       1,
-	}
-	if policy.Contractor.Residence != nil {
-		contr.Address = formatAddress(policy.Contractor.Residence)
-		contr.Locality = policy.Contractor.Residence.Locality
-		contr.CityCode = policy.Contractor.Residence.CityCode
-	}
-
-	dto.Contractor = contr
-
-	var legalRep net.LegalRepresentative
-	if policy.Contractors != nil {
-		for _, v := range *policy.Contractors {
-			if v.IsSignatory {
-				legalRep.Name = v.Name
-				legalRep.Surname = v.Surname
-				legalRep.FiscalCode = v.FiscalCode
-				legalRep.Phone = v.Phone
-				legalRep.Email = v.Mail
-				if v.Residence != nil {
-					legalRep.Address = formatAddress(v.Residence)
-					legalRep.PostalCode = v.Residence.PostalCode
-					legalRep.Locality = v.Residence.Locality
-					legalRep.CityCode = v.Residence.CityCode
-				}
-				break
-			}
-		}
-	}
-
-	dto.LegalRepresentative = legalRep
-
-	asset := net.AssetRequest{
-		ContractorAndTenant:  "si", // TODO
-		EarthquakeCoverage:   "no", // TODO
-		FloodCoverage:        "no", // TODO
-		EarthquakePurchase:   "no",
-		FloodPurchase:        "no",
-		LandSlidePurchase:    "no",
-		ConstructionMaterial: 0, // TODO
-		ConstructionYear:     0, // TODO
-		FloorNumber:          0, // TODO
-		LowestFloor:          0, // TODO
-		GuaranteeList:        make([]net.GuaranteeList, 0),
-	}
-
-	for _, v := range policy.Assets {
-		if v.Building != nil {
-			if v.Building.BuildingAddress != nil {
-				asset.PostalCode = v.Building.BuildingAddress.PostalCode
-				asset.Address = formatAddress(v.Building.BuildingAddress)
-				asset.Locality = v.Building.BuildingAddress.Locality
-				asset.CityCode = v.Building.BuildingAddress.CityCode
-			}
-		}
-		for _, g := range v.Guarantees {
-			if g.Slug == "earthquake" { // TODO check slug
-				asset.EarthquakePurchase = "si"
-				if g.Value != nil {
-					if g.Value.SumInsuredLimitOfIndemnity != 0 {
-						var gL net.GuaranteeList
-						gL.GuaranteeCode = "211/00"
-						gL.CapitalAmount = int(g.Value.SumInsuredLimitOfIndemnity)
-						asset.GuaranteeList = append(asset.GuaranteeList, gL)
-					}
-					if g.Value.SumInsured != 0 {
-						var gL net.GuaranteeList
-						gL.GuaranteeCode = "211/01"
-						gL.CapitalAmount = int(g.Value.SumInsured)
-						asset.GuaranteeList = append(asset.GuaranteeList, gL)
-					}
-					if g.Value.LimitOfIndemnity != 0 {
-						var gL net.GuaranteeList
-						gL.GuaranteeCode = "211/02"
-						gL.CapitalAmount = int(g.Value.LimitOfIndemnity)
-						asset.GuaranteeList = append(asset.GuaranteeList, gL)
-					}
-				}
-			}
-			if g.Slug == "flood" { // TODO check slug
-				asset.FloodPurchase = "si"
-				if g.Value != nil {
-					if g.Value.SumInsuredLimitOfIndemnity != 0 {
-						var gL net.GuaranteeList
-						gL.GuaranteeCode = "212/00"
-						gL.CapitalAmount = int(g.Value.SumInsuredLimitOfIndemnity)
-						asset.GuaranteeList = append(asset.GuaranteeList, gL)
-					}
-					if g.Value.SumInsured != 0 {
-						var gL net.GuaranteeList
-						gL.GuaranteeCode = "212/01"
-						gL.CapitalAmount = int(g.Value.SumInsured)
-						asset.GuaranteeList = append(asset.GuaranteeList, gL)
-					}
-					if g.Value.LimitOfIndemnity != 0 {
-						var gL net.GuaranteeList
-						gL.GuaranteeCode = "212/02"
-						gL.CapitalAmount = int(g.Value.LimitOfIndemnity)
-						asset.GuaranteeList = append(asset.GuaranteeList, gL)
-					}
-				}
-			}
-			if g.Slug == "landslide" { // TODO check slug
-				asset.LandSlidePurchase = "si"
-				if g.Value != nil {
-					if g.Value.SumInsuredLimitOfIndemnity != 0 {
-						var gL net.GuaranteeList
-						gL.GuaranteeCode = "209/00"
-						gL.CapitalAmount = int(g.Value.SumInsuredLimitOfIndemnity)
-						asset.GuaranteeList = append(asset.GuaranteeList, gL)
-					}
-					if g.Value.SumInsured != 0 {
-						var gL net.GuaranteeList
-						gL.GuaranteeCode = "209/01"
-						gL.CapitalAmount = int(g.Value.SumInsured)
-						asset.GuaranteeList = append(asset.GuaranteeList, gL)
-					}
-					if g.Value.LimitOfIndemnity != 0 {
-						var gL net.GuaranteeList
-						gL.GuaranteeCode = "209/02"
-						gL.CapitalAmount = int(g.Value.LimitOfIndemnity)
-						asset.GuaranteeList = append(asset.GuaranteeList, gL)
-					}
-				}
-			}
-		}
-	}
-
-	return dto, nil
-}
-
-func formatAddress(addr *models.Address) string {
-	res := addr.StreetName + "," + addr.StreetNumber
-
-	return res
-}
-
-func netInsuranceQuotation(cl *http.Client, dto net.CatNatRequestDTO) (net.CatNatResponseDTO, *net.ErrorResponse, error) {
+func netInsuranceQuotation(cl *http.Client, dto net.RequestDTO) (net.ResponseDTO, *net.ErrorResponse, error) {
 	url := "https://apigatewaydigital.netinsurance.it/PolizzeGateway24/emettiPolizza/441-029-007"
 	reqBodyBytes := new(bytes.Buffer)
 	err := json.NewEncoder(reqBodyBytes).Encode(dto)
 	if err != nil {
-		return net.CatNatResponseDTO{}, nil, err
+		return net.ResponseDTO{}, nil, err
 	}
 	r := reqBodyBytes.Bytes()
 	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(r))
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := cl.Do(req)
 	if err != nil {
-		return net.CatNatResponseDTO{}, nil, err
+		return net.ResponseDTO{}, nil, err
 	}
 	defer resp.Body.Close()
 
@@ -316,14 +98,14 @@ func netInsuranceQuotation(cl *http.Client, dto net.CatNatRequestDTO) (net.CatNa
 		}
 		if err = json.NewDecoder(resp.Body).Decode(&errResp); err != nil {
 			log.Println("error decoding catnat error response")
-			return net.CatNatResponseDTO{}, nil, err
+			return net.ResponseDTO{}, nil, err
 		}
-		return net.CatNatResponseDTO{}, &errResp, nil
+		return net.ResponseDTO{}, &errResp, nil
 	}
-	cndto := net.CatNatResponseDTO{}
+	cndto := net.ResponseDTO{}
 	if err = json.NewDecoder(resp.Body).Decode(&cndto); err != nil {
 		log.Println("error decoding catnat response")
-		return net.CatNatResponseDTO{}, nil, err
+		return net.ResponseDTO{}, nil, err
 	}
 
 	return cndto, nil, nil
