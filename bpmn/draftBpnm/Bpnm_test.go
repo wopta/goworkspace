@@ -486,7 +486,7 @@ func TestRecoverWithFunction(t *testing.T) {
 	}
 	err = f.RunAt("emit", "DEventWithRec")
 	if err != nil {
-		t.Fatalf("should have error")
+		t.Fatal(err)
 	}
 	exps := []string{
 		"init D",
@@ -516,7 +516,7 @@ func TestRecoverFromPanic(t *testing.T) {
 	}
 	err = f.RunAt("emit", "DEventWithRec")
 	if err != nil {
-		t.Fatalf("should have error")
+		t.Fatal(err)
 	}
 	exps := []string{
 		"init D rec",
@@ -545,7 +545,7 @@ func TestEndActivity(t *testing.T) {
 	}
 	err = f.RunAt("emit", "init")
 	if err != nil {
-		t.Fatalf("should have error")
+		t.Fatal(err)
 	}
 	exps := []string{
 		"init",
@@ -577,7 +577,7 @@ func TestDontCallEndAfterInit(t *testing.T) {
 	}
 	err = f.RunAt("emit", "init")
 	if err != nil {
-		t.Fatalf("should have error")
+		t.Fatal(err)
 	}
 	exps := []string{
 		"init",
@@ -609,7 +609,7 @@ func TestHandlerLessTrue(t *testing.T) {
 	}
 	err = f.RunAt("emit", "init")
 	if err != nil {
-		t.Fatalf("should have error")
+		t.Fatal(err)
 	}
 	exps := []string{
 		"init",
