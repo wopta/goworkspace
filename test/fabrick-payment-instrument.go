@@ -3,8 +3,8 @@ package test
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 
 	"github.com/wopta/goworkspace/lib"
@@ -30,8 +30,8 @@ func fabrickPaymentInstrument(r *http.Request) (string, interface{}, error) {
 		body FabrickPaymentInstrumentReq
 	)
 
-	log.SetPrefix("[FabrickPaymentInstrument] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("FabrickPaymentInstrument")
+	defer log.PopPrefix()
 	log.Println("Handler start -----------------------------------------------")
 
 	rawBody := lib.ErrorByte(io.ReadAll(r.Body))

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"regexp"
 	"strings"
@@ -12,6 +11,7 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/wiseproxy"
 )
@@ -25,8 +25,8 @@ func GetPolicyByFiscalCodeFx(w http.ResponseWriter, r *http.Request) (string, in
 		response           GetPolicesByFiscalCodeResponse
 	)
 
-	log.SetPrefix("[GetPolicyByFiscalCodeFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("GetPolicyByFiscalCodeFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 

@@ -3,11 +3,11 @@ package sellable
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"slices"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -16,20 +16,20 @@ func CommercialCombinedFx(_ http.ResponseWriter, r *http.Request) (string, any, 
 		policy *models.Policy
 		err    error
 	)
-	log.SetPrefix("[CommercialCombinedFx] ")
+	log.AddPrefix("CommercialCombinedFx")
 	log.Println("Handler start -----------------------------------------------")
 
 	defer func() {
 		r.Body.Close()
 		if err != nil {
-			log.Printf("error: %s", err.Error())
+			log.Error(err)
 		}
 		log.Println("Handler end ---------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 
 	if err = json.NewDecoder(r.Body).Decode(&policy); err != nil {
-		log.Println("error decoding request body")
+		log.ErrorF("error decoding request body")
 		return "", nil, err
 	}
 

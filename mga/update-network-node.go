@@ -2,8 +2,8 @@ package mga
 
 import (
 	"encoding/json"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 
 	"github.com/wopta/goworkspace/lib"
@@ -18,8 +18,8 @@ func UpdateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 		inputNode models.NetworkNode
 	)
 
-	log.SetPrefix("[UpdateNetworkNodeFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("UpdateNetworkNodeFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -28,7 +28,7 @@ func UpdateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	err = json.Unmarshal(body, &inputNode)
 	if err != nil {
-		log.Printf("error unmarshaling request: %s", err.Error())
+		log.ErrorF("error unmarshaling request: %s", err.Error())
 		return "", "", err
 	}
 
@@ -36,7 +36,7 @@ func UpdateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	err = network.UpdateNode(inputNode)
 	if err != nil {
-		log.Printf("error updating network node %s", inputNode.Uid)
+		log.ErrorF("error updating network node %s", inputNode.Uid)
 		return "", nil, err
 	}
 

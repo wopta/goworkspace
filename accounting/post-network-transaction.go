@@ -2,11 +2,11 @@ package accounting
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
@@ -15,8 +15,8 @@ import (
 )
 
 func CreateNetworkTransactionFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
-	log.SetPrefix("[CreateNetworkTransactionFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("CreateNetworkTransactionFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -26,13 +26,13 @@ func CreateNetworkTransactionFx(w http.ResponseWriter, r *http.Request) (string,
 
 	transaction := tr.GetTransactionByUid(transactionUid, origin)
 	if transaction == nil {
-		log.Println("could not retrieve transaction")
+		log.ErrorF("could not retrieve transaction")
 		return "", "", fmt.Errorf("error transaction %s not found", transactionUid)
 	}
 
 	err := CreateNetworkTransaction(transaction, origin)
 	if err != nil {
-		log.Printf("error creating network transactions: %s", err.Error())
+		log.ErrorF("error creating network transactions: %s", err.Error())
 	}
 
 	log.Println("Handler end -------------------------------------------------")

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"os"
 	"reflect"
 	"strconv"
@@ -145,6 +145,8 @@ func UpdateRowBigQuery(datasetID string, tableID string, params map[string]strin
 
 // use biquery query constructors
 func UpdateRowBigQueryV2(datasetId, tableId string, params map[string]interface{}, condition string) error {
+	log.AddPrefix("UpdateRowBigQueryV2")
+	defer log.PopPrefix()
 	var (
 		bytes bytes.Buffer
 		err   error
@@ -189,7 +191,7 @@ func UpdateRowBigQueryV2(datasetId, tableId string, params map[string]interface{
 	}
 	bytes.WriteString(condition)
 	queryString := bytes.String()
-	log.Printf("[UpdateRowBigQueryV2] query: %s", queryString)
+	log.Printf("query: %s", queryString)
 
 	client := getBigqueryClient()
 	defer client.Close()
@@ -197,16 +199,16 @@ func UpdateRowBigQueryV2(datasetId, tableId string, params map[string]interface{
 	query := client.Query(queryString)
 	job, err := query.Run(ctx)
 	if err != nil {
-		log.Printf("[UpdateRowBigQueryV2] error running query: %s", err.Error())
+		log.ErrorF("error running query: %s", err.Error())
 		return err
 	}
 	status, err := job.Wait(ctx)
 	if err != nil {
-		log.Printf("[UpdateRowBigQueryV2] error waiting for job to run: %s", err.Error())
+		log.ErrorF("error waiting for job to run: %s", err.Error())
 		return err
 	}
 	if err := status.Err(); err != nil {
-		log.Printf("[UpdateRowBigQueryV2] error on job: %s", err.Error())
+		log.ErrorF("error on job: %s", err.Error())
 		return err
 	}
 
@@ -229,14 +231,14 @@ func ExecuteQueryBigQuery(inputQuery string, params map[string]interface{}) erro
 	ctx := context.Background()
 	job, err := query.Run(ctx)
 	if err != nil {
-		log.Printf("error running query: %s", err.Error())
+		log.ErrorF("error running query: %s", err.Error())
 		return err
 	}
 
 	// Wait for the query to complete and print any errors.
 	status, err := job.Wait(ctx)
 	if err != nil {
-		log.Printf("Failed to wait for job completion: %v", err)
+		log.ErrorF("Failed to wait for job completion: %v", err)
 	}
 	if err = status.Err(); err != nil {
 		log.Printf("Query execution error: %v", err)
@@ -265,27 +267,29 @@ func DeleteRowBigQuery(datasetId, tableId, whereClause string) error {
 	var (
 		b bytes.Buffer
 	)
+	log.AddPrefix("DeleteRowBigQuery")
+	defer log.PopPrefix()
 
 	client := getBigqueryClient()
 	ctx := context.Background()
 	defer client.Close()
 
 	b.WriteString(fmt.Sprintf("DELETE FROM `%s.%s` %s", datasetId, tableId, whereClause))
-	log.Printf("[DeleteRowBigQuery] query: %s", b.String())
+	log.Printf("query: %s", b.String())
 
 	query := client.Query(b.String())
 	job, err := query.Run(ctx)
 	if err != nil {
-		log.Printf("[DeleteRowBigQuery] error running query: %s", err.Error())
+		log.ErrorF("error running query: %s", err.Error())
 		return err
 	}
 	status, err := job.Wait(ctx)
 	if err != nil {
-		log.Printf("[DeleteRowBigQuery] error waiting for job to run: %s", err.Error())
+		log.ErrorF("error waiting for job to run: %s", err.Error())
 		return err
 	}
 	if err := status.Err(); err != nil {
-		log.Printf("[DeleteRowBigQuery] error on job: %s", err.Error())
+		log.ErrorF("error on job: %s", err.Error())
 		return err
 	}
 

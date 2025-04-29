@@ -2,8 +2,8 @@ package mga
 
 import (
 	"encoding/json"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"time"
 
@@ -33,8 +33,8 @@ func CreateNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, 
 		networkNode *models.NetworkNode
 	)
 
-	log.SetPrefix("[CreateNetworkNodeInviteFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("CreateNetworkNodeInviteFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -45,7 +45,7 @@ func CreateNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, 
 
 	err := json.Unmarshal(body, &req)
 	if err != nil {
-		log.Println("error unmarshalling body")
+		log.ErrorF("error unmarshalling body")
 		return "", "", err
 	}
 
@@ -63,7 +63,7 @@ func CreateNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, 
 
 	networkNode, err = network.GetNodeByUid(req.NetworkNodeUid)
 	if err != nil {
-		log.Printf("error getting network node %s from Firestore...", req.NetworkNodeUid)
+		log.ErrorF("error getting network node %s from Firestore...", req.NetworkNodeUid)
 		return "", "", err
 	}
 
@@ -71,7 +71,7 @@ func CreateNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, 
 
 	inviteUid, err := createNetworkNodeInvite(origin, networkNode.Uid, authToken.UserID)
 	if err != nil {
-		log.Printf("error generating invite for network node %s", req.NetworkNodeUid)
+		log.ErrorF("error generating invite for network node %s", req.NetworkNodeUid)
 		return "", "", err
 	}
 
@@ -97,15 +97,16 @@ func createNetworkNodeInvite(origin, networkNodeUid, creatorUid string) (string,
 		CreationDate:   time.Now().UTC(),
 		Expiration:     time.Now().UTC().Add(time.Hour * 168),
 	}
-
-	log.Printf("[createNetworkNodeInvite] saving network node invite %s to Firestore...", inviteUid)
+	log.AddPrefix("CreateNetworkNodeInvite")
+	defer log.PopPrefix()
+	log.Printf("saving network node invite %s to Firestore...", inviteUid)
 
 	err := lib.SetFirestoreErr(fireInvite, inviteUid, invite)
 	if err != nil {
-		log.Printf("[createNetworkNodeInvite] error saving network node invite %s to Firestore", inviteUid)
+		log.ErrorF("error saving network node invite %s to Firestore", inviteUid)
 		return "", err
 	}
 
-	log.Printf("[createNetworkNodeInvite] network node invite %s saved", inviteUid)
+	log.Printf("network node invite %s saved", inviteUid)
 	return inviteUid, nil
 }

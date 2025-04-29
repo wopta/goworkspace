@@ -3,13 +3,13 @@ package policy
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -31,14 +31,14 @@ func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interf
 		req    UploadPolicyMediaReq
 	)
 
-	log.SetPrefix("[UploadPolicyMediaFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("UploadPolicyMediaFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
 	err = r.ParseMultipartForm(32 << 20)
 	if err != nil {
-		log.Printf("error parsing multipart form: %s", err.Error())
+		log.ErrorF("error parsing multipart form: %s", err.Error())
 		return "", nil, err
 	}
 	req.PolicyUid = r.PostFormValue("policyUid")
@@ -51,7 +51,7 @@ func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interf
 	file, _, err := r.FormFile("bytes")
 
 	if err != nil {
-		log.Printf("error getting file from request: %s", err.Error())
+		log.ErrorF("error getting file from request: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -66,7 +66,7 @@ func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interf
 	defer file.Close()
 	req.Bytes, err = io.ReadAll(file)
 	if err != nil {
-		log.Printf("error reading file from request: %s", err.Error())
+		log.ErrorF("error reading file from request: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -74,12 +74,12 @@ func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	docSnap, err := lib.GetFirestoreErr(lib.PolicyCollection, req.PolicyUid)
 	if err != nil {
-		log.Printf("error getting policy %s from Firestore: %s", req.PolicyUid, err.Error())
+		log.ErrorF("error getting policy %s from Firestore: %s", req.PolicyUid, err.Error())
 		return "", nil, err
 	}
 	err = docSnap.DataTo(&policy)
 	if err != nil {
-		log.Printf("error converting docsnap to policy: %s", err.Error())
+		log.ErrorF("error converting docsnap to policy: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -106,7 +106,7 @@ func putAttachment(policy *models.Policy, req UploadPolicyMediaReq) error {
 	gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), fmt.Sprintf("assets/users/%s/%s",
 		policy.Contractor.Uid, filename), req.Bytes)
 	if err != nil {
-		log.Printf("error uploading %s to Google Bucket: %s", filename, err.Error())
+		log.ErrorF("error uploading %s to Google Bucket: %s", filename, err.Error())
 		return err
 	}
 
@@ -129,7 +129,7 @@ func putAttachment(policy *models.Policy, req UploadPolicyMediaReq) error {
 
 	err = lib.SetFirestoreErr(lib.PolicyCollection, policy.Uid, policy)
 	if err != nil {
-		log.Printf("error saving policy %s to Firestore: %s", policy.Uid, err.Error())
+		log.ErrorF("error saving policy %s to Firestore: %s", policy.Uid, err.Error())
 		return err
 	}
 	log.Printf("policy %s saved into Firestore", policy.Uid)

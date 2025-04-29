@@ -3,8 +3,8 @@ package broker
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"regexp"
 	"strings"
@@ -24,8 +24,8 @@ func PolicyFiscalcodeFx(w http.ResponseWriter, r *http.Request) (string, interfa
 		response           GetPolicesByFiscalCodeResponse
 	)
 
-	log.SetPrefix("[PolicyFiscalcodeFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("PolicyFiscalcodeFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 

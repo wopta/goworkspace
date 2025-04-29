@@ -4,8 +4,8 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -33,7 +33,7 @@ func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		transactions  []models.Transaction
 		eventFilename string
 	)
-	log.SetPrefix("ProductTrackOutFx ")
+	log.AddPrefix("ProductTrackOutFx ")
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
@@ -377,7 +377,7 @@ func BigQuery[T any](from time.Time, to time.Time, db Database) []T {
 	log.Println(query)
 	res, err := lib.QueryParametrizedRowsBigQuery[T](query, params)
 	if err != nil {
-		log.Printf("error fetching ancestors from BigQuery for node %s: %s", value, err.Error())
+		log.ErrorF("error fetching ancestors from BigQuery for node %s: %s", value, err.Error())
 		return nil
 	}
 	lib.CheckError(e)

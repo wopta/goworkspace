@@ -2,10 +2,11 @@ package enrich
 
 import (
 	"encoding/json"
-	"log"
+	"fmt"
 	"net/http"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 )
 
 func CitiesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -14,20 +15,20 @@ func CitiesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		result []City
 	)
 
-	log.SetPrefix("[CitiesFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("CitiesFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
 	cities = getCity()
 
 	df := lib.CsvToDataframe(cities)
-	log.Println(len(df.Records()))
+	log.Println(fmt.Sprint(len(df.Records())))
 
 	for k, v := range df.Records() {
 		if k != 0 {
-			log.Println(v)
-			log.Println(k)
+			log.Println(fmt.Sprint(v))
+			log.Println(fmt.Sprint(k))
 			sub := City{
 				Istat:        v[0],
 				Municipality: v[1],

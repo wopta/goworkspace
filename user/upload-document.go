@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -14,14 +13,15 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 )
 
 func UploadDocumentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var identityDocument models.IdentityDocument
 
-	log.SetPrefix("[UploadDocumentFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("UploadDocumentFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 

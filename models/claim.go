@@ -2,12 +2,12 @@ package models
 
 import (
 	"encoding/json"
-	"log"
 	"strings"
 	"time"
 
 	"cloud.google.com/go/bigquery"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 )
 
 func UnmarshalClaim(data []byte) (Claim, error) {

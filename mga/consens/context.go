@@ -2,7 +2,7 @@ package consens
 
 import (
 	"context"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"time"
 )
 

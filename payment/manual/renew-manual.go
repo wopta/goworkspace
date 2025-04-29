@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"time"
 
@@ -31,13 +31,13 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 		flowName    string = models.ECommerceFlow
 	)
 
-	log.SetPrefix("[RenewManualPaymentFx] ")
+	log.AddPrefix("RenewManualPaymentFx")
 	defer func() {
 		if err != nil {
-			log.Printf("error: %s", err)
+			log.ErrorF("error: %s", err)
 		}
 		log.Println("Handler end -----------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 	log.Println("Handler start ----------------------------------------------")
 

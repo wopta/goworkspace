@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"os"
 	"strings"
 	"text/template"
@@ -205,9 +205,10 @@ func getMailAttachments(policy models.Policy, attachmentNames []string) []Attach
 		rawDoc []byte
 		err    error
 	)
-
+	log.AddPrefix("getMailAttachments")
+	defer log.PopPrefix()
 	if policy.Attachments == nil || len(*policy.Attachments) == 0 {
-		log.Println("[getMailAttachments] policy has no attachment")
+		log.Println("policy has no attachment")
 		return at
 	}
 
@@ -221,7 +222,7 @@ func getMailAttachments(policy models.Policy, attachmentNames []string) []Attach
 				rawDoc, err = lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), attachment.Link)
 			}
 			if err != nil {
-				log.Printf("[getMailAttachments] error reading document %s from google storage: %s", attachment.Name, err.Error())
+				log.ErrorF("error reading document %s from google storage: %s", attachment.Name, err.Error())
 				return nil
 			}
 			attachment.Byte = base64.StdEncoding.EncodeToString(rawDoc)

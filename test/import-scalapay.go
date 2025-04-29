@@ -1,7 +1,7 @@
 package test
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -20,8 +20,8 @@ func ImportScalapay(w http.ResponseWriter, r *http.Request) (string, interface{}
 		usersTable    = "bank_account_users_scalapay"
 	)
 	var e error
-	log.SetPrefix("[ImportScalapay] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("ImportScalapay")
+	defer log.PopPrefix()
 
 	log.Println(" ----start -----------------------------------------------")
 

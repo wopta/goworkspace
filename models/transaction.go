@@ -2,7 +2,7 @@ package models
 
 import (
 	"encoding/json"
-	"log"
+	"fmt"
 	"strings"
 	"time"
 
@@ -10,6 +10,7 @@ import (
 	"cloud.google.com/go/civil"
 	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"google.golang.org/api/iterator"
 )
 
@@ -84,7 +85,7 @@ func TransactionToListData(query *firestore.DocumentIterator) []Transaction {
 		lib.CheckError(e)
 		result = append(result, value)
 
-		log.Println(len(result))
+		log.Println(fmt.Sprint(len(result)))
 	}
 	return result
 }
@@ -115,7 +116,7 @@ func (t *Transaction) Normalize() {
 func (t *Transaction) BigQueryParse() {
 	data, err := json.Marshal(t)
 	if err != nil {
-		log.Printf("ERROR Transaction %s marshal: %v", t.Uid, err)
+		log.ErrorF("error Transaction %s marshal: %v", t.Uid, err)
 		return
 	}
 
@@ -134,7 +135,7 @@ func (t *Transaction) BigQuerySave(origin string) {
 
 	err := lib.InsertRowsBigQuery(WoptaDataset, lib.TransactionsCollection, t)
 	if err != nil {
-		log.Println("ERROR Transaction "+t.Uid+" save BigQuery: ", err)
+		log.ErrorF("ERROR Transaction "+t.Uid+" save BigQuery: ", err)
 		return
 	}
 	log.Println("Transaction BigQuery saved!")

@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"time"
 
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"google.golang.org/api/iterator"
 )
 
@@ -131,9 +131,11 @@ func FirestoreDocumentToAgent(query *firestore.DocumentIterator) (*Agent, error)
 }
 
 func UpdateAgentPortfolio(policy *Policy, origin string) error {
-	log.Printf("[updateAgentPortfolio] Policy %s", policy.Uid)
+	log.AddPrefix("UpdateAgentPortfolio")
+	defer log.PopPrefix()
+	log.Printf("Policy %s", policy.Uid)
 	if policy.AgentUid == "" {
-		log.Printf("[updateAgentPortfolio] ERROR agent not set")
+		log.ErrorF("agent not set")
 		return errors.New("agent not set")
 	}
 
@@ -141,12 +143,12 @@ func UpdateAgentPortfolio(policy *Policy, origin string) error {
 	fireAgent := lib.GetDatasetByEnv(origin, AgentCollection)
 	docsnap, err := lib.GetFirestoreErr(fireAgent, policy.AgentUid)
 	if err != nil {
-		log.Printf("[updateAgentPortfolio] ERROR getting agent from firestore: %s", err.Error())
+		log.ErrorF("ERROR getting agent from firestore: %s", err.Error())
 		return err
 	}
 	err = docsnap.DataTo(&agent)
 	if err != nil {
-		log.Printf("[updateAgentPortfolio] ERROR parsing agent: %s", err.Error())
+		log.ErrorF("ERROR parsing agent: %s", err.Error())
 		return err
 	}
 	agent.Policies = append(agent.Policies, policy.Uid)
@@ -158,7 +160,7 @@ func UpdateAgentPortfolio(policy *Policy, origin string) error {
 	agent.UpdatedDate = time.Now().UTC()
 	err = lib.SetFirestoreErr(fireAgent, agent.Uid, agent)
 	if err != nil {
-		log.Printf("[updateAgentPortfolio] ERROR saving agent: %s", err.Error())
+		log.ErrorF("ERROR saving agent: %s", err.Error())
 		return err
 	}
 
@@ -168,9 +170,12 @@ func UpdateAgentPortfolio(policy *Policy, origin string) error {
 }
 
 func IsPolicyInAgentPortfolio(agentUid, policyUid string) bool {
+	log.AddPrefix("IsPolicyInAgentPortfolio")
+	defer log.PopPrefix()
+
 	agent, err := GetAgentByUid(agentUid)
 	if err != nil {
-		log.Printf("[IsPolicyInAgentPortfolio] error retrieving agent: %s", err.Error())
+		log.ErrorF("error retrieving agent: %s", err.Error())
 		return false
 	}
 

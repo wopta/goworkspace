@@ -3,13 +3,13 @@ package models
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"time"
 
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/civil"
 	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"google.golang.org/api/iterator"
 	latlng "google.golang.org/genproto/googleapis/type/latlng"
 )
@@ -319,7 +319,7 @@ func UsersToListData(query *firestore.DocumentIterator) []User {
 	for {
 		d, err := query.Next()
 		if err != nil {
-			log.Println("error")
+			log.ErrorF("error")
 			if err == iterator.Done {
 				log.Println("iterator.Done")
 				break

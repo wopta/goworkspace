@@ -2,7 +2,7 @@ package broker
 
 import (
 	"errors"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"time"
 
@@ -22,18 +22,18 @@ const (
 
 func DuplicateFx(_ http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
-		err            error
-		policy models.Policy
-		responseBytes  []byte
+		err           error
+		policy        models.Policy
+		responseBytes []byte
 	)
 
-	log.SetPrefix("[DuplicateFx]")
+	log.AddPrefix("DuplicateFx")
 	defer func() {
 		if err != nil {
-			log.Printf("error: %s", err.Error())
+			log.ErrorF("error: %s", err.Error())
 		}
 		log.Println("Handler end ---------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 	log.Println("Handler start -----------------------------------------------")
 
@@ -61,13 +61,13 @@ func DuplicateFx(_ http.ResponseWriter, r *http.Request) (string, any, error) {
 	policy.Updated = now
 
 	if err = lib.SetFirestoreErr(lib.PolicyCollection, policy.Uid, policy); err != nil {
-		log.Println("error updating duplicated policy")
+		log.ErrorF("error updating duplicated policy")
 		return "", nil, err
 	}
 	policy.BigquerySave("")
 
 	if responseBytes, err = policy.Marshal(); err != nil {
-		log.Println("error marshalling response")
+		log.ErrorF("error marshalling response")
 		return "", nil, err
 	}
 

@@ -3,7 +3,7 @@ package auth
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 
@@ -21,8 +21,8 @@ func JwtAuaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		responseSsoJwt ResponseSsoJwt
 	)
 
-	log.SetPrefix("[JwtAuaFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("JwtAuaFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -50,12 +50,12 @@ func JwtAuaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 				node[0].AuthId = userfire.UID
 				e = node[0].SaveFirestore()
 				if e != nil {
-					log.Printf("[JwtFx] error updating node %s in Firestore: %s", node[0].Uid, e.Error())
+					log.ErrorF("error updating node %s in Firestore: %s", node[0].Uid, e.Error())
 					return "", nil, e
 				}
 				e = node[0].SaveBigQuery("")
 				if e != nil {
-					log.Printf("[JwtFx] error updating node %s in BigQuery: %s", node[0].Uid, e.Error())
+					log.ErrorF("error updating node %s in BigQuery: %s", node[0].Uid, e.Error())
 					return "", nil, e
 				}
 

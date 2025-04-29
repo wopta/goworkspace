@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -14,6 +13,7 @@ import (
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/payment"
@@ -48,13 +48,14 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 		sendMail    = false
 	)
 
-	log.SetPrefix("[DraftFx] ")
+	log.AddPrefix("[DraftFx] ")
 	defer func() {
 		collectionPrefix = ""
 		if err != nil {
-			log.Printf("error: %s", err.Error())
+			log.Error(err)
 		}
 		log.Println("Handler end -------------------------------------------------")
+		log.PopPrefix()
 	}()
 
 	log.Println("Handler start -----------------------------------------------")
@@ -69,7 +70,7 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	if req.Date != "" {
 		tmpDate, err := time.Parse(time.DateOnly, req.Date)
 		if err != nil {
-			log.Printf("error parsing request date: %s", err.Error())
+			log.ErrorF("error parsing request date: %s", err.Error())
 			return "", nil, err
 		}
 		today = tmpDate
@@ -165,7 +166,7 @@ func getQueryParameters(r *http.Request) (policyType, quoteType string, err erro
 
 	quoteType = r.URL.Query().Get("quoteType")
 	if quoteType == "" {
-		log.Printf("no quoteType specified")
+		log.ErrorF("no quoteType specified")
 		return "", "", errors.New("no quoteType specified")
 	}
 	return policyType, quoteType, nil
@@ -236,7 +237,7 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]mo
 
 	policies, err = lib.QueryParametrizedRowsBigQuery[models.Policy](query.String(), params)
 	if err != nil {
-		log.Printf("error getting policies: %v", err)
+		log.ErrorF("error getting policies: %v", err)
 		return nil, err
 	}
 
@@ -371,7 +372,7 @@ func getPolicyMailDataMap(ps []models.Policy) map[string]NodeFlowRelation {
 	)
 
 	if warrants, err = network.GetWarrants(); err != nil {
-		log.Printf("error loading warrants: %s", err)
+		log.ErrorF("error loading warrants: %s", err)
 		return nil
 	}
 
@@ -387,7 +388,7 @@ func getPolicyMailDataMap(ps []models.Policy) map[string]NodeFlowRelation {
 		if _, ok := nodeMap[p.ProducerUid]; !ok {
 			nn := network.GetNetworkNodeByUid(p.ProducerUid)
 			if nn == nil {
-				log.Printf("error loading networkNode: %s", p.ProducerUid)
+				log.ErrorF("error loading networkNode: %s", p.ProducerUid)
 				return nil
 			}
 			currentNode = *nn

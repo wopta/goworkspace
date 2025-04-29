@@ -2,7 +2,7 @@ package document
 
 import (
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"strconv"
 	"time"
 

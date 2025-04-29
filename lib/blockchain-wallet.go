@@ -7,7 +7,7 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/binary"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"math/big"
 
 	"golang.org/x/crypto/ripemd160"
@@ -126,7 +126,8 @@ func IntToHex(num int64) []byte {
 	buff := new(bytes.Buffer)
 	err := binary.Write(buff, binary.BigEndian, num)
 	if err != nil {
-		log.Panic(err)
+		log.Error(err)
+		panic(err)
 	}
 
 	return buff.Bytes()

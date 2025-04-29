@@ -3,8 +3,8 @@ package broker
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"time"
 
@@ -24,14 +24,14 @@ func InitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		req InitReq
 	)
 
-	log.SetPrefix("[InitFx] ")
+	log.AddPrefix("InitFx")
 	defer func() {
 		r.Body.Close()
 		if err != nil {
-			log.Printf("error: %s", err.Error())
+			log.ErrorF("error: %s", err.Error())
 		}
 		log.Println("Handler end ----------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 
 	log.Println("Handler start -----------------------------------------------")

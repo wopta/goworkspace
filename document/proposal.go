@@ -3,8 +3,8 @@ package document
 import (
 	"encoding/base64"
 	"encoding/json"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 
 	"github.com/go-pdf/fpdf"
@@ -24,18 +24,19 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		product     *models.Product
 		networkNode *models.NetworkNode
 	)
-
-	log.Println("[ProposalFx] handler start ---------------------------------")
+	log.AddPrefix("ProposalFx")
+	defer log.PopPrefix()
+	log.Println("handler start ---------------------------------")
 
 	origin := r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
-	log.Printf("[ProposalFx] body: %s", string(body))
+	log.Printf("body: %s", string(body))
 
 	err = json.Unmarshal(body, &policy)
 	if err != nil {
-		log.Printf("[ProposalFx] error unmarshaling request body: %s", err.Error())
+		log.ErrorF("error unmarshaling request body: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -50,7 +51,7 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	respJson, err := json.Marshal(result)
 
-	log.Println("[ProposalFx] handler end ---------------------------------")
+	log.Println("handler end ---------------------------------")
 
 	return string(respJson), result, err
 }
@@ -62,43 +63,44 @@ func Proposal(origin string, policy *models.Policy, networkNode *models.NetworkN
 		rawDoc   []byte
 		filename string
 	)
-
-	log.Println("[Proposal] function start ----------------------------------")
+	log.AddPrefix("Proposal")
+	defer log.PopPrefix()
+	log.Println("function start ----------------------------------")
 
 	rawPolicy, _ := policy.Marshal()
-	log.Printf("[Proposal] policy: %s", string(rawPolicy))
+	log.Printf("policy: %s", string(rawPolicy))
 
-	log.Printf("[Proposal] generating proposal document for proposal n. %d", policy.ProposalNumber)
+	log.Printf("generating proposal document for proposal n. %d", policy.ProposalNumber)
 
 	pdf = initFpdf()
 
 	switch policy.Name {
 	case models.LifeProduct:
-		log.Println("[Proposal] call lifeProposal...")
+		log.Println("call lifeProposal...")
 		filename, rawDoc = lifeProposal(pdf, origin, policy, networkNode, product)
 	case models.GapProduct:
-		log.Println("[Proposal] call gapProposal...")
+		log.Println("call gapProposal...")
 		filename, rawDoc = gapProposal(pdf, origin, policy, networkNode)
 	case models.PersonaProduct:
-		log.Println("[Proposal] call personaProposal...")
+		log.Println("call personaProposal...")
 		filename, rawDoc = personaProposal(pdf, policy, networkNode, product)
 	case models.CommercialCombinedProduct:
 		generator := contract.NewCommercialCombinedGenerator(engine.NewFpdf(), policy, networkNode, *product, true)
 		rawDoc, err = generator.Contract()
 		if err != nil {
-			log.Printf("error generating contract: %v", err)
+			log.ErrorF("error generating contract: %v", err)
 			return nil
 		}
 		filename, err = generator.Save(rawDoc)
 		if err != nil {
-			log.Printf("error generating contract: %v", err)
+			log.ErrorF("error generating contract: %v", err)
 			return nil
 		}
 	}
 
-	log.Printf("[Proposal] proposal document generated for proposal n. %d", policy.ProposalNumber)
+	log.Printf("proposal document generated for proposal n. %d", policy.ProposalNumber)
 
-	log.Println("[Proposal] function end ----------------------------------")
+	log.Println("function end ----------------------------------")
 
 	return &DocumentResponse{
 		LinkGcs: filename,
@@ -111,22 +113,23 @@ func lifeProposal(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkN
 		rawDoc   []byte
 		filename string
 	)
-
-	log.Println("[lifeProposal] function start ------------------------------")
+	log.AddPrefix("lifeProposal")
+	defer log.PopPrefix()
+	log.Println("function start ------------------------------")
 
 	switch policy.ProductVersion {
 	case models.ProductV1:
-		log.Println("[lifeProposal] life v1")
+		log.Println("life v1")
 		filename, rawDoc = lifeAxaProposalV1(pdf, origin, policy, networkNode, product)
 	case models.ProductV2:
-		log.Println("[lifeProposal] life v2")
+		log.Println("life v2")
 		pdf := engine.NewFpdf()
 		gen := contract.NewLifeGenerator(pdf, policy, networkNode, *product, true)
 		gen.Generate()
 		filename, rawDoc = lifeAxaProposalV2(pdf.GetPdf(), origin, policy, networkNode, product)
 	}
 
-	log.Println("[lifeProposal] function end --------------------------------")
+	log.Println("function end --------------------------------")
 
 	return filename, rawDoc
 }
@@ -136,12 +139,12 @@ func gapProposal(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNo
 		filename string
 		out      []byte
 	)
-
-	log.Println("[gapProposal] function start -------------------------------")
+	log.AddPrefix("gapProposal")
+	log.Println("function start -------------------------------")
 
 	filename, out = gapSogessurProposalV1(pdf, origin, policy, networkNode)
 
-	log.Println("[gapProposal] function end ---------------------------------")
+	log.Println("function end ---------------------------------")
 
 	return filename, out
 }
@@ -151,12 +154,13 @@ func personaProposal(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.
 		filename string
 		out      []byte
 	)
-
-	log.Println("[personaProposal] function start ---------------------------")
+	log.AddPrefix("personaProposal")
+	defer log.PopPrefix()
+	log.Println("function start ---------------------------")
 
 	filename, out = personaGlobalProposalV1(pdf, policy, networkNode, product)
 
-	log.Println("[personaProposal] function end -----------------------------")
+	log.Println("function end -----------------------------")
 
 	return filename, out
 }

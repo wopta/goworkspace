@@ -2,11 +2,11 @@ package models
 
 import (
 	"encoding/json"
-	"log"
 	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"google.golang.org/api/iterator"
 )
 
@@ -305,7 +305,7 @@ func ProductToListData(query *firestore.DocumentIterator) []Product {
 			if err == iterator.Done {
 				break
 			}
-			log.Println(err)
+			log.Error(err)
 		}
 		var value Product
 		e := d.DataTo(&value)

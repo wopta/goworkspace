@@ -2,7 +2,7 @@ package mga
 
 import (
 	"encoding/json"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
 	"github.com/wopta/goworkspace/models"
@@ -43,15 +43,15 @@ func GetWarrantsFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		resp getWarrantsResponse
 	)
 
-	log.SetPrefix("[GetWarrantsFx] ")
+	log.AddPrefix("[GetWarrantsFx] ")
 	log.Println("Handler start -----------------------------------------------")
 
 	defer func() {
 		if err != nil {
-			log.Printf("error: %s", err.Error())
+			log.ErrorF("error: %s", err.Error())
 		}
 		log.Println("Handler end -------------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 
 	retrievedWarrant, err := network.GetWarrants()

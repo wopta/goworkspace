@@ -4,20 +4,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 )
 
 func TestPostFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var request interface{}
 
-	log.SetPrefix("[TestPostFx] ")
-	defer log.SetPrefix("")
-	log.Println("Handler start -----------------------------------------------")
+	log.AddPrefix("TestPostFx")
+	defer log.PopPrefix()
+	log.Printf("Handler start -----------------------------------------------")
 
 	operation := chi.URLParam(r, "operation")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
@@ -51,7 +51,7 @@ func TestPostFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		return fabrickGetPaymentInstruments(req)
 	}
 
-	log.Println("Handler end -------------------------------------------------")
+	log.Printf("Handler end -------------------------------------------------")
 
 	return "{}", nil, nil
 }
@@ -70,7 +70,7 @@ func fabrickGetPaymentInstruments(req fabrickTestRequest) (string, interface{}, 
 
 	request, err := http.NewRequest(http.MethodGet, urlstring, nil)
 	if err != nil {
-		log.Printf("error generating fabrick payment request: %s", err.Error())
+		log.ErrorF("error generating fabrick payment request: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -82,8 +82,7 @@ func fabrickGetPaymentInstruments(req fabrickTestRequest) (string, interface{}, 
 
 	res, err := lib.RetryDo(request, 5, 10)
 	if err != nil || res == nil || res.StatusCode != 200 {
-		log.Println(err)
-		log.Println(res)
+		log.Error(err)
 		return "error", nil, err
 	}
 

@@ -3,10 +3,10 @@ package reserved
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 	prd "github.com/wopta/goworkspace/product"
 )
@@ -19,7 +19,10 @@ func (*ByAssetPerson) isCovered(w *PolicyReservedWrapper) (bool, []models.Policy
 		coveredPolicies = make([]models.Policy, 0)
 		//lastPaidTransaction *models.Transaction
 	)
-	log.Println("[ByAssetPerson.isCovered] start -----------------------------")
+	log.AddPrefix("ByAssetPerson.isCovered")
+	defer log.PopPrefix()
+
+	log.Println("start -----------------------------")
 
 	query := fmt.Sprintf(
 		"SELECT %s FROM `%s.%s` WHERE name = @name AND companyEmit = true AND "+
@@ -37,13 +40,13 @@ func (*ByAssetPerson) isCovered(w *PolicyReservedWrapper) (bool, []models.Policy
 		"fiscalCode": w.Policy.Assets[0].Person.FiscalCode,
 	}
 
-	log.Printf("[ByAssetPerson.isCovered] executing query %s with params %s", query, params)
+	log.Printf("executing query %s with params %s", query, params)
 
 	policies, err := lib.QueryParametrizedRowsBigQuery[models.Policy](query, params)
 	if err != nil {
-		log.Printf("[ByAssetPerson.isCovered] error getting policies: %s", err.Error())
+		log.ErrorF("error getting policies: %s", err.Error())
 	}
-	log.Printf("[ByAssetPerson.isCovered] found %d policies", len(policies))
+	log.Printf("found %d policies", len(policies))
 
 	if len(policies) > 0 {
 		result = true
@@ -79,14 +82,15 @@ func (*ByAssetPerson) isCovered(w *PolicyReservedWrapper) (bool, []models.Policy
 		}
 	*/
 
-	log.Printf("[ByAssetPerson.isCovered] result '%t'", result)
-	log.Println("[ByAssetPerson.isCovered] end -------------------------------")
+	log.Printf("result '%t'", result)
+	log.Println("end -------------------------------")
 
 	return result, coveredPolicies, nil
 }
 
 func lifeReserved(policy *models.Policy) (bool, *models.ReservedInfo) {
-	log.Println("[lifeReserved]")
+	log.AddPrefix("LifeReserved")
+	defer log.PopPrefix()
 
 	var output = ReservedRuleOutput{
 		IsReserved: false,
@@ -99,13 +103,13 @@ func lifeReserved(policy *models.Policy) (bool, *models.ReservedInfo) {
 	fx := new(models.Fx)
 	rulesFile := lib.GetRulesFileV2(policy.Name, policy.ProductVersion, "reserved")
 	input := getInputData(policy)
-	log.Printf("[lifeReserved] input %v", string(input))
+	log.Printf("input %v", string(input))
 	data := getReservedData(policy)
-	log.Printf("[lifeReserved] data %v", string(data))
+	log.Printf("data %v", string(data))
 
 	ruleOutputString, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, &output, input, data)
 
-	log.Printf("[lifeReserved] rules output: %s", ruleOutputString)
+	log.Printf("rules output: %s", ruleOutputString)
 
 	return ruleOutput.(*ReservedRuleOutput).IsReserved, ruleOutput.(*ReservedRuleOutput).ReservedInfo
 }

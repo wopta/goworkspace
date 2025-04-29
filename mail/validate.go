@@ -3,8 +3,8 @@ package mail
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"os"
 
@@ -16,8 +16,8 @@ import (
 func ValidateFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var result map[string]string
 
-	log.SetPrefix("[ValidateFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("ValidateFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -99,7 +99,7 @@ func ToListData(query *firestore.DocumentIterator) ([]MailValidate, []string) {
 		d, err := query.Next()
 
 		if err != nil {
-			log.Println("error")
+			log.ErrorF("error")
 			if err == iterator.Done {
 				log.Println("MailValidate ToListData iterator.Done")
 				break

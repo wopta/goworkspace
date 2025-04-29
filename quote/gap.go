@@ -5,13 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/go-gota/gota/dataframe"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/sellable"
@@ -23,8 +23,8 @@ func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 		warrant *models.Warrant
 	)
 
-	log.SetPrefix("[GapFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("GapFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -59,6 +59,9 @@ func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 }
 
 func Gap(policy *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant, flow string) {
+	log.AddPrefix("Gap")
+	defer log.PopPrefix()
+
 	policy.StartDate = lib.SetDateToStartOfDay(policy.StartDate)
 
 	product, err := sellable.Gap(policy, channel, networkNode, warrant)
@@ -70,19 +73,21 @@ func Gap(policy *models.Policy, channel string, networkNode *models.NetworkNode,
 
 	calculateGapOfferPrices(policy, *product)
 
-	log.Println("[Gap] apply consultacy price")
-	
+	log.Println("apply consultacy price")
+
 	addConsultacyPrice(policy, product)
 
 	removeOfferRate(policy, availableRates)
 }
 
 func calculateGapOfferPrices(policy *models.Policy, product models.Product) {
+	log.AddPrefix("CalculateGapOfferPrices")
+	defer log.PopPrefix()
 	duration := lib.ElapsedYears(policy.StartDate, policy.EndDate)
 	residenceArea := getAreaByProvince(policy.Assets[0].Person.Residence.CityCode)
 	policy.Assets[0].Person.Residence.Area = residenceArea
 	if residenceArea == "" {
-		log.Println("[CalculateGapOfferPrices] residence area not set")
+		log.Println("residence area not set")
 		lib.CheckError(errors.New("residence area not set"))
 	}
 	vehicleValue := policy.Assets[0].Vehicle.PriceValue
