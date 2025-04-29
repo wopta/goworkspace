@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	bpnm "github.com/wopta/goworkspace/bpmn/draftBpnm"
+	bpnm "github.com/wopta/goworkspace/broker/draftBpnm"
 	"github.com/wopta/goworkspace/models"
 )
 
