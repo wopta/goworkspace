@@ -3,12 +3,12 @@ package test
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strings"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 )
 
 type fabrickDeleteReq struct {
@@ -32,7 +32,7 @@ func fabrickDelete(r *http.Request) (string, any, error) {
 
 	fabrickRequest, err := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(request.Body))
 	if err != nil {
-		log.Printf("error creating request: %s", err.Error())
+		log.ErrorF("error creating request: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -46,7 +46,7 @@ func fabrickDelete(r *http.Request) (string, any, error) {
 
 	res, err := lib.RetryDo(fabrickRequest, 5, 10)
 	if err != nil {
-		log.Printf("error getting response: %s", err.Error())
+		log.ErrorF("error getting response: %s", err.Error())
 		return "", nil, err
 	}
 

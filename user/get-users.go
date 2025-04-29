@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"time"
 
@@ -33,8 +33,8 @@ func GetUsersFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		limitValue = 10
 	)
 
-	log.SetPrefix("[GetUsersFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("GetUsersFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -87,8 +87,8 @@ func GetUsersFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 }
 
 func GetUserByAuthIdFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.SetPrefix("[GetUserByAuthIdFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("GetUserByAuthIdFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -110,8 +110,8 @@ func GetUserByAuthId(origin, authId string) (models.User, error) {
 }
 
 func GetUserByFiscalCodeFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.SetPrefix("[GetUserByFiscalCodeFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("[GetUserByFiscalCodeFx] ")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -132,8 +132,8 @@ func GetUserByFiscalCode(fiscalCode string) (models.User, error) {
 }
 
 func GetUserByMailFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.SetPrefix("[GetUserByMailFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("[GetUserByMailFx] ")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -180,13 +180,13 @@ type userInfo struct {
 func GetUsersV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var err error
 
-	log.SetPrefix("[GetUsersV2Fx] ")
+	log.AddPrefix("GetUsersV2Fx")
 	defer func() {
 		if err != nil {
-			log.Printf("error: %s", err)
+			log.ErrorF("error: %s", err)
 		}
 		log.Println("Handler end ---------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 	log.Println("Handler start -----------------------------------------------")
 
@@ -209,7 +209,7 @@ func GetUsersV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	users, err := lib.QueryParametrizedRowsBigQuery[userInfo](query, queryParams)
 	if err != nil {
-		log.Printf("error executing query: %s", err.Error())
+		log.ErrorF("error executing query: %s", err.Error())
 		return "", nil, err
 	}
 

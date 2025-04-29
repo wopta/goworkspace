@@ -1,7 +1,7 @@
 package callback
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
 	"github.com/wopta/goworkspace/lib"
@@ -9,8 +9,8 @@ import (
 )
 
 func EmailVerifyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.SetPrefix("[EmailVerifyFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("EmailVerifyFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 

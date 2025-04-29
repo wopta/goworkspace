@@ -3,7 +3,7 @@ package quote
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"slices"
 	"strconv"
@@ -26,20 +26,20 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		inputCells []Cell
 	)
 
-	log.SetPrefix("[CombinedQbeFx] ")
+	log.AddPrefix("CombinedQbeFx")
 	defer func() {
 		r.Body.Close()
 		if err != nil {
-			log.Printf("error: %s", err.Error())
+			log.ErrorF("error: %s", err.Error())
 		}
 		log.Println("Handler end ---------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 	log.Println("Handler start -----------------------------------------------")
 
 	authToken, err := lib.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	if err != nil {
-		log.Printf("error getting authToken")
+		log.ErrorF("error getting authToken")
 		return "", nil, err
 	}
 	log.Printf(
@@ -51,12 +51,12 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	)
 
 	if err = json.NewDecoder(r.Body).Decode(&reqPolicy); err != nil {
-		log.Println("error decoding request body")
+		log.ErrorF("error decoding request body")
 		return "", nil, err
 	}
 
 	if dbPolicy, err = plc.GetPolicy(reqPolicy.Uid, ""); err != nil {
-		log.Println("error getting policy from DB")
+		log.ErrorF("error getting policy from DB")
 		return "", nil, err
 	}
 
@@ -64,7 +64,7 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	dbPolicy.Assets = reqPolicy.Assets
 
 	if err = sellable.CommercialCombined(&dbPolicy); err != nil {
-		log.Println("error on sellable")
+		log.ErrorF("error on sellable")
 		return "", nil, err
 	}
 
@@ -89,7 +89,7 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	mapCellPolicy(&dbPolicy, baseProduct, outCells, gsLink)
 
 	if err = lib.SetFirestoreErr(lib.PolicyCollection, dbPolicy.Uid, dbPolicy); err != nil {
-		log.Println("error saving quote in policy")
+		log.ErrorF("error saving quote in policy")
 		return "", nil, err
 	}
 	dbPolicy.BigquerySave("")
@@ -182,7 +182,7 @@ func mapCellByColumnAndSection(column, section string, priceGroup map[string]mod
 	parsedValue, err := parseCellValue(cell.Value)
 	if err != nil {
 		hasError = true
-		log.Printf("error parsing value: %s", err.Error())
+		log.ErrorF("error parsing value: %s", err.Error())
 	}
 
 	switch column {
@@ -235,6 +235,8 @@ func mapCellsToPriceGroup(cells []Cell) []models.Price {
 }
 
 func mapCellPolicy(policy *models.Policy, baseProduct *models.Product, cells []Cell, gsLink string) {
+	log.AddPrefix("Commercial")
+	defer log.PopPrefix()
 	var (
 		hasQuoteError bool
 		quoteAtt      = models.Attachment{
@@ -266,7 +268,7 @@ func mapCellPolicy(policy *models.Policy, baseProduct *models.Product, cells []C
 	for _, cell := range policyCells {
 		parsedValue, err := parseCellValue(cell.Value)
 		if err != nil {
-			log.Printf("error parsing value: %s", err.Error())
+			log.ErrorF("error parsing value: %s", err.Error())
 			continue
 		}
 		switch cell.Cell {
@@ -282,7 +284,7 @@ func mapCellPolicy(policy *models.Policy, baseProduct *models.Product, cells []C
 		}
 	}
 
-	log.Println("[Commercial Combined] apply consultacy price")
+	log.Println("apply consultacy price")
 
 	addConsultacyPrice(policy, baseProduct)
 

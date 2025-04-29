@@ -1,10 +1,9 @@
 package callback_out
 
 import (
-	"log"
-
 	"github.com/wopta/goworkspace/callback_out/internal"
 	md "github.com/wopta/goworkspace/callback_out/models"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -13,10 +12,10 @@ var (
 	RequestApproval internal.CallbackoutAction = md.RequestApproval
 	Emit            internal.CallbackoutAction = md.Emit
 	Paid            internal.CallbackoutAction = md.Paid
-	Signed            internal.CallbackoutAction = md.Signed
+	Signed          internal.CallbackoutAction = md.Signed
 	EmitRemittance  internal.CallbackoutAction = md.EmitRemittance
-	Approved  internal.CallbackoutAction = md.Approved
-	Rejected  internal.CallbackoutAction = md.Rejected
+	Approved        internal.CallbackoutAction = md.Approved
+	Rejected        internal.CallbackoutAction = md.Rejected
 )
 
 func Execute(node *models.NetworkNode, policy models.Policy, rawAction internal.CallbackoutAction) {
@@ -32,12 +31,12 @@ func Execute(node *models.NetworkNode, policy models.Policy, rawAction internal.
 	}
 
 	if client, err = newClient(node); err != nil {
-		log.Println(err)
+		log.Error(err)
 		return
 	}
 
 	if client == nil {
-		log.Println("client not found")
+		log.ErrorF("client not found")
 		return
 	}
 

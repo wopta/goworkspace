@@ -2,8 +2,8 @@ package question
 
 import (
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
-	"log"
 )
 
 type Statements struct {
@@ -12,11 +12,13 @@ type Statements struct {
 }
 
 func GetStatements(policy *models.Policy) ([]models.Statement, error) {
-	log.Println("[GetStatements] function start ----------------")
+	log.AddPrefix("GetStatements")
+	defer log.PopPrefix()
+	log.Println("function start ----------------")
 
 	policyJson, err := policy.Marshal()
 	if err != nil {
-		log.Printf("[GetStatements] error marshaling policy: %s", err.Error())
+		log.ErrorF("error marshaling policy: %s", err.Error())
 		return nil, err
 	}
 
@@ -26,12 +28,12 @@ func GetStatements(policy *models.Policy) ([]models.Statement, error) {
 		Text:       "",
 	}
 
-	log.Println("[GetStatements] loading rules file")
+	log.Println("loading rules file")
 
 	rulesFile := lib.GetRulesFileV2(policy.Name, policy.ProductVersion, statements)
 	data := loadExternalData(policy.Name, policy.ProductVersion)
 
-	log.Println("[GetStatements] executing rules")
+	log.Println("executing rules")
 
 	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, rulesStatements, policyJson, data)
 
@@ -40,7 +42,7 @@ func GetStatements(policy *models.Policy) ([]models.Statement, error) {
 		result = append(result, *statement)
 	}
 
-	log.Println("[GetStatements] function end ----------------")
+	log.Println("function end ----------------")
 
 	return result, err
 }

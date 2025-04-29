@@ -2,16 +2,17 @@ package reserved
 
 import (
 	"encoding/json"
-	"log"
 	"slices"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 )
 
 // TODO create sub package reserved/commercial-combined
 func commercialCombinedReserved(p *models.Policy) (bool, *models.ReservedInfo) {
-	log.Println("[commercialCombinedReserved]")
+	log.AddPrefix("CommercialCombinedReserved")
+	defer log.PopPrefix()
 
 	var output = ReservedRuleOutput{
 		IsReserved:   false,
@@ -28,7 +29,7 @@ func commercialCombinedReserved(p *models.Policy) (bool, *models.ReservedInfo) {
 
 	ruleOutputString, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, &output, input, nil)
 
-	log.Printf("[lifeReserved] rules output: %s", ruleOutputString)
+	log.Printf("rules output: %s", ruleOutputString)
 
 	return ruleOutput.(*ReservedRuleOutput).IsReserved, ruleOutput.(*ReservedRuleOutput).ReservedInfo
 }

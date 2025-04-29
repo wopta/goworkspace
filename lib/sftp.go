@@ -3,8 +3,8 @@ package lib
 import (
 	"bufio"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net"
 	"os"
 	"path/filepath"

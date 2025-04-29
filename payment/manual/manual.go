@@ -3,8 +3,8 @@ package manual
 import (
 	"errors"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"time"
 
@@ -42,14 +42,14 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		toAddress   = mail.Address{}
 	)
 
-	log.SetPrefix("[ManualPaymentFx] ")
+	log.AddPrefix("ManualPaymentFx")
 	defer func() {
 		if err != nil {
-			log.Printf("error: %s", err.Error())
+			log.ErrorF("error: %s", err.Error())
 		}
 		r.Body.Close()
 		log.Println("Handler end -------------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 	log.Println("Handler start -----------------------------------------------")
 
@@ -171,14 +171,14 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		// Create/Update document on user collection based on contractor fiscalCode
 		err = plc.SetUserIntoPolicyContractor(&policy, "")
 		if err != nil {
-			log.Printf("ERROR set user into policy contractor: %s", err.Error())
+			log.ErrorF("error set user into policy contractor: %s", err.Error())
 			return "", nil, err
 		}
 
 		// Add contract to policy
 		err = plc.AddContract(&policy, "")
 		if err != nil {
-			log.Printf("ERROR add contract to policy: %s", err.Error())
+			log.ErrorF("error add contract to policy: %s", err.Error())
 			return "", nil, err
 		}
 
@@ -191,14 +191,14 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 		err = plc.Pay(&policy, "")
 		if err != nil {
-			log.Printf("ERROR policy pay: %s", err.Error())
+			log.ErrorF("error policy pay: %s", err.Error())
 			return "", nil, err
 		}
 
 		// Update NetworkNode Portfolio
 		err = network.UpdateNetworkNodePortfolio("", &policy, networkNode)
 		if err != nil {
-			log.Printf("ERROR updating %s portfolio %s", networkNode.Type, err.Error())
+			log.ErrorF("error updating %s portfolio %s", networkNode.Type, err.Error())
 			return "", nil, err
 		}
 
@@ -238,7 +238,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 		err = lib.SetFirestoreErr(lib.PolicyCollection, policy.Uid, policy)
 		if err != nil {
-			log.Printf("ERROR saving policy %s to Firestore: %s", policy.Uid, err.Error())
+			log.ErrorF("error saving policy %s to Firestore: %s", policy.Uid, err.Error())
 			return "", nil, err
 		}
 		policy.BigquerySave("")

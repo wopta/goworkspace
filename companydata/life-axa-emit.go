@@ -2,8 +2,8 @@ package companydata
 
 import (
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"reflect"
@@ -199,7 +199,7 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 	if policy.ProducerUid != "" && policy.Channel == "network" {
 		var node *models.NetworkNode
 		snap, e := lib.GetFirestoreErr("networkNodes", policy.ProducerUid)
-		log.Println(e)
+		log.Error(e)
 		snap.DataTo(&node)
 		log.Println("LifeAxalEmit: node.Code", node.Code)
 		networkCode = node.Code
@@ -234,7 +234,7 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 			}
 
 			r, m := getIndennity(g)
-			log.Println(e)
+			log.Error(e)
 			row := []string{
 				mapCodecCompany(policy, g.CompanyCodec),         //Codice schema
 				fixImportedId(policy),                           //N° adesione individuale univoco

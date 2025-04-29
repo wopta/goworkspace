@@ -3,8 +3,8 @@ package quote
 import (
 	"context"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -162,7 +162,8 @@ func (qs *QuoteSpreadsheet) export(sheetClient *sheets.Service, ctx context.Cont
 	if _, err := sheetClient.Spreadsheets.BatchUpdate(qs.Id, &sheets.BatchUpdateSpreadsheetRequest{
 		Requests: requests,
 	}).Context(ctx).Do(); err != nil {
-		log.Panic(err)
+		log.Error(err)
+		panic(err)
 	}
 
 }

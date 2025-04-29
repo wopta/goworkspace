@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"reflect"
 	"strings"
@@ -26,14 +26,14 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		hasDiff                                 bool
 	)
 
-	log.SetPrefix("[ModifyPolicyFx] ")
+	log.AddPrefix("ModifyPolicyFx")
 	defer func() {
 		r.Body.Close()
 		if err != nil {
-			log.Printf("error: %s", err.Error())
+			log.ErrorF("error: %s", err.Error())
 		}
 		log.Println("Handler end ---------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 	log.Println("Handler start -----------------------------------------------")
 
@@ -41,7 +41,7 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	token := r.Header.Get("Authorization")
 	authToken, err := lib.GetAuthTokenFromIdToken(token)
 	if err != nil {
-		log.Printf("error getting authToken")
+		log.ErrorF("error getting authToken")
 		return "", nil, err
 	}
 	log.Printf(
@@ -53,7 +53,7 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	)
 
 	if err = json.NewDecoder(r.Body).Decode(&inputPolicy); err != nil {
-		log.Printf("error decoding request body: %s", err.Error())
+		log.ErrorF("error decoding request body: %s", err.Error())
 		return "", nil, err
 	}
 	inputPolicy.Normalize()
@@ -61,12 +61,12 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	log.Printf("fetching policy %s from Firestore...", inputPolicy.Uid)
 	originalPolicy, err := plc.GetPolicy(inputPolicy.Uid, "")
 	if err != nil {
-		log.Printf("error fetching policy from Firestore: %s", err.Error())
+		log.ErrorF("error fetching policy from Firestore: %s", err.Error())
 		return "", nil, err
 	}
 	rawPolicy, err := json.Marshal(originalPolicy)
 	if err != nil {
-		log.Printf("error marshaling db policy: %s", err.Error())
+		log.ErrorF("error marshaling db policy: %s", err.Error())
 		return "", nil, err
 	}
 	log.Printf("original policy: %s", string(rawPolicy))
@@ -74,7 +74,7 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	log.Printf("modifying policy...")
 	modifiedPolicy, modifiedUser, err := modifyController(originalPolicy, inputPolicy)
 	if err != nil {
-		log.Printf("error during policy modification: %s", err.Error())
+		log.ErrorF("error during policy modification: %s", err.Error())
 		return "", nil, err
 	}
 	log.Printf("policy %s modified successfully", modifiedPolicy.Uid)
@@ -93,7 +93,7 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 			}
 			*modifiedPolicy.Attachments = append(*modifiedPolicy.Attachments, addendumAtt)
 		} else if !errors.Is(err, document.ErrNotImplemented) {
-			log.Printf("error generating addendum for policy %s: %s", inputPolicy.Uid, err.Error())
+			log.ErrorF("error generating addendum for policy %s: %s", inputPolicy.Uid, err.Error())
 			return "", nil, err
 		}
 	}
@@ -461,7 +461,7 @@ func modifyUserInfo(inputUser models.User) (models.User, error) {
 
 	docsnap, err := lib.GetFirestoreErr(models.UserCollection, inputUser.Uid)
 	if err != nil {
-		log.Printf("error retrieving user %s from Firestore: %s", inputUser.Uid, err.Error())
+		log.ErrorF("error retrieving user %s from Firestore: %s", inputUser.Uid, err.Error())
 		return models.User{}, err
 	}
 	docsnap.DataTo(&dbUser)
@@ -495,7 +495,7 @@ func modifyUserInfo(inputUser models.User) (models.User, error) {
 		log.Printf("modifying user %s email from %s to %s...", modifiedUser.Uid, modifiedUser.Mail, dbUser.Mail)
 		_, err = lib.UpdateUserEmail(modifiedUser.Uid, modifiedUser.Mail)
 		if err != nil {
-			log.Printf("error modifying authentication email: %s", err.Error())
+			log.ErrorF("error modifying authentication email: %s", err.Error())
 			return models.User{}, err
 		}
 		log.Printf("mail modified successfully")
@@ -515,7 +515,7 @@ func writePolicyToDb(modifiedPolicy models.Policy) error {
 
 	err = lib.SetFirestoreErr(models.PolicyCollection, modifiedPolicy.Uid, modifiedPolicy)
 	if err != nil {
-		log.Printf("error writing modified policy to Firestore: %s", err.Error())
+		log.ErrorF("error writing modified policy to Firestore: %s", err.Error())
 		return err
 	}
 
@@ -539,13 +539,13 @@ func writeUserToDB(user models.User) error {
 
 	err = lib.SetFirestoreErr(models.UserCollection, user.Uid, user)
 	if err != nil {
-		log.Printf("error writing modified user to Firestore: %s", err.Error())
+		log.ErrorF("error writing modified user to Firestore: %s", err.Error())
 		return err
 	}
 
 	err = user.BigquerySave("")
 	if err != nil {
-		log.Printf("error writing modified user to BigQuery: %s", err.Error())
+		log.ErrorF("error writing modified user to BigQuery: %s", err.Error())
 		return err
 	}
 

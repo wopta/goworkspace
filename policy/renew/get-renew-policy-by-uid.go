@@ -3,11 +3,11 @@ package renew
 import (
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/policy/utils"
 	"google.golang.org/grpc/codes"
@@ -25,13 +25,13 @@ func GetRenewPolicyByUidFx(w http.ResponseWriter, r *http.Request) (string, any,
 		policy models.Policy
 	)
 
-	log.SetPrefix("[GetRenewPolicyByUidFx] ")
+	log.AddPrefix("GetRenewPolicyByUidFx")
 	defer func() {
 		if err != nil {
-			log.Printf("error: %s", err)
+			log.Error(err)
 		}
 		log.Println("Handler end ---------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 	log.Println("Handler start -----------------------------------------------")
 
@@ -43,7 +43,7 @@ func GetRenewPolicyByUidFx(w http.ResponseWriter, r *http.Request) (string, any,
 
 	policyUid := chi.URLParam(r, "uid")
 	if policy, err = GetRenewPolicyByUid(policyUid); err != nil {
-		log.Printf("error getting policy with uid: '%s'", policyUid)
+		log.ErrorF("error getting policy with uid: '%s'", policyUid)
 		return "", nil, err
 	}
 
@@ -54,7 +54,7 @@ func GetRenewPolicyByUidFx(w http.ResponseWriter, r *http.Request) (string, any,
 
 	bytes, err := json.Marshal(policy)
 	if err != nil {
-		log.Printf("error marshaling policy with uid: '%s'", policyUid)
+		log.ErrorF("error marshaling policy with uid: '%s'", policyUid)
 		return "", nil, err
 	}
 

@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"time"
 
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"google.golang.org/api/iterator"
 )
 
@@ -51,6 +51,9 @@ type Skin struct {
 }
 
 func (agency *Agency) BigquerySave(origin string) error {
+	log.AddPrefix("Agency")
+	defer log.PopPrefix()
+
 	agency.BigManagerUid = agency.Manager.Uid
 	agency.BigRuiRegistration = lib.GetBigQueryNullDateTime(agency.RuiRegistration)
 	agency.BigCreationDate = lib.GetBigQueryNullDateTime(agency.CreationDate)
@@ -59,7 +62,7 @@ func (agency *Agency) BigquerySave(origin string) error {
 	agency.Data = string(data)
 
 	table := lib.GetDatasetByEnv(origin, AgencyCollection)
-	log.Println("[Agency] save big query: " + agency.Uid)
+	log.Println("save big query: " + agency.Uid)
 
 	return lib.InsertRowsBigQuery(WoptaDataset, table, agency)
 }
@@ -83,12 +86,12 @@ func FirestoreDocumentToAgency(query *firestore.DocumentIterator) (*Agency, erro
 	agencyDocumentSnapshot, err := query.Next()
 
 	if err == iterator.Done && agencyDocumentSnapshot == nil {
-		log.Println("agency not found in firebase DB")
+		log.ErrorF("agency not found in firebase DB")
 		return &result, fmt.Errorf("no agent found")
 	}
 
 	if err != iterator.Done && err != nil {
-		log.Println(`error happened while trying to get agency`)
+		log.ErrorF(`error happened while trying to get agency`)
 		return &result, err
 	}
 
@@ -101,9 +104,12 @@ func FirestoreDocumentToAgency(query *firestore.DocumentIterator) (*Agency, erro
 }
 
 func UpdateAgencyPortfolio(policy *Policy, origin string) error {
-	log.Printf("[updateAgencyPortfolio] Policy %s", policy.Uid)
+	log.AddPrefix("updateAgencyPortfolio")
+	defer log.PopPrefix()
+
+	log.Printf("Policy %s", policy.Uid)
 	if policy.AgencyUid == "" {
-		log.Printf("[updateAgencyPortfolio] ERROR agency not set")
+		log.ErrorF("error agency not set")
 		return errors.New("agency not set")
 	}
 
@@ -111,12 +117,12 @@ func UpdateAgencyPortfolio(policy *Policy, origin string) error {
 	fireAgency := lib.GetDatasetByEnv(origin, AgencyCollection)
 	docsnap, err := lib.GetFirestoreErr(fireAgency, policy.AgencyUid)
 	if err != nil {
-		log.Printf("[updateAgencyPortfolio] ERROR getting agency from firestore: %s", err.Error())
+		log.ErrorF("error getting agency from firestore: %s", err.Error())
 		return err
 	}
 	err = docsnap.DataTo(&agency)
 	if err != nil {
-		log.Printf("[updateAgencyPortfolio] ERROR parsing agency: %s", err.Error())
+		log.ErrorF("error parsing agency: %s", err.Error())
 		return err
 	}
 	agency.Policies = append(agency.Policies, policy.Uid)
@@ -128,7 +134,7 @@ func UpdateAgencyPortfolio(policy *Policy, origin string) error {
 	agency.UpdatedDate = time.Now().UTC()
 	err = lib.SetFirestoreErr(fireAgency, agency.Uid, agency)
 	if err != nil {
-		log.Printf("[updateAgencyPortfolio] ERROR saving agency: %s", err.Error())
+		log.ErrorF("error saving agency: %s", err.Error())
 		return err
 	}
 
@@ -138,9 +144,10 @@ func UpdateAgencyPortfolio(policy *Policy, origin string) error {
 }
 
 func IsPolicyInAgencyPortfolio(agencyUid, policyUid string) bool {
+	log.AddPrefix("IsPolicyInAgencyPortfolio")
 	agency, err := GetAgencyByUid(agencyUid)
 	if err != nil {
-		log.Printf("[IsPolicyInAgencyPortfolio] error retrieving agency: %s", err.Error())
+		log.ErrorF("error retrieving agency: %s", err.Error())
 		return false
 	}
 

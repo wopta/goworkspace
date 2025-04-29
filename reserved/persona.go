@@ -1,14 +1,14 @@
 package reserved
 
 import (
-	"log"
-	"math"
-
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
+	"math"
 )
 
 func personaReserved(policy *models.Policy) (bool, *models.ReservedInfo) {
-	log.Println("[personaReserved]")
+	log.AddPrefix("PersonaReserved")
+	defer log.PopPrefix()
 
 	const reason = "BMI index out of range"
 

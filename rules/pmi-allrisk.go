@@ -2,9 +2,9 @@ package rules
 
 import (
 	"encoding/json"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -43,7 +43,7 @@ func PmiAllriskHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 	getBoolEnv := func(key string) bool {
 		flag, err := strconv.ParseBool(os.Getenv(key))
 		if err != nil {
-			log.Printf("error loading %s environment variable", key)
+			log.ErrorF("error loading %s environment variable", key)
 			return false
 		}
 		return flag
@@ -65,8 +65,8 @@ func PmiAllrisk(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		status                int64
 	)
 
-	log.SetPrefix("[PmiAllrisk] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("PmiAllrisk")
+	defer log.PopPrefix()
 	log.Println("Handler start -----------------------------------------------")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))

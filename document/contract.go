@@ -3,8 +3,8 @@ package document
 import (
 	"encoding/base64"
 	"encoding/json"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 
 	"github.com/go-pdf/fpdf"
@@ -22,7 +22,9 @@ var (
 )
 
 func ContractFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[Contract]")
+	log.AddPrefix("Contract")
+	defer log.PopPrefix()
+
 	//lib.Files("./serverless_function_source_code")
 	origin := r.Header.Get("Origin")
 	req := lib.ErrorByte(io.ReadAll(r.Body))
@@ -48,11 +50,13 @@ func ContractFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 func ContractObj(origin string, data models.Policy, networkNode *models.NetworkNode, product *models.Product) <-chan DocumentResponse {
 	r := make(chan DocumentResponse)
+	log.AddPrefix("ContractObj")
+	defer log.PopPrefix()
 
-	log.Println("[ContractObj] function start -------------------------------")
+	log.Println("function start -------------------------------")
 
 	rawPolicy, _ := data.Marshal()
-	log.Printf("[ContractObj] policy: %s", string(rawPolicy))
+	log.Printf("policy: %s", string(rawPolicy))
 
 	go func() {
 		var (
@@ -81,12 +85,12 @@ func ContractObj(origin string, data models.Policy, networkNode *models.NetworkN
 			generator := contract.NewCommercialCombinedGenerator(engine.NewFpdf(), &data, networkNode, *product, false)
 			out, err = generator.Contract()
 			if err != nil {
-				log.Printf("error generating contract: %v", err)
+				log.ErrorF("error generating contract: %v", err)
 				return
 			}
 			filename, err = generator.Save(out)
 			if err != nil {
-				log.Printf("error generating contract: %v", err)
+				log.ErrorF("error generating contract: %v", err)
 				return
 			}
 		}
@@ -99,7 +103,7 @@ func ContractObj(origin string, data models.Policy, networkNode *models.NetworkN
 		}
 	}()
 
-	log.Println("[ContractObj] function end -------------------------------..")
+	log.Println("function end -------------------------------..")
 
 	return r
 }
@@ -109,19 +113,20 @@ func lifeContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkN
 		filename string
 		out      []byte
 	)
-
-	log.Println("[lifeContract] function start ------------------------------")
+	log.AddPrefix("LifeContract")
+	defer log.PopPrefix()
+	log.Println("function start ------------------------------")
 
 	switch policy.ProductVersion {
 	case models.ProductV1:
-		log.Println("[lifeContract] life v1")
+		log.Println("life v1")
 		filename, out = lifeAxaContractV1(pdf, origin, policy, networkNode, product)
 	case models.ProductV2:
-		log.Println("[lifeContract] life v2")
+		log.Println("life v2")
 		filename, out = lifeAxaContractV2(pdf, origin, policy, networkNode, product)
 	}
 
-	log.Println("[lifeContract] function end --------------------------------")
+	log.Println("function end --------------------------------")
 
 	return filename, out
 }
@@ -131,12 +136,13 @@ func gapContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNo
 		filename string
 		out      []byte
 	)
-
-	log.Println("[gapContract] function start -------------------------------")
+	log.AddPrefix("GapContract")
+	defer log.PopPrefix()
+	log.Println("function start -------------------------------")
 
 	filename, out = gapSogessurContractV1(pdf, origin, policy, networkNode)
 
-	log.Println("[gapContract] function end ---------------------------------")
+	log.Println("function end ---------------------------------")
 
 	return filename, out
 }
@@ -146,12 +152,13 @@ func personaContract(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.
 		filename string
 		out      []byte
 	)
-
-	log.Println("[personaContract] function start ---------------------------")
+	log.AddPrefix("personaContract")
+	defer log.PopPrefix()
+	log.Println("function start ---------------------------")
 
 	filename, out = personaGlobalContractV1(pdf, policy, networkNode, product)
 
-	log.Println("[personaContract] function end -----------------------------")
+	log.Println("function end -----------------------------")
 
 	return filename, out
 }

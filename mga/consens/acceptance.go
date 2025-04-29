@@ -3,7 +3,7 @@ package consens
 import (
 	"context"
 	"encoding/json"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"slices"
 	"time"
@@ -32,25 +32,24 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 
 	defer func() {
 		if err != nil {
-			log.Printf("error: %v", err)
+			log.ErrorF("error: %v", err)
 		}
 		log.Println("Handler end ---------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
-
-	log.SetPrefix("[AcceptanceFx] ")
+	log.AddPrefix("[AcceptanceFx] ")
 	log.Println("Handler start -----------------------------------------------")
 
 	idToken := r.Header.Get("Authorization")
 	authToken, err := lib.GetAuthTokenFromIdToken(idToken)
 	if err != nil {
-		log.Println("error extracting authToken")
+		log.ErrorF("error extracting authToken")
 		return "", nil, err
 	}
 
 	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
 	if networkNode == nil {
-		log.Println("error getting networkNode")
+		log.ErrorF("error getting networkNode")
 		err = errNetworkNodeNotFound
 		return "", nil, err
 	}
@@ -58,7 +57,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	err = json.NewDecoder(r.Body).Decode(&request)
 	defer r.Body.Close()
 	if err != nil {
-		log.Println("error decoding request body")
+		log.ErrorF("error decoding request body")
 		return "", nil, err
 	}
 
@@ -72,7 +71,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	filepath := folderPath + request.Product + "/" + request.Slug + ".json"
 	consens, err = getConsensByPath(filepath)
 	if err != nil {
-		log.Println("error getting consens")
+		log.ErrorF("error getting consens")
 		return "", nil, err
 	}
 	consens = enrichConsens(consens, networkNode)
@@ -110,11 +109,11 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 
 	log.Println("saving networkNode to DBs...")
 	if err := networkNode.SaveFirestore(); err != nil {
-		log.Println("error saving networkNode in firestore")
+		log.ErrorF("error saving networkNode in firestore")
 		return "", nil, err
 	}
 	if err := networkNode.SaveBigQuery(""); err != nil {
-		log.Println("error saving networkNode in bigquery")
+		log.ErrorF("error saving networkNode in bigquery")
 		return "", nil, err
 	}
 
@@ -134,20 +133,20 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	}
 	log.Println("saving consens audit to BigQuery...")
 	if err := audit.Save(); err != nil {
-		log.Println("error saving consens audit")
+		log.ErrorF("error saving consens audit")
 		return "", nil, err
 	}
 
 	log.Println("sending consens mail to networkNode...")
 	if err := sendConsensMail(networkNode, consens, nodeConsens); err != nil {
-		log.Printf("error while sending mail: %v", err)
+		log.ErrorF("error while sending mail: %v", err)
 		log.Println("continuing acceptance process...")
 		err = nil
 	}
 
 	log.Println("fetching undeclared consens...")
 	if undeclaredConsens, err = getUndeclaredConsens(request.Product, networkNode); err != nil {
-		log.Println("error getting undeclared consens")
+		log.ErrorF("error getting undeclared consens")
 		return "", nil, err
 	}
 
@@ -157,7 +156,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	}
 
 	if responseBytes, err = json.Marshal(response); err != nil {
-		log.Println("error marshalling response")
+		log.ErrorF("error marshalling response")
 		return "", nil, err
 	}
 

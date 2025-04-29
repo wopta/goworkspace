@@ -1,7 +1,7 @@
 package document
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"math"
 	"os"
 	"strconv"

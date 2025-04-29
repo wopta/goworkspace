@@ -5,10 +5,10 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"io/fs"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -27,7 +27,7 @@ func Files(path string) []string {
 	}
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
 
 	for _, f := range files {
@@ -42,14 +42,14 @@ func Files(path string) []string {
 func readCsvFile(filePath string) [][]string {
 	f, err := os.Open(filePath)
 	if err != nil {
-		log.Fatal("Unable to read input file "+filePath, err)
+		log.ErrorF("Unable to read input file "+filePath, err)
 	}
 	defer f.Close()
 
 	csvReader := csv.NewReader(f)
 	records, err := csvReader.ReadAll()
 	if err != nil {
-		log.Fatal("Unable to parse file as CSV for "+filePath, err)
+		log.ErrorF("Unable to parse file as CSV for "+filePath, err)
 	}
 
 	return records
@@ -58,12 +58,12 @@ func readCsvFile(filePath string) [][]string {
 func ReadDir() {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
 	fmt.Println(dir)
 	dir, err = os.Getwd()
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
 	fmt.Println(dir)
 }

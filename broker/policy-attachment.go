@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -22,8 +22,8 @@ import (
 func GetPolicyAttachmentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var response GetPolicyAttachmentsResponse
 
-	log.SetPrefix("[GetPolicyAttachmentFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("GetPolicyAttachmentFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -130,7 +130,7 @@ func GetPolicyAttachments(policyUid string, origin string) ([]models.Attachment,
 
 		fileData, err := lib.ReadFileFromGoogleStorage(gsLink)
 		if err != nil {
-			log.Printf("error reading document from Google Storage: %s", err.Error())
+			log.ErrorF("error reading document from Google Storage: %s", err.Error())
 			return nil, err
 		}
 

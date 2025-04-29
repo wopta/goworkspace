@@ -3,7 +3,6 @@ package _script
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"regexp"
 	"sort"
@@ -13,6 +12,7 @@ import (
 
 	"github.com/go-gota/gota/dataframe"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/transaction"
 )
@@ -49,12 +49,14 @@ Script to enrich all DB transactions with fabrick extracted data
 func FabrickDataEnrich() {
 	rawDoc, err := os.ReadFile("./_script/fabrick_data.csv")
 	if err != nil {
-		log.Fatalf("error: %v", err)
+		log.ErrorF("error: %v", err)
+		return
 	}
 
 	df, err := lib.CsvToDataframeV2(rawDoc, ';', true)
 	if err != nil {
-		log.Fatalf("error: %v", err)
+		log.ErrorF("error: %v", err)
+		return
 	}
 
 	log.Printf("#rows: %d", df.Nrow())
@@ -142,7 +144,8 @@ func FabrickDataEnrich() {
 
 	// save transactions
 	if err := saveData(trToBeSaved); err != nil {
-		log.Fatalf("error saving data: %s", err)
+		log.ErrorF("error saving data: %s", err)
+		return
 	}
 
 	// save report
@@ -199,6 +202,8 @@ func filterByRegex(data map[string][][]string, col int, regex string) map[string
 
 func parseRows(data map[string][][]string) map[string][]rowStruct {
 	parsedRows := make(map[string][]rowStruct)
+	log.AddPrefix("ParseRows")
+	defer log.PopPrefix()
 	for key, rows := range data {
 		output := make([]rowStruct, 0)
 		for _, row := range rows {
@@ -207,19 +212,19 @@ func parseRows(data map[string][][]string) map[string][]rowStruct {
 			splittedExternalId := strings.Split(lib.TrimSpace(row[externalIdCol]), "_")
 
 			if len(splittedExternalId) < 3 {
-				log.Printf("[parseRows] not one of ours: %s", row[externalIdCol])
+				log.Printf("not one of ours: %s", row[externalIdCol])
 				continue
 			}
 
 			// check if second value is time.DateOnly
 			if _, err := time.Parse(time.DateOnly, splittedExternalId[1]); err != nil {
-				log.Printf("[parseRows] not one of ours: %s", row[externalIdCol])
+				log.Printf("not one of ours: %s", row[externalIdCol])
 				continue
 			}
 
 			payDate, err := time.Parse(time.DateOnly, lib.TrimSpace(row[payDateCol]))
 			if err != nil {
-				log.Printf("[parseRows] error: %v", err)
+				log.Error(err)
 				continue
 			}
 

@@ -8,6 +8,7 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/policy"
 	"github.com/wopta/goworkspace/product"
@@ -21,7 +22,8 @@ func UpdateTransactions() {
 		tr                   models.Transaction
 		modifiedTransactions = make([]string, 0)
 	)
-
+	log.AddPrefix("UpdateTransactions")
+	defer log.PopPrefix()
 	// GET all transactions from firestore
 	ctx := context.Background()
 	client, _ := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
@@ -33,17 +35,17 @@ func UpdateTransactions() {
 			break
 		}
 		if err != nil {
-			fmt.Printf("[UpdateTransactions] ERROR iterator: %s", err.Error())
+			fmt.Printf("ERROR iterator: %s", err.Error())
 			return
 		}
 		if err := doc.DataTo(&tr); err != nil {
-			fmt.Printf("[UpdateTransactions] ERROR datato: %s", err.Error())
+			fmt.Printf("ERROR datato: %s", err.Error())
 			return
 		}
 		trs = append(trs, tr)
 	}
 
-	fmt.Printf("[UpdateTransactions] Found %d transactions/n", len(trs))
+	fmt.Printf("Found %d transactions/n", len(trs))
 
 	for _, tr := range trs {
 		// set updateDate to now
@@ -52,7 +54,7 @@ func UpdateTransactions() {
 		// save to firestore
 		err := lib.SetFirestoreErr(models.TransactionsCollection, tr.Uid, tr)
 		if err != nil {
-			fmt.Printf("[UpdateTransactions] ERROR saving to firestore: %s", err.Error())
+			fmt.Printf("ERROR saving to firestore: %s", err.Error())
 			return
 		}
 		modifiedTransactions = append(modifiedTransactions, tr.Uid)
@@ -60,8 +62,8 @@ func UpdateTransactions() {
 		tr.BigQuerySave("")
 	}
 
-	fmt.Printf("[UpdateTransactions] Modified %d transactions: %v/n", len(modifiedTransactions), modifiedTransactions)
-	fmt.Println("[UpdateTransactions] done")
+	fmt.Printf("Modified %d transactions: %v/n", len(modifiedTransactions), modifiedTransactions)
+	fmt.Println("done")
 }
 
 type QueryResult struct {
@@ -70,7 +72,8 @@ type QueryResult struct {
 
 func UpdateTransactionsCommission() {
 	var modifiedTransactions = make([]string, 0)
-
+	log.AddPrefix("UpdateNetworkTransactions")
+	defer log.PopPrefix()
 	query := fmt.Sprintf(
 		"SELECT uid FROM `%s.%s` WHERE isDelete = false AND commissions = 0",
 		models.WoptaDataset,
@@ -78,14 +81,14 @@ func UpdateTransactionsCommission() {
 	)
 	transactionUids, err := lib.QueryRowsBigQuery[QueryResult](query)
 	if err != nil {
-		fmt.Printf("[UpdateNetworkTransactions] error getting network transactions: %s", err.Error())
+		fmt.Printf("error getting network transactions: %s", err.Error())
 		return
 	}
 
-	fmt.Printf("[UpdateTransactionsCommission] found %d transactions\n", len(transactionUids))
+	fmt.Printf("found %d transactions\n", len(transactionUids))
 
 	if len(transactionUids) == 0 {
-		fmt.Println("[UpdateTransactionsCommission] done")
+		fmt.Println("done")
 		return
 	}
 
@@ -109,8 +112,8 @@ func UpdateTransactionsCommission() {
 
 		if plc == nil {
 			temp := policy.GetPolicyByUid(tr.PolicyUid, "")
-			plc = &temp
 			policyMap[tr.PolicyUid] = plc
+			plc = &temp
 		}
 
 		err := updateTransactionCommission(tr, plc, productMap[tr.PolicyName])
@@ -120,20 +123,22 @@ func UpdateTransactionsCommission() {
 		modifiedTransactions = append(modifiedTransactions, tr.Uid)
 	}
 
-	fmt.Printf("[UpdateTransactionsCommission] modified %d transactions => %s\n", len(modifiedTransactions), modifiedTransactions)
-	fmt.Println("[UpdateTransactionsCommission] done")
+	fmt.Printf("modified %d transactions => %s\n", len(modifiedTransactions), modifiedTransactions)
+	fmt.Println("done")
 }
 
 func updateTransactionCommission(tr *models.Transaction, policy *models.Policy, mgaProduct *models.Product) error {
+	log.AddPrefix("updateTransactionCommission")
+	defer log.PopPrefix()
 	commissionMga := lib.RoundFloat(product.GetCommissionByProduct(policy, mgaProduct, false), 2)
-	fmt.Printf("[updateTransactionCommission] new commission %.2f\n", commissionMga)
+	fmt.Printf("new commission %.2f\n", commissionMga)
 
 	tr.Commissions = commissionMga
 	tr.UpdateDate = time.Now().UTC()
 
 	err := lib.SetFirestoreErr(models.TransactionsCollection, tr.Uid, tr)
 	if err != nil {
-		fmt.Printf("[updateTransactionCommission] error saving transaction to firestore: %s", err.Error())
+		fmt.Printf("error saving transaction to firestore: %s", err.Error())
 		return err
 	}
 	tr.BigQuerySave("")

@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -26,8 +26,8 @@ func UpdateUserRoleFx(w http.ResponseWriter, r *http.Request) (string, interface
 		request           updateUserReq
 	)
 
-	log.SetPrefix("[UpdateUserRoleFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("UpdateUserRoleFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -69,7 +69,7 @@ func UpdateUserRoleFx(w http.ResponseWriter, r *http.Request) (string, interface
 	user.Role = request.Role
 	err = lib.SetFirestoreErr(fireUser, userUid, user)
 	if err != nil {
-		log.Printf("error save user %s firestore: %s", user.Role, err.Error())
+		log.ErrorF("error save user %s firestore: %s", user.Role, err.Error())
 		return "", nil, err
 	}
 

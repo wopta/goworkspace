@@ -2,7 +2,7 @@ package product
 
 import (
 	"encoding/json"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"os"
 	"sort"
 	"strings"
@@ -12,7 +12,9 @@ import (
 )
 
 func GetAllProductsByChannel(channel string) []models.ProductInfo {
-	log.Println("[GetAllProductsByChannel] function start -----------------------")
+	log.AddPrefix("GetAllProductsByChannel")
+	defer log.PopPrefix()
+	log.Println("function start -----------------------")
 
 	var products = make([]models.ProductInfo, 0)
 
@@ -26,14 +28,16 @@ func GetAllProductsByChannel(channel string) []models.ProductInfo {
 
 	products = getProductsFromFileList(fileList)
 
-	log.Printf("[GetAllProductsByChannel] found %d products", len(products))
-	log.Println("[GetAllProductsByChannel] function end -------------------------")
+	log.Printf("found %d products", len(products))
+	log.Println("function end -------------------------")
 
 	return products
 }
 
 func GetProductsByChannel(productList []string, channel string) []models.ProductInfo {
-	log.Println("[GetNetworkNodeProducts] function start ---------------------")
+	log.AddPrefix("GetNetworkNodeProducts")
+	defer log.PopPrefix()
+	log.Println("function start ---------------------")
 
 	var products = make([]models.ProductInfo, 0)
 
@@ -48,8 +52,8 @@ func GetProductsByChannel(productList []string, channel string) []models.Product
 
 	products = getProductsFromFileList(fileList)
 
-	log.Printf("[GetNetworkNodeProducts] found %d products", len(products))
-	log.Println("[GetNetworkNodeProducts] function end -----------------------")
+	log.Printf("found %d products", len(products))
+	log.Println("function end -----------------------")
 
 	return products
 }
@@ -61,13 +65,14 @@ func getProductsFromFileList(fileList []string) []models.ProductInfo {
 		fileChunks     = make([][]string, 0)
 		currentProduct models.BaseProduct
 	)
-
+	log.AddPrefix("GetProductsFromFileList")
+	defer log.PopPrefix()
 	if len(fileList) == 0 {
-		log.Println("[getProductsFromFileList] error empty fileList")
+		log.Println("error empty fileList")
 		return products
 	}
 
-	log.Printf("[getProductsFromFileList] checking fileList %v", fileList)
+	log.Printf("checking fileList %v", fileList)
 
 	// create subarrays for each different product
 	for _, file := range fileList {
@@ -91,19 +96,19 @@ func getProductsFromFileList(fileList []string) []models.ProductInfo {
 		sort.Slice(chunk, func(i, j int) bool {
 			return strings.SplitN(chunk[i], "/", 4)[2] > strings.SplitN(chunk[j], "/", 4)[2]
 		})
-		log.Printf("[getProductsFromFileList] sorted chunk %v", chunk)
+		log.Printf("sorted chunk %v", chunk)
 		// loop each version
 		for _, file := range chunk {
 			// download file from bucket
-			log.Printf("[getProductsFromFileList] downloading file %s", file)
+			log.Printf("downloading file %s", file)
 			fileBytes := lib.GetFilesByEnv(file)
 			if err != nil {
-				log.Printf("[GetProductsByChannel] error getting file: %s", err.Error())
+				log.ErrorF("error getting file: %s", err.Error())
 				break
 			}
 			err = json.Unmarshal(fileBytes, &currentProduct)
 			if err != nil {
-				log.Printf("[GetProductsByChannel] error unmarshaling file: %s", err.Error())
+				log.ErrorF("error unmarshaling file: %s", err.Error())
 				break
 			}
 
@@ -124,7 +129,8 @@ func getProductsFileList() []string {
 		err      error
 		fileList = make([]string, 0)
 	)
-
+	log.AddPrefix("GetNetworkNodeProducts")
+	defer log.PopPrefix()
 	switch os.Getenv("env") {
 	case "local":
 		fileList, err = lib.ListLocalFolderContent(models.ProductsFolder)
@@ -133,7 +139,7 @@ func getProductsFileList() []string {
 	}
 
 	if err != nil {
-		log.Printf("[GetNetworkNodeProducts] error getting file list: %s", err.Error())
+		log.ErrorF("error getting file list: %s", err.Error())
 	}
 
 	checkedList := lib.SliceFilter(fileList, checkSlashes)

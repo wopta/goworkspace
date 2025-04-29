@@ -2,7 +2,7 @@ package document
 
 import (
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"strings"
 
 	"github.com/wopta/goworkspace/document/internal/engine"
@@ -23,7 +23,7 @@ func Proforma(policy models.Policy) (DocumentResp, error) {
 
 	generator := proforma.NewProformaGenerator(engine.NewFpdf(), &policy)
 	if out, err = generator.Generate(); err != nil {
-		log.Printf("error generating proforma: %v", err)
+		log.ErrorF("error generating proforma: %v", err)
 		return DocumentResp{}, err
 	}
 
@@ -31,7 +31,7 @@ func Proforma(policy models.Policy) (DocumentResp, error) {
 		policy.CodeCompany, policy.StartDate.AddDate(policy.Annuity, 0, 0).Year()), " ", "_")
 
 	if gsLink, err = generator.Save(filename, out); err != nil {
-		log.Printf("error saving proforma: %v", err)
+		log.ErrorF("error saving proforma: %v", err)
 		return DocumentResp{}, err
 	}
 

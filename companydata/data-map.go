@@ -2,7 +2,7 @@ package companydata
 
 import (
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"reflect"
 	"strconv"
 	"strings"

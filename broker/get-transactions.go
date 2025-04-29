@@ -3,7 +3,7 @@ package broker
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -23,8 +23,8 @@ type Transactions []models.Transaction
 func GetPolicyTransactionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var response GetPolicyTransactionsResp
 
-	log.SetPrefix("[GetPolicyTransactionsFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("GetPolicyTransactionsFx")
+	defer log.PopPrefix()
 	log.Println("Handler start -----------------------------------------------")
 
 	policyUid := chi.URLParam(r, "policyUid")
@@ -34,13 +34,13 @@ func GetPolicyTransactionsFx(w http.ResponseWriter, r *http.Request) (string, in
 	idToken := r.Header.Get("Authorization")
 	authToken, err := lib.GetAuthTokenFromIdToken(idToken)
 	if err != nil {
-		log.Printf("error getting authToken: %s", err.Error())
+		log.ErrorF("error getting authToken: %s", err.Error())
 		return "", nil, err
 	}
 
 	policy, err := plc.GetPolicy(policyUid, origin)
 	if err != nil {
-		log.Printf("error fetching policy %s from Firestore: %s", policyUid, err.Error())
+		log.ErrorF("error fetching policy %s from Firestore: %s", policyUid, err.Error())
 		return "", nil, err
 	}
 

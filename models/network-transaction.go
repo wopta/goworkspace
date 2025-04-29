@@ -2,10 +2,10 @@ package models
 
 import (
 	"fmt"
-	"log"
 
 	"cloud.google.com/go/bigquery"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 )
 
 const (
@@ -46,8 +46,8 @@ type NetworkTransaction struct {
 }
 
 func (nt *NetworkTransaction) SaveBigQuery() error {
-	log.Println("[NetworkTransaction.SaveBigQuery]")
-
+	log.AddPrefix("NetworkTransaction.SaveBigQuery")
+	defer log.PopPrefix()
 	var (
 		err       error
 		datasetId = WoptaDataset
@@ -60,15 +60,15 @@ func (nt *NetworkTransaction) SaveBigQuery() error {
 
 	result, err := lib.QueryRowsBigQuery[NetworkTransaction](query)
 	if err != nil {
-		log.Printf("[NetworkTransaction.SaveBigQuery] error querying db with query %s: %s", query, err.Error())
+		log.ErrorF("error querying db with query %s: %s", query, err.Error())
 		return err
 	}
 
 	if len(result) == 0 {
-		log.Printf("[NetworkTransaction.SaveBigQuery] creating new NetworkTransaction %s", nt.Uid)
+		log.Printf("creating new NetworkTransaction %s", nt.Uid)
 		err = lib.InsertRowsBigQuery(datasetId, tableId, nt)
 	} else {
-		log.Printf("[NetworkTransaction.SaveBigQuery] updating NetworkTransaction %s", nt.Uid)
+		log.Printf("updating NetworkTransaction %s", nt.Uid)
 		updatedFields := make(map[string]interface{})
 		updatedFields["status"] = nt.Status
 		updatedFields["statusHistory"] = nt.StatusHistory
@@ -92,9 +92,9 @@ func (nt *NetworkTransaction) SaveBigQuery() error {
 	}
 
 	if err != nil {
-		log.Printf("[NetworkTransaction.SaveBigQuery] error saving to db: %s", err.Error())
+		log.ErrorF("error saving to db: %s", err.Error())
 	} else {
-		log.Println("[NetworkTransaction.SaveBigQuery] NetworkTransaction saved!")
+		log.Println("NetworkTransaction saved!")
 	}
 
 	return err

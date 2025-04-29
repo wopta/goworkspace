@@ -3,7 +3,7 @@ package lib
 import (
 	"context"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 	"strings"
@@ -17,7 +17,7 @@ func getClient() (*auth.Client, context.Context) {
 	app, err := firebase.NewApp(ctx, &firebase.Config{ProjectID: os.Getenv("GOOGLE_PROJECT_ID")})
 	client, err := app.Auth(ctx)
 	if err != nil {
-		log.Fatalf("error getting Auth client: %v\n", err)
+		log.ErrorF("error getting Auth client: %v\n", err)
 	}
 	return client, ctx
 }
@@ -32,7 +32,7 @@ func CreateCustomJwt(email, role, nodeType, id string) (string, error) {
 	}
 	token, err := client.CustomTokenWithClaims(ctx, id, claims)
 	if err != nil {
-		log.Fatalf("error minting custom token: %v\n", err)
+		log.ErrorF("error minting custom token: %v\n", err)
 	}
 	log.Printf("Got custom token: %v\n", token)
 	return token, err
@@ -56,29 +56,33 @@ func CreateUserWithEmailAndPassword(email string, password string, id *string) (
 }
 
 func UpdateUserEmail(uid, email string) (*auth.UserRecord, error) {
+	log.AddPrefix("UpdateUserEmail")
+	defer log.PopPrefix()
 	client, ctx := getClient()
 	params := (&auth.UserToUpdate{}).
 		Email(email).
 		EmailVerified(true)
 	userRecord, err := client.UpdateUser(ctx, uid, params)
 	if err != nil {
-		log.Printf("[UpdateUserEmail] error updating user: %v\n", err)
+		log.ErrorF("error updating user: %v\n", err)
 		return nil, err
 	}
-	log.Printf("[UpdateUserEmail] successfully updated user: %v\n", userRecord)
+	log.Printf("successfully updated user: %v\n", userRecord)
 	return userRecord, err
 }
 
 func HandleUserAuthenticationStatus(uid string, disabled bool) error {
+	log.AddPrefix("UpdateUserEmail")
+	defer log.PopPrefix()
 	client, ctx := getClient()
 	params := (&auth.UserToUpdate{}).
 		Disabled(disabled)
 	userRecord, err := client.UpdateUser(ctx, uid, params)
 	if err != nil {
-		log.Printf("[UpdateUserEmail] error updating user: %v\n", err)
+		log.ErrorF("error updating user: %v\n", err)
 		return err
 	}
-	log.Printf("[UpdateUserEmail] successfully updated user: %v\n", userRecord)
+	log.Printf("successfully updated user: %v\n", userRecord)
 	return err
 }
 
@@ -147,7 +151,7 @@ func SetCustomClaimForUser(uid string, claims map[string]interface{}) {
 
 	err := client.SetCustomUserClaims(ctx, uid, claims)
 	if err != nil {
-		log.Fatalf("error setting custom claims %v\n", err)
+		log.ErrorF("error setting custom claims %v\n", err)
 	}
 }
 
@@ -163,23 +167,24 @@ func GetAuthUserIdByEmail(mail string) (string, error) {
 }
 
 func VerifyAppcheck(handler func(w http.ResponseWriter, r *http.Request) (string, interface{}, error)) func(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-
+	log.AddPrefix("VerifyAppcheck")
+	defer log.PopPrefix()
 	wrappedHandler := func(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 		errorHandler := func(w http.ResponseWriter) (string, interface{}, error) {
-			log.Println("[VerifyAppcheck]: unauthenticated.")
+			log.Println("unauthenticated.")
 			return "", nil, fmt.Errorf("Unavailable")
 		}
 
 		ctx := context.Background()
 		app, err := firebase.NewApp(ctx, &firebase.Config{ProjectID: os.Getenv("GOOGLE_PROJECT_ID")})
 		if err != nil {
-			log.Fatalf("error initializing app: %v\n", err)
+			log.ErrorF("error initializing app: %v\n", err)
 			return errorHandler(w)
 		}
 
 		appCheck, err := app.AppCheck(context.Background())
 		if err != nil {
-			log.Fatalf("error initializing app: %v\n", err)
+			log.ErrorF("error initializing app: %v\n", err)
 			return errorHandler(w)
 		}
 

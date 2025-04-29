@@ -1,6 +1,6 @@
 package lib
 
-import "log"
+import "github.com/wopta/goworkspace/lib/log"
 
 type AuthToken struct {
 	Role          string `json:"role"`
@@ -11,6 +11,9 @@ type AuthToken struct {
 }
 
 func GetAuthTokenFromIdToken(idToken string) (AuthToken, error) {
+	log.AddPrefix("GetAuthTokenFromIdToken")
+	defer log.PopPrefix()
+
 	if idToken == "" {
 		return AuthToken{
 			Role:   UserRoleAll,
@@ -22,7 +25,7 @@ func GetAuthTokenFromIdToken(idToken string) (AuthToken, error) {
 
 	token, err := VerifyUserIdToken(idToken)
 	if err != nil {
-		log.Printf("[GetAuthTokenFromIdToken] idToken: %s , err: %v", idToken, err)
+		log.Printf("idToken: %s , err: %v", idToken, err)
 		return AuthToken{}, err
 	}
 

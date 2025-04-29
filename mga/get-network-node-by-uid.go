@@ -2,7 +2,7 @@ package mga
 
 import (
 	"errors"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -17,13 +17,13 @@ func GetNetworkNodeByUidFx(w http.ResponseWriter, r *http.Request) (string, inte
 
 	defer func() {
 		if err != nil {
-			log.Printf("error: %+v", err.Error())
+			log.ErrorF("error: %+v", err.Error())
 		}
 		log.Println("Handler end -------------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 
-	log.SetPrefix("[GetNetworkNodeByUidFx] ")
+	log.AddPrefix("[GetNetworkNodeByUidFx] ")
 	log.Println("Handler start -----------------------------------------------")
 
 	idToken := r.Header.Get("Authorization")
