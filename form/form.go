@@ -22,7 +22,7 @@ var formRoutes []lib.Route = []lib.Route{
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
-		Route:   "fleet/assistance/v1",
+		Route:   "/fleet/assistance/v1",
 		Handler: lib.ResponseLoggerWrapper(FleetAssistenceInclusiveMovement),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
