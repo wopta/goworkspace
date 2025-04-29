@@ -1,7 +1,7 @@
 {
 	"processes": [
 		{
-			"name": "emit",
+			"name": "emitCallBack",
 			"description": "Callback for emit process",
 			"order": {
 				"inWhatProcessInjected": "emit",
@@ -32,7 +32,7 @@
 					"gateways": [
 						{
 							"nextActivities": [
-								"end_emit"
+								"end"
 							],
 							"decision": "!config.emit"
 						},
@@ -94,7 +94,7 @@
 			]
 		},
 		{
-			"name": "pay",
+			"name": "payCallBack",
 			"description": "Callback for pay process",
 			"order": {
 				"inWhatProcessInjected": "pay",
@@ -125,7 +125,7 @@
 					"gateways": [
 						{
 							"nextActivities": [
-								"end_pay"
+								"end"
 							],
 							"decision": "!config.pay"
 						},
@@ -187,7 +187,7 @@
 			]
 		},
 		{
-			"name": "proposal",
+			"name": "proposalCallback",
 			"description": "Callback for proposal process",
 			"order": {
 				"inWhatProcessInjected": "proposal",
@@ -218,7 +218,7 @@
 					"gateways": [
 						{
 							"nextActivities": [
-								"end_proposal"
+								"end"
 							],
 							"decision": "!config.proposal"
 						},
@@ -280,7 +280,7 @@
 			]
 		},
 		{
-			"name": "requestApproval",
+			"name": "requestApprovalCallBack",
 			"description": "Callback for requestApproval process",
 			"order": {
 				"inWhatProcessInjected": "requestApproval",
@@ -311,7 +311,7 @@
 					"gateways": [
 						{
 							"nextActivities": [
-								"end_requestApproval"
+								"end"
 							],
 							"decision": "!config.requestApproval"
 						},
@@ -373,7 +373,7 @@
 			]
 		},
 		{
-			"name": "sign",
+			"name": "signCallback",
 			"description": "Callback for sign process",
 			"order": {
 				"inWhatProcessInjected": "sign",
@@ -404,7 +404,7 @@
 					"gateways": [
 						{
 							"nextActivities": [
-								"end_sign"
+								"end"
 							],
 							"decision": "!config.sign"
 						},

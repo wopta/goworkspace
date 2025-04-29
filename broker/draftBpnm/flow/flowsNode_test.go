@@ -2,45 +2,16 @@ package flow
 
 import (
 	"errors"
-	"net/http"
 	"testing"
 
 	bpnm "github.com/wopta/goworkspace/broker/draftBpnm"
 	"github.com/wopta/goworkspace/models"
 )
 
-type callbackConfig struct {
-	Proposal        bool `json:"proposal"`
-	RequestApproval bool `json:"requestApproval"`
-	Emit            bool `json:"emit"`
-	Pay             bool `json:"pay"`
-	Sign            bool `json:"sign"`
-
-	//need to integrate inside channel_flow first
-	//need to define AcceptanceFx
-	Approved bool `json:"approved"`
-	Rejected bool `json:"rejected"`
-}
-
-func (c *callbackConfig) GetType() string {
-	return "callbackConfig"
-}
-
-type callbackInfo struct {
-	Request     *http.Request
-	RequestBody []byte
-	Response    *http.Response
-	Error       error
-}
-
-func (c *callbackInfo) GetType() string {
-	return "callbackInfo"
-}
-
 func funcTestWithInfo(message string, log *mockLog) func(bpnm.StorageData) error {
 	return func(st bpnm.StorageData) error {
 		log.println(message)
-		st.AddLocal("callbackInfo", &callbackInfo{RequestBody: []byte("prova request")})
+		st.AddLocal("callbackInfo", &CallbackInfo{RequestBody: []byte("prova request")})
 		return nil
 	}
 }
@@ -60,7 +31,7 @@ func getBuilderFlowNode(log *mockLog, store bpnm.StorageData) *bpnm.BpnmBuilder 
 		builder.AddHandler("winSign", funcTestWithInfo("winSign", log)),
 		builder.AddHandler("baseCallback", funcTestWithInfo("baseCallback", log)),
 		builder.AddHandler("saveAudit", func(sd bpnm.StorageData) error {
-			d, e := bpnm.GetData[*callbackInfo]("callbackInfo", sd)
+			d, e := bpnm.GetData[*CallbackInfo]("callbackInfo", sd)
 			if e != nil {
 				return e
 			}
@@ -88,12 +59,12 @@ func TestEmitForWinNodeWithConfigTrue(t *testing.T) {
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("node", &winNode)
 
-	store.AddLocal("config", &callbackConfig{Emit: true})
+	store.AddLocal("config", &CallbackConfig{Emit: true})
 	exps := []string{
 		"winEmit",
 		"saveAudit prova request",
 	}
-	testFlow(t, "emit", exps, store, getBuilderFlowNode)
+	testFlow(t, "emitCallBack", exps, store, getBuilderFlowNode)
 }
 
 func TestEmitForWinNodeWithConfigFalse(t *testing.T) {
@@ -102,7 +73,7 @@ func TestEmitForWinNodeWithConfigFalse(t *testing.T) {
 	store.AddGlobal("node", &winNode)
 
 	exps := []string{}
-	store.AddLocal("config", &callbackConfig{Emit: false})
+	store.AddLocal("config", &CallbackConfig{Emit: false})
 
-	testFlow(t, "emit", exps, store, getBuilderFlowNode)
+	testFlow(t, "emitCallBack", exps, store, getBuilderFlowNode)
 }

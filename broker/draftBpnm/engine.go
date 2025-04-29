@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 
 	"github.com/maja42/goval"
+	"github.com/wopta/goworkspace/lib/log"
 )
 
 // Run a process, it starts from defaultActivity defined in json
@@ -20,7 +20,7 @@ func (f *FlowBpnm) Run(processName string) error {
 
 // Run a process, it starts from 'startingActivity'
 func (f *FlowBpnm) RunAt(processName, startingActivity string) error {
-	log.Println("Run ", processName)
+	log.InfoF("Run %v", processName)
 	process := f.process[processName]
 	if process == nil {
 		return fmt.Errorf("Process '%v' not founded", processName)
@@ -29,7 +29,7 @@ func (f *FlowBpnm) RunAt(processName, startingActivity string) error {
 	if e := process.loop(startingActivity); e != nil { //TODO: how to check if there is an infinite loop
 		return e
 	}
-	log.Println("Stop ", processName)
+	log.InfoF("Stop %v", processName)
 	return nil
 }
 
@@ -93,7 +93,7 @@ func (p *processBpnm) loop(nameActivity string) error {
 }
 
 func (act *activity) runActivity(nameProcess string, storage StorageData) error {
-	log.Printf("Run process '%v', activity '%v'", nameProcess, act.name)
+	log.InfoF("Run process '%v', activity '%v'", nameProcess, act.name)
 	if pre := act.preActivity; pre != nil {
 		if err := pre.loop(pre.defaultStart); err != nil {
 			return err
@@ -124,7 +124,7 @@ func callWithRecover(nameProcess string, storage StorageData, act *activity) *er
 			return
 		}
 		if r := recover(); r != nil || (err != nil && *err != nil) {
-			log.Printf("Run recorver process '%v', activity '%v'", nameProcess, act.name)
+			log.InfoF("Run recorver process '%v', activity '%v'", nameProcess, act.name)
 			*err = act.recover(storage)
 		}
 		*err = nil
@@ -147,7 +147,7 @@ func (act *activity) evaluateDecisions(processName string, storage StorageData, 
 			return ga.nextActivities, nil
 		}
 		if len(ga.nextActivities) == 0 {
-			log.Printf("Process '%v' has not activities", processName)
+			log.InfoF("Process '%v' has not activities", processName)
 			return []*activity{}, nil
 		}
 		resultEvaluation, err = eval.Evaluate(ga.decision, date, nil)

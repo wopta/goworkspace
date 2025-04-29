@@ -226,6 +226,9 @@ func (p *processBpnm) hydrateGateways(activities []activityBuilder) error {
 				decision:       builderGateway.Decision,
 			}
 			for iact, nextJump := range builderGateway.NextActivities {
+				if nextJump == "end" {
+					nextJump = getNameEndActivity(p.name)
+				}
 				if _, exist := p.activities[nextJump]; !exist {
 					return fmt.Errorf("No event named %v", nextJump)
 				}
