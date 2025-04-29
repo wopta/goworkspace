@@ -10,6 +10,7 @@ import (
 
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/auth"
+	env "github.com/wopta/goworkspace/lib/environment"
 )
 
 func getClient() (*auth.Client, context.Context) {
@@ -114,7 +115,7 @@ func VerifyAuthorization(handler func(w http.ResponseWriter, r *http.Request) (s
 			return "", nil, fmt.Errorf("not found")
 		}
 
-		if len(roles) == 0 || os.Getenv("env") == "local" || SliceContains(roles, "internal") {
+		if len(roles) == 0 || env.IsLocal() || SliceContains(roles, "internal") {
 			return handler(w, r)
 		}
 

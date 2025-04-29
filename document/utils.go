@@ -13,6 +13,7 @@ import (
 	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
 	lib "github.com/wopta/goworkspace/lib"
+	env "github.com/wopta/goworkspace/lib/environment"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -332,7 +333,7 @@ func GetEnterprise(list []models.Asset) *models.Enterprise {
 func Save(m pdf.Maroto, data models.Policy) (string, []byte) {
 	//-----------Save file
 	var filename string
-	if os.Getenv("env") == "local" {
+	if env.IsLocal() {
 		err := m.OutputFileAndClose("document/contract.pdf")
 		lib.CheckError(err)
 	} else {

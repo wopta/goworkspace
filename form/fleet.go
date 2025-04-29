@@ -39,17 +39,8 @@ func AxaFleet(w http.ResponseWriter, r *http.Request, spreadsheetSource string, 
 		satusCol = "J"
 	)
 
-	switch os.Getenv("env") {
-	case "local":
-		path = lib.ErrorByte(os.ReadFile("function-data/sa/positive-apex-350507-33284d6fdd55.json"))
-	case "dev":
-		path = lib.GetFromStorage("function-data", "sa/positive-apex-350507-33284d6fdd55.json", "")
-	case "prod":
-		path = lib.GetFromStorage("core-350507-function-data", "sa/positive-apex-350507-33284d6fdd55.json", "")
+	path = lib.GetFilesByEnv("sa/positive-apex-350507-33284d6fdd55.json")
 
-	default:
-
-	}
 	ctx := context.Background()
 	srv, e := sheets.NewService(ctx, option.WithCredentialsJSON(path), option.WithScopes(sheets.SpreadsheetsScope))
 	fmt.Println(e)

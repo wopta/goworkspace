@@ -80,9 +80,11 @@ changed_modules = [
 ]
 updateable_modules = [
     AUTH,
+    BPMN,
     BROKER,
     CALLBACK,
     CLAIM,
+    COMPANY_DATA,
     DOCUMENT,
     ENRICH,
     FORM,
@@ -112,6 +114,7 @@ updateable_functions = [
     BROKER,
     CALLBACK,
     CLAIM,
+    COMPANY_DATA,
     ENRICH,
     FORM,
     MAIL,

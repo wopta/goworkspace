@@ -2,13 +2,12 @@ package companydata
 
 import (
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
-	"io/ioutil"
 	"os"
 	"strconv"
 	"time"
 
-	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 )
 
 func AxaPartnersSftpUpload(filePath string) {
@@ -50,16 +49,8 @@ func AxaSftpUpload(filePath string, basePath string) {
 		pk []byte
 		e  error
 	)
-	switch os.Getenv("env") {
-	case "local":
-		pk = lib.ErrorByte(ioutil.ReadFile("function-data/env/twayserviceKey.ssh"))
-	case "dev":
-		pk = lib.GetFromStorage("function-data", "env/twayserviceKey.ssh", "")
-	case "prod":
-		pk = lib.GetFromStorage("core-350507-function-data", "env/twayserviceKey.ssh", "")
-	default:
 
-	}
+	pk = lib.GetFilesByEnv("env/twayserviceKey.ssh")
 
 	lib.CheckError(e)
 

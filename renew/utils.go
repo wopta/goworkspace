@@ -12,6 +12,7 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
+	env "github.com/wopta/goworkspace/lib/environment"
 	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
@@ -57,7 +58,7 @@ func getProductsFileList() []string {
 	)
 
 	switch os.Getenv("env") {
-	case "local", "local-test":
+	case env.Local, env.LocalTest:
 		fileList, err = lib.ListLocalFolderContent(models.ProductsFolder)
 	default:
 		fileList, err = lib.ListGoogleStorageFolderContent(models.ProductsFolder)
