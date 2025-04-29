@@ -113,17 +113,42 @@ type ErrorResponse struct {
 	Errors   map[string]any `json:"errors"`
 }
 
+const earthquakeBuildingCode = "211/00"
+const earthquakeContentCode = "211/01"
+const earthquakeStockCode = "211/02"
+const floodBuildingCode = "212/00"
+const floodContentCode = "212/01"
+const floodStockCode = "212/02"
+const landslideBuildingCode = "209/00"
+const landslideContentCode = "209/01"
+const landslideStockCode = "209/02"
+
+const earthquakeSlug = "earthquake"
+const floodSlug = "flood"
+const landslideSlug = "landslide"
+
 func (d *RequestDTO) FromPolicy(p *models.Policy) error {
 
-	d.ProductCode = "007"
+	const catNatProductCode = "007"
+	const catNatDistributorCode = "0155"
+	const catNatSecondLevelCode = "0001"
+	const catNatThirdLevelCode = "00180"
+	const catNatSplitting = "01"
+	const catNatSalesChannel = "3"
+	const catNatPersonalDataType = "2"
+
+	const yes = "si"
+	const no = "no"
+
+	d.ProductCode = catNatProductCode
 	d.Date = p.StartDate.Format("2006-01-02")
 	d.ExternalReference = p.Uid
-	d.DistributorCode = "0155"
-	d.SecondLevelCode = "0001"
-	d.ThirdLevelCode = "00180"
-	d.Splitting = "01"
-	d.Emission = "no"
-	d.SalesChannel = "3"
+	d.DistributorCode = catNatDistributorCode
+	d.SecondLevelCode = catNatSecondLevelCode
+	d.ThirdLevelCode = catNatThirdLevelCode
+	d.Splitting = catNatSplitting
+	d.Emission = no
+	d.SalesChannel = catNatSalesChannel
 
 	var atecoCode string
 	for _, v := range p.Assets {
@@ -132,7 +157,7 @@ func (d *RequestDTO) FromPolicy(p *models.Policy) error {
 		}
 	}
 	contr := Contractor{
-		PersonalDataType:          "2",
+		PersonalDataType:          catNatPersonalDataType,
 		CompanyName:               p.Contractor.Name,
 		VatNumber:                 p.Contractor.VatCode,
 		FiscalCode:                p.Contractor.FiscalCode,
@@ -140,10 +165,10 @@ func (d *RequestDTO) FromPolicy(p *models.Policy) error {
 		Phone:                     p.Contractor.Phone,
 		Email:                     p.Contractor.Mail,
 		PrivacyConsentDate:        p.StartDate.Format("2006-01-02"),
-		ProcessingConsent:         "no",
-		GenericMarketingConsent:   "no",
-		MarketingProfilingConsent: "no",
-		MarketingActivityConsent:  "no",
+		ProcessingConsent:         no,
+		GenericMarketingConsent:   no,
+		MarketingProfilingConsent: no,
+		MarketingActivityConsent:  no,
 		DocumentationFormat:       1,
 	}
 	if p.Contractor.Residence != nil {
@@ -177,12 +202,12 @@ func (d *RequestDTO) FromPolicy(p *models.Policy) error {
 	d.LegalRepresentative = legalRep
 
 	asset := AssetRequest{
-		ContractorAndTenant:  "si", // TODO
-		EarthquakeCoverage:   "no", // TODO
-		FloodCoverage:        "no", // TODO
-		EarthquakePurchase:   "no",
-		FloodPurchase:        "no",
-		LandSlidePurchase:    "no",
+		ContractorAndTenant:  yes, // TODO
+		EarthquakeCoverage:   no,  // TODO
+		FloodCoverage:        no,  // TODO
+		EarthquakePurchase:   no,
+		FloodPurchase:        no,
+		LandSlidePurchase:    no,
 		ConstructionMaterial: 0, // TODO
 		ConstructionYear:     0, // TODO
 		FloorNumber:          0, // TODO
@@ -200,70 +225,70 @@ func (d *RequestDTO) FromPolicy(p *models.Policy) error {
 			}
 		}
 		for _, g := range v.Guarantees {
-			if g.Slug == "earthquake" { // TODO check slug
-				asset.EarthquakePurchase = "si"
+			if g.Slug == earthquakeSlug { // TODO check slug
+				asset.EarthquakePurchase = yes
 				if g.Value != nil {
 					if g.Value.SumInsuredLimitOfIndemnity != 0 {
 						var gL GuaranteeList
-						gL.GuaranteeCode = "211/00"
+						gL.GuaranteeCode = earthquakeBuildingCode
 						gL.CapitalAmount = int(g.Value.SumInsuredLimitOfIndemnity)
 						asset.GuaranteeList = append(asset.GuaranteeList, gL)
 					}
 					if g.Value.SumInsured != 0 {
 						var gL GuaranteeList
-						gL.GuaranteeCode = "211/01"
+						gL.GuaranteeCode = earthquakeContentCode
 						gL.CapitalAmount = int(g.Value.SumInsured)
 						asset.GuaranteeList = append(asset.GuaranteeList, gL)
 					}
 					if g.Value.LimitOfIndemnity != 0 {
 						var gL GuaranteeList
-						gL.GuaranteeCode = "211/02"
+						gL.GuaranteeCode = earthquakeStockCode
 						gL.CapitalAmount = int(g.Value.LimitOfIndemnity)
 						asset.GuaranteeList = append(asset.GuaranteeList, gL)
 					}
 				}
 			}
-			if g.Slug == "flood" { // TODO check slug
-				asset.FloodPurchase = "si"
+			if g.Slug == floodSlug { // TODO check slug
+				asset.FloodPurchase = yes
 				if g.Value != nil {
 					if g.Value.SumInsuredLimitOfIndemnity != 0 {
 						var gL GuaranteeList
-						gL.GuaranteeCode = "212/00"
+						gL.GuaranteeCode = floodBuildingCode
 						gL.CapitalAmount = int(g.Value.SumInsuredLimitOfIndemnity)
 						asset.GuaranteeList = append(asset.GuaranteeList, gL)
 					}
 					if g.Value.SumInsured != 0 {
 						var gL GuaranteeList
-						gL.GuaranteeCode = "212/01"
+						gL.GuaranteeCode = floodContentCode
 						gL.CapitalAmount = int(g.Value.SumInsured)
 						asset.GuaranteeList = append(asset.GuaranteeList, gL)
 					}
 					if g.Value.LimitOfIndemnity != 0 {
 						var gL GuaranteeList
-						gL.GuaranteeCode = "212/02"
+						gL.GuaranteeCode = floodStockCode
 						gL.CapitalAmount = int(g.Value.LimitOfIndemnity)
 						asset.GuaranteeList = append(asset.GuaranteeList, gL)
 					}
 				}
 			}
-			if g.Slug == "landslide" { // TODO check slug
-				asset.LandSlidePurchase = "si"
+			if g.Slug == landslideSlug { // TODO check slug
+				asset.LandSlidePurchase = yes
 				if g.Value != nil {
 					if g.Value.SumInsuredLimitOfIndemnity != 0 {
 						var gL GuaranteeList
-						gL.GuaranteeCode = "209/00"
+						gL.GuaranteeCode = landslideBuildingCode
 						gL.CapitalAmount = int(g.Value.SumInsuredLimitOfIndemnity)
 						asset.GuaranteeList = append(asset.GuaranteeList, gL)
 					}
 					if g.Value.SumInsured != 0 {
 						var gL GuaranteeList
-						gL.GuaranteeCode = "209/01"
+						gL.GuaranteeCode = landslideContentCode
 						gL.CapitalAmount = int(g.Value.SumInsured)
 						asset.GuaranteeList = append(asset.GuaranteeList, gL)
 					}
 					if g.Value.LimitOfIndemnity != 0 {
 						var gL GuaranteeList
-						gL.GuaranteeCode = "209/02"
+						gL.GuaranteeCode = landslideStockCode
 						gL.CapitalAmount = int(g.Value.LimitOfIndemnity)
 						asset.GuaranteeList = append(asset.GuaranteeList, gL)
 					}
@@ -272,7 +297,7 @@ func (d *RequestDTO) FromPolicy(p *models.Policy) error {
 		}
 	}
 	d.Asset = asset
-	
+
 	return nil
 }
 
@@ -280,46 +305,48 @@ func (d *ResponseDTO) ToPolicy(p *models.Policy) error {
 	eOffer := make(map[string]*models.GuaranteValue)
 	fOffer := make(map[string]*models.GuaranteValue)
 	lOffer := make(map[string]*models.GuaranteValue)
+
 	for _, a := range d.AssetDetail {
 		for _, g := range a.GuaranteeDetail {
-			if g.GuaranteeCode == "211/00" {
+			if g.GuaranteeCode == earthquakeBuildingCode {
 				eOffer["default"].SumInsuredLimitOfIndemnity = g.GuaranteeGross
 			}
-			if g.GuaranteeCode == "211/01" {
+			if g.GuaranteeCode == earthquakeContentCode {
 				eOffer["default"].SumInsured = g.GuaranteeGross
 			}
-			if g.GuaranteeCode == "211/02" {
+			if g.GuaranteeCode == earthquakeStockCode {
 				eOffer["default"].LimitOfIndemnity = g.GuaranteeGross
 			}
-			if g.GuaranteeCode == "212/00" {
+			if g.GuaranteeCode == floodBuildingCode {
 				fOffer["default"].SumInsuredLimitOfIndemnity = g.GuaranteeGross
 			}
-			if g.GuaranteeCode == "212/01" {
+			if g.GuaranteeCode == floodContentCode {
 				fOffer["default"].SumInsured = g.GuaranteeGross
 			}
-			if g.GuaranteeCode == "212/02" {
+			if g.GuaranteeCode == floodStockCode {
 				fOffer["default"].LimitOfIndemnity = g.GuaranteeGross
 			}
-			if g.GuaranteeCode == "209/00" {
+			if g.GuaranteeCode == landslideBuildingCode {
 				lOffer["default"].SumInsuredLimitOfIndemnity = g.GuaranteeGross
 			}
-			if g.GuaranteeCode == "209/01" {
+			if g.GuaranteeCode == landslideContentCode {
 				lOffer["default"].SumInsured = g.GuaranteeGross
 			}
-			if g.GuaranteeCode == "209/02" {
+			if g.GuaranteeCode == landslideStockCode {
 				lOffer["default"].LimitOfIndemnity = g.GuaranteeGross
 			}
 		}
 	}
+
 	for _, a := range p.Assets {
 		for _, g := range a.Guarantees {
-			if g.Slug == "earthquake" {
+			if g.Slug == earthquakeSlug {
 				g.Offer = eOffer
 			}
-			if g.Slug == "flood" {
+			if g.Slug == floodSlug {
 				g.Offer = fOffer
 			}
-			if g.Slug == "landslide" {
+			if g.Slug == landslideSlug {
 				g.Offer = lOffer
 			}
 		}
