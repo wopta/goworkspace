@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"slices"
 	"time"
@@ -21,8 +21,8 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		policy models.Policy
 	)
 
-	log.SetPrefix("[LeadFx]")
-	defer log.SetPrefix("")
+	log.AddPrefix("LeadFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -31,7 +31,7 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	token := r.Header.Get("Authorization")
 	authToken, err := lib.GetAuthTokenFromIdToken(token)
 	if err != nil {
-		log.Printf("error getting authToken")
+		log.ErrorF("error getting authToken")
 		return "", nil, err
 	}
 	log.Printf(
@@ -48,7 +48,7 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	err = json.Unmarshal([]byte(body), &policy)
 	if err != nil {
-		log.Printf("error unmarshaling policy: %s", err.Error())
+		log.ErrorF("error unmarshaling policy: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -56,13 +56,13 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	err = lead(authToken, &policy)
 	if err != nil {
-		log.Printf("error creating lead: %s", err.Error())
+		log.ErrorF("error creating lead: %s", err.Error())
 		return "", nil, err
 	}
 
 	resp, err := policy.Marshal()
 	if err != nil {
-		log.Printf("error marshaling response: %s", err.Error())
+		log.ErrorF("error marshaling response: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -73,8 +73,9 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 func lead(authToken models.AuthToken, policy *models.Policy) error {
 	var err error
-
-	log.Println("[lead] start ------------------------------------------------")
+	log.AddPrefix("lead")
+	defer log.PopPrefix()
+	log.Println("start ------------------------------------------------")
 
 	if policy.Uid != "" {
 		if err = checkIfPolicyIsLead(policy); err != nil {
@@ -86,7 +87,7 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 
 	if policy.Channel == "" {
 		policy.Channel = authToken.GetChannelByRoleV2()
-		log.Printf("[lead] setting policy channel to '%s'", policy.Channel)
+		log.Printf("setting policy channel to '%s'", policy.Channel)
 	}
 
 	networkNode = network.GetNetworkNodeByUid(authToken.UserID)
@@ -94,51 +95,53 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 		warrant = networkNode.GetWarrant()
 	}
 
-	log.Println("[lead] starting bpmn flow...")
+	log.Println("starting bpmn flow...")
 	state := runBrokerBpmn(policy, leadFlowKey)
 	if state == nil || state.Data == nil {
-		log.Println("[lead] error bpmn - state not set")
+		log.Println("error bpmn - state not set")
 		return errors.New("error on bpmn - no data present")
 	}
 	*policy = *state.Data
 
-	log.Println("[lead] saving lead to firestore...")
+	log.Println("saving lead to firestore...")
 	err = lib.SetFirestoreErr(lib.PolicyCollection, policy.Uid, policy)
 	lib.CheckError(err)
 
-	log.Println("[lead] saving lead to bigquery...")
+	log.Println("saving lead to bigquery...")
 	policy.BigquerySave(origin)
 
-	log.Println("[lead] saving guarantees to bigquery...")
+	log.Println("saving guarantees to bigquery...")
 	models.SetGuaranteBigquery(*policy, "lead", lib.GuaranteeCollection)
 
-	log.Println("[lead] end --------------------------------------------------")
+	log.Println("end --------------------------------------------------")
 	return err
 }
 
 func checkIfPolicyIsLead(policy *models.Policy) error {
+	log.AddPrefix("checkIfPolicyIsLead")
+	defer log.PopPrefix()
 	var recoveredPolicy models.Policy
 	policyDoc, err := lib.GetFirestoreErr(lib.PolicyCollection, policy.Uid)
 	if err != nil {
-		log.Printf("[checkIfPolicyIsLead] error getting policy %s from firebase: %s", policy.Uid, err.Error())
+		log.ErrorF("error getting policy %s from firebase: %s", policy.Uid, err.Error())
 		return nil
 	} else if !policyDoc.Exists() {
-		log.Printf("[checkIfPolicyIsLead] policy %s not found on Firebase", policy.Uid)
+		log.Printf("policy %s not found on Firebase", policy.Uid)
 		return nil
 	}
 
 	if err := policyDoc.DataTo(&recoveredPolicy); err != nil {
-		log.Printf("[checkIfPolicyIsLead] error converting policy %s data: %s", policy.Uid, err.Error())
+		log.ErrorF("error converting policy %s data: %s", policy.Uid, err.Error())
 		return nil
 	}
 
 	allowedStatus := []string{models.PolicyStatusInit, models.PolicyStatusPartnershipLead, models.PolicyStatusInitLead}
 	if !slices.Contains(allowedStatus, recoveredPolicy.Status) {
-		log.Printf("[checkIfPolicyIsLead] error policy %s is not a lead", policy.Uid)
+		log.ErrorF("error policy %s is not a lead", policy.Uid)
 		return errors.New("policy is not a lead")
 	}
 
-	log.Printf("[checkIfPolicyIsLead] found lead for existing policy %s", policy.Uid)
+	log.Printf("found lead for existing policy %s", policy.Uid)
 
 	policy.CreationDate = recoveredPolicy.CreationDate
 	policy.Status = recoveredPolicy.Status
@@ -151,8 +154,10 @@ func checkIfPolicyIsLead(policy *models.Policy) error {
 	return nil
 }
 
-func SetLeadData(policy *models.Policy, product models.Product) {
-	log.Println("[setLeadData] start -----------------------------------------")
+func setLeadData(policy *models.Policy, product models.Product) {
+	log.AddPrefix("SetLeadData")
+	defer log.PopPrefix()
+	log.Println("start -----------------------------------------")
 
 	now := time.Now().UTC()
 
@@ -163,7 +168,7 @@ func SetLeadData(policy *models.Policy, product models.Product) {
 		policy.Status = models.PolicyStatusInitLead
 		policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 	}
-	log.Printf("[setLeadData] policy status %s", policy.Status)
+	log.Printf("policy status %s", policy.Status)
 
 	policy.IsSign = false
 	policy.IsPay = false
@@ -183,7 +188,7 @@ func SetLeadData(policy *models.Policy, product models.Product) {
 
 	setRenewInfo(policy, product)
 
-	log.Println("[setLeadData] add information set")
+	log.Println("add information set")
 	informationSet := models.Attachment{
 		Name:     "Precontrattuale",
 		FileName: "Precontrattuale.pdf",
@@ -203,7 +208,7 @@ func SetLeadData(policy *models.Policy, product models.Product) {
 		*policy.Attachments = append(*policy.Attachments, informationSet)
 	}
 
-	log.Println("[setLeadData] end -------------------------------------------")
+	log.Println("end -------------------------------------------")
 }
 
 func setPolicyProducerNode(policy *models.Policy, node *models.NetworkNode) {

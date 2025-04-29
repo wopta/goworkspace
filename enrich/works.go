@@ -2,7 +2,7 @@ package enrich
 
 import (
 	"encoding/json"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
 	"github.com/wopta/goworkspace/lib"
@@ -14,8 +14,8 @@ func WorksFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 		result []Work
 	)
 
-	log.SetPrefix("[WorksFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("WorksFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 

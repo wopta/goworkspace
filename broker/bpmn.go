@@ -2,7 +2,7 @@ package broker
 
 import (
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"os"
 	"strings"
 
@@ -36,8 +36,9 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		flow     []models.Process
 		flowFile *models.NodeSetting
 	)
-
-	log.Println("[runBrokerBpmn] configuring flow ----------------------------")
+	log.AddPrefix("RunBrokerBpmn")
+	defer log.PopPrefix()
+	log.Println("configuring flow ----------------------------")
 
 	toAddress = mail.Address{}
 	ccAddress = mail.Address{}
@@ -45,10 +46,10 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 
 	flowName, flowFile = policy.GetFlow(networkNode, warrant)
 	if flowFile == nil {
-		log.Println("[runBrokerBpmn] exiting bpmn - flowFile not loaded")
+		log.Println("exiting bpmn - flowFile not loaded")
 		return nil
 	}
-	log.Printf("[runBrokerBpmn] flowName '%s'", flowName)
+	log.Printf("flowName '%s'", flowName)
 
 	product = prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode, warrant)
 	mgaProduct = prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
@@ -63,12 +64,12 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 	case emitFlowKey:
 		flow = flowFile.EmitFlow
 	default:
-		log.Println("[runBrokerBpmn] error flow not set")
+		log.Println("error flow not set")
 		return nil
 	}
 
 	flowHandlers := lib.SliceMap[models.Process, string](flow, func(h models.Process) string { return h.Name })
-	log.Printf("[runBrokerBpmn] starting %s flow with set handlers: %s", flowKey, strings.Join(flowHandlers, ","))
+	log.Printf("starting %s flow with set handlers: %s", flowKey, strings.Join(flowHandlers, ","))
 
 	state := bpmn.NewBpmn(*policy)
 
@@ -96,13 +97,14 @@ func addLeadHandlers(state *bpmn.State) {
 
 func setLeadBpmn(state *bpmn.State) error {
 	policy := state.Data
-	SetLeadData(policy, *mgaProduct)
+	setLeadData(policy, *mgaProduct)
 	return nil
 }
 
 func sendLeadMail(state *bpmn.State) error {
 	policy := state.Data
-
+	log.AddPrefix("SendEmail")
+	defer log.PopPrefix()
 	toAddress = mail.GetContractorEmail(policy)
 	ccAddress = mail.Address{}
 	switch flowName {
@@ -111,7 +113,7 @@ func sendLeadMail(state *bpmn.State) error {
 	}
 
 	log.Printf(
-		"[sendLeadMail] from '%s', to '%s', cc '%s'",
+		"from '%s', to '%s', cc '%s'",
 		fromAddress.String(),
 		toAddress.String(),
 		ccAddress.String(),
@@ -131,20 +133,21 @@ func addProposalHandlers(state *bpmn.State) {
 
 func setProposalBpm(state *bpmn.State) error {
 	policy := state.Data
-
+	log.AddPrefix("SetProposalData")
+	defer log.PopPrefix()
 	// TODO: remove when a proper solution to handle PMI is found
 	if policy.Name == models.PmiProduct {
 		return nil
 	}
 
 	if policy.ProposalNumber != 0 {
-		log.Printf("[setProposalData] policy '%s' already has proposal with number '%d'", policy.Uid, policy.ProposalNumber)
+		log.Printf("policy '%s' already has proposal with number '%d'", policy.Uid, policy.ProposalNumber)
 		return nil
 	}
 
-	SetProposalData(policy)
+	setProposalData(policy)
 
-	log.Printf("[setProposalData] saving proposal n. %d to firestore...", policy.ProposalNumber)
+	log.Printf("saving proposal n. %d to firestore...", policy.ProposalNumber)
 
 	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
@@ -152,7 +155,8 @@ func setProposalBpm(state *bpmn.State) error {
 
 func sendProposalMail(state *bpmn.State) error {
 	policy := state.Data
-
+	log.AddPrefix("SendProposalEmail")
+	defer log.PopPrefix()
 	// TODO: remove when a proper solution to handle PMI is found
 	if policy.Name == models.PmiProduct {
 		return nil
@@ -170,7 +174,7 @@ func sendProposalMail(state *bpmn.State) error {
 	}
 
 	log.Printf(
-		"[sendProposalMail] from '%s', to '%s', cc '%s'",
+		"from '%s', to '%s', cc '%s'",
 		fromAddress.String(),
 		toAddress.String(),
 		ccAddress.String(),
@@ -191,11 +195,13 @@ func addRequestApprovalHandlers(state *bpmn.State) {
 
 func setRequestApprovalBpmn(state *bpmn.State) error {
 	policy := state.Data
+	log.AddPrefix("SendRequestApproval")
+	defer log.PopPrefix()
 	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 
 	setRequestApprovalData(policy)
 
-	log.Printf("[setRequestApproval] saving policy with uid %s to Firestore....", policy.Uid)
+	log.Printf("saving policy with uid %s to Firestore....", policy.Uid)
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
@@ -245,12 +251,14 @@ func addEmitHandlers(state *bpmn.State) {
 func emitData(state *bpmn.State) error {
 	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 	policy := state.Data
-	EmitBase(policy, origin)
+	emitBase(policy, origin)
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
 func sendMailSign(state *bpmn.State) error {
 	policy := state.Data
+	log.AddPrefix("SendEmailSign")
+	defer log.PopPrefix()
 
 	ccAddress = mail.Address{}
 	switch flowName {
@@ -266,7 +274,7 @@ func sendMailSign(state *bpmn.State) error {
 	}
 
 	log.Printf(
-		"[sendMailSign] from '%s', to '%s', cc '%s'",
+		"from '%s', to '%s', cc '%s'",
 		fromAddress.String(),
 		toAddress.String(),
 		ccAddress.String(),
@@ -277,13 +285,13 @@ func sendMailSign(state *bpmn.State) error {
 
 func sign(state *bpmn.State) error {
 	policy := state.Data
-	EmitSign(policy, origin)
+	emitSign(policy, origin)
 	return nil
 }
 
 func pay(state *bpmn.State) error {
 	policy := state.Data
-	EmitPay(policy, origin)
+	emitPay(policy, origin)
 	if policy.PayUrl == "" {
 		return fmt.Errorf("missing payment url")
 	}
@@ -298,10 +306,12 @@ func setAdvanceBpm(state *bpmn.State) error {
 
 func updateUserAndNetworkNode(state *bpmn.State) error {
 	policy := state.Data
+	log.AddPrefix("PutUser")
+	defer log.PopPrefix()
 	// promote documents from temp bucket to user and connect it to policy
 	err := plc.SetUserIntoPolicyContractor(policy, origin)
 	if err != nil {
-		log.Printf("[putUser] ERROR SetUserIntoPolicyContractor %s", err.Error())
+		log.ErrorF("error SetUserIntoPolicyContractor %s", err.Error())
 		return err
 	}
 	return network.UpdateNetworkNodePortfolio(origin, policy, networkNode)
@@ -309,7 +319,8 @@ func updateUserAndNetworkNode(state *bpmn.State) error {
 
 func sendEmitProposalMail(state *bpmn.State) error {
 	policy := state.Data
-
+	log.AddPrefix("sendEmitProposalMail")
+	defer log.PopPrefix()
 	// TODO: remove when a proper solution to handle PMI is found
 	if policy.Name == models.PmiProduct {
 		return nil
@@ -327,8 +338,8 @@ func sendEmitProposalMail(state *bpmn.State) error {
 	}
 
 	log.Printf(
-		"[sendEmitProposalMail] from '%s', to '%s', cc '%s'",
 		fromAddress.String(),
+		"from '%s', to '%s', cc '%s'",
 		toAddress.String(),
 		ccAddress.String(),
 	)

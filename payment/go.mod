@@ -8,14 +8,16 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/google/uuid v1.6.0
-	github.com/wopta/goworkspace/callback_out v1.0.48
-	github.com/wopta/goworkspace/lib v1.0.142
-	github.com/wopta/goworkspace/mail v1.0.152
-	github.com/wopta/goworkspace/models v1.2.37
-	github.com/wopta/goworkspace/network v1.0.102
-	github.com/wopta/goworkspace/policy v1.0.185
-	github.com/wopta/goworkspace/product v1.1.34
-	github.com/wopta/goworkspace/transaction v1.0.176
+	github.com/wopta/goworkspace/accounting v1.0.7
+	github.com/wopta/goworkspace/callback_out v1.0.50
+	github.com/wopta/goworkspace/document v1.1.147
+	github.com/wopta/goworkspace/lib v1.0.143
+	github.com/wopta/goworkspace/mail v1.0.154
+	github.com/wopta/goworkspace/models v1.2.39
+	github.com/wopta/goworkspace/network v1.0.104
+	github.com/wopta/goworkspace/policy v1.0.187
+	github.com/wopta/goworkspace/product v1.1.36
+	github.com/wopta/goworkspace/transaction v1.0.180
 )
 
 require (
@@ -39,13 +41,14 @@ require (
 	github.com/cloudevents/sdk-go/v2 v2.14.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
+	github.com/fattureincloud/fattureincloud-go-sdk/v2 v2.1.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-chi/cors v1.2.1 // indirect
 	github.com/go-gota/gota v0.12.0 // indirect
 	github.com/go-jose/go-jose/v4 v4.0.1 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/go-pdf/fpdf v0.6.0 // indirect
+	github.com/go-pdf/fpdf v0.8.0 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
@@ -77,7 +80,6 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	github.com/wopta/goworkspace/document v1.1.145 // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect

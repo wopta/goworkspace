@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"strconv"
 	"time"
@@ -37,23 +37,23 @@ func RefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, interfa
 		isRenew               bool
 	)
 
-	log.SetPrefix("[RefreshPayByLinkFx] ")
+	log.AddPrefix("RefreshPayByLinkFx")
 	defer func() {
 		if err != nil {
-			log.Printf("error: %s", err)
+			log.Error(err)
 		}
 		log.Println("Handler end ---------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 
 	if err = json.NewDecoder(r.Body).Decode(&request); err != nil {
-		log.Println("error unmarshaling body")
+		log.ErrorF("error unmarshaling body")
 		return "", nil, err
 	}
 
 	isRenewParam := r.URL.Query().Get("isRenew")
 	if isRenew, err = strconv.ParseBool(isRenewParam); err != nil && isRenewParam != "" {
-		log.Printf("error parsing isRenew param '%s'", isRenewParam)
+		log.ErrorF("error parsing isRenew param '%s'", isRenewParam)
 		return "", nil, err
 	}
 
@@ -61,7 +61,7 @@ func RefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, interfa
 		policyCollection = lib.RenewPolicyCollection
 		transactionCollection = lib.RenewTransactionCollection
 		if policy, err = plcRenew.GetRenewPolicyByUid(request.PolicyUid); err != nil {
-			log.Println("error getting renew policy")
+			log.ErrorF("error getting renew policy")
 			return "", nil, err
 		}
 	} else {
@@ -69,7 +69,7 @@ func RefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, interfa
 	}
 
 	if transactions, err = getTransactionsList(policy, isRenew); err != nil {
-		log.Println("error getting transactions")
+		log.ErrorF("error getting transactions")
 		return "", nil, err
 	}
 
@@ -100,7 +100,7 @@ func RefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, interfa
 	}
 	payUrl, updatedTransactions, err := client.Update()
 	if err != nil {
-		log.Printf("error scheduling transactions on fabrick: %s", err.Error())
+		log.ErrorF("error scheduling transactions on fabrick: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -113,16 +113,16 @@ func RefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, interfa
 	policy.BigQueryParse()
 
 	if err = lib.SetFirestoreErr(policyCollection, policy.Uid, policy); err != nil {
-		log.Println("error saving policy to firestore")
+		log.ErrorF("error saving policy to firestore")
 		return "", nil, err
 	}
 	if err = lib.InsertRowsBigQuery(lib.WoptaDataset, policyCollection, policy); err != nil {
-		log.Println("error saving policy to bigquery")
+		log.ErrorF("error saving policy to bigquery")
 		return "", nil, err
 	}
 
 	if err = sendPayByLinkEmail(policy); err != nil {
-		log.Println("error sending payment email")
+		log.ErrorF("error sending payment email")
 		return "", nil, err
 	}
 
@@ -137,7 +137,7 @@ func getTransactionsList(policy models.Policy, isRenew bool) ([]models.Transacti
 
 	if isRenew {
 		if transactions, err = trRenew.GetRenewActiveTransactionsByPolicyUid(policy.Uid, policy.Annuity); err != nil {
-			log.Println("error getting renew transactions")
+			log.ErrorF("error getting renew transactions")
 			return nil, err
 		}
 	} else {

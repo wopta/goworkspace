@@ -3,7 +3,7 @@ package form
 import (
 	"context"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 	"strconv"
@@ -17,7 +17,7 @@ import (
 	//"google.golang.org/api/firebaseappcheck/v1"
 )
 
-func AxaFleet(w http.ResponseWriter, r *http.Request,spreadsheetSource string , spreadsheetArch string) ( [][]interface{}, bool, error) {
+func AxaFleet(w http.ResponseWriter, r *http.Request, spreadsheetSource string, spreadsheetArch string) ([][]interface{}, bool, error) {
 	log.Println("AxaFleetEmit")
 	log.Println(os.Getenv("env"))
 	var (
@@ -39,17 +39,8 @@ func AxaFleet(w http.ResponseWriter, r *http.Request,spreadsheetSource string , 
 		satusCol = "J"
 	)
 
-	switch os.Getenv("env") {
-	case "local":
-		path = lib.ErrorByte(os.ReadFile("function-data/sa/positive-apex-350507-33284d6fdd55.json"))
-	case "dev":
-		path = lib.GetFromStorage("function-data", "sa/positive-apex-350507-33284d6fdd55.json", "")
-	case "prod":
-		path = lib.GetFromStorage("core-350507-function-data", "sa/positive-apex-350507-33284d6fdd55.json", "")
+	path = lib.GetFilesByEnv("sa/positive-apex-350507-33284d6fdd55.json")
 
-	default:
-
-	}
 	ctx := context.Background()
 	srv, e := sheets.NewService(ctx, option.WithCredentialsJSON(path), option.WithScopes(sheets.SpreadsheetsScope))
 	fmt.Println(e)
@@ -97,15 +88,15 @@ func AxaFleet(w http.ResponseWriter, r *http.Request,spreadsheetSource string , 
 					DATAIMMATRICOLAZIONE = row[4].(string)
 					TARGA = row[2].(string)
 					MODELLO = row[3].(string)
-					now:=time.Now()
-					DATAFINECOPERTURA = "31/12/"+strconv.Itoa(now.Year())
+					now := time.Now()
+					DATAFINECOPERTURA = "31/12/" + strconv.Itoa(now.Year())
 					sequence++
 
 				} else {
 					for x, axarow := range axa.Values {
 						// var t string
 						if strings.ToUpper(axarow[13].(string)) == strings.ToUpper(row[7].(string)) {
-							fmt.Println("axarow[13] == row[2]: ",x)
+							fmt.Println("axarow[13] == row[2]: ", x)
 							progressiveFormattedpre = axarow[4].(string)
 							founded = true
 							DATAVALIDITACOPERTURA = axarow[20].(string)
@@ -157,7 +148,6 @@ func AxaFleet(w http.ResponseWriter, r *http.Request,spreadsheetSource string , 
 
 		}
 	}
-	
 
 	return excel, toEmit, e
 

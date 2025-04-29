@@ -4,10 +4,10 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 	prd "github.com/wopta/goworkspace/product"
 	"io"
-	"log"
 	"net/http"
 )
 
@@ -17,16 +17,18 @@ func ReservedFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		policy  *models.Policy
 		product *models.Product
 	)
-	log.Println("[ReservedFx] handler start ---------------------------------")
+	log.AddPrefix("ReservedFx")
+	defer log.PopPrefix()
+	log.Println("handler start ---------------------------------")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
-	log.Printf("[ReservedFx] body: %s", string(body))
+	log.Printf("body: %s", string(body))
 
 	err = json.Unmarshal(body, &policy)
 	if err != nil {
-		log.Printf("[ReservedFx] error unmarshaling request body: %s", err.Error())
+		log.ErrorF("error unmarshaling request body: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -36,7 +38,7 @@ func ReservedFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	respJson, err := json.Marshal(resp)
 
-	log.Println("[ReservedFx] handler end -----------------------------------")
+	log.Println("handler end -----------------------------------")
 
 	return string(respJson), resp, err
 }
@@ -46,11 +48,12 @@ func Reserved(policy *models.Policy, product *models.Product) *DocumentResponse 
 		rawDoc []byte
 		gsLink string
 	)
-	log.Println("[Reserved] function start ----------------------------------")
+	log.AddPrefix("Reserved")
+	log.Println("function start ----------------------------------")
 
 	switch policy.Name {
 	case models.LifeProduct:
-		log.Println("[Reserved] call lifeReserved...")
+		log.Println("call lifeReserved...")
 		gsLink, rawDoc = lifeReserved(policy, product)
 	}
 

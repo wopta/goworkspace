@@ -3,7 +3,7 @@ package document
 import (
 	"bytes"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"math"
 	"os"
 	"strings"
@@ -13,6 +13,7 @@ import (
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/ttacon/libphonenumber"
 	"github.com/wopta/goworkspace/lib"
+	env "github.com/wopta/goworkspace/lib/environment"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -69,7 +70,7 @@ func loadCustomFonts(pdf *fpdf.Fpdf) {
 
 func saveContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 	var filename string
-	if os.Getenv("env") == "local" {
+	if env.IsLocal() {
 		err := pdf.OutputFileAndClose("./document/contract.pdf")
 		lib.CheckError(err)
 	} else {
@@ -91,7 +92,7 @@ func saveProposal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 		out      bytes.Buffer
 	)
 
-	if os.Getenv("env") == "local" {
+	if env.IsLocal() {
 		err := pdf.OutputFileAndClose("./document/proposal.pdf")
 		lib.CheckError(err)
 	} else {
@@ -112,7 +113,7 @@ func saveReservedDocument(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte
 		out      bytes.Buffer
 	)
 
-	if os.Getenv("env") == "local" {
+	if env.IsLocal() {
 		err := pdf.OutputFileAndClose("./document/reserved_document.pdf")
 		lib.CheckError(err)
 	} else {
@@ -524,8 +525,10 @@ func drawDynamicCell(pdf *fpdf.Fpdf, fontSize, cellHeight, cellWidth, rowLines, 
 
 func formatPhoneNumber(phone string) string {
 	num, err := libphonenumber.Parse(phone, "IT")
+	log.AddPrefix("DisplayPhoneNumber")
+	defer log.PopPrefix()
 	if err != nil {
-		log.Printf("[DisplayPhoneNumber] error parsing phone %s", phone)
+		log.ErrorF("error parsing phone %s", phone)
 		return "================"
 	}
 	return libphonenumber.Format(num, libphonenumber.INTERNATIONAL)

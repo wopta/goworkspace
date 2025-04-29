@@ -1,7 +1,7 @@
 package callback
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
@@ -52,7 +52,6 @@ func init() {
 }
 
 func Callback(w http.ResponseWriter, r *http.Request) {
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
 	router := lib.GetRouter("callback", callbackRoutes)
 	router.ServeHTTP(w, r)

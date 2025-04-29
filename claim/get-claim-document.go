@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"log"
 	"net/http"
 	"os"
 
 	"github.com/go-chi/chi/v5"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -28,14 +28,14 @@ func GetClaimDocumentFx(w http.ResponseWriter, r *http.Request) (string, interfa
 		request  GetClaimDocumentReq
 		response GetClaimDocumentResp
 	)
-	log.SetPrefix("[GetClaimDocumentFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("GetClaimDocumentFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
 	authToken, err := lib.VerifyUserIdToken(r.Header.Get("Authorization"))
 	if err != nil {
-		log.Printf("invalid idToken, error %s", err.Error())
+		log.ErrorF("invalid idToken, error %s", err.Error())
 		return "", "", err
 	}
 
@@ -44,13 +44,13 @@ func GetClaimDocumentFx(w http.ResponseWriter, r *http.Request) (string, interfa
 
 	err = json.Unmarshal(body, &request)
 	if err != nil {
-		log.Printf("error parsing body, error %s", err.Error())
+		log.ErrorF("error parsing body, error %s", err.Error())
 		return "", "", err
 	}
 
 	res, err := getClaimDocument(r.Header.Get("Origin"), authToken.UID, chi.URLParam(r, "claimUid"), request.DocumentName)
 	if err != nil {
-		log.Printf("error getting document, error %s", err.Error())
+		log.ErrorF("error getting document, error %s", err.Error())
 		return "", "", err
 	}
 
@@ -65,16 +65,17 @@ func GetClaimDocumentFx(w http.ResponseWriter, r *http.Request) (string, interfa
 
 func getClaimDocument(origin, userUid, claimUid, fileName string) (string, error) {
 	var user models.User
-
+	log.AddPrefix("getClaimDocument")
+	defer log.PopPrefix()
 	fireUser := lib.GetDatasetByEnv(origin, lib.UserCollection)
 	docsnap, err := lib.GetFirestoreErr(fireUser, userUid)
 	if err != nil {
-		log.Printf("[getClaimDocument] error retrieving user %s from database, error message %s", userUid, err.Error())
+		log.Printf("error retrieving user %s from database, error message %s", userUid, err.Error())
 		return "", err
 	}
 	err = docsnap.DataTo(&user)
 	if err != nil {
-		log.Println("[getClaimDocument] error convert docsnap to user")
+		log.Println("error convert docsnap to user")
 		return "", err
 	}
 
@@ -92,5 +93,5 @@ func getClaimDocument(origin, userUid, claimUid, fileName string) (string, error
 		}
 	}
 
-	return "", errors.New("[getClaimDocument] not found")
+	return "", errors.New("not found")
 }

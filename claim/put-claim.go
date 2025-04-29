@@ -3,7 +3,6 @@ package claim
 import (
 	"encoding/base64"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -12,13 +11,14 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
 )
 
 func PutClaimFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.SetPrefix("[PutClaimFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("PutClaimFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -38,25 +38,27 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 		att  []mail.Attachment
 		err  error
 	)
+	log.AddPrefix("PutClaim")
+	defer log.PopPrefix()
 
 	userAuthID, err := lib.GetUserIdFromIdToken(idToken)
 	if err != nil {
-		log.Printf("[PutClaim] invalid idToken, error %s", err.Error())
+		log.ErrorF("invalid idToken, error %s", err.Error())
 		return "", nil, err
 	}
 
 	fireUsers := lib.GetDatasetByEnv(origin, lib.UserCollection)
 	docsnap, err := lib.GetFirestoreErr(fireUsers, userAuthID)
 	if err != nil {
-		log.Printf("[PutClaim] get user from DB error %s", err.Error())
+		log.ErrorF("get user from DB error %s", err.Error())
 		return "", nil, err
 	}
 	err = docsnap.DataTo(&user)
 	if err != nil {
-		log.Printf("[PutClaim] data to DB error %s", err.Error())
+		log.ErrorF("data to DB error %s", err.Error())
 		return "", nil, err
 	}
-	log.Println("[PutClaim] User: ", user)
+	log.Printf("User: %v", user)
 
 	claim.CreationDate = time.Now().UTC()
 	claim.Updated = claim.CreationDate
@@ -84,11 +86,11 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 		obj.IsAttachment = true
 	}
 
-	log.Println("[PutClaim] uploading attachments to google storage")
+	log.Println("uploading attachments to google storage")
 	for i, doc := range claim.Documents {
 		byteFile, err := base64.StdEncoding.DecodeString(doc.Byte)
 		if err != nil {
-			log.Println("[PutClaim] error decoding base64 document encoding")
+			log.ErrorF("error decoding base64 document encoding")
 			return "", nil, err
 		}
 		gsLink := lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+user.Uid+"/claims/"+
@@ -98,20 +100,20 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 		claim.Documents[i].Link = gsLink
 	}
 	obj.Attachments = &att
-	log.Println("[PutClaim] attachments uploaded to google storage")
+	log.Println("attachments uploaded to google storage")
 
 	if user.Claims == nil {
 		user.Claims = new([]models.Claim)
 	}
 	*user.Claims = append(*user.Claims, *claim)
 
-	log.Printf("[PutClaim] update user %s on firestore", user.Uid)
+	log.Printf("update user %s on firestore", user.Uid)
 	err = lib.UpdateFirestoreErr(fireUsers, user.Uid, map[string]interface{}{
 		"claims":  user.Claims,
 		"updated": time.Now().UTC(),
 	})
 	if err != nil {
-		log.Println("[PutClaim] error during user update")
+		log.ErrorF("error during user update")
 		return "", nil, err
 	}
 
@@ -119,7 +121,7 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 
 	err = claim.BigquerySave(origin)
 	if err != nil {
-		log.Printf("[PutClaim] error bigquery save claim %s", claim.ClaimUid)
+		log.ErrorF("error bigquery save claim %s", claim.ClaimUid)
 	}
 
 	return "{}", nil, nil

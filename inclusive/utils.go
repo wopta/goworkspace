@@ -3,7 +3,7 @@ package inclusive
 import (
 	"context"
 
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"os"
 
 	"cloud.google.com/go/bigquery"
@@ -23,17 +23,17 @@ func QueryRowsBigQuery[T any](datasetID string, tableID string, query string) ([
 	defer client.Close()
 	queryi := client.Query(query)
 	iter, e = queryi.Read(ctx)
-	log.Println(e)
+	log.Error(e)
 	for {
 		var row T
 		e := iter.Next(&row)
 
 		if e == iterator.Done {
-			log.Println(e)
+			log.Error(e)
 			return res, e
 		}
 		if e != nil {
-			log.Println(e)
+			log.Error(e)
 			return res, e
 		}
 
@@ -55,6 +55,6 @@ func InsertRowsBigQuery(datasetID string, tableID string, value interface{}) err
 	defer client.Close()
 	inserter := client.Dataset(datasetID).Table(tableID).Inserter()
 	e := inserter.Put(context.Background(), value)
-	log.Println(e)
+	log.Error(e)
 	return e
 }

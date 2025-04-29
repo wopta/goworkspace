@@ -2,7 +2,7 @@ package broker
 
 import (
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 
 	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"

@@ -2,12 +2,12 @@ package callback_out
 
 import (
 	"io"
-	"log"
 	"time"
 
 	"cloud.google.com/go/bigquery"
 	"github.com/wopta/goworkspace/callback_out/internal"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -55,6 +55,6 @@ func saveAudit(node *models.NetworkNode, action internal.CallbackoutAction, res 
 	}
 
 	if err := lib.InsertRowsBigQuery(lib.WoptaDataset, CallbackOutTableId, audit); err != nil {
-		log.Printf("error saving audit: %s", err)
+		log.ErrorF("error saving audit: %s", err)
 	}
 }

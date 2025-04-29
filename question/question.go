@@ -3,8 +3,8 @@ package question
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
@@ -34,7 +34,6 @@ func init() {
 }
 
 func Question(w http.ResponseWriter, r *http.Request) {
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
 	router := lib.GetRouter("question", questionRoutes)
 	router.ServeHTTP(w, r)
@@ -46,8 +45,8 @@ func GetQuestionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		policy *models.Policy
 	)
 
-	log.SetPrefix("[GetQuestionsFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("GetQuestionsFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -59,7 +58,7 @@ func GetQuestionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	err := json.Unmarshal(body, &policy)
 	if err != nil {
-		log.Printf("error unmarshaling request body: %s", err.Error())
+		log.ErrorF("error unmarshaling request body: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -78,7 +77,7 @@ func GetQuestionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	}
 
 	if err != nil {
-		log.Printf("error: %s", err.Error())
+		log.ErrorF("error: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -91,8 +90,9 @@ func GetQuestionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 func loadExternalData(productName, productVersion string) []byte {
 	var data []byte
-
-	log.Println("[loadExternalData] function start ------------")
+	log.AddPrefix("LoadExternalData")
+	defer log.PopPrefix()
+	log.Println("function start ------------")
 
 	switch productName {
 	case models.PersonaProduct:
@@ -100,9 +100,9 @@ func loadExternalData(productName, productVersion string) []byte {
 			productName, productVersion))
 	}
 
-	log.Printf("[loadExternalData] response: %s", string(data))
+	log.Printf("response: %s", string(data))
 
-	log.Println("[loadExternalData] function end ------------")
+	log.Println("function end ------------")
 
 	return data
 }

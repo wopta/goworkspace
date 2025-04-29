@@ -2,8 +2,8 @@ package broker
 
 import (
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"time"
 
@@ -30,8 +30,8 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		callbackEvent string
 	)
 
-	log.SetPrefix("[AcceptanceFx]")
-	defer log.SetPrefix("")
+	log.AddPrefix("AcceptanceFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -40,7 +40,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	token := r.Header.Get("Authorization")
 	authToken, err := lib.GetAuthTokenFromIdToken(token)
 	if err != nil {
-		log.Printf("error getting authToken: %s", err.Error())
+		log.ErrorF("error getting authToken: %s", err.Error())
 		return "", nil, err
 	}
 	log.Printf(
@@ -62,13 +62,13 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	err = lib.CheckPayload[AcceptancePayload](body, &payload, []string{"action"})
 	if err != nil {
-		log.Printf("ERROR: %s", err.Error())
+		log.ErrorF("error: %s", err.Error())
 		return "", nil, err
 	}
 
 	policy, err = plc.GetPolicy(policyUid, origin)
 	if err != nil {
-		log.Printf("error retrieving policy %s from Firestore: %s", policyUid, err.Error())
+		log.ErrorF("error retrieving policy %s from Firestore: %s", policyUid, err.Error())
 		return "", nil, err
 	}
 
@@ -94,7 +94,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	log.Println("saving to firestore...")
 	err = lib.SetFirestoreErr(firePolicy, policy.Uid, &policy)
 	if err != nil {
-		log.Printf("error saving policy to firestore: %s", err.Error())
+		log.ErrorF("error saving policy to firestore: %s", err.Error())
 		return "", nil, err
 	}
 	log.Println("firestore saved!")
@@ -103,7 +103,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	policyJsonLog, err := policy.Marshal()
 	if err != nil {
-		log.Printf("error marshaling policy: %s", err.Error())
+		log.ErrorF("error marshaling policy: %s", err.Error())
 	}
 	log.Printf("Policy: %s", string(policyJsonLog))
 

@@ -3,7 +3,7 @@ package auth
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 	"strings"
@@ -22,8 +22,8 @@ func GetTokenForExternalIntegrationFx(w http.ResponseWriter, r *http.Request) (s
 		response GetTokenForExternalIntegrationResponse
 	)
 
-	log.SetPrefix("[GetTokenForExternalIntegrationFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("GetTokenForExternalIntegrationFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 

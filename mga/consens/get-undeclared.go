@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/wopta/goworkspace/lib/log"
 	"io/fs"
-	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
+	env "github.com/wopta/goworkspace/lib/environment"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 )
@@ -28,25 +29,25 @@ func GetUndeclaredConsensFx(w http.ResponseWriter, r *http.Request) (string, any
 
 	defer func() {
 		if err != nil {
-			log.Printf("error: %v", err)
+			log.ErrorF("error: %v", err)
 		}
 		log.Println("Handler end ---------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 
-	log.SetPrefix("[GetUndeclaredConsensFx] ")
+	log.AddPrefix("[GetUndeclaredConsensFx] ")
 	log.Println("Handler start -----------------------------------------------")
 
 	idToken := r.Header.Get("Authorization")
 	authToken, err := lib.GetAuthTokenFromIdToken(idToken)
 	if err != nil {
-		log.Println("error extracting authToken")
+		log.ErrorF("error extracting authToken")
 		return "", nil, err
 	}
 
 	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
 	if networkNode == nil {
-		log.Println("error getting networkNode")
+		log.ErrorF("error getting networkNode")
 		err = errNetworkNodeNotFound
 		return "", nil, err
 	}
@@ -55,7 +56,7 @@ func GetUndeclaredConsensFx(w http.ResponseWriter, r *http.Request) (string, any
 
 	log.Println("fetching undeclared consens...")
 	if consens, err = getUndeclaredConsens(product, networkNode); err != nil {
-		log.Println("error getting undeclared consens")
+		log.ErrorF("error getting undeclared consens")
 		return "", nil, err
 	}
 
@@ -65,7 +66,7 @@ func GetUndeclaredConsensFx(w http.ResponseWriter, r *http.Request) (string, any
 	}
 
 	if responseBytes, err = json.Marshal(response); err != nil {
-		log.Println("error marshalling response")
+		log.ErrorF("error marshalling response")
 		return "", nil, err
 	}
 
@@ -134,7 +135,7 @@ func getProductConsens(product string) ([]SystemConsens, error) {
 		err               error
 	)
 	switch os.Getenv("env") {
-	case "local":
+	case env.Local:
 		fileList, err = lib.ListLocalFolderContent(path)
 	default:
 		fileList, err = lib.ListGoogleStorageFolderContent(path)

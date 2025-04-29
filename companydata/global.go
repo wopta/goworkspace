@@ -2,14 +2,15 @@ package companydata
 
 import (
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"strconv"
 	"time"
 
 	lib "github.com/wopta/goworkspace/lib"
+	env "github.com/wopta/goworkspace/lib/environment"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -68,7 +69,7 @@ func GlobalSftpDownload(filename string, bucket string, folder string) ([]byte, 
 }
 func GlobalSftpUpload(filename string, folder string) error {
 
-	if executiondate.After(from) && executiondate.Before(to) && os.Getenv("env") == "prod" {
+	if executiondate.After(from) && executiondate.Before(to) && env.IsProduction() {
 
 		client, e := lib.NewSftpclient(config)
 		println("filename: ", filename)
@@ -93,7 +94,7 @@ func GlobalSftpUpload(filename string, folder string) error {
 	return e
 }
 func GlobalSftpDelete(filename string) error {
-	if executiondate.After(from) && executiondate.Before(to) && os.Getenv("env") == "prod" {
+	if executiondate.After(from) && executiondate.Before(to) && env.IsProduction() {
 		client, e := lib.NewSftpclient(config)
 
 		println("filename: ", filename)

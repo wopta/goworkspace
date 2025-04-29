@@ -3,8 +3,8 @@ package fabrick
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -13,6 +13,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/wopta/goworkspace/lib"
+	env "github.com/wopta/goworkspace/lib/environment"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -33,7 +34,7 @@ func callFabrickRequest(req *http.Request) (*http.Response, error) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("x-auth-token", os.Getenv("FABRICK_PERSISTENT_KEY"))
 	req.Header.Set("Accept", "application/json")
-	log.Println("[getFabrickClient]", req)
+	log.Println("getFabrickClient", req)
 
 	return client.Do(req)
 }
@@ -94,7 +95,7 @@ func getFabrickRequestBody(
 	if expireDate != "" {
 		tmpExpireDate, err := time.Parse(time.DateOnly, expireDate)
 		if err != nil {
-			log.Printf("error parsing expireDate: %s", err.Error())
+			log.ErrorF("error parsing expireDate: %s", err.Error())
 			return ""
 		}
 		expireDate = time.Date(
@@ -151,7 +152,7 @@ func getFabrickRequestBody(
 
 	res, err := pay.Marshal()
 	if err != nil {
-		log.Printf("error marshalling body: %s", err.Error())
+		log.ErrorF("error marshalling body: %s", err.Error())
 		return ""
 	}
 
@@ -166,7 +167,7 @@ func getFabrickPaymentRequest(body string) *http.Request {
 
 	request, err := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(body))
 	if err != nil {
-		log.Printf("error generating fabrick payment request: %s", err.Error())
+		log.ErrorF("error generating fabrick payment request: %s", err.Error())
 		return nil
 	}
 
@@ -204,7 +205,7 @@ func createFabrickTransaction(
 		log.Printf("policy '%s' request headers: %s", policy.Uid, request.Header)
 		log.Printf("policy '%s' request body: %s", policy.Uid, request.Body)
 
-		if os.Getenv("env") == "local" || os.Getenv("env") == "local-test" {
+		if env.IsLocal() || os.Getenv("env") == env.LocalTest {
 			status := "200"
 			local := "local"
 			url := fmt.Sprintf("www.dev.wopta.it/%s", transaction.Uid)
@@ -268,12 +269,12 @@ func FabrickExpireBill(providerId string) error {
 
 	req, err := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(reqBody))
 	if err != nil {
-		log.Printf("error creating request: %s", err.Error())
+		log.ErrorF("error creating request: %s", err.Error())
 		return err
 	}
 	res, err := callFabrickRequest(req)
 	if err != nil {
-		log.Printf("error getting response: %s", err.Error())
+		log.ErrorF("error getting response: %s", err.Error())
 		return err
 	}
 
@@ -310,7 +311,7 @@ func fabrickHasMandate(userToken string) (bool, error) {
 		return false, err
 	}
 
-	if os.Getenv("env") == "local" || os.Getenv("env") == "local-test" {
+	if env.IsLocal() || os.Getenv("env") == env.LocalTest {
 		st := "INACTIVE"
 		if userToken == "user-has-token" {
 			st = "ACTIVE"
@@ -327,12 +328,12 @@ func fabrickHasMandate(userToken string) (bool, error) {
 	} else {
 		res, err := callFabrickRequest(req)
 		if err != nil {
-			log.Printf("error getting response: %s", err.Error())
+			log.ErrorF("error getting response: %s", err.Error())
 			return false, err
 		}
 
 		if res.StatusCode != http.StatusOK {
-			log.Printf("error status %s", res.Status)
+			log.ErrorF("error status %s", res.Status)
 			return false, fmt.Errorf("error status %s", res.Status)
 		}
 

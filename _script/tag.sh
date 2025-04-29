@@ -5,6 +5,7 @@ echo $2
 
 git add .
 git commit -m "$2"
+git pull wopta master 
 git push work master 
 git push google master  
 git push wopta master  

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"slices"
@@ -17,6 +16,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	env "github.com/wopta/goworkspace/lib/environment"
+	"github.com/wopta/goworkspace/lib/log"
 )
 
 type Route struct {
@@ -31,7 +32,7 @@ func ResponseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) 
 	return func(w http.ResponseWriter, r *http.Request) {
 		str, _, err := handler(w, r)
 		if err != nil {
-			log.Printf("Error: %s", err.Error())
+			log.Error(err)
 			resp := map[string]string{
 				"errorMessage": err.Error(),
 			}
@@ -49,7 +50,7 @@ func ResponseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) 
 func GetRouter(module string, routes []Route) *chi.Mux {
 	var prefix string
 
-	if IsLocal() {
+	if env.IsLocal() {
 		prefix = "/" + module
 	}
 
@@ -62,7 +63,6 @@ func GetRouter(module string, routes []Route) *chi.Mux {
 	mux.Use(middleware.SetHeader("Content-type", "application/json"))
 	mux.Use(corsMiddleware)
 	mux.Use(logRequestMiddleware)
-
 
 	for _, route := range routes {
 		mw := make([]func(http.Handler) http.Handler, 0)
@@ -87,12 +87,7 @@ func GetRouter(module string, routes []Route) *chi.Mux {
 
 func loggerConfig(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
-
-		defer func() {
-			log.SetPrefix("")
-		}()
-
+		log.ResetPrefix()
 		next.ServeHTTP(w, r)
 	})
 }
@@ -126,7 +121,7 @@ func obfuscateFields(body []byte) []byte {
 
 	err := json.Unmarshal(body, &temp)
 	if err != nil {
-		log.Printf("error unmarshaling body fields: %s", err.Error())
+		log.ErrorF("error unmarshaling body fields: %s", err.Error())
 		return []byte{}
 	}
 
@@ -138,7 +133,7 @@ func obfuscateFields(body []byte) []byte {
 
 	bb, err := json.Marshal(temp)
 	if err != nil {
-		log.Printf("error marshaling body fields: %s", err.Error())
+		log.ErrorF("error marshaling body fields: %s", err.Error())
 		return []byte{}
 	}
 
@@ -165,7 +160,7 @@ func createAuditLog(r *http.Request, payload string) {
 	log.Println("saving audit trail...")
 	audit, err := parseHttpRequest(r, payload)
 	if err != nil {
-		log.Printf("error creating audit log: %s", err.Error())
+		log.ErrorF("error creating audit log: %s", err.Error())
 	}
 	log.Printf("audit log: %v", audit)
 	if err = audit.SaveToBigQuery(); err == nil {
@@ -197,7 +192,7 @@ func corsMiddleware(next http.Handler) http.Handler {
 			AllowedMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete, http.MethodHead},
 		}
 
-		if r.Method == http.MethodOptions || IsLocal() {
+		if r.Method == http.MethodOptions || env.IsLocal() {
 			options.AllowedOrigins = []string{"*"}
 		}
 
@@ -220,35 +215,35 @@ func appCheckMiddleware(next http.Handler) http.Handler {
 		ctx := r.Context()
 		roles := ctx.Value("roles").([]string)
 
-		if len(roles) == 0 || IsLocal() || slices.Contains(roles, UserRoleInternal) {
+		if len(roles) == 0 || env.IsLocal() || slices.Contains(roles, UserRoleInternal) {
 			next.ServeHTTP(w, r)
 			return
 		}
 
 		app, err := firebase.NewApp(ctx, &firebase.Config{ProjectID: os.Getenv("GOOGLE_PROJECT_ID")})
 		if err != nil {
-			log.Printf("error initializing app: %s", err.Error())
+			log.ErrorF("error initializing app: %s", err.Error())
 			http.Error(w, "internal server error", http.StatusInternalServerError)
 			return
 		}
 
 		appCheck, err := app.AppCheck(ctx)
 		if err != nil {
-			log.Printf("error initializing app: %s\n", err.Error())
+			log.ErrorF("error initializing app: %s\n", err.Error())
 			http.Error(w, "internal server error", http.StatusInternalServerError)
 			return
 		}
 
 		appCheckToken, ok := r.Header[http.CanonicalHeaderKey("X-Firebase-AppCheck")]
 		if !ok {
-			log.Printf("error missing token")
+			log.ErrorF("error missing token")
 			http.Error(w, "forbidden", http.StatusForbidden)
 			return
 		}
 
 		_, err = appCheck.VerifyToken(appCheckToken[0])
 		if err != nil {
-			log.Printf("error invalid token: %s", err.Error())
+			log.ErrorF("error invalid token: %s", err.Error())
 			http.Error(w, "forbidden", http.StatusForbidden)
 			return
 		}
@@ -269,14 +264,14 @@ func checkEntitlement(next http.Handler) http.Handler {
 
 		idToken := strings.ReplaceAll(r.Header.Get("Authorization"), "Bearer ", "")
 		if idToken == "" {
-			log.Println("empty token")
+			log.ErrorF("empty token")
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
 
 		token, err := VerifyUserIdToken(idToken)
 		if err != nil {
-			log.Printf("verify id token error: %s", err.Error())
+			log.ErrorF("verify id token error: %s", err.Error())
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
@@ -287,7 +282,7 @@ func checkEntitlement(next http.Handler) http.Handler {
 		}
 
 		if !slices.Contains(roles, userRole) {
-			log.Printf("userRole '%s' not allowed", userRole)
+			log.ErrorF("userRole '%s' not allowed", userRole)
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}

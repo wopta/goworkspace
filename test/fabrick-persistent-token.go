@@ -3,8 +3,8 @@ package test
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"os"
 
@@ -27,8 +27,8 @@ func fabrickPersistentToken(r *http.Request) (string, interface{}, error) {
 		body fabrickPersistentTokenReq
 	)
 
-	log.SetPrefix("[fabrickPersistentToken] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("fabrickPersistentToken")
+	defer log.PopPrefix()
 	log.Println("Handler Start -----------------------------------------------")
 
 	rawBody := lib.ErrorByte(io.ReadAll(r.Body))

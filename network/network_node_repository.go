@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"os"
 	"time"
 
@@ -95,21 +95,22 @@ func UpdateNode(node models.NetworkNode) error {
 		err          error
 		originalNode *models.NetworkNode
 	)
+	log.AddPrefix("UpdateNode")
+	defer log.PopPrefix()
+	log.Println("function start ----------------------------------")
 
-	log.Println("[UpdateNode] function start ----------------------------------")
-
-	log.Printf("[UpdateNode] fetching network node %s from Firestore...", node.Uid)
+	log.Printf("fetching network node %s from Firestore...", node.Uid)
 
 	originalNode, err = GetNodeByUid(node.Uid)
 	if err != nil {
-		log.Printf("[UpdateNode] error fetching network node from firestore: %s", err.Error())
+		log.Printf("error fetching network node from firestore: %s", err.Error())
 		return err
 	}
 
 	if originalNode.Code != node.Code {
 		err = TestNetworkNodeUniqueness(node.Code)
 		if err != nil {
-			log.Printf("[UpdateNode] error testing network node uniqueness: %s", err.Error())
+			log.Printf("error testing network node uniqueness: %s", err.Error())
 			return err
 		}
 	}
@@ -117,7 +118,7 @@ func UpdateNode(node models.NetworkNode) error {
 	if originalNode.AuthId != "" && originalNode.Mail != node.Mail {
 		_, err := lib.UpdateUserEmail(node.Uid, node.Mail)
 		if err != nil {
-			log.Printf("[UpdateNode] error updating network node mail on Firebase Auth: %s", err.Error())
+			log.Printf("error updating network node mail on Firebase Auth: %s", err.Error())
 			return err
 		}
 	}
@@ -129,7 +130,7 @@ func UpdateNode(node models.NetworkNode) error {
 		err = lib.HandleUserAuthenticationStatus(originalNode.Uid, !node.IsActive)
 		if err != nil {
 			// TODO: in case of error we might want to restore the old email in auth
-			log.Printf("[UpdateNode] error updating network node auth status on Firebase Auth: %s", err.Error())
+			log.ErrorF("error updating network node auth status on Firebase Auth: %s", err.Error())
 			return err
 		}
 	}
@@ -154,7 +155,7 @@ func UpdateNode(node models.NetworkNode) error {
 
 	err = addWorksForUid(originalNode, &node)
 	if err != nil {
-		log.Printf("[UpdateNode] error updating WorksForUid '%s' in network node '%s': %s", originalNode.WorksForUid, originalNode.Uid, err.Error())
+		log.ErrorF("error updating WorksForUid '%s' in network node '%s': %s", originalNode.WorksForUid, originalNode.Uid, err.Error())
 		return err
 	}
 
@@ -175,15 +176,15 @@ func UpdateNode(node models.NetworkNode) error {
 		originalNode.Role = node.Type
 	}
 
-	log.Printf("[UpdateNode] writing network node %s in Firestore...", originalNode.Uid)
+	log.Printf("writing network node %s in Firestore...", originalNode.Uid)
 
 	err = originalNode.SaveFirestore()
 	if err != nil {
-		log.Printf("[UpdateNode] error updating network node %s in Firestore", originalNode.Uid)
+		log.ErrorF("error updating network node %s in Firestore", originalNode.Uid)
 		return err
 	}
 
-	log.Printf("[UpdateNode] writing network node %s in BigQuery...", originalNode.Uid)
+	log.Printf("writing network node %s in BigQuery...", originalNode.Uid)
 
 	return originalNode.SaveBigQuery("")
 }
@@ -192,7 +193,7 @@ func updateNodeTreeRelations(node models.NetworkNode) error {
 	ctx := context.Background()
 	client, err := bigquery.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
 	if err != nil {
-		log.Printf("error getting BigQuery client: %s", err.Error())
+		log.ErrorF("error getting BigQuery client: %s", err.Error())
 		return err
 	}
 	defer client.Close()
@@ -232,14 +233,16 @@ func updateNodeTreeRelations(node models.NetworkNode) error {
 }
 
 func GetNetworkNodeByUid(nodeUid string) *models.NetworkNode {
+	log.AddPrefix("GetNetworkNodeByUid")
+	defer log.PopPrefix()
 	if nodeUid == "" {
-		log.Println("[GetNetworkNodeByUid] nodeUid empty")
+		log.Println("nodeUid empty")
 		return nil
 	}
 
 	networkNode, err := GetNodeByUid(nodeUid)
 	if err != nil {
-		log.Printf("[GetNetworkNodeByUid] error getting producer %s from Firestore", nodeUid)
+		log.ErrorF("error getting producer %s from Firestore", nodeUid)
 	}
 
 	return networkNode
@@ -247,11 +250,13 @@ func GetNetworkNodeByUid(nodeUid string) *models.NetworkNode {
 
 func GetAllNetworkNodes() ([]models.NetworkNode, error) {
 	var nodes []models.NetworkNode
+	log.AddPrefix("GetAllNetworkNodes")
+	defer log.PopPrefix()
 	docIterator := lib.OrderFirestore(lib.NetworkNodesCollection, "code", firestore.Asc)
 
 	snapshots, err := docIterator.GetAll()
 	if err != nil {
-		log.Printf("[GetAllNetworkNodes] error getting nodes from Firestore: %s", err.Error())
+		log.ErrorF("error getting nodes from Firestore: %s", err.Error())
 		return nodes, err
 	}
 
@@ -259,7 +264,7 @@ func GetAllNetworkNodes() ([]models.NetworkNode, error) {
 		var node models.NetworkNode
 		err = snapshot.DataTo(&node)
 		if err != nil {
-			log.Printf("[GetAllNetworkNodes] error parsing node %s: %s", snapshot.Ref.ID, err.Error())
+			log.ErrorF("error parsing node %s: %s", snapshot.Ref.ID, err.Error())
 		} else {
 			nodes = append(nodes, node)
 		}
@@ -269,8 +274,10 @@ func GetAllNetworkNodes() ([]models.NetworkNode, error) {
 }
 
 func DeleteNetworkNodeByUid(origin, nodeUid string) error {
+	log.AddPrefix("DeleteNetworkNodeByUid")
+	defer log.PopPrefix()
 	if nodeUid == "" {
-		log.Println("[DeleteNetworkNodeByUid] no nodeUid specified")
+		log.ErrorF("no nodeUid specified")
 		return fmt.Errorf("no nodeUid specified")
 	}
 
@@ -280,31 +287,33 @@ func DeleteNetworkNodeByUid(origin, nodeUid string) error {
 }
 
 func UpdateNetworkNodePortfolio(origin string, policy *models.Policy, networkNode *models.NetworkNode) error {
+	log.AddPrefix("UpdateNetworkNodePortfolio")
+	defer log.PopPrefix()
 	if networkNode == nil {
-		log.Printf("[UpdateNetworkNodePortfolio] no networkNode specified")
+		log.Printf("no networkNode specified")
 		return nil
 	}
 
-	log.Printf("[UpdateNetworkNodePortfolio] adding policy %s to networkNode %s portfolio", policy.Uid, networkNode.Uid)
+	log.Printf("adding policy %s to networkNode %s portfolio", policy.Uid, networkNode.Uid)
 
 	networkNode.Policies = append(networkNode.Policies, policy.Uid)
 
 	if !lib.SliceContains(networkNode.Users, policy.Contractor.Uid) {
-		log.Printf("[UpdateNetworkNodePortfolio] adding user %s to networkNode %s users list", policy.Contractor.Uid, networkNode.Uid)
+		log.Printf("adding user %s to networkNode %s users list", policy.Contractor.Uid, networkNode.Uid)
 		networkNode.Users = append(networkNode.Users, policy.Contractor.Uid)
 	}
 
 	networkNode.UpdatedDate = time.Now().UTC()
 
-	log.Printf("[UpdateNetworkNodePortfolio] saving networkNode %s to Firestore...", networkNode.Uid)
+	log.Printf("saving networkNode %s to Firestore...", networkNode.Uid)
 	fireNetwork := lib.GetDatasetByEnv(origin, lib.NetworkNodesCollection)
 	err := lib.SetFirestoreErr(fireNetwork, networkNode.Uid, networkNode)
 	if err != nil {
-		log.Printf("[UpdateNetworkNodePortfolio] error saving networkNode %s to Firestore: %s", networkNode.Uid, err.Error())
+		log.Printf("error saving networkNode %s to Firestore: %s", networkNode.Uid, err.Error())
 		return err
 	}
 
-	log.Printf("[UpdateNetworkNodePortfolio] saving networkNode %s to BigQuery...", networkNode.Uid)
+	log.Printf("saving networkNode %s to BigQuery...", networkNode.Uid)
 	err = networkNode.SaveBigQuery(origin)
 
 	return err
@@ -426,9 +435,10 @@ var ErrNodeNotFound = errors.New("node not found")
 
 func GetNetworkNodeByCode(code string) (*models.NetworkNode, error) {
 	var node *models.NetworkNode
-
+	log.AddPrefix("GetNetworkNodeByCode")
+	defer log.PopPrefix()
 	if code == "" {
-		log.Println("[GetNetworkNodeByCode] code empty")
+		log.Println("code empty")
 		return nil, fmt.Errorf("empty code")
 	}
 
@@ -436,18 +446,18 @@ func GetNetworkNodeByCode(code string) (*models.NetworkNode, error) {
 	nodeDocSnapshot, err := iter.Next()
 
 	if errors.Is(err, iterator.Done) && nodeDocSnapshot == nil {
-		log.Println("[GetNetworkNodeByCode] node not found")
+		log.Println("node not found")
 		return nil, ErrNodeNotFound
 	}
 
 	if !errors.Is(err, iterator.Done) && err != nil {
-		log.Printf("[GetNetworkNodeByCode] error getting node: %s", err.Error())
+		log.Printf("error getting node: %s", err.Error())
 		return nil, err
 	}
 
 	err = nodeDocSnapshot.DataTo(&node)
 	if node == nil || err != nil {
-		log.Printf("[GetNetworkNodeByCode] could not parse node: %s", err)
+		log.Printf("could not parse node: %s", err)
 		return nil, err
 	}
 

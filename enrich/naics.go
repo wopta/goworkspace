@@ -2,7 +2,7 @@ package enrich
 
 import (
 	"encoding/json"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
 	"github.com/wopta/goworkspace/lib"
@@ -14,8 +14,8 @@ func NaicsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 		result []Naics
 	)
 
-	log.SetPrefix("[NaicsFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("NaicsFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 

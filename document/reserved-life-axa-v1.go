@@ -4,14 +4,16 @@ import (
 	"fmt"
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
-	"log"
 	"strings"
 	"time"
 )
 
 func lifeReserved(policy *models.Policy, product *models.Product) (string, []byte) {
-	log.Println("[lifeReserved] function start ------------------------------")
+	log.AddPrefix("lifeReserved")
+	defer log.PopPrefix()
+	log.Println("function start ------------------------------")
 
 	pdf := initFpdf()
 
@@ -33,7 +35,7 @@ func lifeReserved(policy *models.Policy, product *models.Product) (string, []byt
 
 	gsLink, out := saveReservedDocument(pdf, policy)
 
-	log.Println("[lifeReserved] function end --------------------------------")
+	log.Println("function end --------------------------------")
 
 	return gsLink, out
 }

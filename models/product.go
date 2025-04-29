@@ -2,11 +2,11 @@ package models
 
 import (
 	"encoding/json"
-	"log"
 	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"google.golang.org/api/iterator"
 )
 
@@ -40,6 +40,7 @@ type Product struct {
 	EmitMaxElapsedDays uint               `json:"emitMaxElapsedDays" firestore:"-" bigquery:"-"`
 	Categories         []string           `json:"categories" firestore:"-" bigquery:"-"`
 	ConsultancyConfig  *ConsultancyConfig `json:"consultancyConfig" firestore:"consultancyConfig" bigquery:"-"`
+	IsAIAgentEnabled   bool               `json:"isAIAgentEnabled" firestore:"isAIAgentEnabled" bigquery:"-"`
 
 	// DEPRECATED FIELDS
 
@@ -308,7 +309,7 @@ func ProductToListData(query *firestore.DocumentIterator) []Product {
 			if err == iterator.Done {
 				break
 			}
-			log.Println(err)
+			log.Error(err)
 		}
 		var value Product
 		e := d.DataTo(&value)

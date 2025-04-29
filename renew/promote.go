@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"sync"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -33,13 +33,15 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		}
 	)
 
-	log.SetPrefix("[PromoteFx] ")
+	log.AddPrefix("PromoteFx")
+
 	defer func() {
 		collectionPrefix = ""
 		if err != nil {
-			log.Printf("error: %s", err.Error())
+			log.Error(err)
 		}
 		log.Println("Handler end -------------------------------------------------")
+		log.PopPrefix()
 	}()
 
 	log.Println("Handler start -----------------------------------------------")
@@ -47,13 +49,13 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	reqBytes := lib.ErrorByte(io.ReadAll(r.Body))
 	err = json.Unmarshal(reqBytes, &request)
 	if err != nil {
-		log.Printf("error unmarshalling request: %s", err.Error())
+		log.ErrorF("error unmarshalling request: %s", err.Error())
 		return "", nil, err
 	}
 
 	if request.Date != "" {
 		if targetDate, err = time.Parse(time.DateOnly, request.Date); err != nil {
-			log.Printf("error parsing request.Date: %s", err.Error())
+			log.ErrorF("error parsing request.Date: %s", err.Error())
 			return "", nil, err
 		}
 	}
@@ -66,7 +68,7 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 
 	policies, err := getRenewingPolicies(targetDate)
 	if err != nil {
-		log.Printf("error querying bigquery: %s", err.Error())
+		log.ErrorF("error querying bigquery: %s", err.Error())
 		return "", nil, err
 	}
 	log.Printf("found %02d policies", len(policies))

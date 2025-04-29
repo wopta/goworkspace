@@ -4,13 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
-
-	"golang.org/x/exp/slices"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/wiseproxy"
+	"golang.org/x/exp/slices"
 )
 
 func CanUserRegisterUseCase(fiscalCode string) (bool, *models.User, *string, *string) {

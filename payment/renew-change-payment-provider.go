@@ -3,7 +3,7 @@ package payment
 import (
 	"encoding/json"
 	"errors"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"strings"
 	"time"
@@ -35,22 +35,22 @@ func RenewChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (strin
 		unpaidTransactions   = make([]models.Transaction, 0)
 	)
 
-	log.SetPrefix("[RenewChangePaymentProviderFx] ")
+	log.AddPrefix("[RenewChangePaymentProviderFx] ")
 	defer func() {
 		if err != nil {
-			log.Printf("error: %s", err)
+			log.ErrorF("error: %s", err)
 		}
 		log.Println("Handler end ---------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
-		log.Println("error decoding body")
+		log.ErrorF("error decoding body")
 		return "", nil, err
 	}
 
 	if policy, err = plcRenew.GetRenewPolicyByUid(req.PolicyUid); err != nil {
-		log.Println("error getting renew policy")
+		log.ErrorF("error getting renew policy")
 		return "", nil, err
 	}
 
@@ -60,7 +60,7 @@ func RenewChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (strin
 	}
 
 	if activeTransactions, err = trsRenew.GetRenewActiveTransactionsByPolicyUid(policy.Uid, policy.Annuity); err != nil {
-		log.Println("error getting renew transactions")
+		log.ErrorF("error getting renew transactions")
 		return "", nil, err
 	}
 
@@ -91,7 +91,7 @@ func RenewChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (strin
 	client := NewClient(policy.Payment, policy, *product, unpaidTransactions, req.ScheduleFirstRate, "")
 	payUrl, updatedTransactions, err = client.Update()
 	if err != nil {
-		log.Printf("error changing payment provider to %s: %s", req.ProviderName, err.Error())
+		log.ErrorF("error changing payment provider to %s: %s", req.ProviderName, err.Error())
 		return "", nil, err
 	}
 
@@ -101,17 +101,17 @@ func RenewChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (strin
 	policy.BigQueryParse()
 
 	if err = common.SaveTransactionsToDB(updatedTransactions, lib.RenewTransactionCollection); err != nil {
-		log.Println("error saving transactions")
+		log.ErrorF("error saving transactions")
 		return "", nil, err
 	}
 
 	if err = lib.SetFirestoreErr(lib.RenewPolicyCollection, policy.Uid, policy); err != nil {
-		log.Println("error saving policy to firestore")
+		log.ErrorF("error saving policy to firestore")
 		return "", nil, err
 	}
 
 	if err = lib.InsertRowsBigQuery(lib.WoptaDataset, lib.RenewPolicyCollection, policy); err != nil {
-		log.Println("error saving policy to bigquery")
+		log.ErrorF("error saving policy to bigquery")
 		return "", nil, err
 	}
 
@@ -119,7 +119,7 @@ func RenewChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (strin
 	resp.Transactions = responseTransactions
 
 	if rawResp, err = json.Marshal(resp); err != nil {
-		log.Println("error marshaling response")
+		log.ErrorF("error marshaling response")
 		return "", nil, err
 	}
 

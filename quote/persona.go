@@ -3,8 +3,8 @@ package quote
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"math"
 	"net/http"
 	"slices"
@@ -23,8 +23,8 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		warrant *models.Warrant
 	)
 
-	log.Println("[PersonaFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("PersonaFx")
+	defer log.PopPrefix()
 	log.Println("Handler start -----------------------------------------------")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
@@ -32,7 +32,7 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 
 	err := json.Unmarshal(body, &policy)
 	if err != nil {
-		log.Printf("error unmarshaling body: %s", err.Error())
+		log.ErrorF("error unmarshaling body: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -40,7 +40,7 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 
 	authToken, err := lib.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	if err != nil {
-		log.Printf("error getting authToken from idToken: %s", err.Error())
+		log.ErrorF("error getting authToken from idToken: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -58,7 +58,7 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	log.Println("start quoting")
 
 	if err = Persona(&policy, authToken.GetChannelByRoleV2(), networkNode, warrant, flow); err != nil {
-		log.Printf("error on quote: %s", err.Error())
+		log.ErrorF("error on quote: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -71,8 +71,9 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 
 func Persona(policy *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant, flow string) error {
 	var personaRates map[string]json.RawMessage
-
-	log.Println("[Persona] function start -----------------------------------")
+	log.AddPrefix("Persona")
+	defer log.PopPrefix()
+	log.Println("function start -----------------------------------")
 
 	personProduct := sellable.Persona(*policy, channel, networkNode, warrant)
 
@@ -82,14 +83,14 @@ func Persona(policy *models.Policy, channel string, networkNode *models.NetworkN
 		policy.Name, policy.ProductVersion))
 	err := json.Unmarshal(b, &personaRates)
 	if err != nil {
-		log.Printf("[Persona] error unmarshaling persona rates: %s", err.Error())
+		log.ErrorF("error unmarshaling persona rates: %s", err.Error())
 		return err
 	}
 
 	policy.StartDate = lib.SetDateToStartOfDay(time.Now().UTC())
 	policy.EndDate = lib.AddMonths(policy.StartDate, 12)
 
-	log.Println("[Persona] populating policy guarantees list")
+	log.Println("populating policy guarantees list")
 
 	guaranteesList := make([]models.Guarante, 0)
 	for _, guarantee := range personProduct.Companies[0].GuaranteesMap {
@@ -97,11 +98,11 @@ func Persona(policy *models.Policy, channel string, networkNode *models.NetworkN
 	}
 	policy.Assets[0].Guarantees = guaranteesList
 
-	log.Println("[Persona] init offer prices struct")
+	log.Println("init offer prices struct")
 
 	initOfferPrices(policy, personProduct)
 
-	log.Println("[Persona] calculate guarantees prices")
+	log.Println("calculate guarantees prices")
 
 	for _, guarantee := range policy.Assets[0].Guarantees {
 		switch guarantee.Slug {
@@ -120,7 +121,7 @@ func Persona(policy *models.Policy, channel string, networkNode *models.NetworkN
 		case "IPM":
 			contractorAge, err := policy.CalculateContractorAge()
 			if err != nil {
-				log.Printf("[Persona] error calculate contractor age: %s", err.Error())
+				log.ErrorF("error calculate contractor age: %s", err.Error())
 				return err
 			}
 			if contractorAge < 66 {
@@ -129,15 +130,15 @@ func Persona(policy *models.Policy, channel string, networkNode *models.NetworkN
 		}
 	}
 
-	log.Println("[Persona] applying discounts")
+	log.Println("applying discounts")
 
 	applyDiscounts(policy)
 
-	log.Println("[Persona] calculate offers prices")
+	log.Println("calculate offers prices")
 
 	calculatePersonaOfferPrices(policy)
 
-	log.Println("[Persona] round offers prices")
+	log.Println("round offers prices")
 
 	roundMonthlyOfferPrices(policy, "IPI", "DRG")
 
@@ -145,11 +146,11 @@ func Persona(policy *models.Policy, channel string, networkNode *models.NetworkN
 
 	roundToTwoDecimalPlaces(policy)
 
-	log.Println("[Persona] apply consultacy price")
-	
+	log.Println("apply consultacy price")
+
 	addConsultacyPrice(policy, personProduct)
 
-	log.Println("[Persona] filter by minimum price")
+	log.Println("filter by minimum price")
 
 	companyIdx := slices.IndexFunc(personProduct.Companies, func(c models.Company) bool {
 		return c.Name == policy.Company
@@ -157,11 +158,11 @@ func Persona(policy *models.Policy, channel string, networkNode *models.NetworkN
 
 	filterOffersByMinimumPrice(policy, personProduct.Companies[companyIdx].MinimumYearlyPrice, personProduct.Companies[companyIdx].MinimumMonthlyPrice)
 
-	log.Println("[Persona] filtering available rates")
+	log.Println("filtering available rates")
 
 	removeOfferRate(policy, availableRate)
 
-	log.Println("[Persona] function end -----------------------------------")
+	log.Println("function end -----------------------------------")
 
 	return nil
 }

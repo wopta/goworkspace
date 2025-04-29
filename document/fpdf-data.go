@@ -3,7 +3,7 @@ package document
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"sort"
 	"strconv"
 	"strings"
@@ -80,7 +80,8 @@ func loadLifeBeneficiariesInfo(policy *models.Policy) ([]map[string]string, stri
 
 func loadProponentInfo(networkNode *models.NetworkNode) map[string]string {
 	policyProponent := make(map[string]string)
-
+	log.AddPrefix("loadProponentInfo")
+	defer log.PopPrefix()
 	policyProponent["name"] = "Wopta Assicurazioni Srl"
 
 	if networkNode == nil || networkNode.Type == models.PartnershipNetworkNodeType || networkNode.IsMgaProponent {
@@ -126,7 +127,7 @@ func loadProponentInfo(networkNode *models.NetworkNode) map[string]string {
 	}
 
 	jsonProponent, _ := json.Marshal(policyProponent)
-	log.Printf("[loadProponentInfo] proponent info %s", string(jsonProponent))
+	log.Printf("proponent info %s", string(jsonProponent))
 	return policyProponent
 }
 
@@ -138,13 +139,15 @@ func loadProducerInfo(origin string, networkNode *models.NetworkNode) map[string
 		"ruiRegistration": "02.03.2022",
 	}
 
+	log.AddPrefix("loadProducerInfo")
+	defer log.PopPrefix()
 	if networkNode == nil || strings.EqualFold(networkNode.Type, models.PartnershipNetworkNodeType) {
 		jsonProducer, _ := json.Marshal(policyProducer)
-		log.Printf("[loadProducerInfo] producer info %s", string(jsonProducer))
+		log.Printf("producer info %s", string(jsonProducer))
 		return policyProducer
 	}
 
-	log.Printf("[loadProducerInfo] setting producer %s info, producerType %s", networkNode.Uid, networkNode.Type)
+	log.Printf("setting producer %s info, producerType %s", networkNode.Uid, networkNode.Type)
 
 	switch networkNode.Type {
 	case models.AgentNetworkNodeType:
@@ -160,7 +163,7 @@ func loadProducerInfo(origin string, networkNode *models.NetworkNode) map[string
 	}
 
 	jsonProducer, _ := json.Marshal(policyProducer)
-	log.Printf("[loadProducerInfo] producer info %s", string(jsonProducer))
+	log.Printf("producer info %s", string(jsonProducer))
 
 	return policyProducer
 }
@@ -209,7 +212,7 @@ func loadDesignation(networkNode *models.NetworkNode) string {
 		)
 	}
 
-	log.Printf("[loadDesignation] designation info %s", designation)
+	log.Printf("designation info %s", designation)
 
 	return designation
 }
@@ -343,6 +346,8 @@ func loadAnnex4Section1Info(policy *models.Policy, networkNode *models.NetworkNo
 			"Assicurazione %s, iscritto al RUI sezione A nr A000701923 dal 14.02.2022, ai sensi dell’articolo 22, " +
 			"comma 10, del decreto legge 18 ottobre 2012, n. 179, convertito nella legge 17 dicembre 2012, n. 221"
 	)
+	log.AddPrefix("loadAnnex4Section1Info")
+	defer log.PopPrefix()
 
 	if policy.Channel != models.NetworkChannel || networkNode == nil || networkNode.IsMgaProponent {
 		section1Info = fmt.Sprintf(
@@ -361,7 +366,7 @@ func loadAnnex4Section1Info(policy *models.Policy, networkNode *models.NetworkNo
 		)
 	}
 
-	log.Printf("[loadAnnex4Section1Info] section 1 info: %s", section1Info)
+	log.Printf("section 1 info: %s", section1Info)
 
 	return section1Info
 }

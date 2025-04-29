@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi/v5"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/transaction"
 )
@@ -31,8 +31,8 @@ func PutNetworkTransactionFx(w http.ResponseWriter, r *http.Request) (string, an
 		request PutNetworkTransactionRequest
 	)
 
-	log.SetPrefix("[PutNetworkTransactionFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("PutNetworkTransactionFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -41,7 +41,7 @@ func PutNetworkTransactionFx(w http.ResponseWriter, r *http.Request) (string, an
 
 	networkTransaction := transaction.GetNetworkTransactionByUid(uid)
 	if networkTransaction == nil {
-		log.Println("error network transaction not found")
+		log.ErrorF("error network transaction not found")
 		return "", "", fmt.Errorf("no network transaction found for uid %s", uid)
 	}
 
@@ -50,7 +50,7 @@ func PutNetworkTransactionFx(w http.ResponseWriter, r *http.Request) (string, an
 
 	err = json.Unmarshal(body, &request)
 	if err != nil {
-		log.Printf("error unmarshaling request: %s", err.Error())
+		log.ErrorF("error unmarshaling request: %s", err.Error())
 		return "", "", err
 	}
 

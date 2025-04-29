@@ -1,9 +1,8 @@
 package enrich
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -19,23 +18,15 @@ func AtecoFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 		enrichByte []byte
 	)
 
-	log.SetPrefix("[AtecoFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("[AtecoFx] ")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
 	ateco := chi.URLParam(r, "ateco")
 	log.Println(ateco)
 
-	switch os.Getenv("env") {
-	case "local":
-		ricAteco = lib.ErrorByte(os.ReadFile("function-data/data/rules/Riclassificazione_Ateco.csv"))
-	case "dev":
-		ricAteco = lib.GetFromStorage("function-data", "data/rules/Riclassificazione_Ateco.csv", "")
-	case "prod":
-		ricAteco = lib.GetFromStorage("core-350507-function-data", "data/rules/Riclassificazione_Ateco.csv", "")
-	default:
-	}
+	ricAteco = lib.GetFilesByEnv("data/rules/Riclassificazione_Ateco.csv")
 
 	df := lib.CsvToDataframe(ricAteco)
 	fil := df.Filter(

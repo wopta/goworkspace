@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 
@@ -25,8 +25,8 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		fabrickCallback FabrickCallback
 	)
 
-	log.SetPrefix("[PaymentFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("PaymentFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -39,12 +39,12 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 
 	err = json.Unmarshal([]byte(request), &fabrickCallback)
 	if err != nil {
-		log.Printf("ERROR unmarshaling request (%s): %s", string(request), err.Error())
+		log.ErrorF("error unmarshaling request (%s): %s", string(request), err.Error())
 		return fmt.Sprintf(responseFormat, false, string(request)), nil, nil
 	}
 
 	if fabrickCallback.PaymentID == nil {
-		log.Printf("ERROR no providerId found: %s", err.Error())
+		log.ErrorF("error no providerId found: %s", err.Error())
 		return "", nil, fmt.Errorf("no providerId found")
 	}
 	providerId = *fabrickCallback.PaymentID
@@ -68,7 +68,7 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	}
 
 	if err != nil {
-		log.Printf("ERROR request (%s): %s", string(request), err.Error())
+		log.ErrorF("error request (%s): %s", string(request), err.Error())
 		return fmt.Sprintf(responseFormat, false, string(request)), nil, nil
 	}
 
@@ -82,28 +82,30 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 }
 
 func fabrickPayment(origin, providerId string, policy *models.Policy) error {
-	log.Printf("[fabrickPayment] Policy %s", policy.Uid)
+	log.AddPrefix("fabrickPayment")
+	defer log.PopPrefix()
+	log.Printf("Policy %s", policy.Uid)
 
 	policy.SanitizePaymentData()
 
 	transaction, err := tr.GetTransactionToBePaid(policy.Uid, providerId, trSchedule, lib.TransactionsCollection)
 	if err != nil {
-		log.Printf("[fabrickPayment] ERROR getting transaction: %s", err.Error())
+		log.ErrorF("error getting transaction: %s", err.Error())
 		return err
 	}
 
 	if transaction.IsPay {
-		log.Printf("[fabrickPayment] ERROR Policy %s with transaction %s already paid", policy.Uid, transaction.Uid)
+		log.ErrorF("error Policy %s with transaction %s already paid", policy.Uid, transaction.Uid)
 		return errors.New("transaction already paid")
 	}
 
 	state := runCallbackBpmn(policy, payFlowKey)
 	if state == nil || state.Data == nil {
-		log.Println("[fabrickPayment] error bpmn - state not set")
+		log.Println("error bpmn - state not set")
 		return nil
 	}
 	if state.IsFailed {
-		log.Println("[fabrickPayment] error bpmn - state failed")
+		log.Println("error bpmn - state failed")
 		return nil
 	}
 
