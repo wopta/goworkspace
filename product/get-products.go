@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/wopta/goworkspace/lib"
+	env "github.com/wopta/goworkspace/lib/environment"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -132,7 +133,7 @@ func getProductsFileList() []string {
 	log.AddPrefix("GetNetworkNodeProducts")
 	defer log.PopPrefix()
 	switch os.Getenv("env") {
-	case "local":
+	case env.Local:
 		fileList, err = lib.ListLocalFolderContent(models.ProductsFolder)
 	default:
 		fileList, err = lib.ListGoogleStorageFolderContent(models.ProductsFolder)

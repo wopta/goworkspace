@@ -380,19 +380,9 @@ func PmiAllriskDeprecated(w http.ResponseWriter, r *http.Request) (string, inter
 
 	json.Unmarshal([]byte(request), &result)
 	//swich source by env for retive data
-	switch os.Getenv("env") {
-	case "local":
-		groule = lib.ErrorByte(ioutil.ReadFile("../function-data/dev/grules/" + rulesFile))
-		ricAteco = lib.ErrorByte(ioutil.ReadFile("function-data/data/rules/Riclassificazione_Ateco.csv"))
-	case "dev":
-		groule = lib.GetFromStorage("function-data", "grules/"+rulesFile, "")
-		ricAteco = lib.GetFromStorage("function-data", "data/rules/Riclassificazione_Ateco.csv", "")
-	case "prod":
-		groule = lib.GetFromStorage("core-350507-function-data", "grules/"+rulesFile, "")
-		ricAteco = lib.GetFromStorage("core-350507-function-data", "data/rules/Riclassificazione_Ateco.csv", "")
-	default:
+	groule = lib.GetFilesByEnv("grules/" + rulesFile)
+	ricAteco = lib.GetFilesByEnv("data/rules/Riclassificazione_Ateco.csv")
 
-	}
 	df := lib.CsvToDataframe(ricAteco)
 	fil := df.Filter(
 		dataframe.F{Colidx: 5, Colname: "Codice Ateco 2007", Comparator: series.Eq, Comparando: result["ateco"]},

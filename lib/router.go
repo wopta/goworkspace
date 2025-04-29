@@ -16,6 +16,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	env "github.com/wopta/goworkspace/lib/environment"
 	"github.com/wopta/goworkspace/lib/log"
 )
 
@@ -49,7 +50,7 @@ func ResponseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) 
 func GetRouter(module string, routes []Route) *chi.Mux {
 	var prefix string
 
-	if IsLocal() {
+	if env.IsLocal() {
 		prefix = "/" + module
 	}
 
@@ -191,7 +192,7 @@ func corsMiddleware(next http.Handler) http.Handler {
 			AllowedMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete, http.MethodHead},
 		}
 
-		if r.Method == http.MethodOptions || IsLocal() {
+		if r.Method == http.MethodOptions || env.IsLocal() {
 			options.AllowedOrigins = []string{"*"}
 		}
 
@@ -214,7 +215,7 @@ func appCheckMiddleware(next http.Handler) http.Handler {
 		ctx := r.Context()
 		roles := ctx.Value("roles").([]string)
 
-		if len(roles) == 0 || IsLocal() || slices.Contains(roles, UserRoleInternal) {
+		if len(roles) == 0 || env.IsLocal() || slices.Contains(roles, UserRoleInternal) {
 			next.ServeHTTP(w, r)
 			return
 		}

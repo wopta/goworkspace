@@ -17,6 +17,7 @@ import (
 
 	"cloud.google.com/go/storage"
 	firebase "firebase.google.com/go"
+	env "github.com/wopta/goworkspace/lib/environment"
 	"google.golang.org/api/iterator"
 )
 
@@ -138,10 +139,6 @@ func GetReaderGCS(bucket string, file string, keyPath string) io.Reader {
 	rc.Close()
 	CheckError(err)
 	return slurp
-}
-
-func deleteFiles() {
-
 }
 
 func ReadStorageDirContent(bucketName, folderPath string) [][]byte {
@@ -277,20 +274,22 @@ func PutToFireStorage(bucketname string, path string, file []byte) string {
 }
 
 func GetFilesByEnv(file string) []byte {
-	var res1 []byte
+	var res []byte
 
 	switch os.Getenv("env") {
-	case "local":
-		res1 = ErrorByte(os.ReadFile("../function-data/dev/" + file))
-	case "local-test":
-		res1 = ErrorByte(os.ReadFile("../../function-data/dev/" + file))
-	case "dev":
-		res1 = GetFromStorage("function-data", file, "")
-	case "prod":
-		res1 = GetFromStorage("core-350507-function-data", file, "")
+	case env.Local:
+		res = ErrorByte(os.ReadFile("../function-data/dev/" + file))
+	case env.LocalTest:
+		res = ErrorByte(os.ReadFile("../../function-data/dev/" + file))
+	case env.Development:
+		res = GetFromStorage("function-data", file, "")
+	case env.Uat:
+		res = GetFromStorage("core-452909-function-data", file, "")
+	case env.Production:
+		res = GetFromStorage("core-350507-function-data", file, "")
 	}
 
-	return res1
+	return res
 }
 
 func GetFilesByEnvV2(file string) ([]byte, error) {
@@ -300,13 +299,15 @@ func GetFilesByEnvV2(file string) ([]byte, error) {
 	)
 
 	switch os.Getenv("env") {
-	case "local":
+	case env.Local:
 		res, err = os.ReadFile("../function-data/dev/" + file)
-	case "local-test":
+	case env.LocalTest:
 		res, err = os.ReadFile("../../function-data/dev/" + file)
-	case "dev":
+	case env.Development:
 		res, err = GetFromStorageErr("function-data", file, "")
-	case "prod":
+	case env.Uat:
+		res, err = GetFromStorageErr("core-452909-function-data", file, "")
+	case env.Production:
 		res, err = GetFromStorageErr("core-350507-function-data", file, "")
 	}
 
@@ -317,11 +318,15 @@ func GetFolderContentByEnv(folderName string) [][]byte {
 	var res [][]byte
 
 	switch os.Getenv("env") {
-	case "local":
+	case env.Local:
 		res = ReadLocalDirContent("../function-data/dev/" + folderName)
-	case "dev":
+	case env.LocalTest:
+		res = ReadLocalDirContent("../../function-data/dev/" + folderName)
+	case env.Development:
 		res = ReadStorageDirContent("function-data", folderName)
-	case "prod":
+	case env.Uat:
+		res = ReadStorageDirContent("core-452909-function-data", folderName)
+	case env.Production:
 		res = ReadStorageDirContent("core-350507-function-data", folderName)
 	}
 
@@ -329,52 +334,56 @@ func GetFolderContentByEnv(folderName string) [][]byte {
 }
 
 func GetByteByEnv(file string, isLocal bool) []byte {
-	var res1 []byte
+	var res []byte
 	switch os.Getenv("env") {
 
-	case "local":
-		res1 = ErrorByte(os.ReadFile("../function-data/dev/" + file))
-	case "local-test":
-		res1 = ErrorByte(os.ReadFile("../../function-data/dev/" + file))
-	case "dev":
+	case env.Local:
+		res = ErrorByte(os.ReadFile("../function-data/dev/" + file))
+	case env.LocalTest:
+		res = ErrorByte(os.ReadFile("../../function-data/dev/" + file))
+	case env.Development:
 		if isLocal {
-			res1 = ErrorByte(os.ReadFile("./serverless_function_source_code/" + file))
+			res = ErrorByte(os.ReadFile("./serverless_function_source_code/" + file))
 		} else {
-			res1 = GetFromStorage("function-data", file, "")
+			res = GetFromStorage("function-data", file, "")
 		}
-	case "prod":
+	case env.Uat:
 		if isLocal {
-			res1 = ErrorByte(os.ReadFile("./serverless_function_source_code/" + file))
+			res = ErrorByte(os.ReadFile("./serverless_function_source_code/" + file))
 		} else {
-			res1 = GetFromStorage("core-350507-function-data", file, "")
+			res = GetFromStorage("core-452909-function-data", file, "")
 		}
-	default:
-
+	case env.Production:
+		if isLocal {
+			res = ErrorByte(os.ReadFile("./serverless_function_source_code/" + file))
+		} else {
+			res = GetFromStorage("core-350507-function-data", file, "")
+		}
 	}
-	return res1
+
+	return res
 }
 
 func GetAssetPathByEnv(base string) string {
-	var res1 string
+	var res string
+
 	switch os.Getenv("env") {
-	case "local":
-		res1 = base + "/assets"
-	case "dev":
-		res1 = "./serverless_function_source_code/assets"
-	case "prod":
-		res1 = "./serverless_function_source_code/assets"
-	default:
+	case env.Local:
+		res = base + "/assets"
+	case env.Development, env.Uat, env.Production:
+		res = "./serverless_function_source_code/assets"
 	}
 
-	return res1
+	return res
 }
 
 func GetAssetPathByEnvV2() string {
 	var path string
+
 	switch os.Getenv("env") {
-	case "local":
+	case env.Local:
 		path = "../function-data/dev/assets/documents/"
-	case "dev", "prod":
+	case env.Development, env.Uat, env.Production:
 		path = "./serverless_function_source_code/tmp/assets/"
 	}
 
@@ -382,7 +391,7 @@ func GetAssetPathByEnvV2() string {
 }
 
 func CheckFileExistence(filePath string) bool {
-	if IsLocal() {
+	if env.IsLocal() {
 		_, err := os.OpenFile("../function-data/dev/"+filePath, os.O_RDWR, 0755)
 		if errors.Is(err, os.ErrNotExist) {
 			return false

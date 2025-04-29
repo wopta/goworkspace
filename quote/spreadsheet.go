@@ -34,17 +34,8 @@ func (qs *QuoteSpreadsheet) Spreadsheets() ([]Cell, string) {
 		bucketSavePath = "test/download/"
 	)
 
-	switch os.Getenv("env") {
-	case "local":
-		path = lib.ErrorByte(os.ReadFile("../function-data/dev/sa/positive-apex-350507-33284d6fdd55.json"))
-	case "dev":
-		path = lib.GetFromStorage("function-data", "sa/positive-apex-350507-33284d6fdd55.json", "")
-	case "prod":
-		path = lib.GetFromStorage("core-350507-function-data", "sa/positive-apex-350507-33284d6fdd55.json", "")
+	path = lib.GetFilesByEnv("sa/positive-apex-350507-33284d6fdd55.json")
 
-	default:
-
-	}
 	ctx := context.Background()
 	spreadsheet := &GoogleSpreadsheet{
 		CredentialsByte: path,

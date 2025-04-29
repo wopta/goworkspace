@@ -13,6 +13,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/wopta/goworkspace/lib"
+	env "github.com/wopta/goworkspace/lib/environment"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -204,7 +205,7 @@ func createFabrickTransaction(
 		log.Printf("policy '%s' request headers: %s", policy.Uid, request.Header)
 		log.Printf("policy '%s' request body: %s", policy.Uid, request.Body)
 
-		if os.Getenv("env") == "local" || os.Getenv("env") == "local-test" {
+		if env.IsLocal() || os.Getenv("env") == env.LocalTest {
 			status := "200"
 			local := "local"
 			url := fmt.Sprintf("www.dev.wopta.it/%s", transaction.Uid)
@@ -310,7 +311,7 @@ func fabrickHasMandate(userToken string) (bool, error) {
 		return false, err
 	}
 
-	if os.Getenv("env") == "local" || os.Getenv("env") == "local-test" {
+	if env.IsLocal() || os.Getenv("env") == env.LocalTest {
 		st := "INACTIVE"
 		if userToken == "user-has-token" {
 			st = "ACTIVE"
