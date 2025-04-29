@@ -61,15 +61,25 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	var out []byte
 	if errResp != nil {
 		out, err = json.Marshal(errResp)
-	} else {
-		if resp.Result == "OK" {
-			_ = resp.ToPolicy(reqPolicy)
-			out, err = json.Marshal(reqPolicy)
-		} else {
-			out, err = json.Marshal(resp)
+		if err != nil {
+			log.Println("error encoding response %w", err.Error())
+			return "", nil, err
 		}
+
+		return string(out), out, err
 	}
 
+	if resp.Result != "OK" {
+		out, err = json.Marshal(resp)
+		if err != nil {
+			log.Println("error encoding response %w", err.Error())
+			return "", nil, err
+		}
+		return string(out), out, err
+	}
+
+	_ = resp.ToPolicy(reqPolicy)
+	out, err = json.Marshal(reqPolicy)
 	if err != nil {
 		log.Println("error encoding response %w", err.Error())
 		return "", nil, err
