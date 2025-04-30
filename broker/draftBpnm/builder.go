@@ -148,7 +148,7 @@ func (b *BpnmBuilder) AddHandler(nameHandler string, handler activityHandler) er
 		b.handlers = make(map[string]activityHandler)
 	}
 	if _, exist := b.handlers[nameHandler]; exist {
-		return errors.New("Handler's been already defined")
+		return fmt.Errorf("Handler %v has been already defined", nameHandler)
 	}
 	b.handlers[nameHandler] = handler
 	return nil
