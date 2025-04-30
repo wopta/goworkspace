@@ -25,7 +25,7 @@ type PaymentInfoBpmn struct {
 	callback.FabrickCallback
 }
 
-func (PaymentInfoBpmn) GetType() string {
+func (*PaymentInfoBpmn) GetType() string {
 	return "paymentInfo"
 }
 

@@ -151,6 +151,7 @@ func TestPayForEcommerce(t *testing.T) {
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("product", &productEcommerce)
 	store.AddGlobal("node", &winNode)
+	store.AddGlobal("paymentInfo", &paymentInfo)
 
 	exps := []string{
 		"updatePolicy",
@@ -305,6 +306,7 @@ func TestPayForProviderMga(t *testing.T) {
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productProviderMga)
 	store.AddGlobal("node", &winNode)
+	store.AddGlobal("paymentInfo", &paymentInfo)
 
 	exps := []string{
 		"updatePolicy",
@@ -389,6 +391,7 @@ func TestPayForRemittanceMga(t *testing.T) {
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productRemittanceMga)
 	store.AddGlobal("node", &winNode)
+	store.AddGlobal("paymentInfo", &paymentInfo)
 
 	exps := []string{}
 	testFlow(t, "pay", exps, store, getBuilderFlowChannel)
