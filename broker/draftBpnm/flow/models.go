@@ -3,6 +3,7 @@ package flow
 import (
 	"net/http"
 
+	"github.com/wopta/goworkspace/callback"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -11,10 +12,21 @@ type CallbackInfo struct {
 	RequestBody []byte
 	Response    *http.Response
 	Error       error
+	Action      string
 }
 
 func (c *CallbackInfo) GetType() string {
 	return "callbackInfo"
+}
+
+type PaymentInfoBpmn struct {
+	Schedule      string
+	PaymentMethod string
+	callback.FabrickCallback
+}
+
+func (PaymentInfoBpmn) GetType() string {
+	return "paymentInfo"
 }
 
 type CallbackConfig struct {

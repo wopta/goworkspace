@@ -216,6 +216,10 @@
 					"type": "policy"
 				},
 				{
+					"name": "paymentInfo",
+					"type": "paymentInfo"
+				},
+				{
 					"name": "product",
 					"type": "product"
 				}

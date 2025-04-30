@@ -96,6 +96,10 @@ var (
 	policyNetwork   = PolicyDraft{&models.Policy{Channel: lib.NetworkChannel}}
 )
 
+var (
+	paymentInfo = PaymentInfoBpmn{}
+)
+
 // product
 var (
 	productEcommerce     = ProductDraft{&models.Product{Flow: models.ECommerceFlow}}
@@ -185,7 +189,6 @@ func TestLeadForMga(t *testing.T) {
 	store.AddGlobal("policy", &policyMga)
 	store.AddGlobal("product", &productMga)
 	store.AddGlobal("node", &winNode)
-
 	exps := []string{
 		"setLeadData",
 	}
@@ -219,7 +222,7 @@ func TestPayForMga(t *testing.T) {
 	store.AddGlobal("policy", &policyMga)
 	store.AddGlobal("product", &productMga)
 	store.AddGlobal("node", &winNode)
-
+	store.AddGlobal("paymentInfo", &paymentInfo)
 	exps := []string{
 		"updatePolicy",
 		"payTransaction",
@@ -263,6 +266,7 @@ func TestLeadForProviderMga(t *testing.T) {
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productProviderMga)
 	store.AddGlobal("node", &winNode)
+	store.AddGlobal("paymentInfo", &paymentInfo)
 
 	exps := []string{
 		"setLeadData",
@@ -346,6 +350,7 @@ func TestLeadForRemittanceMga(t *testing.T) {
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productRemittanceMga)
 	store.AddGlobal("node", &winNode)
+	store.AddGlobal("paymentInfo", &paymentInfo)
 
 	exps := []string{
 		"setLeadData",
