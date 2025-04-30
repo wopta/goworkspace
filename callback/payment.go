@@ -44,7 +44,6 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	}
 
 	if fabrickCallback.PaymentID == nil {
-		log.ErrorF("error no providerId found: %s", err.Error())
 		return "", nil, fmt.Errorf("no providerId found")
 	}
 	providerId = *fabrickCallback.PaymentID
