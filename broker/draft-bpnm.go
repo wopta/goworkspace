@@ -81,6 +81,7 @@ func getNodeFlow() (*bpmn.BpnmBuilder, error) {
 	if e != nil {
 		return nil, e
 	}
+	//hard coded, need to be on json
 	callback := flow.CallbackConfig{
 		Proposal:        true,
 		RequestApproval: true,
@@ -98,14 +99,8 @@ func getNodeFlow() (*bpmn.BpnmBuilder, error) {
 		builder.AddHandler("winSign", callBackSigned),
 		builder.AddHandler("saveAudit", saveAudit),
 		builder.AddHandler("winPay", callBackPaid),
-		builder.AddHandler("winProposal", func(st bpmn.StorageData) error {
-			log.Println("winProposal")
-			return nil
-		}),
-		builder.AddHandler("winRequestApproval", func(st bpmn.StorageData) error {
-			log.Println("winRequestApproval")
-			return nil
-		}),
+		builder.AddHandler("winProposal", callBackProposal),
+		builder.AddHandler("winRequestApproval", callBackRequestApproval),
 	)
 	if err != nil {
 		return nil, err
@@ -721,6 +716,28 @@ func callBackEmit(st bpmn.StorageData) error {
 	return nil
 }
 
+func callBackProposal(st bpmn.StorageData) error {
+	node, err := bpmn.GetData[*flow.NetworkDraft]("node", st)
+	if err != nil {
+		return err
+	}
+	policy, err := bpmn.GetData[*flow.PolicyDraft]("policy", st)
+	if err != nil {
+		return err
+	}
+	win := win.NewClient(node.ExternalNetworkCode)
+	_info := win.Proposal(*policy.Policy)
+
+	info := flow.CallbackInfo{
+		Request:     _info.Request,
+		RequestBody: _info.RequestBody,
+		Response:    _info.Response,
+		Error:       _info.Error,
+	}
+	st.AddLocal("callbackInfo", &info)
+	return nil
+}
+
 func callBackPaid(st bpmn.StorageData) error {
 	node, err := bpmn.GetData[*flow.NetworkDraft]("node", st)
 	if err != nil {
@@ -732,6 +749,28 @@ func callBackPaid(st bpmn.StorageData) error {
 	}
 	win := win.NewClient(node.ExternalNetworkCode)
 	_info := win.Paid(*policy.Policy)
+
+	info := flow.CallbackInfo{
+		Request:     _info.Request,
+		RequestBody: _info.RequestBody,
+		Response:    _info.Response,
+		Error:       _info.Error,
+	}
+	st.AddLocal("callbackInfo", &info)
+	return nil
+}
+
+func callBackRequestApproval(st bpmn.StorageData) error {
+	node, err := bpmn.GetData[*flow.NetworkDraft]("node", st)
+	if err != nil {
+		return err
+	}
+	policy, err := bpmn.GetData[*flow.PolicyDraft]("policy", st)
+	if err != nil {
+		return err
+	}
+	win := win.NewClient(node.ExternalNetworkCode)
+	_info := win.RequestApproval(*policy.Policy)
 
 	info := flow.CallbackInfo{
 		Request:     _info.Request,
