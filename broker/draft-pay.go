@@ -92,7 +92,7 @@ func fabrickPayment(origin, providerId string, policy *models.Policy, paymentInf
 		log.ErrorF("error getting transaction: %s", err.Error())
 		return err
 	}
-
+	//TODO: to remove after test
 	//	if transaction.IsPay {
 	//		log.ErrorF("error Policy %s with transaction %s already paid", policy.Uid, transaction.Uid)
 	//		return errors.New("transaction already paid")

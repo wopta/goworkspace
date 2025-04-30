@@ -80,7 +80,7 @@ func DraftEmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	policy, err = plc.GetPolicy(uid, origin)
 	lib.CheckError(err)
-
+	//TODO: to remove after test
 	//	if policy.Channel == models.NetworkChannel && policy.ProducerUid != authToken.UserID {
 	//		log.Printf("user %s cannot emit policy %s because producer not equal to request user", authToken.UserID, policy.Uid)
 	//		return "", nil, errors.New("operation not allowed")
@@ -88,7 +88,7 @@ func DraftEmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	policyJsonLog, _ := policy.Marshal()
 	log.Printf("Policy %s JSON: %s", uid, string(policyJsonLog))
-
+	//TODO: to remove after test
 	//	if policy.IsPay || policy.IsSign || policy.CompanyEmit || policy.CompanyEmitted || policy.IsDeleted {
 	//		log.Printf("cannot emit policy %s because state is not correct", policy.Uid)
 	//		return "", nil, errors.New("operation not allowed")

@@ -90,6 +90,5 @@ func namirialStepFinished(origin, policyUid string) error {
 
 	policy.BigquerySave(origin)
 
-	//callback_out.Execute(networkNode, policy, callback_out.Signed)
 	return nil
 }

@@ -13,6 +13,7 @@ import (
 	"cloud.google.com/go/bigquery"
 	bpmn "github.com/wopta/goworkspace/broker/draftBpnm"
 	"github.com/wopta/goworkspace/broker/draftBpnm/flow"
+	"github.com/wopta/goworkspace/callback_out/win"
 	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/lib/log"
@@ -93,74 +94,24 @@ func getNodeFlow() (*bpmn.BpnmBuilder, error) {
 	builder.SetStorage(store)
 	err := bpmn.IsError(
 		builder.AddHandler("baseCallback", baseRequest),
-		builder.AddHandler("winEmit", func(st bpmn.StorageData) error {
-			log.Println("winEmit")
-			return nil
-		}),
-		builder.AddHandler("winLead", func(st bpmn.StorageData) error {
-			log.Println("winLead")
-			return nil
-		}),
-		builder.AddHandler("winPay", func(st bpmn.StorageData) error {
-			log.Println("winPay")
-			return nil
-		}), builder.AddHandler("winProposal", func(st bpmn.StorageData) error {
+		builder.AddHandler("winEmit", callBackEmit),
+		builder.AddHandler("winSign", callBackSigned),
+		builder.AddHandler("saveAudit", saveAudit),
+		builder.AddHandler("winPay", callBackPaid),
+		builder.AddHandler("winProposal", func(st bpmn.StorageData) error {
 			log.Println("winProposal")
 			return nil
 		}),
 		builder.AddHandler("winRequestApproval", func(st bpmn.StorageData) error {
 			log.Println("winRequestApproval")
 			return nil
-		}), builder.AddHandler("winSign", func(st bpmn.StorageData) error {
-			log.Println("winSign")
-			return nil
 		}),
-		builder.AddHandler("saveAudit", saveAudit),
 	)
 	if err != nil {
 		return nil, err
 	}
 	return builder, nil
 }
-
-//func inspratica(policy models.Policy, state, producer string) ([]byte, error) {
-//	winPolicy := policyDto(policy, producer)
-//	payload := inspraticaReq{
-//		Anagrafica:   winPolicy.Anagrafica,
-//		Garanzie:     winPolicy.Garanzie,
-//		IdPratica:    winPolicy.IdPratica,
-//		PerAss:       winPolicy.PerAss,
-//		Prodotto:     winPolicy.Prodotto,
-//		TotaleAnnuo:  winPolicy.TotaleAnnuo,
-//		TotaleFirma:  winPolicy.TotaleFirma,
-//		TotaleFutura: winPolicy.TotaleFutura,
-//		Utente:       winPolicy.Utente,
-//		StatoPratica: state,
-//	}
-//
-//	return json.Marshal(payload)
-//}
-//func winEmit(st bpmn.StorageData) flow.CallbackInfo {
-//	path := "restba/extquote/inspratica"
-//	node, err := bpmn.GetData[*flow.NetworkDraft]("node", st)
-//	body, err := inspratica(policy, "QUOTAZIONE_ACCETTATA", node.ExternalNetworkCode)
-//	if err != nil {
-//		return internal.CallbackInfo{
-//			Request:     nil,
-//			RequestBody: nil,
-//			Response:    nil,
-//			Error:       err,
-//		}
-//	}
-//
-//	req, res, err := c.post(bytes.NewReader(body))
-//	return internal.CallbackInfo{
-//		Request:     req,
-//		RequestBody: body,
-//		Response:    res,
-//		Error:       err,
-//	}
-//}
 
 type auditSchema struct {
 	CreationDate  bigquery.NullDateTime `bigquery:"creationDate"`
@@ -745,6 +696,72 @@ func sendEmitProposalMailDraft(state bpmn.StorageData) error {
 	)
 
 	mail.SendMailProposal(*policy.Policy, addresses.FromAddress, addresses.ToAddress, addresses.CcAddress, flowName, []string{models.ProposalAttachmentName})
+	return nil
+}
+
+func callBackEmit(st bpmn.StorageData) error {
+	node, err := bpmn.GetData[*flow.NetworkDraft]("node", st)
+	if err != nil {
+		return err
+	}
+	policy, err := bpmn.GetData[*flow.PolicyDraft]("policy", st)
+	if err != nil {
+		return err
+	}
+	win := win.NewClient(node.ExternalNetworkCode)
+	_info := win.Emit(*policy.Policy)
+
+	info := flow.CallbackInfo{
+		Request:     _info.Request,
+		RequestBody: _info.RequestBody,
+		Response:    _info.Response,
+		Error:       _info.Error,
+	}
+	st.AddLocal("callbackInfo", &info)
+	return nil
+}
+
+func callBackPaid(st bpmn.StorageData) error {
+	node, err := bpmn.GetData[*flow.NetworkDraft]("node", st)
+	if err != nil {
+		return err
+	}
+	policy, err := bpmn.GetData[*flow.PolicyDraft]("policy", st)
+	if err != nil {
+		return err
+	}
+	win := win.NewClient(node.ExternalNetworkCode)
+	_info := win.Paid(*policy.Policy)
+
+	info := flow.CallbackInfo{
+		Request:     _info.Request,
+		RequestBody: _info.RequestBody,
+		Response:    _info.Response,
+		Error:       _info.Error,
+	}
+	st.AddLocal("callbackInfo", &info)
+	return nil
+}
+
+func callBackSigned(st bpmn.StorageData) error {
+	node, err := bpmn.GetData[*flow.NetworkDraft]("node", st)
+	if err != nil {
+		return err
+	}
+	policy, err := bpmn.GetData[*flow.PolicyDraft]("policy", st)
+	if err != nil {
+		return err
+	}
+	win := win.NewClient(node.ExternalNetworkCode)
+	_info := win.Signed(*policy.Policy)
+
+	info := flow.CallbackInfo{
+		Request:     _info.Request,
+		RequestBody: _info.RequestBody,
+		Response:    _info.Response,
+		Error:       _info.Error,
+	}
+	st.AddLocal("callbackInfo", &info)
 	return nil
 }
 
