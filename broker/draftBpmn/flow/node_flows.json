@@ -464,6 +464,192 @@
 					]
 				}
 			]
+		},
+		{
+			"name": "approvedCallBack",
+			"description": "Callback for approved process",
+			"order": {
+				"inWhatProcessInjected": "approved",
+				"inWhatActivityInjected": "end",
+				"order": "post"
+			},
+			"globalData": [
+				{
+					"name": "policy",
+					"type": "policy"
+				},
+				{
+					"name": "node",
+					"type": "networkNode"
+				}
+			],
+			"defaultStart": "init",
+			"activities": [
+				{
+					"name": "init",
+					"inputData": [
+						{
+							"name": "config",
+							"type": "callbackConfig"
+						}
+					],
+					"handlerless": true,
+					"gateways": [
+						{
+							"nextActivities": [
+								"end"
+							],
+							"decision": "!config.approved"
+						},
+						{
+							"nextActivities": [
+								"winApproved"
+							],
+							"decision": "node.callbackConfig.name==`winClient`"
+						},
+						{
+							"nextActivities": [
+								"baseCallback"
+							],
+							"decision": "node.callbackConfig.name==`facileBrokerClient`"
+						}
+					]
+				},
+				{
+					"name": "baseCallback",
+					"outputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					],
+					"gateways": [
+						{
+							"nextActivities": [
+								"saveAudit"
+							]
+						}
+					]
+				},
+				{
+					"name": "winApproved",
+					"outputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					],
+					"gateways": [
+						{
+							"nextActivities": [
+								"saveAudit"
+							]
+						}
+					]
+				},
+				{
+					"name": "saveAudit",
+					"inputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "rejectedCallBack",
+			"description": "Callback for rejected process",
+			"order": {
+				"inWhatProcessInjected": "rejected",
+				"inWhatActivityInjected": "end",
+				"order": "post"
+			},
+			"globalData": [
+				{
+					"name": "policy",
+					"type": "policy"
+				},
+				{
+					"name": "node",
+					"type": "networkNode"
+				}
+			],
+			"defaultStart": "init",
+			"activities": [
+				{
+					"name": "init",
+					"inputData": [
+						{
+							"name": "config",
+							"type": "callbackConfig"
+						}
+					],
+					"handlerless": true,
+					"gateways": [
+						{
+							"nextActivities": [
+								"end"
+							],
+							"decision": "!config.rejected"
+						},
+						{
+							"nextActivities": [
+								"winRejected"
+							],
+							"decision": "node.callbackConfig.name==`winClient`"
+						},
+						{
+							"nextActivities": [
+								"baseCallback"
+							],
+							"decision": "node.callbackConfig.name==`facileBrokerClient`"
+						}
+					]
+				},
+				{
+					"name": "baseCallback",
+					"outputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					],
+					"gateways": [
+						{
+							"nextActivities": [
+								"saveAudit"
+							]
+						}
+					]
+				},
+				{
+					"name": "winRejected",
+					"outputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					],
+					"gateways": [
+						{
+							"nextActivities": [
+								"saveAudit"
+							]
+						}
+					]
+				},
+				{
+					"name": "saveAudit",
+					"inputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					]
+				}
+			]
 		}
 	]
 }

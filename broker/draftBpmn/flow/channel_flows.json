@@ -458,6 +458,72 @@
 					"name": "sendMailContract"
 				}
 			]
+		},
+		{
+			"name": "approved",
+			"description": "Approved process",
+			"order": {
+				"inWhatProcessInjected": "approved",
+				"inWhatActivityInjected": "end",
+				"order": "post"
+			},
+			"globalData": [
+				{
+					"name": "policy",
+					"type": "policy"
+				},
+				{
+					"name": "node",
+					"type": "networkNode"
+				}
+			],
+			"defaultStart": "init",
+			"activities": [
+				{
+					"name": "init",
+					"inputData": [
+						{
+							"name": "config",
+							"type": "callbackConfig"
+						}
+					],
+					"handlerless": true,
+					"gateways": []
+				}
+			]
+		},
+		{
+			"name": "rejected",
+			"description": "Rejected process",
+			"order": {
+				"inWhatProcessInjected": "rejected",
+				"inWhatActivityInjected": "end",
+				"order": "post"
+			},
+			"globalData": [
+				{
+					"name": "policy",
+					"type": "policy"
+				},
+				{
+					"name": "node",
+					"type": "networkNode"
+				}
+			],
+			"defaultStart": "init",
+			"activities": [
+				{
+					"name": "init",
+					"inputData": [
+						{
+							"name": "config",
+							"type": "callbackConfig"
+						}
+					],
+					"handlerless": true,
+					"gateways": []
+				}
+			]
 		}
 	]
 }
