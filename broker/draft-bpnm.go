@@ -501,10 +501,6 @@ func sendProposalMailDraft(state bpmn.StorageData) error {
 	return nil
 }
 
-//	======================================
-//	REQUEST APPROVAL FUNCTIONS
-//	======================================
-
 func setRequestApprovalBpmnDraft(state bpmn.StorageData) error {
 	policy, e := bpmn.GetData[*flow.PolicyDraft]("policy", state)
 	if e != nil {
