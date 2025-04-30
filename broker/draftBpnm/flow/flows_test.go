@@ -98,6 +98,7 @@ var (
 
 var (
 	paymentInfo = PaymentInfoBpmn{}
+	addresses   = Addresses{}
 )
 
 // product
@@ -113,6 +114,8 @@ func TestEmitForEcommerce(t *testing.T) {
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("product", &productEcommerce)
 	store.AddGlobal("node", &winNode)
+	store.AddGlobal("addresses", &addresses)
+
 	exps := []string{
 		"setProposalData",
 		"emitData",
@@ -129,6 +132,8 @@ func TestLeadForEcommerce(t *testing.T) {
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("product", &productEcommerce)
 	store.AddGlobal("node", &winNode)
+	store.AddGlobal("addresses", &addresses)
+
 	exps := []string{
 		"setLeadData",
 		"sendLeadMail",
@@ -141,6 +146,7 @@ func TestProposalForEcommerce(t *testing.T) {
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("product", &productEcommerce)
 	store.AddGlobal("node", &winNode)
+	store.AddGlobal("addresses", &addresses)
 
 	exps := []string{}
 	testFlow(t, "proposal", exps, store, getBuilderFlowChannel)
@@ -152,6 +158,7 @@ func TestPayForEcommerce(t *testing.T) {
 	store.AddGlobal("product", &productEcommerce)
 	store.AddGlobal("node", &winNode)
 	store.AddGlobal("paymentInfo", &paymentInfo)
+	store.AddGlobal("addresses", &addresses)
 
 	exps := []string{
 		"updatePolicy",
@@ -165,6 +172,7 @@ func TestSignForEcommerce(t *testing.T) {
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("product", &productEcommerce)
 	store.AddGlobal("node", &winNode)
+	store.AddGlobal("addresses", &addresses)
 
 	exps := []string{
 		"fillAttachments",
@@ -180,6 +188,7 @@ func TestEmitForMga(t *testing.T) {
 	store.AddGlobal("policy", &policyMga)
 	store.AddGlobal("product", &productMga)
 	store.AddGlobal("node", &winNode)
+	store.AddGlobal("addresses", &addresses)
 
 	exps := []string{}
 	testFlow(t, "emit", exps, store, getBuilderFlowChannel)
@@ -190,6 +199,8 @@ func TestLeadForMga(t *testing.T) {
 	store.AddGlobal("policy", &policyMga)
 	store.AddGlobal("product", &productMga)
 	store.AddGlobal("node", &winNode)
+	store.AddGlobal("addresses", &addresses)
+
 	exps := []string{
 		"setLeadData",
 	}
@@ -201,6 +212,7 @@ func TestProposalForMga(t *testing.T) {
 	store.AddGlobal("policy", &policyMga)
 	store.AddGlobal("product", &productMga)
 	store.AddGlobal("node", &winNode)
+	store.AddGlobal("addresses", &addresses)
 
 	exps := []string{
 		"setProposalData",
@@ -213,6 +225,7 @@ func TestApprovalForMga(t *testing.T) {
 	store.AddGlobal("policy", &policyMga)
 	store.AddGlobal("product", &productMga)
 	store.AddGlobal("node", &winNode)
+	store.AddGlobal("addresses", &addresses)
 
 	exps := []string{}
 	testFlow(t, "requestApproval", exps, store, getBuilderFlowChannel)
@@ -224,6 +237,8 @@ func TestPayForMga(t *testing.T) {
 	store.AddGlobal("product", &productMga)
 	store.AddGlobal("node", &winNode)
 	store.AddGlobal("paymentInfo", &paymentInfo)
+	store.AddGlobal("addresses", &addresses)
+
 	exps := []string{
 		"updatePolicy",
 		"payTransaction",
@@ -236,6 +251,7 @@ func TestSignForMga(t *testing.T) {
 	store.AddGlobal("policy", &policyMga)
 	store.AddGlobal("product", &productMga)
 	store.AddGlobal("node", &winNode)
+	store.AddGlobal("addresses", &addresses)
 
 	exps := []string{
 		"fillAttachments",
@@ -250,6 +266,7 @@ func TestEmitForProviderMga(t *testing.T) {
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productProviderMga)
 	store.AddGlobal("node", &winNode)
+	store.AddGlobal("addresses", &addresses)
 
 	exps := []string{
 		"setProposalData",
@@ -268,6 +285,7 @@ func TestLeadForProviderMga(t *testing.T) {
 	store.AddGlobal("product", &productProviderMga)
 	store.AddGlobal("node", &winNode)
 	store.AddGlobal("paymentInfo", &paymentInfo)
+	store.AddGlobal("addresses", &addresses)
 
 	exps := []string{
 		"setLeadData",
@@ -280,6 +298,7 @@ func TestProposalForProviderMga(t *testing.T) {
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productProviderMga)
 	store.AddGlobal("node", &winNode)
+	store.AddGlobal("addresses", &addresses)
 
 	exps := []string{
 		"setProposalData",
@@ -293,6 +312,7 @@ func TestApprovalForProviderMga(t *testing.T) {
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productProviderMga)
 	store.AddGlobal("node", &winNode)
+	store.AddGlobal("addresses", &addresses)
 
 	exps := []string{
 		"setRequestApprovalData",
@@ -307,6 +327,7 @@ func TestPayForProviderMga(t *testing.T) {
 	store.AddGlobal("product", &productProviderMga)
 	store.AddGlobal("node", &winNode)
 	store.AddGlobal("paymentInfo", &paymentInfo)
+	store.AddGlobal("addresses", &addresses)
 
 	exps := []string{
 		"updatePolicy",
@@ -320,6 +341,7 @@ func TestSignForProviderMga(t *testing.T) {
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("product", &productProviderMga)
 	store.AddGlobal("node", &winNode)
+	store.AddGlobal("addresses", &addresses)
 
 	exps := []string{
 		"fillAttachments",
@@ -335,6 +357,7 @@ func TestEmitForRemittanceMga(t *testing.T) {
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productRemittanceMga)
 	store.AddGlobal("node", &winNode)
+	store.AddGlobal("addresses", &addresses)
 
 	exps := []string{
 		"setProposalData",
@@ -353,6 +376,7 @@ func TestLeadForRemittanceMga(t *testing.T) {
 	store.AddGlobal("product", &productRemittanceMga)
 	store.AddGlobal("node", &winNode)
 	store.AddGlobal("paymentInfo", &paymentInfo)
+	store.AddGlobal("addresses", &addresses)
 
 	exps := []string{
 		"setLeadData",
@@ -365,6 +389,7 @@ func TestProposalForRemittanceMga(t *testing.T) {
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productRemittanceMga)
 	store.AddGlobal("node", &winNode)
+	store.AddGlobal("addresses", &addresses)
 
 	exps := []string{
 		"setProposalData",
@@ -378,6 +403,7 @@ func TestApprovalForRemittanceMga(t *testing.T) {
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productRemittanceMga)
 	store.AddGlobal("node", &winNode)
+	store.AddGlobal("addresses", &addresses)
 
 	exps := []string{
 		"setRequestApprovalData",
@@ -392,6 +418,7 @@ func TestPayForRemittanceMga(t *testing.T) {
 	store.AddGlobal("product", &productRemittanceMga)
 	store.AddGlobal("node", &winNode)
 	store.AddGlobal("paymentInfo", &paymentInfo)
+	store.AddGlobal("addresses", &addresses)
 
 	exps := []string{}
 	testFlow(t, "pay", exps, store, getBuilderFlowChannel)
@@ -402,6 +429,7 @@ func TestSignForRemittanceMga(t *testing.T) {
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productRemittanceMga)
 	store.AddGlobal("node", &winNode)
+	store.AddGlobal("addresses", &addresses)
 
 	exps := []string{
 		"setSign",
@@ -417,6 +445,7 @@ func TestSignForRemittanceMgaWithNodeFlow(t *testing.T) {
 	storeFlowChannel.AddGlobal("policy", &policyNetwork)
 	storeFlowChannel.AddGlobal("product", &productRemittanceMga)
 	storeFlowChannel.AddGlobal("node", &winNode)
+	storeFlowChannel.AddGlobal("addresses", &addresses)
 
 	storeNode := bpnm.NewStorageBpnm()
 	storeNode.AddLocal("config", &CallbackConfig{Sign: false})
@@ -442,6 +471,7 @@ func TestEmitForEcommerceWithNodeFlow(t *testing.T) {
 	storeFlowChannel.AddGlobal("policy", &policyEcommerce)
 	storeFlowChannel.AddGlobal("product", &productEcommerce)
 	storeFlowChannel.AddGlobal("node", &winNode)
+	storeFlowChannel.AddGlobal("addresses", &addresses)
 
 	storeNode := bpnm.NewStorageBpnm()
 	storeNode.AddLocal("config", &CallbackConfig{Emit: true})
@@ -471,6 +501,7 @@ func TestEmitForWgaWithNodeFlow(t *testing.T) {
 	storeFlowChannel.AddGlobal("policy", &policyMga)
 	storeFlowChannel.AddGlobal("product", &productEcommerce)
 	storeFlowChannel.AddGlobal("node", &winNode)
+	storeFlowChannel.AddGlobal("addresses", &addresses)
 
 	storeNode := bpnm.NewStorageBpnm()
 	storeNode.AddLocal("config", &CallbackConfig{Emit: true})
@@ -491,6 +522,7 @@ func TestEmitForEcommerceWithNodeFlowConfFalse(t *testing.T) {
 	storeFlowChannel.AddGlobal("policy", &policyEcommerce)
 	storeFlowChannel.AddGlobal("product", &productEcommerce)
 	storeFlowChannel.AddGlobal("node", &winNode)
+	storeFlowChannel.AddGlobal("addresses", &addresses)
 
 	storeNode := bpnm.NewStorageBpnm()
 	storeNode.AddLocal("config", &CallbackConfig{Emit: false})

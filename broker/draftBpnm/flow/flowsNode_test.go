@@ -24,7 +24,6 @@ func getBuilderFlowNode(log *mockLog, store bpnm.StorageData) *bpnm.BpnmBuilder 
 	builder.SetStorage(store)
 	e = bpnm.IsError(
 		builder.AddHandler("winEmit", funcTestWithInfo("winEmit", log)),
-		builder.AddHandler("winLead", funcTestWithInfo("winLead", log)),
 		builder.AddHandler("winPay", funcTestWithInfo("winPay", log)),
 		builder.AddHandler("winProposal", funcTestWithInfo("winProposal", log)),
 		builder.AddHandler("winRequestApproval", funcTestWithInfo("winRequestApproval", log)),
