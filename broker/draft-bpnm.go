@@ -54,6 +54,7 @@ func getFlow(policy *models.Policy, networkNode *models.NetworkNode, storage bpm
 	if product.Flow == "" {
 		product.Flow = policy.Channel
 	}
+
 	storage.AddGlobal("policy", &policyDraft)
 	storage.AddGlobal("product", &productDraft)
 	storage.AddGlobal("node", &networkDraft)
@@ -627,7 +628,13 @@ func payDraft(state bpmn.StorageData) error {
 	if e != nil {
 		return e
 	}
-	emitPay(policy.Policy, origin)
+	product, e := bpmn.GetData[*flow.ProductDraft]("product", state)
+	if e != nil {
+		return e
+	}
+
+	mgaProduct = prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
+	EmitPayCustom(policy.Policy, origin, product.Product, mgaProduct)
 	if policy.PayUrl == "" {
 		return fmt.Errorf("missing payment url")
 	}
