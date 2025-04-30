@@ -102,6 +102,8 @@ func getNodeFlow() (*bpmn.BpnmBuilder, error) {
 		builder.AddHandler("winPay", callBackPaid),
 		builder.AddHandler("winProposal", callBackProposal),
 		builder.AddHandler("winRequestApproval", callBackRequestApproval),
+		builder.AddHandler("winApproved", func(st bpmn.StorageData) error { return nil }),
+		builder.AddHandler("winRejected", func(st bpmn.StorageData) error { return nil }),
 	)
 	if err != nil {
 		return nil, err
