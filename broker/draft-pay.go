@@ -68,8 +68,7 @@ func DraftPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	}
 
 	if err != nil {
-		log.ErrorF("error request (%s): %s", string(request), err.Error())
-		return fmt.Sprintf(responseFormat, false, string(request)), nil, nil
+		return "", nil, err
 	}
 
 	response := fmt.Sprintf(responseFormat, true, string(request))
