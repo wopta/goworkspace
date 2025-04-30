@@ -2,7 +2,6 @@ package broker
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -10,18 +9,18 @@ import (
 
 	"github.com/wopta/goworkspace/callback"
 	"github.com/wopta/goworkspace/lib/log"
+	tr "github.com/wopta/goworkspace/transaction"
 
 	draftbpnm "github.com/wopta/goworkspace/broker/draftBpnm"
 	"github.com/wopta/goworkspace/broker/draftBpnm/flow"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	plc "github.com/wopta/goworkspace/policy"
-	tr "github.com/wopta/goworkspace/transaction"
 )
 
 const fabrickBillPaid string = "PAID"
 
-func PaymentDraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func DraftPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		responseFormat  string = `{"result":%t,"requestPayload":%s,"locale": "it"}`
 		err             error
@@ -73,8 +72,6 @@ func PaymentDraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		return fmt.Sprintf(responseFormat, false, string(request)), nil, nil
 	}
 
-	//callback_out.Execute(networkNode, policy, callback_out.Paid)
-
 	response := fmt.Sprintf(responseFormat, true, string(request))
 
 	log.Println("Handler end -------------------------------------------------")
@@ -90,17 +87,18 @@ func fabrickPayment(origin, providerId string, policy *models.Policy, paymentInf
 	policy.SanitizePaymentData()
 
 	transaction, err := tr.GetTransactionToBePaid(policy.Uid, providerId, paymentInfo.Schedule, lib.TransactionsCollection)
+	paymentInfo.FabrickCallback.PaymentID = &transaction.Uid
 	if err != nil {
 		log.ErrorF("error getting transaction: %s", err.Error())
 		return err
 	}
 
-	if transaction.IsPay {
-		log.ErrorF("error Policy %s with transaction %s already paid", policy.Uid, transaction.Uid)
-		return errors.New("transaction already paid")
-	}
+	//	if transaction.IsPay {
+	//		log.ErrorF("error Policy %s with transaction %s already paid", policy.Uid, transaction.Uid)
+	//		return errors.New("transaction already paid")
+	//	}
 	storage := draftbpnm.NewStorageBpnm()
-	storage.AddGlobal("paymentInfo", paymentInfo)
+	storage.AddGlobal("paymentInfo", &paymentInfo)
 	flowPayment, err := getFlow(policy, networkNode, storage)
 	if err != nil {
 		return err

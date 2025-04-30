@@ -60,19 +60,25 @@ var brokerRoutes []lib.Route = []lib.Route{
 	},
 	{
 		Route:   "/draft/policy/emit",
-		Handler: lib.ResponseLoggerWrapper(EmitDraftFx),
+		Handler: lib.ResponseLoggerWrapper(DraftEmitFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
 		Route:   "/draft/policy/lead",
-		Handler: lib.ResponseLoggerWrapper(LeadDraftFx),
+		Handler: lib.ResponseLoggerWrapper(DraftLeadFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
 		Route:   "/draft/policy/pay",
-		Handler: lib.ResponseLoggerWrapper(PaymentDraftFx),
+		Handler: lib.ResponseLoggerWrapper(DraftPaymentFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/draft/policy/sign",
+		Handler: lib.ResponseLoggerWrapper(DraftSignFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},

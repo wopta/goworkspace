@@ -36,19 +36,19 @@ func getFlow(policy *models.Policy, networkNode *models.NetworkNode, storage bpm
 	product = prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode, warrant)
 	flowName, _ = policy.GetFlow(networkNode, warrant)
 
-	//	mgaProduct = product
-	//	toAddress = mail.Address{}
-	//	ccAddress = mail.Address{}
-	//	fromAddress = mail.AddressAnna
-
 	productDraft := flow.ProductDraft{
-		product,
+		Product: product,
 	}
 	policyDraft := flow.PolicyDraft{
-		policy,
+		Policy: policy,
 	}
 	networkDraft := flow.NetworkDraft{
-		networkNode,
+		NetworkNode: networkNode,
+	}
+	address := flow.Addresses{
+		ToAddress:   mail.Address{},
+		CcAddress:   mail.Address{},
+		FromAddress: mail.AddressAnna,
 	}
 	if product.Flow == "" {
 		product.Flow = policy.Channel
@@ -56,10 +56,11 @@ func getFlow(policy *models.Policy, networkNode *models.NetworkNode, storage bpm
 	storage.AddGlobal("policy", &policyDraft)
 	storage.AddGlobal("product", &productDraft)
 	storage.AddGlobal("node", &networkDraft)
+	storage.AddGlobal("addresses", &address)
 	builder.SetStorage(storage)
 
 	if networkNode == nil || networkNode.CallbackConfig == nil {
-		log.Println("no node or callback config available")
+		log.InfoF("no node or callback config available, no callback")
 		return builder.Build()
 	}
 	injected, err := getNodeFlow()
@@ -254,26 +255,30 @@ func sendMailPayDraft(state bpmn.StorageData) error {
 	if err != nil {
 		return err
 	}
+	addresses, e := bpmn.GetData[*flow.Addresses]("addresses", state)
+	if e != nil {
+		return e
+	}
 
 	switch flowName {
 	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
 		if sendEmail {
-			toAddress = mail.GetContractorEmail(policy.Policy)
-			ccAddress = mail.GetNetworkNodeEmail(networkNode)
+			addresses.ToAddress = mail.GetContractorEmail(policy.Policy)
+			addresses.CcAddress = mail.GetNetworkNodeEmail(networkNode)
 		} else {
-			toAddress = mail.GetNetworkNodeEmail(networkNode)
+			addresses.ToAddress = mail.GetNetworkNodeEmail(networkNode)
 		}
 	case models.MgaFlow, models.ECommerceFlow:
-		toAddress = mail.GetContractorEmail(policy.Policy)
+		addresses.ToAddress = mail.GetContractorEmail(policy.Policy)
 	}
 
 	log.Printf(
 		"[sendMailPay] from '%s', to '%s', cc '%s'",
-		fromAddress.String(),
-		toAddress.String(),
-		ccAddress.String(),
+		addresses.FromAddress.String(),
+		addresses.ToAddress.String(),
+		addresses.CcAddress.String(),
 	)
-	mail.SendMailPay(*policy.Policy, fromAddress, toAddress, ccAddress, flowName)
+	mail.SendMailPay(*policy.Policy, addresses.FromAddress, addresses.ToAddress, addresses.CcAddress, flowName)
 
 	return nil
 }
@@ -284,25 +289,30 @@ func sendMailContractDraft(state bpmn.StorageData) error {
 		return err
 	}
 
+	addresses, e := bpmn.GetData[*flow.Addresses]("addresses", state)
+	if e != nil {
+		return e
+	}
+
 	switch flowName {
 	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
 		if sendEmail {
-			toAddress = mail.GetContractorEmail(policy.Policy)
-			ccAddress = mail.GetNetworkNodeEmail(networkNode)
+			addresses.ToAddress = mail.GetContractorEmail(policy.Policy)
+			addresses.CcAddress = mail.GetNetworkNodeEmail(networkNode)
 		} else {
-			toAddress = mail.GetNetworkNodeEmail(networkNode)
+			addresses.ToAddress = mail.GetNetworkNodeEmail(networkNode)
 		}
 	case models.MgaFlow, models.ECommerceFlow:
-		toAddress = mail.GetContractorEmail(policy.Policy)
+		addresses.ToAddress = mail.GetContractorEmail(policy.Policy)
 	}
 
 	log.Printf(
 		"[sendMailContract] from '%s', to '%s', cc '%s'",
-		fromAddress.String(),
-		toAddress.String(),
-		ccAddress.String(),
+		addresses.FromAddress.String(),
+		addresses.ToAddress.String(),
+		addresses.CcAddress.String(),
 	)
-	mail.SendMailContract(*policy.Policy, nil, fromAddress, toAddress, ccAddress, flowName)
+	mail.SendMailContract(*policy.Policy, nil, addresses.FromAddress, addresses.ToAddress, addresses.CcAddress, flowName)
 
 	return nil
 }
@@ -359,8 +369,8 @@ func payTransactionDraft(state bpmn.StorageData) error {
 	if err != nil {
 		return err
 	}
-	providerId := *paymentInfo.FabrickCallback.PaymentID
-	transaction, _ := tr.GetTransactionToBePaid(policy.Uid, providerId, paymentInfo.Schedule, lib.TransactionsCollection)
+	providerId := paymentInfo.FabrickCallback.PaymentID
+	transaction, _ := tr.GetTransactionToBePaid(policy.Uid, *providerId, paymentInfo.Schedule, lib.TransactionsCollection)
 	err = tr.Pay(&transaction, origin, paymentInfo.PaymentMethod)
 	if err != nil {
 		log.Printf("[fabrickPayment] ERROR Transaction Pay %s", err.Error())
@@ -369,12 +379,17 @@ func payTransactionDraft(state bpmn.StorageData) error {
 
 	transaction.BigQuerySave(origin)
 
+	mgaProduct = prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 	return tr.CreateNetworkTransactions(policy.Policy, &transaction, networkNode, mgaProduct)
-	return nil
 }
 
 func updatePolicyDraft(state bpmn.StorageData) error {
 	policy, err := bpmn.GetData[*flow.PolicyDraft]("policy", state)
+	if err != nil {
+		return err
+	}
+
+	addresses, err := bpmn.GetData[*flow.Addresses]("addresses", state)
 	if err != nil {
 		return err
 	}
@@ -415,22 +430,22 @@ func updatePolicyDraft(state bpmn.StorageData) error {
 
 	switch flowName {
 	case models.ProviderMgaFlow:
-		toAddress = mail.GetContractorEmail(policy.Policy)
-		ccAddress = mail.GetNetworkNodeEmail(networkNode)
+		addresses.ToAddress = mail.GetContractorEmail(policy.Policy)
+		addresses.CcAddress = mail.GetNetworkNodeEmail(networkNode)
 	case models.RemittanceMgaFlow:
-		toAddress = mail.GetNetworkNodeEmail(networkNode)
+		addresses.ToAddress = mail.GetNetworkNodeEmail(networkNode)
 	case models.MgaFlow, models.ECommerceFlow:
-		toAddress = mail.GetContractorEmail(policy.Policy)
+		addresses.ToAddress = mail.GetContractorEmail(policy.Policy)
 	}
 
 	// Send mail with the contract to the user
 	log.Printf(
 		"from '%s', to '%s', cc '%s'",
-		fromAddress.String(),
-		toAddress.String(),
-		ccAddress.String(),
+		addresses.FromAddress.String(),
+		addresses.ToAddress.String(),
+		addresses.CcAddress.String(),
 	)
-	mail.SendMailContract(*policy.Policy, nil, fromAddress, toAddress, ccAddress, flowName)
+	mail.SendMailContract(*policy.Policy, nil, addresses.FromAddress, addresses.ToAddress, addresses.CcAddress, flowName)
 
 	return nil
 }
@@ -451,20 +466,25 @@ func sendLeadMailDraft(state bpmn.StorageData) error {
 		return e
 	}
 
-	toAddress = mail.GetContractorEmail(policy.Policy)
-	ccAddress = mail.Address{}
+	addresses, e := bpmn.GetData[*flow.Addresses]("addresses", state)
+	if e != nil {
+		return e
+	}
+
+	addresses.ToAddress = mail.GetContractorEmail(policy.Policy)
+	addresses.CcAddress = mail.Address{}
 	switch flowName {
 	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
-		ccAddress = mail.GetNetworkNodeEmail(networkNode)
+		addresses.CcAddress = mail.GetNetworkNodeEmail(networkNode)
 	}
 
 	log.Printf(
 		"[sendLeadMail] from '%s', to '%s', cc '%s'",
-		fromAddress.String(),
-		toAddress.String(),
-		ccAddress.String(),
+		addresses.FromAddress.String(),
+		addresses.ToAddress.String(),
+		addresses.CcAddress.String(),
 	)
-	mail.SendMailLead(*policy.Policy, fromAddress, toAddress, ccAddress, flowName, []string{})
+	mail.SendMailLead(*policy.Policy, addresses.FromAddress, addresses.ToAddress, addresses.CcAddress, flowName, []string{})
 	return nil
 }
 
@@ -498,6 +518,11 @@ func sendProposalMailDraft(state bpmn.StorageData) error {
 		return e
 	}
 
+	addresses, e := bpmn.GetData[*flow.Addresses]("addresses", state)
+	if e != nil {
+		return e
+	}
+
 	// TODO: remove when a proper solution to handle PMI is found
 	if policy.Name == models.PmiProduct {
 		return nil
@@ -507,21 +532,20 @@ func sendProposalMailDraft(state bpmn.StorageData) error {
 		return nil
 	}
 
-	toAddress = mail.GetContractorEmail(policy.Policy)
-	ccAddress = mail.Address{}
+	addresses.ToAddress = mail.GetContractorEmail(policy.Policy)
 	switch flowName {
 	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
-		ccAddress = mail.GetNetworkNodeEmail(networkNode)
+		addresses.CcAddress = mail.GetNetworkNodeEmail(networkNode)
 	}
 
 	log.Printf(
 		"[sendProposalMail] from '%s', to '%s', cc '%s'",
-		fromAddress.String(),
-		toAddress.String(),
-		ccAddress.String(),
+		addresses.FromAddress.String(),
+		addresses.ToAddress.String(),
+		addresses.CcAddress.String(),
 	)
 
-	mail.SendMailProposal(*policy.Policy, fromAddress, toAddress, ccAddress, flowName, []string{models.ProposalAttachmentName})
+	mail.SendMailProposal(*policy.Policy, addresses.FromAddress, addresses.ToAddress, addresses.CcAddress, flowName, []string{models.ProposalAttachmentName})
 	return nil
 }
 
@@ -547,28 +571,32 @@ func sendRequestApprovalMailDraft(state bpmn.StorageData) error {
 	if e != nil {
 		return e
 	}
+	addresses, e := bpmn.GetData[*flow.Addresses]("addresses", state)
+	if e != nil {
+		return e
+	}
 
 	if policy.Status == models.PolicyStatusWaitForApprovalMga {
 		return nil
 	}
 
-	toAddress = mail.GetContractorEmail(policy.Policy)
-	ccAddress = mail.Address{}
+	addresses.ToAddress = mail.GetContractorEmail(policy.Policy)
+	addresses.CcAddress = mail.Address{}
 	switch flowName {
 	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
-		ccAddress = mail.GetNetworkNodeEmail(networkNode)
+		addresses.CcAddress = mail.GetNetworkNodeEmail(networkNode)
 	case models.ECommerceChannel:
-		toAddress = mail.Address{} // fail safe for not sending email on ecommerce reserved
+		addresses.ToAddress = mail.Address{} // fail safe for not sending email on ecommerce reserved
 	}
 
 	if policy.Name == "qbe" {
-		toAddress = mail.Address{
+		addresses.ToAddress = mail.Address{
 			Address: os.Getenv("QBE_RESERVED_MAIL"),
 		}
-		ccAddress = mail.Address{}
+		addresses.CcAddress = mail.Address{}
 	}
 
-	mail.SendMailReserved(*policy.Policy, fromAddress, toAddress, ccAddress, flowName,
+	mail.SendMailReserved(*policy.Policy, addresses.FromAddress, addresses.ToAddress, addresses.CcAddress, flowName,
 		[]string{models.ProposalAttachmentName})
 	return nil
 }
@@ -589,26 +617,29 @@ func sendMailSignDraft(state bpmn.StorageData) error {
 		return e
 	}
 
-	ccAddress = mail.Address{}
+	addresses, e := bpmn.GetData[*flow.Addresses]("addresses", state)
+	if e != nil {
+		return e
+	}
 	switch flowName {
 	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
 		if sendEmail {
-			toAddress = mail.GetContractorEmail(policy.Policy)
-			ccAddress = mail.GetNetworkNodeEmail(networkNode)
+			addresses.ToAddress = mail.GetContractorEmail(policy.Policy)
+			addresses.CcAddress = mail.GetNetworkNodeEmail(networkNode)
 		} else {
-			toAddress = mail.GetNetworkNodeEmail(networkNode)
+			addresses.ToAddress = mail.GetNetworkNodeEmail(networkNode)
 		}
 	case models.MgaFlow, models.ECommerceFlow:
-		toAddress = mail.GetContractorEmail(policy.Policy)
+		addresses.ToAddress = mail.GetContractorEmail(policy.Policy)
 	}
 
 	log.Printf(
 		"[sendMailSign] from '%s', to '%s', cc '%s'",
-		fromAddress.String(),
-		toAddress.String(),
-		ccAddress.String(),
+		addresses.FromAddress.String(),
+		addresses.ToAddress.String(),
+		addresses.CcAddress.String(),
 	)
-	mail.SendMailSign(*policy.Policy, fromAddress, toAddress, ccAddress, flowName)
+	mail.SendMailSign(*policy.Policy, addresses.FromAddress, addresses.ToAddress, addresses.CcAddress, flowName)
 	return nil
 }
 
@@ -681,6 +712,10 @@ func sendEmitProposalMailDraft(state bpmn.StorageData) error {
 		return e
 	}
 
+	addresses, e := bpmn.GetData[*flow.Addresses]("addresses", state)
+	if e != nil {
+		return e
+	}
 	// TODO: remove when a proper solution to handle PMI is found
 	if policy.Name == models.PmiProduct {
 		return nil
@@ -690,21 +725,21 @@ func sendEmitProposalMailDraft(state bpmn.StorageData) error {
 		return nil
 	}
 
-	toAddress = mail.GetContractorEmail(policy.Policy)
-	ccAddress = mail.Address{}
+	addresses.ToAddress = mail.GetContractorEmail(policy.Policy)
+	addresses.CcAddress = mail.Address{}
 	switch flowName {
 	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
-		ccAddress = mail.GetNetworkNodeEmail(networkNode)
+		addresses.CcAddress = mail.GetNetworkNodeEmail(networkNode)
 	}
 
 	log.Printf(
 		"[sendEmitProposalMail] from '%s', to '%s', cc '%s'",
-		fromAddress.String(),
-		toAddress.String(),
-		ccAddress.String(),
+		addresses.FromAddress.String(),
+		addresses.ToAddress.String(),
+		addresses.CcAddress.String(),
 	)
 
-	mail.SendMailProposal(*policy.Policy, fromAddress, toAddress, ccAddress, flowName, []string{models.ProposalAttachmentName})
+	mail.SendMailProposal(*policy.Policy, addresses.FromAddress, addresses.ToAddress, addresses.CcAddress, flowName, []string{models.ProposalAttachmentName})
 	return nil
 }
 

@@ -2,6 +2,7 @@ package flow
 
 import (
 	"net/http"
+	"net/mail"
 
 	"github.com/wopta/goworkspace/callback"
 	"github.com/wopta/goworkspace/models"
@@ -68,4 +69,12 @@ type NetworkDraft struct {
 
 func (p *NetworkDraft) GetType() string {
 	return "networkNode"
+}
+
+type Addresses struct {
+	CcAddress, ToAddress, FromAddress mail.Address
+}
+
+func (*Addresses) GetType() string {
+	return "addresses"
 }

@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 
-	draftbpnm "github.com/wopta/goworkspace/broker/draftBpnm"
+	"github.com/wopta/goworkspace/broker/draftBpnm"
 	"github.com/wopta/goworkspace/lib/log"
 
 	"github.com/wopta/goworkspace/lib"
@@ -13,7 +13,7 @@ import (
 	"github.com/wopta/goworkspace/network"
 )
 
-func LeadDraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func DraftLeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err    error
 		policy models.Policy
@@ -94,11 +94,12 @@ func leaddraft(authToken models.AuthToken, policy *models.Policy) error {
 	}
 
 	log.Println("starting bpmn flow...")
-	flow, e := getFlow(policy, networkNode, draftbpnm.NewStorageBpnm())
+	storage := draftbpnm.NewStorageBpnm()
+	flowLead, e := getFlow(policy, networkNode, storage)
 	if e != nil {
 		return e
 	}
-	e = flow.Run("lead")
+	e = flowLead.Run("lead")
 	if e != nil {
 		return e
 	}

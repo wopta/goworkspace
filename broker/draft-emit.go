@@ -27,7 +27,7 @@ var (
 	Rejected        string = "Rejected"
 )
 
-func EmitDraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func DraftEmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		request      EmitRequest
 		err          error

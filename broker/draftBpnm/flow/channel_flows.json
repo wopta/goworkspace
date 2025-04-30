@@ -15,6 +15,10 @@
 				{
 					"name": "node",
 					"type": "networkNode"
+				},
+				{
+					"name": "addresses",
+					"type": "addresses"
 				}
 			],
 			"description": "Emit process",
@@ -125,6 +129,10 @@
 				{
 					"name": "product",
 					"type": "product"
+				},
+				{
+					"name": "addresses",
+					"type": "addresses"
 				}
 			],
 			"description": "Lead process for e-commerce",
@@ -222,6 +230,10 @@
 				{
 					"name": "product",
 					"type": "product"
+				},
+				{
+					"name": "addresses",
+					"type": "addresses"
 				}
 			],
 			"description": "Payiment process",
@@ -364,6 +376,10 @@
 				{
 					"name": "product",
 					"type": "product"
+				},
+				{
+					"name": "addresses",
+					"type": "addresses"
 				}
 			],
 			"description": "Sign process",
