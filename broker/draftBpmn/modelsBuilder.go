@@ -1,4 +1,4 @@
-package draftbpnm
+package draftbpmn
 
 type BpnmBuilder struct {
 	Processes []*processBuilder `json:"processes"`

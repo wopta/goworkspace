@@ -1,4 +1,4 @@
-package draftbpnm
+package draftbpmn
 
 import (
 	"encoding/json"

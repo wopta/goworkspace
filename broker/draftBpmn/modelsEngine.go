@@ -1,4 +1,4 @@
-package draftbpnm
+package draftbpmn
 
 type FlowBpnm struct {
 	process map[string]*processBpnm

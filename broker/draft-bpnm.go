@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"cloud.google.com/go/bigquery"
-	bpmn "github.com/wopta/goworkspace/broker/draftBpnm"
-	"github.com/wopta/goworkspace/broker/draftBpnm/flow"
+	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
+	"github.com/wopta/goworkspace/broker/draftBpmn/flow"
 	"github.com/wopta/goworkspace/callback_out/win"
 	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
@@ -26,7 +26,7 @@ import (
 )
 
 func getFlow(policy *models.Policy, networkNode *models.NetworkNode, storage bpmn.StorageData) (*bpmn.FlowBpnm, error) {
-	builder, err := bpmn.NewBpnmBuilder("broker/draftBpnm/flow/channel_flows.json")
+	builder, err := bpmn.NewBpnmBuilder("broker/draftBpmn/flow/channel_flows.json")
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func getFlow(policy *models.Policy, networkNode *models.NetworkNode, storage bpm
 
 func getNodeFlow() (*bpmn.BpnmBuilder, error) {
 	store := bpmn.NewStorageBpnm()
-	builder, e := bpmn.NewBpnmBuilder("broker/draftBpnm/flow/node_flows.json")
+	builder, e := bpmn.NewBpnmBuilder("broker/draftBpmn/flow/node_flows.json")
 	if e != nil {
 		return nil, e
 	}

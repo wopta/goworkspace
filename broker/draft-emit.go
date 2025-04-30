@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	draftbpnm "github.com/wopta/goworkspace/broker/draftBpnm"
+	draftbpnm "github.com/wopta/goworkspace/broker/draftBpmn"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"

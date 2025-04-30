@@ -11,8 +11,8 @@ import (
 	"github.com/wopta/goworkspace/lib/log"
 	tr "github.com/wopta/goworkspace/transaction"
 
-	draftbpnm "github.com/wopta/goworkspace/broker/draftBpnm"
-	"github.com/wopta/goworkspace/broker/draftBpnm/flow"
+	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
+	"github.com/wopta/goworkspace/broker/draftBpmn/flow"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	plc "github.com/wopta/goworkspace/policy"
@@ -96,7 +96,7 @@ func fabrickPayment(origin, providerId string, policy *models.Policy, paymentInf
 	//		log.ErrorF("error Policy %s with transaction %s already paid", policy.Uid, transaction.Uid)
 	//		return errors.New("transaction already paid")
 	//	}
-	storage := draftbpnm.NewStorageBpnm()
+	storage := bpmn.NewStorageBpnm()
 	storage.AddGlobal("paymentInfo", &paymentInfo)
 	flowPayment, err := getFlow(policy, networkNode, storage)
 	if err != nil {

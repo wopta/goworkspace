@@ -4,33 +4,33 @@ import (
 	"errors"
 	"testing"
 
-	bpnm "github.com/wopta/goworkspace/broker/draftBpnm"
+	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
 	"github.com/wopta/goworkspace/models"
 )
 
-func funcTestWithInfo(message string, log *mockLog) func(bpnm.StorageData) error {
-	return func(st bpnm.StorageData) error {
+func funcTestWithInfo(message string, log *mockLog) func(bpmn.StorageData) error {
+	return func(st bpmn.StorageData) error {
 		log.println(message)
 		st.AddLocal("callbackInfo", &CallbackInfo{RequestBody: []byte("prova request")})
 		return nil
 	}
 }
 
-func getBuilderFlowNode(log *mockLog, store bpnm.StorageData) *bpnm.BpnmBuilder {
-	builder, e := bpnm.NewBpnmBuilder("node_flows.json")
+func getBuilderFlowNode(log *mockLog, store bpmn.StorageData) *bpmn.BpnmBuilder {
+	builder, e := bpmn.NewBpnmBuilder("node_flows.json")
 	if e != nil {
 		return nil
 	}
 	builder.SetStorage(store)
-	e = bpnm.IsError(
+	e = bpmn.IsError(
 		builder.AddHandler("winEmit", funcTestWithInfo("winEmit", log)),
 		builder.AddHandler("winPay", funcTestWithInfo("winPay", log)),
 		builder.AddHandler("winProposal", funcTestWithInfo("winProposal", log)),
 		builder.AddHandler("winRequestApproval", funcTestWithInfo("winRequestApproval", log)),
 		builder.AddHandler("winSign", funcTestWithInfo("winSign", log)),
 		builder.AddHandler("baseCallback", funcTestWithInfo("baseCallback", log)),
-		builder.AddHandler("saveAudit", func(sd bpnm.StorageData) error {
-			d, e := bpnm.GetData[*CallbackInfo]("callbackInfo", sd)
+		builder.AddHandler("saveAudit", func(sd bpmn.StorageData) error {
+			d, e := bpmn.GetData[*CallbackInfo]("callbackInfo", sd)
 			if e != nil {
 				return e
 			}
@@ -54,7 +54,7 @@ var (
 )
 
 func TestEmitForWinNodeWithConfigTrue(t *testing.T) {
-	store := bpnm.NewStorageBpnm()
+	store := bpmn.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("node", &winNode)
 
@@ -67,7 +67,7 @@ func TestEmitForWinNodeWithConfigTrue(t *testing.T) {
 }
 
 func TestEmitForWinNodeWithConfigFalse(t *testing.T) {
-	store := bpnm.NewStorageBpnm()
+	store := bpmn.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("node", &winNode)
 

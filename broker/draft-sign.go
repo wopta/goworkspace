@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	draftbpnm "github.com/wopta/goworkspace/broker/draftBpnm"
+	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
@@ -79,7 +79,7 @@ func namirialStepFinished(origin, policyUid string) error {
 
 	log.Println("starting bpmn flow...")
 
-	flow, err := getFlow(&policy, networkNode, draftbpnm.NewStorageBpnm())
+	flow, err := getFlow(&policy, networkNode, bpmn.NewStorageBpnm())
 	if err != nil {
 		return err
 	}
