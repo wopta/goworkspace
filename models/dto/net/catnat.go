@@ -145,7 +145,8 @@ func (d *RequestDTO) FromPolicy(p *models.Policy) error {
 	const catNatThirdLevelCode = "00180"
 	const catNatSplitting = "01"
 	const catNatSalesChannel = "3"
-	const catNatPersonalDataType = "2"
+	const catNatLegalPerson = "2"
+	const catNatSoleProp = "3"
 
 	d.ProductCode = catNatProductCode
 	d.Date = p.StartDate.Format("2006-01-02")
@@ -163,8 +164,15 @@ func (d *RequestDTO) FromPolicy(p *models.Policy) error {
 			atecoCode = v.Building.Ateco
 		}
 	}
+
+	var dt string
+	if p.Contractor.Type == "legalEntity" && p.Contractor.FiscalCode == "" {
+		dt = catNatLegalPerson
+	} else {
+		dt = catNatSoleProp
+	}
 	contr := Contractor{
-		PersonalDataType:          catNatPersonalDataType,
+		PersonalDataType:          dt,
 		CompanyName:               p.Contractor.Name,
 		VatNumber:                 p.Contractor.VatCode,
 		FiscalCode:                p.Contractor.FiscalCode,
