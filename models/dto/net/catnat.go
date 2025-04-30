@@ -113,19 +113,29 @@ type ErrorResponse struct {
 	Errors   map[string]any `json:"errors"`
 }
 
-const earthquakeBuildingCode = "211/00"
-const earthquakeContentCode = "211/01"
-const earthquakeStockCode = "211/02"
-const floodBuildingCode = "212/00"
-const floodContentCode = "212/01"
-const floodStockCode = "212/02"
-const landslideBuildingCode = "209/00"
-const landslideContentCode = "209/01"
-const landslideStockCode = "209/02"
+const earthquakeCode = "211"
+const floodCode = "212"
+const landslideCode = "209"
+const buildingCode = "/00"
+const contentCode = "/01"
+const stockCode = "/02"
+
+const earthquakeBuildingCode = earthquakeCode + buildingCode
+const earthquakeContentCode = earthquakeCode + contentCode
+const earthquakeStockCode = earthquakeCode + stockCode
+const floodBuildingCode = floodCode + buildingCode
+const floodContentCode = floodCode + contentCode
+const floodStockCode = floodCode + stockCode
+const landslideBuildingCode = landslideCode + buildingCode
+const landslideContentCode = landslideCode + contentCode
+const landslideStockCode = landslideCode + stockCode
 
 const earthquakeSlug = "earthquake"
 const floodSlug = "flood"
 const landslideSlug = "landslide"
+
+const yes = "si"
+const no = "no"
 
 func (d *RequestDTO) FromPolicy(p *models.Policy) error {
 
@@ -136,9 +146,6 @@ func (d *RequestDTO) FromPolicy(p *models.Policy) error {
 	const catNatSplitting = "01"
 	const catNatSalesChannel = "3"
 	const catNatPersonalDataType = "2"
-
-	const yes = "si"
-	const no = "no"
 
 	d.ProductCode = catNatProductCode
 	d.Date = p.StartDate.Format("2006-01-02")
