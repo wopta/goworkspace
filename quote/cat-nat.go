@@ -1,14 +1,13 @@
 package quote
 
 import (
-	"bytes"
 	"encoding/json"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	client "github.com/wopta/goworkspace/models/client"
 	"github.com/wopta/goworkspace/models/dto/net"
 )
 
@@ -47,13 +46,10 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		return "", nil, err
 	}
 
-	const scope = "emettiPolizza_441-029-007"
-	const basePath = "https://apigatewaydigital.netinsurance.it"
-	const authEndpoint = "/Identity/connect/token"
-	const tokenUrl = basePath + authEndpoint
-	client := lib.ClientCredentials(os.Getenv("NETINS_ID"), os.Getenv("NETINS_SECRET"), scope, tokenUrl)
+	netClient := client.NewNetClient()
+	netClient.Authenticate()
 
-	resp, errResp, err := netInsuranceQuotation(client, cnReq)
+	resp, errResp, err := netClient.Quote(cnReq)
 	if err != nil {
 		log.Printf("error calling NetInsurance api: %s", err.Error())
 		return "", nil, err
@@ -86,39 +82,4 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	}
 
 	return string(out), out, err
-}
-
-func netInsuranceQuotation(cl *http.Client, dto net.RequestDTO) (net.ResponseDTO, *net.ErrorResponse, error) {
-	url := "https://apigatewaydigital.netinsurance.it/PolizzeGateway24/emettiPolizza/441-029-007"
-	reqBodyBytes := new(bytes.Buffer)
-	err := json.NewEncoder(reqBodyBytes).Encode(dto)
-	if err != nil {
-		return net.ResponseDTO{}, nil, err
-	}
-	r := reqBodyBytes.Bytes()
-	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(r))
-	req.Header.Set("Content-Type", "application/json")
-	resp, err := cl.Do(req)
-	if err != nil {
-		return net.ResponseDTO{}, nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		errResp := net.ErrorResponse{
-			Errors: make(map[string]any),
-		}
-		if err = json.NewDecoder(resp.Body).Decode(&errResp); err != nil {
-			log.Println("error decoding catnat error response")
-			return net.ResponseDTO{}, nil, err
-		}
-		return net.ResponseDTO{}, &errResp, nil
-	}
-	cndto := net.ResponseDTO{}
-	if err = json.NewDecoder(resp.Body).Decode(&cndto); err != nil {
-		log.Println("error decoding catnat response")
-		return net.ResponseDTO{}, nil, err
-	}
-
-	return cndto, nil, nil
 }
