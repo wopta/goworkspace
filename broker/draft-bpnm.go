@@ -94,21 +94,26 @@ func getNodeFlow() (*bpmn.BpnmBuilder, error) {
 	err := bpmn.IsError(
 		builder.AddHandler("baseCallback", baseRequest),
 		builder.AddHandler("winEmit", func(st bpmn.StorageData) error {
-			return baseRequest(st)
+			log.Println("winEmit")
+			return nil
 		}),
 		builder.AddHandler("winLead", func(st bpmn.StorageData) error {
-			return baseRequest(st)
+			log.Println("winLead")
+			return nil
 		}),
-
 		builder.AddHandler("winPay", func(st bpmn.StorageData) error {
-			return baseRequest(st)
+			log.Println("winPay")
+			return nil
 		}), builder.AddHandler("winProposal", func(st bpmn.StorageData) error {
-			return baseRequest(st)
+			log.Println("winProposal")
+			return nil
 		}),
 		builder.AddHandler("winRequestApproval", func(st bpmn.StorageData) error {
-			return baseRequest(st)
+			log.Println("winRequestApproval")
+			return nil
 		}), builder.AddHandler("winSign", func(st bpmn.StorageData) error {
-			return baseRequest(st)
+			log.Println("winSign")
+			return nil
 		}),
 		builder.AddHandler("saveAudit", saveAudit),
 	)
