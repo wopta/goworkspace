@@ -331,7 +331,7 @@ func payTransactionDraft(state bpmn.StorageData) error {
 
 	transaction.BigQuerySave(origin)
 
-	mgaProduct = prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
+	mgaProduct := prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 	return tr.CreateNetworkTransactions(policy.Policy, &transaction, networkNode, mgaProduct)
 }
 
@@ -407,7 +407,7 @@ func setLeadBpmnDraft(state bpmn.StorageData) error {
 	if e != nil {
 		return e
 	}
-	mgaProduct = prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
+	mgaProduct := prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 	setLeadData(policy.Policy, *mgaProduct)
 	return nil
 }
@@ -633,7 +633,7 @@ func payDraft(state bpmn.StorageData) error {
 		return e
 	}
 
-	mgaProduct = prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
+	mgaProduct := prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 	EmitPayCustom(policy.Policy, origin, product.Product, mgaProduct)
 	if policy.PayUrl == "" {
 		return fmt.Errorf("missing payment url")
