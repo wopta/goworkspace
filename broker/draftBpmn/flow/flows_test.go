@@ -29,11 +29,10 @@ func funcTest(message string, log *mockLog) func(bpmn.StorageData) error {
 	}
 }
 
-func getBuilderFlowChannel(log *mockLog, store bpmn.StorageData) *bpmn.BpnmBuilder {
-
-	builder, e := bpmn.NewBpnmBuilder("channel_flows.json")
+func getBuilderFlowChannel(log *mockLog, store bpmn.StorageData) (*bpmn.BpnmBuilder, error) {
+	builder, e := bpmn.NewBpnmBuilderRawPath("../../../../function-data/dev//flows/draft/channel_flows.json")
 	if e != nil {
-		return nil
+		return nil, e
 	}
 	builder.SetStorage(store)
 	e = bpmn.IsError(
@@ -63,17 +62,20 @@ func getBuilderFlowChannel(log *mockLog, store bpmn.StorageData) *bpmn.BpnmBuild
 		builder.AddHandler("sendAcceptanceMail", funcTest("sendAcceptanceMail", log)),
 	)
 	if e != nil {
-		return nil
+		return nil, e
 	}
 
-	return builder
+	return builder, nil
 }
 
-type builderFlow func(*mockLog, bpmn.StorageData) *bpmn.BpnmBuilder
+type builderFlow func(*mockLog, bpmn.StorageData) (*bpmn.BpnmBuilder, error)
 
 func testFlow(t *testing.T, process string, expectedACtivities []string, store bpmn.StorageData, builbuilderFlow builderFlow) {
 	log := mockLog{}
-	build := builbuilderFlow(&log, store)
+	build, e := builbuilderFlow(&log, store)
+	if e != nil {
+		t.Fatal(e)
+	}
 	flow, e := build.Build()
 	if e != nil {
 		t.Fatal(e)
@@ -458,14 +460,20 @@ func TestSignForRemittanceMgaWithNodeFlow(t *testing.T) {
 		"addContract",
 		"sendMailContract",
 	}
-	testFlow(t, "sign", exps, storeFlowChannel, func(log *mockLog, sd bpmn.StorageData) *bpmn.BpnmBuilder {
-		build := getBuilderFlowChannel(log, storeFlowChannel)
-		nodeBuild := getBuilderFlowNode(log, storeNode)
+	testFlow(t, "sign", exps, storeFlowChannel, func(log *mockLog, sd bpmn.StorageData) (*bpmn.BpnmBuilder, error) {
+		build, e := getBuilderFlowChannel(log, storeFlowChannel)
+		if e != nil {
+			return nil, e
+		}
+		nodeBuild, e := getBuilderFlowNode(log, storeNode)
+		if e != nil {
+			return nil, e
+		}
 		if e := build.Inject(nodeBuild); e != nil {
 			t.Fatal(e)
 		}
 
-		return build
+		return build, nil
 	})
 }
 
@@ -489,14 +497,20 @@ func TestEmitForEcommerceWithNodeFlow(t *testing.T) {
 		"winEmit",
 		"saveAudit prova request",
 	}
-	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpmn.StorageData) *bpmn.BpnmBuilder {
-		build := getBuilderFlowChannel(log, storeFlowChannel)
-		nodeBuild := getBuilderFlowNode(log, storeNode)
+	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpmn.StorageData) (*bpmn.BpnmBuilder, error) {
+		build, e := getBuilderFlowChannel(log, storeFlowChannel)
+		if e != nil {
+			return nil, e
+		}
+		nodeBuild, e := getBuilderFlowNode(log, storeNode)
+		if e != nil {
+			return nil, e
+		}
 		if e := build.Inject(nodeBuild); e != nil {
-			t.Fatal(e)
+			return nil, e
 		}
 
-		return build
+		return build, nil
 	})
 }
 func TestEmitForWgaWithNodeFlow(t *testing.T) {
@@ -510,14 +524,21 @@ func TestEmitForWgaWithNodeFlow(t *testing.T) {
 	storeNode.AddLocal("config", &CallbackConfig{Emit: true})
 
 	exps := []string{}
-	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpmn.StorageData) *bpmn.BpnmBuilder {
-		build := getBuilderFlowChannel(log, storeFlowChannel)
-		nodeBuild := getBuilderFlowNode(log, storeNode)
+	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpmn.StorageData) (*bpmn.BpnmBuilder, error) {
+		build, e := getBuilderFlowChannel(log, storeFlowChannel)
+		if e != nil {
+			return nil, e
+		}
+		nodeBuild, e := getBuilderFlowNode(log, storeNode)
+
+		if e != nil {
+			return nil, e
+		}
 		if e := build.Inject(nodeBuild); e != nil {
 			t.Fatal(e)
 		}
 
-		return build
+		return build, nil
 	})
 }
 func TestEmitForEcommerceWithNodeFlowConfFalse(t *testing.T) {
@@ -538,13 +559,19 @@ func TestEmitForEcommerceWithNodeFlowConfFalse(t *testing.T) {
 		"sendEmitProposalMail",
 		"sendMailSign",
 	}
-	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpmn.StorageData) *bpmn.BpnmBuilder {
-		build := getBuilderFlowChannel(log, storeFlowChannel)
-		nodeBuild := getBuilderFlowNode(log, storeNode)
+	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpmn.StorageData) (*bpmn.BpnmBuilder, error) {
+		build, e := getBuilderFlowChannel(log, storeFlowChannel)
+		if e != nil {
+			return nil, e
+		}
+		nodeBuild, e := getBuilderFlowNode(log, storeNode)
+		if e != nil {
+			return nil, e
+		}
 		if e := build.Inject(nodeBuild); e != nil {
-			t.Fatal(e)
+			return nil, e
 		}
 
-		return build
+		return build, nil
 	})
 }

@@ -63,7 +63,7 @@ func testLog(log *mockLog, exps []string, t *testing.T) {
 }
 
 func getInjectableFlow(log *mockLog) (*BpnmBuilder, error) {
-	injectedFlow, err := NewBpnmBuilder("provaInjection.json")
+	injectedFlow, err := NewBpnmBuilderRawPath("provaInjection.json")
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func addDefaultHandlersForTest(g *BpnmBuilder, log *mockLog) error {
 }
 
 func TestBpnmHappyPath(t *testing.T) {
-	g, err := NewBpnmBuilder("prova.json")
+	g, err := NewBpnmBuilderRawPath("prova.json")
 	log := &mockLog{}
 	if err != nil {
 		t.Fatal(err)
@@ -152,7 +152,7 @@ func TestBpnmHappyPath(t *testing.T) {
 }
 
 func TestBpnmHappyPath2(t *testing.T) {
-	g, err := NewBpnmBuilder("prova.json")
+	g, err := NewBpnmBuilderRawPath("prova.json")
 	log := &mockLog{}
 	if err != nil {
 		t.Fatal(err)
@@ -181,7 +181,7 @@ func TestBpnmHappyPath2(t *testing.T) {
 }
 
 func TestBpnmMissingOutput(t *testing.T) {
-	g, err := NewBpnmBuilder("prova.json")
+	g, err := NewBpnmBuilderRawPath("prova.json")
 	log := mockLog{}
 	if err != nil {
 		t.Fatal(err)
@@ -212,7 +212,7 @@ func TestBpnmMissingOutput(t *testing.T) {
 }
 
 func TestBpnmMissingHandler(t *testing.T) {
-	g, err := NewBpnmBuilder("prova.json")
+	g, err := NewBpnmBuilderRawPath("prova.json")
 	log := mockLog{}
 	if err != nil {
 		t.Fatal(err)
@@ -232,7 +232,7 @@ func TestBpnmMissingHandler(t *testing.T) {
 }
 
 func TestBpnmInjection(t *testing.T) {
-	g, err := NewBpnmBuilder("prova.json")
+	g, err := NewBpnmBuilderRawPath("prova.json")
 	log := &mockLog{}
 	if err != nil {
 		t.Fatal(err)
@@ -272,7 +272,7 @@ func TestBpnmInjection(t *testing.T) {
 }
 
 func TestBpnmWithMultipleInjection(t *testing.T) {
-	g, err := NewBpnmBuilder("prova.json")
+	g, err := NewBpnmBuilderRawPath("prova.json")
 	log := mockLog{}
 	if err != nil {
 		t.Fatal(err)
@@ -295,7 +295,7 @@ func TestBpnmWithMultipleInjection(t *testing.T) {
 }
 
 func TestRunFromSpecificActivity(t *testing.T) {
-	g, err := NewBpnmBuilder("prova.json")
+	g, err := NewBpnmBuilderRawPath("prova.json")
 	log := &mockLog{}
 	if err != nil {
 		t.Fatal(err)
@@ -334,7 +334,7 @@ func TestBpnmStoreClean(t *testing.T) {
 	//this case test how the framework manage memory
 	//at each cycles
 	//it marks every output resource of each activities (T), after all activities(T) have finished, it clean the store leaving only the marked ones
-	g, err := NewBpnmBuilder("prova.json")
+	g, err := NewBpnmBuilderRawPath("prova.json")
 	log := &mockLog{}
 	if err != nil {
 		t.Fatal(err)
@@ -402,7 +402,7 @@ func TestBpnmStoreClean(t *testing.T) {
 
 func TestMergeBuilder(t *testing.T) {
 	log := &mockLog{}
-	g, err := NewBpnmBuilder("prova.json")
+	g, err := NewBpnmBuilderRawPath("prova.json")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -440,7 +440,7 @@ func TestMergeBuilder(t *testing.T) {
 
 func TestErrorWithoutRecover(t *testing.T) {
 	log := &mockLog{}
-	g, err := NewBpnmBuilder("prova.json")
+	g, err := NewBpnmBuilderRawPath("prova.json")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -467,7 +467,7 @@ func TestErrorWithoutRecover(t *testing.T) {
 
 func TestRecoverWithFunction(t *testing.T) {
 	log := &mockLog{}
-	g, err := NewBpnmBuilder("prova.json")
+	g, err := NewBpnmBuilderRawPath("prova.json")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -497,7 +497,7 @@ func TestRecoverWithFunction(t *testing.T) {
 
 func TestRecoverFromPanic(t *testing.T) {
 	log := &mockLog{}
-	g, err := NewBpnmBuilder("prova.json")
+	g, err := NewBpnmBuilderRawPath("prova.json")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -526,7 +526,7 @@ func TestRecoverFromPanic(t *testing.T) {
 }
 func TestEndActivity(t *testing.T) {
 	log := &mockLog{}
-	g, err := NewBpnmBuilder("prova.json")
+	g, err := NewBpnmBuilderRawPath("prova.json")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -558,7 +558,7 @@ func TestEndActivity(t *testing.T) {
 func TestDontCallEndAfterInit(t *testing.T) {
 	//i've set "callEndIfStop": false,
 	log := &mockLog{}
-	g, err := NewBpnmBuilder("prova.json")
+	g, err := NewBpnmBuilderRawPath("prova.json")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -588,7 +588,7 @@ func TestDontCallEndAfterInit(t *testing.T) {
 func TestHandlerLessTrue(t *testing.T) {
 	//i've set "handlerless": true,
 	log := &mockLog{}
-	g, err := NewBpnmBuilder("prova.json")
+	g, err := NewBpnmBuilderRawPath("prova.json")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -19,7 +19,7 @@ import (
 )
 
 func getFlow(policy *models.Policy, networkNode *models.NetworkNode, storage bpmn.StorageData) (*bpmn.FlowBpnm, error) {
-	builder, err := bpmn.NewBpnmBuilder("broker/draftBpmn/flow/channel_flows.json")
+	builder, err := bpmn.NewBpnmBuilder("flows/draft/channel_flows.json")
 	if err != nil {
 		return nil, err
 	}

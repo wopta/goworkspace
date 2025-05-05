@@ -2,9 +2,11 @@ package flow
 
 import (
 	"errors"
+	"os"
 	"testing"
 
 	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
+	env "github.com/wopta/goworkspace/lib/environment"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -16,10 +18,11 @@ func funcTestWithInfo(message string, log *mockLog) func(bpmn.StorageData) error
 	}
 }
 
-func getBuilderFlowNode(log *mockLog, store bpmn.StorageData) *bpmn.BpnmBuilder {
-	builder, e := bpmn.NewBpnmBuilder("node_flows.json")
+func getBuilderFlowNode(log *mockLog, store bpmn.StorageData) (*bpmn.BpnmBuilder, error) {
+	os.Setenv("env", env.LocalTest)
+	builder, e := bpmn.NewBpnmBuilderRawPath("../../../../function-data/dev//flows/draft/node_flows.json")
 	if e != nil {
-		return nil
+		return nil, e
 	}
 	builder.SetStorage(store)
 	e = bpmn.IsError(
@@ -44,9 +47,9 @@ func getBuilderFlowNode(log *mockLog, store bpmn.StorageData) *bpmn.BpnmBuilder 
 		}),
 	)
 	if e != nil {
-		return nil
+		return nil, e
 	}
-	return builder
+	return builder, nil
 }
 
 var (

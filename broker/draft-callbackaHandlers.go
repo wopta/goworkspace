@@ -32,7 +32,7 @@ type auditSchema struct {
 
 func getNodeFlow() (*bpmn.BpnmBuilder, error) {
 	store := bpmn.NewStorageBpnm()
-	builder, e := bpmn.NewBpnmBuilder("broker/draftBpmn/flow/node_flows.json")
+	builder, e := bpmn.NewBpnmBuilder("flows/draft/node_flows.json")
 	if e != nil {
 		return nil, e
 	}

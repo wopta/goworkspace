@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/wopta/goworkspace/lib"
 )
 
 func getKeyInjectedProcess(targetPro, targetAct string, order orderActivity) keyInjected {
@@ -17,11 +19,20 @@ func getKeyInjectedProcess(targetPro, targetAct string, order orderActivity) key
 	}
 }
 
-func NewBpnmBuilder(path string) (*BpnmBuilder, error) {
+func NewBpnmBuilderRawPath(path string) (*BpnmBuilder, error) {
 	var Bpnm BpnmBuilder
 	jsonProva, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
+	}
+	json.Unmarshal(jsonProva, &Bpnm)
+	return &Bpnm, nil
+}
+func NewBpnmBuilder(path string) (*BpnmBuilder, error) {
+	var Bpnm BpnmBuilder
+	jsonProva := lib.GetFilesByEnv(path)
+	if len(jsonProva) == 0 {
+		return nil, errors.New("Json not founded: " + path)
 	}
 	json.Unmarshal(jsonProva, &Bpnm)
 	return &Bpnm, nil
