@@ -469,8 +469,8 @@
 			"name": "approvedCallBack",
 			"description": "Callback for approved process",
 			"order": {
-				"inWhatProcessInjected": "approved",
-				"inWhatActivityInjected": "end",
+				"inWhatProcessInjected": "approve",
+				"inWhatActivityInjected": "approved",
 				"order": "post"
 			},
 			"globalData": [
@@ -559,11 +559,11 @@
 			]
 		},
 		{
-			"name": "rejectedCallBack",
+			"name": "rejectedCallback",
 			"description": "Callback for rejected process",
 			"order": {
-				"inWhatProcessInjected": "rejected",
-				"inWhatActivityInjected": "end",
+				"inWhatProcessInjected": "approve",
+				"inWhatActivityInjected": "rejected",
 				"order": "post"
 			},
 			"globalData": [
@@ -587,67 +587,40 @@
 						}
 					],
 					"handlerless": true,
-					"gateways": [
-						{
-							"nextActivities": [
-								"end"
-							],
-							"decision": "!config.rejected"
-						},
-						{
-							"nextActivities": [
-								"winRejected"
-							],
-							"decision": "node.callbackConfig.name==`winClient`"
-						},
-						{
-							"nextActivities": [
-								"baseCallback"
-							],
-							"decision": "node.callbackConfig.name==`facileBrokerClient`"
-						}
-					]
+					"gateways": []
+				}
+			]
+		},
+		{
+			"name": "rejected",
+			"description": "Rejected process",
+			"order": {
+				"inWhatProcessInjected": "approve",
+				"inWhatActivityInjected": "rejected",
+				"order": "post"
+			},
+			"globalData": [
+				{
+					"name": "policy",
+					"type": "policy"
 				},
 				{
-					"name": "baseCallback",
-					"outputData": [
-						{
-							"name": "callbackInfo",
-							"type": "callbackInfo"
-						}
-					],
-					"gateways": [
-						{
-							"nextActivities": [
-								"saveAudit"
-							]
-						}
-					]
-				},
+					"name": "node",
+					"type": "networkNode"
+				}
+			],
+			"defaultStart": "init",
+			"activities": [
 				{
-					"name": "winRejected",
-					"outputData": [
-						{
-							"name": "callbackInfo",
-							"type": "callbackInfo"
-						}
-					],
-					"gateways": [
-						{
-							"nextActivities": [
-								"saveAudit"
-							]
-						}
-					]
-				},
-				{
-					"name": "saveAudit",
+					"name": "init",
 					"inputData": [
 						{
-							"name": "callbackInfo",
-							"type": "callbackInfo"
+							"name": "config",
+							"type": "callbackConfig"
 						}
-					]
+					],
+					"handlerless": true,
+					"gateways": []
 				}
 			]
 		}

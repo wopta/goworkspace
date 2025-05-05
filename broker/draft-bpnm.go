@@ -190,6 +190,8 @@ func addHandlersDraft(builder *bpmn.BpnmBuilder) error {
 		builder.AddHandler("setRequestApprovalData", setRequestApprovalBpmnDraft),
 		builder.AddHandler("sendRequestApprovalMail", sendRequestApprovalMailDraft),
 		builder.AddHandler("addContract", addContractDraft),
+		builder.AddHandler("rejected", func(state bpmn.StorageData) error { return nil }),
+		builder.AddHandler("approved", func(state bpmn.StorageData) error { return nil }),
 	)
 }
 

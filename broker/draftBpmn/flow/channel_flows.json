@@ -460,13 +460,8 @@
 			]
 		},
 		{
-			"name": "approved",
-			"description": "Approved process",
-			"order": {
-				"inWhatProcessInjected": "approved",
-				"inWhatActivityInjected": "end",
-				"order": "post"
-			},
+			"name": "approve",
+			"description": "approve process -> approved or rejected",
 			"globalData": [
 				{
 					"name": "policy",
@@ -481,47 +476,27 @@
 			"activities": [
 				{
 					"name": "init",
-					"inputData": [
-						{
-							"name": "config",
-							"type": "callbackConfig"
-						}
-					],
 					"handlerless": true,
-					"gateways": []
-				}
-			]
-		},
-		{
-			"name": "rejected",
-			"description": "Rejected process",
-			"order": {
-				"inWhatProcessInjected": "rejected",
-				"inWhatActivityInjected": "end",
-				"order": "post"
-			},
-			"globalData": [
-				{
-					"name": "policy",
-					"type": "policy"
+					"gateways": [
+						{
+							"nextActivities": [
+								"approved"
+							],
+							"decision": "false"
+						},
+						{
+							"nextActivities": [
+								"rejected"
+							],
+							"decision": "false"
+						}
+					]
 				},
 				{
-					"name": "node",
-					"type": "networkNode"
-				}
-			],
-			"defaultStart": "init",
-			"activities": [
+					"name": "rejected"
+				},
 				{
-					"name": "init",
-					"inputData": [
-						{
-							"name": "config",
-							"type": "callbackConfig"
-						}
-					],
-					"handlerless": true,
-					"gateways": []
+					"name": "approved"
 				}
 			]
 		}
