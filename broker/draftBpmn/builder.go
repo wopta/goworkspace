@@ -257,7 +257,7 @@ func getNameEndActivity(nameProcess string) string {
 	return "end_" + nameProcess
 }
 
-// isInputProvidedByOutput: check if every inputs if correctly provided by outputs, otherwise return error
+// isInputProvidedByOutput: check if every inputs is correctly provided by outputs, otherwise return error
 func isInputProvidedByOutput(inputs []typeData, outputs []typeData) error {
 	//check if input is equal to output
 	checkData := func(input typeData, output typeData) (isFounded bool, err error) {
