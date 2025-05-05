@@ -164,6 +164,7 @@ func (d *RequestDTO) FromPolicy(p *models.Policy) error {
 	for _, v := range p.Assets {
 		if v.Building != nil {
 			atecoCode = v.Building.Ateco
+			break
 		}
 	}
 
