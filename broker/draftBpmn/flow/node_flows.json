@@ -469,7 +469,7 @@
 			"name": "approvedCallBack",
 			"description": "Callback for approved process",
 			"order": {
-				"inWhatProcessInjected": "approve",
+				"inWhatProcessInjected": "acceptance",
 				"inWhatActivityInjected": "approved",
 				"order": "post"
 			},
@@ -587,40 +587,67 @@
 						}
 					],
 					"handlerless": true,
-					"gateways": []
-				}
-			]
-		},
-		{
-			"name": "rejected",
-			"description": "Rejected process",
-			"order": {
-				"inWhatProcessInjected": "acceptance",
-				"inWhatActivityInjected": "rejected",
-				"order": "post"
-			},
-			"globalData": [
-				{
-					"name": "policy",
-					"type": "policy"
+					"gateways": [
+						{
+							"nextActivities": [
+								"end"
+							],
+							"decision": "!config.rejected"
+						},
+						{
+							"nextActivities": [
+								"winRejected"
+							],
+							"decision": "node.callbackConfig.name==`winClient`"
+						},
+						{
+							"nextActivities": [
+								"baseCallback"
+							],
+							"decision": "node.callbackConfig.name==`facileBrokerClient`"
+						}
+					]
 				},
 				{
-					"name": "node",
-					"type": "networkNode"
-				}
-			],
-			"defaultStart": "init",
-			"activities": [
-				{
-					"name": "init",
-					"inputData": [
+					"name": "baseCallback",
+					"outputData": [
 						{
-							"name": "config",
-							"type": "callbackConfig"
+							"name": "callbackInfo",
+							"type": "callbackInfo"
 						}
 					],
-					"handlerless": true,
-					"gateways": []
+					"gateways": [
+						{
+							"nextActivities": [
+								"saveAudit"
+							]
+						}
+					]
+				},
+				{
+					"name": "winRejected",
+					"outputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					],
+					"gateways": [
+						{
+							"nextActivities": [
+								"saveAudit"
+							]
+						}
+					]
+				},
+				{
+					"name": "saveAudit",
+					"inputData": [
+						{
+							"name": "callbackInfo",
+							"type": "callbackInfo"
+						}
+					]
 				}
 			]
 		}

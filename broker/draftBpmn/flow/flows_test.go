@@ -60,6 +60,7 @@ func getBuilderFlowChannel(log *mockLog, store bpmn.StorageData) *bpmn.BpnmBuild
 		builder.AddHandler("addContract", funcTest("addContract", log)),
 		builder.AddHandler("rejected", funcTest("rejected", log)),
 		builder.AddHandler("approved", funcTest("approved", log)),
+		builder.AddHandler("sendAcceptanceMail", funcTest("sendAcceptanceMail", log)),
 	)
 	if e != nil {
 		return nil
