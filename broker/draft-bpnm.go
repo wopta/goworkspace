@@ -76,6 +76,35 @@ func getFlow(policy *models.Policy, networkNode *models.NetworkNode, storage bpm
 	return builder.Build()
 }
 
+func addHandlersDraft(builder *bpmn.BpnmBuilder) error {
+	return bpmn.IsError(
+		builder.AddHandler("setProposalData", setProposalDataDraft),
+		builder.AddHandler("emitData", emitDataDraft),
+		builder.AddHandler("sendMailSign", sendMailSignDraft),
+		builder.AddHandler("pay", payDraft),
+		builder.AddHandler("setAdvice", setAdvanceDraft),
+		builder.AddHandler("putUser", updateUserAndNetworkNodeDraft),
+		builder.AddHandler("sendEmitProposalMail", sendEmitProposalMailDraft),
+		builder.AddHandler("setLeadData", setLeadBpmnDraft),
+		builder.AddHandler("sendLeadMail", sendLeadMailDraft),
+		builder.AddHandler("updatePolicy", updatePolicyDraft),
+		builder.AddHandler("sign", signDraft),
+		builder.AddHandler("payTransaction", payTransactionDraft),
+		builder.AddHandler("sendProposalMail", sendProposalMailDraft),
+		builder.AddHandler("fillAttachments", fillAttachmentsDraft),
+		builder.AddHandler("setToPay", setToPayDraft),
+		builder.AddHandler("setSign", setSignDraft),
+		builder.AddHandler("sendMailContract", sendMailContractDraft),
+		builder.AddHandler("sendMailPay", sendMailPayDraft),
+		builder.AddHandler("setRequestApprovalData", setRequestApprovalBpmnDraft),
+		builder.AddHandler("sendRequestApprovalMail", sendRequestApprovalMailDraft),
+		builder.AddHandler("addContract", addContractDraft),
+		builder.AddHandler("rejected", draftrejectPolicy),
+		builder.AddHandler("approved", draftapprovePolicy),
+		builder.AddHandler("sendAcceptanceMail", sendAcceptanceMail),
+	)
+}
+
 func getNodeFlow() (*bpmn.BpnmBuilder, error) {
 	store := bpmn.NewStorageBpnm()
 	builder, e := bpmn.NewBpnmBuilder("broker/draftBpmn/flow/node_flows.json")
@@ -102,8 +131,8 @@ func getNodeFlow() (*bpmn.BpnmBuilder, error) {
 		builder.AddHandler("winPay", callBackPaid),
 		builder.AddHandler("winProposal", callBackProposal),
 		builder.AddHandler("winRequestApproval", callBackRequestApproval),
-		builder.AddHandler("winApproved", func(st bpmn.StorageData) error { return nil }),
-		builder.AddHandler("winRejected", func(st bpmn.StorageData) error { return nil }),
+		builder.AddHandler("winApproved", callBackApproved),
+		builder.AddHandler("winRejected", callBackRejected),
 	)
 	if err != nil {
 		return nil, err
@@ -167,32 +196,36 @@ func saveAudit(st bpmn.StorageData) error {
 	return nil
 }
 
-func addHandlersDraft(builder *bpmn.BpnmBuilder) error {
-	return bpmn.IsError(
-		builder.AddHandler("setProposalData", setProposalDataDraft),
-		builder.AddHandler("emitData", emitDataDraft),
-		builder.AddHandler("sendMailSign", sendMailSignDraft),
-		builder.AddHandler("pay", payDraft),
-		builder.AddHandler("setAdvice", setAdvanceDraft),
-		builder.AddHandler("putUser", updateUserAndNetworkNodeDraft),
-		builder.AddHandler("sendEmitProposalMail", sendEmitProposalMailDraft),
-		builder.AddHandler("setLeadData", setLeadBpmnDraft),
-		builder.AddHandler("sendLeadMail", sendLeadMailDraft),
-		builder.AddHandler("updatePolicy", updatePolicyDraft),
-		builder.AddHandler("sign", signDraft),
-		builder.AddHandler("payTransaction", payTransactionDraft),
-		builder.AddHandler("sendProposalMail", sendProposalMailDraft),
-		builder.AddHandler("fillAttachments", fillAttachmentsDraft),
-		builder.AddHandler("setToPay", setToPayDraft),
-		builder.AddHandler("setSign", setSignDraft),
-		builder.AddHandler("sendMailContract", sendMailContractDraft),
-		builder.AddHandler("sendMailPay", sendMailPayDraft),
-		builder.AddHandler("setRequestApprovalData", setRequestApprovalBpmnDraft),
-		builder.AddHandler("sendRequestApprovalMail", sendRequestApprovalMailDraft),
-		builder.AddHandler("addContract", addContractDraft),
-		builder.AddHandler("rejected", func(state bpmn.StorageData) error { return nil }),
-		builder.AddHandler("approved", func(state bpmn.StorageData) error { return nil }),
+func sendAcceptanceMail(state bpmn.StorageData) error {
+	policy, err := bpmn.GetData[*flow.PolicyDraft]("policy", state)
+	if err != nil {
+		return err
+	}
+	addresses, err := bpmn.GetData[*flow.Addresses]("addresses", state)
+	if err != nil {
+		return err
+	}
+
+	node, err := bpmn.GetData[*flow.NetworkDraft]("node", state)
+	if err != nil {
+		return err
+	}
+	log.Printf("toAddress '%s'", addresses.ToAddress.String())
+	//TODO: to remove after test
+	return nil
+	var warrant *models.Warrant
+	if node.NetworkNode != nil {
+		warrant = node.GetWarrant()
+	}
+	flowName, _ := policy.GetFlow(node.NetworkNode, warrant)
+	mail.SendMailReservedResult(
+		*policy.Policy,
+		mail.AddressAssunzione,
+		addresses.ToAddress,
+		mail.Address{},
+		flowName,
 	)
+	return nil
 }
 
 func addContractDraft(state bpmn.StorageData) error {
@@ -778,6 +811,50 @@ func callBackRequestApproval(st bpmn.StorageData) error {
 	}
 	win := win.NewClient(node.ExternalNetworkCode)
 	_info := win.RequestApproval(*policy.Policy)
+
+	info := flow.CallbackInfo{
+		Request:     _info.Request,
+		RequestBody: _info.RequestBody,
+		Response:    _info.Response,
+		Error:       _info.Error,
+	}
+	st.AddLocal("callbackInfo", &info)
+	return nil
+}
+
+func callBackApproved(st bpmn.StorageData) error {
+	node, err := bpmn.GetData[*flow.NetworkDraft]("node", st)
+	if err != nil {
+		return err
+	}
+	policy, err := bpmn.GetData[*flow.PolicyDraft]("policy", st)
+	if err != nil {
+		return err
+	}
+	win := win.NewClient(node.ExternalNetworkCode)
+	_info := win.Approved(*policy.Policy)
+
+	info := flow.CallbackInfo{
+		Request:     _info.Request,
+		RequestBody: _info.RequestBody,
+		Response:    _info.Response,
+		Error:       _info.Error,
+	}
+	st.AddLocal("callbackInfo", &info)
+	return nil
+}
+
+func callBackRejected(st bpmn.StorageData) error {
+	node, err := bpmn.GetData[*flow.NetworkDraft]("node", st)
+	if err != nil {
+		return err
+	}
+	policy, err := bpmn.GetData[*flow.PolicyDraft]("policy", st)
+	if err != nil {
+		return err
+	}
+	win := win.NewClient(node.ExternalNetworkCode)
+	_info := win.Rejected(*policy.Policy)
 
 	info := flow.CallbackInfo{
 		Request:     _info.Request,
