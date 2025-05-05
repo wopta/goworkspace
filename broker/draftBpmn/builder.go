@@ -268,7 +268,7 @@ func isInputInOutput(inputs []typeData, outputs []typeData) error {
 		return false, nil
 	}
 	if len(inputs) > len(outputs) {
-		return errors.New("Insufficient number of date")
+		return errors.New("Insufficient number of output data")
 	}
 	for _, input := range inputs {
 		err := fmt.Errorf("The input %v isnt provided by output", input)
