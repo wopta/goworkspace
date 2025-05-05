@@ -104,13 +104,6 @@ func leaddraft(authToken models.AuthToken, policy *models.Policy) error {
 		return e
 	}
 
-	log.Println("saving lead to firestore...")
-	err = lib.SetFirestoreErr(lib.PolicyCollection, policy.Uid, policy)
-	lib.CheckError(err)
-
-	log.Println("saving lead to bigquery...")
-	policy.BigquerySave(origin)
-
 	log.Println("saving guarantees to bigquery...")
 	models.SetGuaranteBigquery(*policy, "lead", lib.GuaranteeCollection)
 

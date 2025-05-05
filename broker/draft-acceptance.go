@@ -52,7 +52,6 @@ func DraftAcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	origin := r.Header.Get("origin")
 	policyUid := chi.URLParam(r, "policyUid")
-	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 
 	log.Printf("Policy Uid %s", policyUid)
 
@@ -100,23 +99,6 @@ func DraftAcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	if err != nil {
 		return "", nil, err
 	}
-	policy.Updated = time.Now().UTC()
-
-	log.Println("saving to firestore...")
-	err = lib.SetFirestoreErr(firePolicy, policy.Uid, &policy)
-	if err != nil {
-		log.ErrorF("error saving policy to firestore: %s", err.Error())
-		return "", nil, err
-	}
-	log.Println("firestore saved!")
-
-	policy.BigquerySave(origin)
-
-	policyJsonLog, err := policy.Marshal()
-	if err != nil {
-		log.ErrorF("error marshaling policy: %s", err.Error())
-	}
-	log.Printf("Policy: %s", string(policyJsonLog))
 
 	log.Println("Handler end -------------------------------------------------")
 
@@ -137,6 +119,7 @@ func draftrejectPolicy(storage draftbpmn.StorageData) error {
 	policy.ReservedInfo.AcceptanceNote = acceptanceInfo.Action
 	policy.ReservedInfo.AcceptanceDate = time.Now().UTC()
 	log.Printf("Policy Uid %s REJECTED", policy.Uid)
+	policy.Updated = time.Now().UTC()
 	return nil
 }
 
@@ -154,5 +137,6 @@ func draftapprovePolicy(storage draftbpmn.StorageData) error {
 	policy.ReservedInfo.AcceptanceNote = acceptanceInfo.Action
 	policy.ReservedInfo.AcceptanceDate = time.Now().UTC()
 	log.Printf("Policy Uid %s APPROVED", policy.Uid)
+	policy.Updated = time.Now().UTC()
 	return nil
 }

@@ -132,7 +132,6 @@ func emitDraft(policy *models.Policy, request EmitRequest, origin string) (EmitR
 	log.Println("[Emit] start ------------------------------------------------")
 	var responseEmit EmitResponse
 
-	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 	fireGuarantee := lib.GetDatasetByEnv(origin, lib.GuaranteeCollection)
 
 	log.Printf("[Emit] Emitting - Policy Uid %s", policy.Uid)
@@ -157,15 +156,6 @@ func emitDraft(policy *models.Policy, request EmitRequest, origin string) (EmitR
 	policy.Updated = time.Now().UTC()
 	policyJson, _ := policy.Marshal()
 	log.Printf("[Emit] Policy %s: %s", request.Uid, string(policyJson))
-
-	log.Println("[Emit] saving policy to firestore...")
-	err = lib.SetFirestoreErr(firePolicy, request.Uid, policy)
-	if err != nil {
-		return responseEmit, err
-	}
-
-	log.Println("[Emit] saving policy to bigquery...")
-	policy.BigquerySave(origin)
 
 	log.Println("[Emit] saving guarantees to bigquery...")
 	models.SetGuaranteBigquery(*policy, "emit", fireGuarantee)

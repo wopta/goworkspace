@@ -102,6 +102,10 @@ func addHandlersDraft(builder *bpmn.BpnmBuilder) error {
 		builder.AddHandler("rejected", draftrejectPolicy),
 		builder.AddHandler("approved", draftapprovePolicy),
 		builder.AddHandler("sendAcceptanceMail", sendAcceptanceMail),
+
+		builder.AddHandler("end_accepance", savePolicy),
+		builder.AddHandler("end_emit", savePolicy),
+		builder.AddHandler("end_lead", savePolicy),
 	)
 }
 
@@ -195,6 +199,24 @@ func saveAudit(st bpmn.StorageData) error {
 	if err := lib.InsertRowsBigQuery(lib.WoptaDataset, CallbackOutTableId, audit); err != nil {
 		return err
 	}
+	return nil
+}
+
+func savePolicy(state bpmn.StorageData) error {
+	policy, err := bpmn.GetData[*flow.PolicyDraft]("policy", state)
+	if err != nil {
+		return err
+	}
+	policy.Updated = time.Now().UTC()
+	log.Println("saving to firestore...")
+	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
+	err = lib.SetFirestoreErr(firePolicy, policy.Uid, &policy)
+	if err != nil {
+		return err
+	}
+	log.Println("firestore saved!")
+
+	policy.BigquerySave(origin)
 	return nil
 }
 
