@@ -474,10 +474,6 @@
 				{
 					"name": "addresses",
 					"type": "addresses"
-				},
-				{
-					"name": "acceptanceInfo",
-					"type": "acceptanceInfo"
 				}
 			],
 			"defaultStart": "init",
@@ -485,7 +481,19 @@
 				{
 					"name": "init",
 					"handlerless": true,
-					"inputData": [],
+					"callEndIfStop": false,
+					"inputData": [
+						{
+							"name": "acceptanceInfo",
+							"type": "acceptanceInfo"
+						}
+					],
+					"outputData": [
+						{
+							"name": "acceptanceInfo",
+							"type": "acceptanceInfo"
+						}
+					],
 					"gateways": [
 						{
 							"nextActivities": [

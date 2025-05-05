@@ -90,7 +90,8 @@ func DraftAcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	storage := draftbpmn.NewStorageBpnm()
 	networkNode := network.GetNetworkNodeByUid(policy.ProducerUid)
 	storage.AddGlobal("addresses", addresses)
-	storage.AddGlobal("acceptanceInfo", &payload)
+	storage.AddLocal("acceptanceInfo", &payload)
+
 	flow, err := getFlow(&policy, networkNode, storage)
 	if err != nil {
 		return "", nil, err
