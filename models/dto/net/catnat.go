@@ -1,6 +1,8 @@
 package net
 
-import "github.com/wopta/goworkspace/models"
+import (
+	"github.com/wopta/goworkspace/models"
+)
 
 type Contractor struct {
 	PersonalDataType          string `json:"tipoAnagrafica"`
@@ -240,80 +242,59 @@ func (d *RequestDTO) FromPolicy(p *models.Policy) error {
 			}
 		}
 		for _, g := range v.Guarantees {
-			if g.Slug == earthquakeSlug { // TODO check slug
-				asset.EarthquakePurchase = yes
-				if g.Value != nil {
-					if g.Value.SumInsuredLimitOfIndemnity != 0 {
-						var gL GuaranteeList
-						gL.GuaranteeCode = earthquakeBuildingCode
-						gL.CapitalAmount = int(g.Value.SumInsuredLimitOfIndemnity)
-						asset.GuaranteeList = append(asset.GuaranteeList, gL)
-					}
-					if g.Value.SumInsured != 0 {
-						var gL GuaranteeList
-						gL.GuaranteeCode = earthquakeContentCode
-						gL.CapitalAmount = int(g.Value.SumInsured)
-						asset.GuaranteeList = append(asset.GuaranteeList, gL)
-					}
-					if g.Value.LimitOfIndemnity != 0 {
-						var gL GuaranteeList
-						gL.GuaranteeCode = earthquakeStockCode
-						gL.CapitalAmount = int(g.Value.LimitOfIndemnity)
-						asset.GuaranteeList = append(asset.GuaranteeList, gL)
-					}
-				}
-			}
-			if g.Slug == floodSlug { // TODO check slug
-				asset.FloodPurchase = yes
-				if g.Value != nil {
-					if g.Value.SumInsuredLimitOfIndemnity != 0 {
-						var gL GuaranteeList
-						gL.GuaranteeCode = floodBuildingCode
-						gL.CapitalAmount = int(g.Value.SumInsuredLimitOfIndemnity)
-						asset.GuaranteeList = append(asset.GuaranteeList, gL)
-					}
-					if g.Value.SumInsured != 0 {
-						var gL GuaranteeList
-						gL.GuaranteeCode = floodContentCode
-						gL.CapitalAmount = int(g.Value.SumInsured)
-						asset.GuaranteeList = append(asset.GuaranteeList, gL)
-					}
-					if g.Value.LimitOfIndemnity != 0 {
-						var gL GuaranteeList
-						gL.GuaranteeCode = floodStockCode
-						gL.CapitalAmount = int(g.Value.LimitOfIndemnity)
-						asset.GuaranteeList = append(asset.GuaranteeList, gL)
-					}
-				}
-			}
-			if g.Slug == landslideSlug { // TODO check slug
-				asset.LandSlidePurchase = yes
-				if g.Value != nil {
-					if g.Value.SumInsuredLimitOfIndemnity != 0 {
-						var gL GuaranteeList
-						gL.GuaranteeCode = landslideBuildingCode
-						gL.CapitalAmount = int(g.Value.SumInsuredLimitOfIndemnity)
-						asset.GuaranteeList = append(asset.GuaranteeList, gL)
-					}
-					if g.Value.SumInsured != 0 {
-						var gL GuaranteeList
-						gL.GuaranteeCode = landslideContentCode
-						gL.CapitalAmount = int(g.Value.SumInsured)
-						asset.GuaranteeList = append(asset.GuaranteeList, gL)
-					}
-					if g.Value.LimitOfIndemnity != 0 {
-						var gL GuaranteeList
-						gL.GuaranteeCode = landslideStockCode
-						gL.CapitalAmount = int(g.Value.LimitOfIndemnity)
-						asset.GuaranteeList = append(asset.GuaranteeList, gL)
-					}
-				}
-			}
+			setGuarantee(&asset, g)
 		}
 	}
 	d.Asset = asset
 
 	return nil
+}
+
+func setGuarantee(asset *AssetRequest, guarantee models.Guarante) {
+	if guarantee.Value == nil {
+		return
+	}
+	switch guarantee.Slug {
+	case earthquakeSlug:
+		asset.EarthquakePurchase = yes
+	case floodSlug:
+		asset.FloodPurchase = yes
+	case landslideSlug:
+		asset.LandSlidePurchase = yes
+	}
+	setGuaranteeValue(asset, guarantee, mapCodeFromSlug(guarantee.Slug))
+}
+
+func mapCodeFromSlug(slug string) string {
+	var code string
+	switch slug {
+	case earthquakeSlug:
+		code = earthquakeCode
+	case floodSlug:
+		code = floodCode
+	case landslideSlug:
+		code = landslideCode
+	}
+	return code
+}
+
+func setGuaranteeValue(asset *AssetRequest, guarantee models.Guarante, code string) {
+	var gL GuaranteeList
+	if guarantee.Value.SumInsuredLimitOfIndemnity != 0 {
+		gL.GuaranteeCode = code + buildingCode
+		gL.CapitalAmount = int(guarantee.Value.SumInsuredLimitOfIndemnity)
+		asset.GuaranteeList = append(asset.GuaranteeList, gL)
+	}
+	if guarantee.Value.SumInsured != 0 {
+		gL.GuaranteeCode = code + contentCode
+		gL.CapitalAmount = int(guarantee.Value.SumInsured)
+		asset.GuaranteeList = append(asset.GuaranteeList, gL)
+	}
+	if guarantee.Value.LimitOfIndemnity != 0 {
+		gL.GuaranteeCode = code + stockCode
+		gL.CapitalAmount = int(guarantee.Value.LimitOfIndemnity)
+		asset.GuaranteeList = append(asset.GuaranteeList, gL)
+	}
 }
 
 func (d *ResponseDTO) ToPolicy(p *models.Policy) error {
