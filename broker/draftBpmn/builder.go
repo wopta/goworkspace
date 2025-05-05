@@ -233,7 +233,7 @@ func (p *processBpnm) hydrateGateways(activities []activityBuilder) error {
 					return fmt.Errorf("No event named %v", nextJump)
 				}
 				gateway.nextActivities[iact] = p.activities[nextJump]
-				if e := isInputInOutput(gateway.nextActivities[iact].requiredInputData, builderActivity.OutputDataRequired); e != nil {
+				if e := isInputProvidedByOutput(gateway.nextActivities[iact].requiredInputData, builderActivity.OutputDataRequired); e != nil {
 					prefix := fmt.Sprintf("input activity: '%v' and output activity: '%v'", gateway.nextActivities[iact].name, builderActivity.Name)
 					return fmt.Errorf(prefix+", has error: %v", e.Error())
 				}
@@ -257,7 +257,7 @@ func getNameEndActivity(nameProcess string) string {
 	return "end_" + nameProcess
 }
 
-func isInputInOutput(inputs []typeData, outputs []typeData) error {
+func isInputProvidedByOutput(inputs []typeData, outputs []typeData) error {
 	checkData := func(input typeData, output typeData) (bool, error) {
 		if input.Name == output.Name {
 			if input.Type == output.Type {
