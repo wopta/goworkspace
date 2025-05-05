@@ -271,7 +271,7 @@ func isInputInOutput(inputs []typeData, outputs []typeData) error {
 		return errors.New("Insufficient number of output data")
 	}
 	for _, input := range inputs {
-		err := fmt.Errorf("The input %v isnt provided by output", input)
+		err := fmt.Errorf("The input %v isn't provided by output", input)
 		for _, output := range outputs {
 			isFounded, errComparison := checkData(input, output)
 			if !isFounded {
