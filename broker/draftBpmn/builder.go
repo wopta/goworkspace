@@ -86,7 +86,7 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 		}
 		newProcess.activities = builtActivities
 		if err = newProcess.hydrateGateways(p.Activities); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("Process '%v' with %v", p.Name, err)
 		}
 		newProcess.defaultStart = p.DefaultStart
 		flow.process[newProcess.name] = newProcess
@@ -233,6 +233,10 @@ func (p *processBpnm) hydrateGateways(activities []activityBuilder) error {
 					return fmt.Errorf("No event named %v", nextJump)
 				}
 				gateway.nextActivities[iact] = p.activities[nextJump]
+				if e := isInputInOutput(gateway.nextActivities[iact].requiredInputData, builderActivity.OutputDataRequired); e != nil {
+					prefix := fmt.Sprintf("input activity: '%v' and output activity: '%v'", gateway.nextActivities[iact].name, builderActivity.Name)
+					return fmt.Errorf(prefix+", has error: %v", e.Error())
+				}
 			}
 			gateways[igat] = gateway
 		}
@@ -251,4 +255,36 @@ func getEndingActivityBuilder(nameProcess string) activityBuilder {
 
 func getNameEndActivity(nameProcess string) string {
 	return "end_" + nameProcess
+}
+
+func isInputInOutput(inputs []typeData, outputs []typeData) error {
+	checkData := func(input typeData, output typeData) (bool, error) {
+		if input.Name == output.Name {
+			if input.Type == output.Type {
+				return true, nil
+			}
+			return true, fmt.Errorf("The type of output data '%v' differ from the input one, '%v'!='%v'", output.Name, output.Type, input.Type)
+		}
+		return false, nil
+	}
+	if len(inputs) > len(outputs) {
+		return errors.New("Insufficient number of date")
+	}
+	for _, input := range inputs {
+		err := fmt.Errorf("The input %v isnt provided by output", input)
+		for _, output := range outputs {
+			isFounded, errComparison := checkData(input, output)
+			if !isFounded {
+				continue
+			}
+			err = nil
+			if errComparison != nil {
+				return errComparison
+			}
+		}
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

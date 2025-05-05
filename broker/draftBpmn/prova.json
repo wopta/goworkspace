@@ -74,6 +74,12 @@
 					"name": "BEvent",
 					"handlerless": true,
 					"description": "emit policy",
+					"inputData": [
+						{
+							"name": "validationObject",
+							"type": "validity"
+						}
+					],
 					"outputData": [
 						{
 							"name": "error",
@@ -95,13 +101,7 @@
 				},
 				{
 					"name": "CEvent",
-					"description": "emit policy",
-					"inputData": [
-						{
-							"name": "error",
-							"type": "error"
-						}
-					]
+					"description": "emit policy"
 				},
 				{
 					"name": "DEventWithRec",
