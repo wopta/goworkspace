@@ -5,35 +5,35 @@ import (
 )
 
 type Contractor struct {
-	PersonalDataType          string `json:"tipoAnagrafica"`
-	CompanyName               string `json:"ragioneSociale"`
-	VatNumber                 string `json:"partitaIva"`
-	FiscalCode                string `json:"codiceFiscale"`
-	AtecoCode                 string `json:"codiceAteco"`
-	PostalCode                string `json:"cap"`
-	Address                   string `json:"indirizzo"`
-	Locality                  string `json:"comune"`
-	CityCode                  string `json:"provincia"`
-	Phone                     string `json:"telefonoCellulare"`
-	Email                     string `json:"email"`
-	PrivacyConsentDate        string `json:"dataConsensoPrivacy"`
-	ProcessingConsent         string `json:"consensoTrattamento"`
-	GenericMarketingConsent   string `json:"consensoMarketingGenerico"`
-	MarketingProfilingConsent string `json:"consensoProfilazioneMarketing"`
-	MarketingActivityConsent  string `json:"consensoAttivitaMarketing"`
+	PersonalDataType          string `json:"tipoAnagrafica,omitempty"`
+	CompanyName               string `json:"ragioneSociale,omitempty"`
+	VatNumber                 string `json:"partitaIva,omitempty"`
+	FiscalCode                string `json:"codiceFiscale,omitempty"`
+	AtecoCode                 string `json:"codiceAteco,omitempty"`
+	PostalCode                string `json:"cap,omitempty"`
+	Address                   string `json:"indirizzo,omitempty"`
+	Locality                  string `json:"comune,omitempty"`
+	CityCode                  string `json:"provincia,omitempty"`
+	Phone                     string `json:"telefonoCellulare,omitempty"`
+	Email                     string `json:"email,omitempty"`
+	PrivacyConsentDate        string `json:"dataConsensoPrivacy,omitempty"`
+	ProcessingConsent         string `json:"consensoTrattamento,omitempty"`
+	GenericMarketingConsent   string `json:"consensoMarketingGenerico,omitempty"`
+	MarketingProfilingConsent string `json:"consensoProfilazioneMarketing,omitempty"`
+	MarketingActivityConsent  string `json:"consensoAttivitaMarketing,omitempty"`
 	DocumentationFormat       int    `json:"formatoDocumentazione"`
 }
 
 type LegalRepresentative struct {
-	Name       string `json:"nome"`
-	Surname    string `json:"cognome"`
-	FiscalCode string `json:"codiceFiscale"`
-	PostalCode string `json:"cap"`
-	Address    string `json:"indirizzo"`
-	Locality   string `json:"comune"`
-	CityCode   string `json:"provincia"`
-	Phone      string `json:"telefonoCellulare"`
-	Email      string `json:"email"`
+	Name       string `json:"nome,omitempty"`
+	Surname    string `json:"cognome,omitempty"`
+	FiscalCode string `json:"codiceFiscale,omitempty"`
+	PostalCode string `json:"cap,omitempty"`
+	Address    string `json:"indirizzo,omitempty"`
+	Locality   string `json:"comune,omitempty"`
+	CityCode   string `json:"provincia,omitempty"`
+	Phone      string `json:"telefonoCellulare,omitempty"`
+	Email      string `json:"email,omitempty"`
 }
 
 type GuaranteeList struct {
