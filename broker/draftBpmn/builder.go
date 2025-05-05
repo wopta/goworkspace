@@ -257,13 +257,17 @@ func getNameEndActivity(nameProcess string) string {
 	return "end_" + nameProcess
 }
 
+// isInputProvidedByOutput: check if every inputs if correctly provided by outputs, otherwise return error
 func isInputProvidedByOutput(inputs []typeData, outputs []typeData) error {
-	checkData := func(input typeData, output typeData) (bool, error) {
+	//check if input is equal to output
+	checkData := func(input typeData, output typeData) (isFounded bool, err error) {
 		if input.Name == output.Name {
 			if input.Type == output.Type {
 				return true, nil
 			}
-			return true, fmt.Errorf("The type of output data '%v' differ from the input one, '%v'!='%v'", output.Name, output.Type, input.Type)
+			isFounded = true
+			err = fmt.Errorf("The type of output data '%v' differ from the input one, '%v'!='%v'", output.Name, output.Type, input.Type)
+			return
 		}
 		return false, nil
 	}
