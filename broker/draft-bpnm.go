@@ -164,6 +164,8 @@ func addContractDraft(state bpmn.StorageData) error {
 }
 
 func sendMailPayDraft(state bpmn.StorageData) error {
+	log.AddPrefix("sendMailPay")
+	defer log.PopPrefix()
 	policy, err := bpmn.GetData[*flow.PolicyDraft]("policy", state)
 	if err != nil {
 		return err
@@ -186,7 +188,7 @@ func sendMailPayDraft(state bpmn.StorageData) error {
 	}
 
 	log.Printf(
-		"[sendMailPay] from '%s', to '%s', cc '%s'",
+		"from '%s', to '%s', cc '%s'",
 		addresses.FromAddress.String(),
 		addresses.ToAddress.String(),
 		addresses.CcAddress.String(),
@@ -197,6 +199,8 @@ func sendMailPayDraft(state bpmn.StorageData) error {
 }
 
 func sendMailContractDraft(state bpmn.StorageData) error {
+	log.AddPrefix("sendMailContract")
+	defer log.PopPrefix()
 	policy, err := bpmn.GetData[*flow.PolicyDraft]("policy", state)
 	if err != nil {
 		return err
@@ -220,7 +224,7 @@ func sendMailContractDraft(state bpmn.StorageData) error {
 	}
 
 	log.Printf(
-		"[sendMailContract] from '%s', to '%s', cc '%s'",
+		"from '%s', to '%s', cc '%s'",
 		addresses.FromAddress.String(),
 		addresses.ToAddress.String(),
 		addresses.CcAddress.String(),
@@ -238,7 +242,7 @@ func setSignDraft(state bpmn.StorageData) error {
 
 	err = plc.Sign(policy.Policy, origin)
 	if err != nil {
-		log.Printf("[setSign] ERROR: %s", err.Error())
+		log.Error(err)
 		return err
 	}
 
@@ -252,7 +256,7 @@ func setToPayDraft(state bpmn.StorageData) error {
 	}
 	err = plc.SetToPay(policy.Policy, origin)
 	if err != nil {
-		log.Printf("[setToPay] ERROR: %s", err.Error())
+		log.Error(err)
 		return err
 	}
 
@@ -266,7 +270,7 @@ func fillAttachmentsDraft(state bpmn.StorageData) error {
 	}
 	err = plc.FillAttachments(policy.Policy, origin)
 	if err != nil {
-		log.Printf("[fillAttachments] ERROR: %s", err.Error())
+		log.Error(err)
 		return err
 	}
 
@@ -286,7 +290,7 @@ func payTransactionDraft(state bpmn.StorageData) error {
 	transaction, _ := tr.GetTransactionToBePaid(policy.Uid, *providerId, paymentInfo.Schedule, lib.TransactionsCollection)
 	err = tr.Pay(&transaction, origin, paymentInfo.PaymentMethod)
 	if err != nil {
-		log.Printf("[fabrickPayment] ERROR Transaction Pay %s", err.Error())
+		log.Error(err)
 		return err
 	}
 
@@ -615,7 +619,7 @@ func updateUserAndNetworkNodeDraft(state bpmn.StorageData) error {
 	// promote documents from temp bucket to user and connect it to policy
 	err := plc.SetUserIntoPolicyContractor(policy.Policy, origin)
 	if err != nil {
-		log.Printf("[putUser] ERROR SetUserIntoPolicyContractor %s", err.Error())
+		log.ErrorF("[putUser] ERROR SetUserIntoPolicyContractor %s", err.Error())
 		return err
 	}
 	return network.UpdateNetworkNodePortfolio(origin, policy.Policy, networkNode)
