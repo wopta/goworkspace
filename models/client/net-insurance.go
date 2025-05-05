@@ -29,13 +29,12 @@ func (c *Client) Authenticate() {
 
 func (c *Client) Quote(dto net.RequestDTO) (net.ResponseDTO, *net.ErrorResponse, error) {
 	url := "https://apigatewaydigital.netinsurance.it/PolizzeGateway24/emettiPolizza/441-029-007"
-	reqBodyBytes := new(bytes.Buffer)
-	err := json.NewEncoder(reqBodyBytes).Encode(dto)
+	rBuff := new(bytes.Buffer)
+	err := json.NewEncoder(rBuff).Encode(dto)
 	if err != nil {
 		return net.ResponseDTO{}, nil, err
 	}
-	r := reqBodyBytes.Bytes()
-	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(r))
+	req, _ := http.NewRequest(http.MethodPost, url, rBuff)
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := c.httpC.Do(req)
 	if err != nil {
