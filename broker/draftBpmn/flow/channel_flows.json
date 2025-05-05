@@ -460,7 +460,7 @@
 			]
 		},
 		{
-			"name": "approve",
+			"name": "acceptance",
 			"description": "approve process -> approved or rejected",
 			"globalData": [
 				{
@@ -470,6 +470,14 @@
 				{
 					"name": "node",
 					"type": "networkNode"
+				},
+				{
+					"name": "addresses",
+					"type": "addresses"
+				},
+				{
+					"name": "acceptanceInfo",
+					"type": "acceptanceInfo"
 				}
 			],
 			"defaultStart": "init",
@@ -477,26 +485,44 @@
 				{
 					"name": "init",
 					"handlerless": true,
+					"inputData": [],
 					"gateways": [
 						{
 							"nextActivities": [
 								"approved"
 							],
-							"decision": "false"
+							"decision": "acceptanceInfo.action==`Approved`"
 						},
 						{
 							"nextActivities": [
 								"rejected"
 							],
-							"decision": "false"
+							"decision": "acceptanceInfo.action==`Rejected`"
 						}
 					]
 				},
 				{
-					"name": "rejected"
+					"name": "rejected",
+					"gateways": [
+						{
+							"nextActivities": [
+								"sendAcceptanceMail"
+							]
+						}
+					]
 				},
 				{
-					"name": "approved"
+					"name": "approved",
+					"gateways": [
+						{
+							"nextActivities": [
+								"sendAcceptanceMail"
+							]
+						}
+					]
+				},
+				{
+					"name": "sendAcceptanceMail"
 				}
 			]
 		}

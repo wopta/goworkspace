@@ -562,7 +562,7 @@
 			"name": "rejectedCallback",
 			"description": "Callback for rejected process",
 			"order": {
-				"inWhatProcessInjected": "approve",
+				"inWhatProcessInjected": "acceptance",
 				"inWhatActivityInjected": "rejected",
 				"order": "post"
 			},
@@ -595,7 +595,7 @@
 			"name": "rejected",
 			"description": "Rejected process",
 			"order": {
-				"inWhatProcessInjected": "approve",
+				"inWhatProcessInjected": "acceptance",
 				"inWhatActivityInjected": "rejected",
 				"order": "post"
 			},
