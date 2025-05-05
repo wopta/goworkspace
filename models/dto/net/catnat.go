@@ -160,10 +160,10 @@ func (d *RequestDTO) FromPolicy(p *models.Policy) error {
 	d.Emission = no
 	d.SalesChannel = catNatSalesChannel
 
-	var atecoCode string
-	for _, v := range p.Assets {
-		if v.Building != nil {
-			atecoCode = v.Building.Ateco
+	var baseAsset models.Asset
+	for _, a := range p.Assets {
+		if a.Building != nil {
+			baseAsset = a
 			break
 		}
 	}
@@ -179,7 +179,7 @@ func (d *RequestDTO) FromPolicy(p *models.Policy) error {
 		CompanyName:               p.Contractor.Name,
 		VatNumber:                 p.Contractor.VatCode,
 		FiscalCode:                p.Contractor.FiscalCode,
-		AtecoCode:                 atecoCode,
+		AtecoCode:                 baseAsset.Building.Ateco,
 		Phone:                     p.Contractor.Phone,
 		Email:                     p.Contractor.Mail,
 		PrivacyConsentDate:        p.StartDate.Format("2006-01-02"),
@@ -219,32 +219,59 @@ func (d *RequestDTO) FromPolicy(p *models.Policy) error {
 
 	d.LegalRepresentative = legalRep
 
+	useTypeMap := map[string]string{
+		"owner-tenant": "si",
+		"tenant":       "no",
+	}
+	buildingYearMap := map[string]int{
+		"before_1950":       1,
+		"from_1950_to_1990": 2,
+		"after_1990":        3,
+		"unknown":           4,
+	}
+	floorMap := map[string]int{
+		"up_to_2":     2,
+		"more_than_3": 1,
+	}
+	lowestFloorMap := map[string]int{
+		"first_floor":  1,
+		"upper_floor":  2,
+		"ground_floor": 3,
+		"underground":  4,
+	}
+	buildingMaterialMap := map[string]int{
+		"brick":    1,
+		"concrete": 2,
+		"steel":    3,
+		"unknown":  4,
+	}
+	quoteQuestionMap := map[bool]string{
+		true:  "si",
+		false: "no",
+	}
+
 	asset := AssetRequest{
-		ContractorAndTenant:  yes, // TODO
-		EarthquakeCoverage:   no,  // TODO
-		FloodCoverage:        no,  // TODO
+		ContractorAndTenant:  useTypeMap[baseAsset.Building.Type],
+		EarthquakeCoverage:   quoteQuestionMap[p.QuoteQuestions["hasEarthquake"].(bool)],
+		FloodCoverage:        quoteQuestionMap[p.QuoteQuestions["hasFlood"].(bool)],
 		EarthquakePurchase:   no,
 		FloodPurchase:        no,
 		LandSlidePurchase:    no,
-		ConstructionMaterial: 0, // TODO
-		ConstructionYear:     0, // TODO
-		FloorNumber:          0, // TODO
-		LowestFloor:          0, // TODO
+		ConstructionMaterial: buildingMaterialMap[baseAsset.Building.BuildingMaterial],
+		ConstructionYear:     buildingYearMap[baseAsset.Building.BuildingYear],
+		FloorNumber:          floorMap[baseAsset.Building.Floor],
+		LowestFloor:          lowestFloorMap[baseAsset.Building.Floor],
 		GuaranteeList:        make([]GuaranteeList, 0),
 	}
 
-	for _, v := range p.Assets {
-		if v.Building != nil {
-			if v.Building.BuildingAddress != nil {
-				asset.PostalCode = v.Building.BuildingAddress.PostalCode
-				asset.Address = formatAddress(v.Building.BuildingAddress)
-				asset.Locality = v.Building.BuildingAddress.Locality
-				asset.CityCode = v.Building.BuildingAddress.CityCode
-			}
-		}
-		for _, g := range v.Guarantees {
-			setGuarantee(&asset, g)
-		}
+	if baseAsset.Building.BuildingAddress != nil {
+		asset.PostalCode = baseAsset.Building.BuildingAddress.PostalCode
+		asset.Address = formatAddress(baseAsset.Building.BuildingAddress)
+		asset.Locality = baseAsset.Building.BuildingAddress.Locality
+		asset.CityCode = baseAsset.Building.BuildingAddress.CityCode
+	}
+	for _, g := range baseAsset.Guarantees {
+		setGuarantee(&asset, g)
 	}
 	d.Asset = asset
 
