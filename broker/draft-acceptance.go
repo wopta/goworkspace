@@ -1,6 +1,7 @@
 package broker
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -69,11 +70,10 @@ func DraftAcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		log.ErrorF("error retrieving policy %s from Firestore: %s", policyUid, err.Error())
 		return "", nil, err
 	}
-	//TODO: to remove after test
-	//	if !lib.SliceContains(models.GetWaitForApprovalStatusList(), policy.Status) {
-	//		log.Printf("policy Uid %s: wrong status %s", policy.Uid, policy.Status)
-	//		return "", nil, fmt.Errorf("policy uid '%s': wrong status '%s'", policy.Uid, policy.Status)
-	//	}
+	if !lib.SliceContains(models.GetWaitForApprovalStatusList(), policy.Status) {
+		log.Printf("policy Uid %s: wrong status %s", policy.Uid, policy.Status)
+		return "", nil, fmt.Errorf("policy uid '%s': wrong status '%s'", policy.Uid, policy.Status)
+	}
 	addresses := &flow.Addresses{}
 	switch policy.Channel {
 	case models.MgaChannel:
