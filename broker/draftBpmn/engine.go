@@ -118,7 +118,7 @@ func (act *activity) runActivity(nameProcess string, storage StorageData) error 
 }
 
 func callWithRecover(nameProcess string, storage StorageData, act *activity) *error {
-	var err *error = new(error) //i used a pointer since defer is called after the return, so normally i cant change the value
+	var err *error = new(error) //i use a pointer since defer is called after the return, so normally i cant change the value
 	defer func() {
 		if act.recover == nil {
 			return
