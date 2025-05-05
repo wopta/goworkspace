@@ -118,6 +118,8 @@ func getNodeFlow() (*bpmn.BpnmBuilder, error) {
 		Emit:            true,
 		Pay:             true,
 		Sign:            true,
+		Approved:        true,
+		Rejected:        true,
 	}
 	if e := store.AddLocal("config", &callback); e != nil {
 		return nil, e
