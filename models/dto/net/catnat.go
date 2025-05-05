@@ -376,6 +376,13 @@ func (d *ResponseDTO) ToPolicy(p *models.Policy) error {
 		}
 	}
 
+	p.PriceGross = d.AnnualGross
+	p.PriceNett = d.AnnualNet
+	p.TaxAmount = d.AnnualTax
+	p.OffersPrices["default"]["yearly"].Gross = p.PriceGross
+	p.OffersPrices["default"]["yearly"].Net = p.PriceNett
+	p.OffersPrices["default"]["yearly"].Tax = p.TaxAmount
+
 	return nil
 }
 
