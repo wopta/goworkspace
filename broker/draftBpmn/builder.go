@@ -32,7 +32,7 @@ func NewBpnmBuilder(path string) (*BpnmBuilder, error) {
 	var Bpnm BpnmBuilder
 	jsonProva := lib.GetFilesByEnv(path)
 	if len(jsonProva) == 0 {
-		return nil, errors.New("Json not founded: " + path)
+		return nil, errors.New("Json not found: " + path)
 	}
 	json.Unmarshal(jsonProva, &Bpnm)
 	return &Bpnm, nil

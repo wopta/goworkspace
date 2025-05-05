@@ -58,7 +58,7 @@ func GetData[t DataBpnm](name string, storage StorageData) (t, error) {
 
 	result = data.(t)
 	if data.GetType() != result.GetType() {
-		return *new(t), fmt.Errorf("Data '%v' with type %v founded has a different type than '%v'", name, result.GetType(), data.GetType())
+		return *new(t), fmt.Errorf("Data '%v' has type %v, which differs from expected type '%v'", name, result.GetType(), data.GetType())
 	}
 	return result, nil
 }

@@ -125,7 +125,7 @@ func (p *StorageBpnm) GetGlobal(name string) (DataBpnm, error) {
 	if p.higherStore != nil {
 		return p.higherStore.GetGlobal(name)
 	}
-	return nil, fmt.Errorf("no data founded %v", name)
+	return nil, fmt.Errorf("no data found %v", name)
 }
 
 func (p *StorageBpnm) GetLocal(name string) (DataBpnm, error) {
@@ -138,7 +138,7 @@ func (p *StorageBpnm) GetLocal(name string) (DataBpnm, error) {
 	if p.higherStore != nil {
 		return p.higherStore.GetLocal(name)
 	}
-	return nil, fmt.Errorf("no data founded %v", name)
+	return nil, fmt.Errorf("no data found %v", name)
 }
 
 func (base *StorageBpnm) setHigherStorage(higher StorageData) error {

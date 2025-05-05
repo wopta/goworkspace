@@ -13,7 +13,7 @@ import (
 func (f *FlowBpnm) Run(processName string) error {
 	process := f.process[processName]
 	if process == nil {
-		return fmt.Errorf("Process '%v' not founded", processName)
+		return fmt.Errorf("Process '%v' not found", processName)
 	}
 	return f.RunAt(processName, process.defaultStart)
 }
@@ -23,7 +23,7 @@ func (f *FlowBpnm) RunAt(processName, startingActivity string) error {
 	log.InfoF("Run %v", processName)
 	process := f.process[processName]
 	if process == nil {
-		return fmt.Errorf("Process '%v' not founded", processName)
+		return fmt.Errorf("Process '%v' not found", processName)
 	}
 
 	if e := process.loop(startingActivity); e != nil { //TODO: how to check if there is an infinite loop
