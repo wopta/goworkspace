@@ -11,15 +11,15 @@ import (
 	"github.com/wopta/goworkspace/models/dto/net"
 )
 
-type Client struct {
+type NetClient struct {
 	httpC *http.Client
 }
 
-func NewNetClient() *Client {
-	return &Client{}
+func NewNetClient() *NetClient {
+	return &NetClient{}
 }
 
-func (c *Client) Authenticate() {
+func (c *NetClient) Authenticate() {
 	const scope = "emettiPolizza_441-029-007"
 	const basePath = "https://apigatewaydigital.netinsurance.it"
 	const authEndpoint = "/Identity/connect/token"
@@ -27,7 +27,7 @@ func (c *Client) Authenticate() {
 	c.httpC = lib.ClientCredentials(os.Getenv("NETINS_ID"), os.Getenv("NETINS_SECRET"), scope, tokenUrl)
 }
 
-func (c *Client) Quote(dto net.RequestDTO) (net.ResponseDTO, *net.ErrorResponse, error) {
+func (c *NetClient) Quote(dto net.RequestDTO) (net.ResponseDTO, *net.ErrorResponse, error) {
 	url := "https://apigatewaydigital.netinsurance.it/PolizzeGateway24/emettiPolizza/441-029-007"
 	rBuff := new(bytes.Buffer)
 	err := json.NewEncoder(rBuff).Encode(dto)
@@ -61,7 +61,7 @@ func (c *Client) Quote(dto net.RequestDTO) (net.ResponseDTO, *net.ErrorResponse,
 	return cndto, nil, nil
 }
 
-func (c *Client) Emit() error {
+func (c *NetClient) Emit() error {
 
 	return nil
 }

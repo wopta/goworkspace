@@ -7,7 +7,7 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	client "github.com/wopta/goworkspace/models/client"
+	netclient "github.com/wopta/goworkspace/models/client"
 	"github.com/wopta/goworkspace/models/dto/net"
 )
 
@@ -46,7 +46,7 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		return "", nil, err
 	}
 
-	netClient := client.NewNetClient()
+	netClient := netclient.NewNetClient()
 	netClient.Authenticate()
 
 	resp, errResp, err := netClient.Quote(cnReq)
