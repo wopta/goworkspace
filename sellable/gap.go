@@ -2,7 +2,7 @@ package sellable
 
 import (
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"strings"
 	"time"
 
@@ -25,31 +25,33 @@ const (
 //   - the product or parts of it depending on the sellability rules
 //   - and an eventual error
 func Gap(policy *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant) (*models.Product, error) {
-	log.Println("[Gap] function start ---------------")
+	log.AddPrefix("Gap")
+	defer log.PopPrefix()
+	log.Println("function start ---------------")
 
-	log.Println("[Gap] validating policy")
+	log.Println("validating policy")
 
 	if err := validatePolicy(policy); err != nil {
-		log.Printf("[Gap] error validating policy: %s", err.Error())
+		log.ErrorF("error validating policy: %s", err.Error())
 		return nil, fmt.Errorf("the policy did not pass validation: %v", err)
 	}
 
-	log.Println("[Gap] loading product file")
+	log.Println("loading product file")
 
 	product, err := getProduct(policy, channel, networkNode, warrant)
 	if err != nil {
-		log.Printf("[Gap] error loading product: %s", err.Error())
+		log.ErrorF("error loading product: %s", err.Error())
 		return nil, fmt.Errorf("no products for this vehicle: %v", err)
 	}
 
-	log.Println("[Gap] check policy vendibility")
+	log.Println("check policy vendibility")
 
 	if err := isVehicleSellable(policy); err != nil {
-		log.Printf("[Gap] error check policy vendility: %s", err.Error())
+		log.ErrorF("error check policy vendility: %s", err.Error())
 		return nil, fmt.Errorf("vehicle not sellable: %v", err)
 	}
 
-	log.Println("[Gap] function end ---------------")
+	log.Println("function end ---------------")
 
 	return product, nil
 }

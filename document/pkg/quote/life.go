@@ -62,8 +62,6 @@ func (lg *LifeGenerator) Exec() ([]byte, error) {
 
 	lg.guaranteeTable()
 
-	lg.engine.NewLine(normalSpacing)
-
 	lg.baseGenerator.priceSummary()
 
 	lg.engine.NewLine(largeSpacing)

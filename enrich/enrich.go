@@ -1,11 +1,11 @@
 package enrich
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 )
 
 var enrichRoutes []lib.Route = []lib.Route{
@@ -49,8 +49,6 @@ func init() {
 }
 
 func Enrich(w http.ResponseWriter, r *http.Request) {
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
-
 	router := lib.GetRouter("enrich", enrichRoutes)
 	router.ServeHTTP(w, r)
 }

@@ -1,17 +1,19 @@
 package quote
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
 func removeOfferRate(policy *models.Policy, availableRates []string) {
+	log.AddPrefix("RemoveOfferRate")
+	defer log.PopPrefix()
 	for offerKey, offerValue := range policy.OffersPrices {
 		for rate := range offerValue {
 			if !lib.SliceContains(availableRates, rate) {
-				log.Printf("[removeOfferRate] removing rate %s", rate)
+				log.Printf("removing rate %s", rate)
 				delete(policy.OffersPrices[offerKey], rate)
 			}
 		}
@@ -42,6 +44,6 @@ func addConsultacyPrice(policy *models.Policy, product *models.Product) {
 	if !product.ConsultancyConfig.IsConfigurable {
 		policy.ConsultancyValue.Percentage = product.ConsultancyConfig.DefaultValue
 	}
-	
-	policy.ConsultancyValue.Price = lib.RoundFloat(policy.PriceGross * policy.ConsultancyValue.Percentage, 2)
+
+	policy.ConsultancyValue.Price = lib.RoundFloat(policy.PriceGross*policy.ConsultancyValue.Percentage, 2)
 }

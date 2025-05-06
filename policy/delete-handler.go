@@ -3,12 +3,12 @@ package policy
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -24,8 +24,8 @@ func DeletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		request PolicyDeleteRequest
 	)
 
-	log.SetPrefix("[DeletePolicyFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("DeletePolicyFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -36,7 +36,7 @@ func DeletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	err = json.Unmarshal(body, &request)
 	if err != nil {
-		log.Printf("error unmarshaling request: %s", err.Error())
+		log.ErrorF("error unmarshaling request: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -49,7 +49,7 @@ func DeletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	log.Println("setting policy to delete in firestore...")
 	err = lib.SetFirestoreErr(firePolicy, policyUid, policy)
 	if err != nil {
-		log.Printf("error saving policy to firestore: %s", err.Error())
+		log.ErrorF("error saving policy to firestore: %s", err.Error())
 		return "", nil, err
 	}
 	log.Println("policy set to deleted in firestore")

@@ -1,7 +1,7 @@
 package bpmn
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 
 	"github.com/wopta/goworkspace/models"
 )

@@ -3,8 +3,8 @@ package network
 import (
 	"fmt"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
-	"log"
 )
 
 func GetNodeAncestors(nodeUid string) ([]models.NetworkTreeElement, error) {
@@ -22,7 +22,7 @@ func GetNodeAncestors(nodeUid string) ([]models.NetworkTreeElement, error) {
 
 	ancestors, err := lib.QueryParametrizedRowsBigQuery[models.NetworkTreeElement](query, params)
 	if err != nil {
-		log.Printf("error fetching ancestors from BigQuery for node %s: %s", nodeUid, err.Error())
+		log.ErrorF("error fetching ancestors from BigQuery for node %s: %s", nodeUid, err.Error())
 		return nil, err
 	}
 
@@ -44,7 +44,7 @@ func GetNodeChildren(nodeUid string) ([]models.NetworkTreeElement, error) {
 
 	children, err := lib.QueryParametrizedRowsBigQuery[models.NetworkTreeElement](query, params)
 	if err != nil {
-		log.Printf("error fetching children from BigQuery for node %s: %s", nodeUid, err.Error())
+		log.ErrorF("error fetching children from BigQuery for node %s: %s", nodeUid, err.Error())
 		return nil, err
 	}
 

@@ -104,6 +104,11 @@ func (bg *baseGenerator) heading() {
 }
 
 func (bg *baseGenerator) priceSummary() {
+	if bg.dto.Price.Consultancy.ValueFloat == 0 {
+		return
+	}
+
+	bg.engine.NewLine(5)
 	bg.engine.RawWriteText(domain.TableCell{
 		Text:      "Premio di Polizza ",
 		Height:    constants.CellHeight,

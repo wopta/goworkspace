@@ -1,7 +1,7 @@
 package mga
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -14,8 +14,8 @@ func DeleteNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 		err error
 	)
 
-	log.SetPrefix("[DeleteNetworkNodeFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("[DeleteNetworkNodeFx] ")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -26,7 +26,7 @@ func DeleteNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	err = network.DeleteNetworkNodeByUid(origin, nodeUid)
 	if err != nil {
-		log.Printf("error deleting node %s from firestore", nodeUid)
+		log.ErrorF("error deleting node %s from firestore", nodeUid)
 		return "", "", err
 	}
 

@@ -3,12 +3,12 @@ package policy
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -17,8 +17,8 @@ func GetPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		result map[string]string
 	)
 
-	log.SetPrefix("[GetPolicyFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("GetPolicyFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 

@@ -1,9 +1,10 @@
 package lib
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
-	"os"
+
+	env "github.com/wopta/goworkspace/lib/environment"
 )
 
 func EnableCors(w *http.ResponseWriter, r *http.Request) {
@@ -22,7 +23,7 @@ func EnableCors(w *http.ResponseWriter, r *http.Request) {
 	(*w).Header().Set("Access-Control-Allow-Credentials", "false")
 
 	// Only for local development
-	if os.Getenv("env") == "local" {
+	if env.IsLocal() {
 		(*w).Header().Set("Access-Control-Allow-Origin", "*")
 		(*w).Header().Set("Content-Type", "application/json")
 	}

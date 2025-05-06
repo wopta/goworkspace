@@ -216,20 +216,19 @@ func (el *LifeGenerator) addEmailSection() {
 func (el *LifeGenerator) addSignSection() {
 	el.engine.WriteTexts(
 		el.engine.GetTableCell("ATTENZIONE", constants.PinkColor, constants.BoldFontStyle),
-		el.engine.GetTableCell(" :Solo una volta firmati i documenti ed effettuato il pagamento, la copertura assicurativa sarà attiva e così ti invieremo i documenti contrattuali da te firmati, che poi potrai visualizzare nell’area riservata ai clienti della nostra app e/o sito.", constants.BlackColor),
+		el.engine.GetTableCell(": Solo una volta firmati i documenti ed effettuato il pagamento, la copertura assicurativa sarà attiva e così ti invieremo i documenti contrattuali da te firmati, che poi potrai visualizzare nell’area riservata ai clienti della nostra app e/o sito.", constants.BlackColor),
 	)
 }
 
 func (el *LifeGenerator) addPolicyInformationSection() {
-
-	if el.dtoLife.ConsultancyValue.Price == "0" {
+	if el.dtoLife.ConsultancyValue.Price.ValueFloat == 0{
 		return
 	}
 	el.engine.NewLine(constants.CellHeight)
 	text :=
 	"Infine, ti ricordiamo la presente polizza prevede il pagamento dei seguenti costi:\n" +
 	fmt.Sprintf("- Premio di polizza: euro %v con frazionamento %v\n", el.dtoLife.Prizes.Gross.Text, el.dtoLife.Prizes.Split) +
-	fmt.Sprintf("- Dettaglio dei costi: euro %v corrisposti con il pagamento della prima rata di polizza. Il documento contabile è scaricabile dall’app o nella tua area riservata\n", el.dtoLife.ConsultancyValue.Price) +
+	fmt.Sprintf("- Dettaglio dei costi: euro %v corrisposti con il pagamento della prima rata di polizza\n", el.dtoLife.ConsultancyValue.Price.Text) +
 	fmt.Sprintf("- Per un totale annuo di euro %v", el.dtoLife.PriceAnnuity)
 
 	el.engine.WriteText(el.engine.GetTableCell(text, constants.BlackColor))
@@ -237,18 +236,16 @@ func (el *LifeGenerator) addPolicyInformationSection() {
 
 func (el *LifeGenerator) addSupportInformationSection() {
 	if el.dtoLife.Channel != models.NetworkChannel {
-		text := "Restiamo a disposizione per ogni ulteriore informazione anche attraverso informativa e dichiarazioni privacy per l’Intermediario canali di contatto che trovi a questo "
 		el.engine.RawWriteText(
-			el.engine.GetTableCell(text, constants.BlackColor),
+			el.engine.GetTableCell("Restiamo a disposizione per ogni ulteriore informazione anche attraverso i canali di contatto che trovi a questo ", constants.BlackColor),
 		)
 		el.engine.WriteLink("https://www.wopta.it/it/vita/#contact-us", el.engine.GetTableCell("link", constants.PinkColor))
-		return
-	}
-
-	if el.dtoLife.Channel == models.NetworkChannel {
+		el.engine.RawWriteText(el.engine.GetTableCell(".", constants.BlackColor))
+	} else {
 		el.engine.RawWriteText(
 			el.engine.GetTableCell("Se hai necessità di ulteriori informazioni e supporto, rivolgiti al tuo intermediario, che trovi in copia conoscenza alla mail accompagnatoria di questa comunicazione.", constants.BlackColor))
 	}
+	el.engine.NewLine(constants.CellHeight)
 }
 
 func (el *LifeGenerator) addGreatingsSection() {

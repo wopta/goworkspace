@@ -2,9 +2,9 @@ package rules
 
 import (
 	"encoding/json"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -43,7 +43,7 @@ func PmiAllriskHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 	getBoolEnv := func(key string) bool {
 		flag, err := strconv.ParseBool(os.Getenv(key))
 		if err != nil {
-			log.Printf("error loading %s environment variable", key)
+			log.ErrorF("error loading %s environment variable", key)
 			return false
 		}
 		return flag
@@ -65,8 +65,8 @@ func PmiAllrisk(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		status                int64
 	)
 
-	log.SetPrefix("[PmiAllrisk] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("PmiAllrisk")
+	defer log.PopPrefix()
 	log.Println("Handler start -----------------------------------------------")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
@@ -380,19 +380,9 @@ func PmiAllriskDeprecated(w http.ResponseWriter, r *http.Request) (string, inter
 
 	json.Unmarshal([]byte(request), &result)
 	//swich source by env for retive data
-	switch os.Getenv("env") {
-	case "local":
-		groule = lib.ErrorByte(ioutil.ReadFile("../function-data/dev/grules/" + rulesFile))
-		ricAteco = lib.ErrorByte(ioutil.ReadFile("function-data/data/rules/Riclassificazione_Ateco.csv"))
-	case "dev":
-		groule = lib.GetFromStorage("function-data", "grules/"+rulesFile, "")
-		ricAteco = lib.GetFromStorage("function-data", "data/rules/Riclassificazione_Ateco.csv", "")
-	case "prod":
-		groule = lib.GetFromStorage("core-350507-function-data", "grules/"+rulesFile, "")
-		ricAteco = lib.GetFromStorage("core-350507-function-data", "data/rules/Riclassificazione_Ateco.csv", "")
-	default:
+	groule = lib.GetFilesByEnv("grules/" + rulesFile)
+	ricAteco = lib.GetFilesByEnv("data/rules/Riclassificazione_Ateco.csv")
 
-	}
 	df := lib.CsvToDataframe(ricAteco)
 	fil := df.Filter(
 		dataframe.F{Colidx: 5, Colname: "Codice Ateco 2007", Comparator: series.Eq, Comparando: result["ateco"]},

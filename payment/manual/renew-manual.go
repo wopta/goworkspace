@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"time"
 
@@ -16,6 +16,7 @@ import (
 	plcRenew "github.com/wopta/goworkspace/policy/renew"
 	prd "github.com/wopta/goworkspace/product"
 	tr "github.com/wopta/goworkspace/transaction"
+	"github.com/wopta/goworkspace/payment/consultancy"
 	trxRenew "github.com/wopta/goworkspace/transaction/renew"
 )
 
@@ -30,13 +31,13 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 		flowName    string = models.ECommerceFlow
 	)
 
-	log.SetPrefix("[RenewManualPaymentFx] ")
+	log.AddPrefix("RenewManualPaymentFx")
 	defer func() {
 		if err != nil {
-			log.Printf("error: %s", err)
+			log.ErrorF("error: %s", err)
 		}
 		log.Println("Handler end -----------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 	log.Println("Handler start ----------------------------------------------")
 
@@ -79,6 +80,7 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 	}
 
 	isFirstTransactionAnnuity := lib.IsEqual(policy.StartDate.AddDate(policy.Annuity, 0, 0), transaction.EffectiveDate)
+
 	if !isFirstTransactionAnnuity {
 		err = errors.New("cannot pay transaction that is not the first")
 		return "", nil, err
@@ -121,6 +123,10 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 	err = common.SaveTransactionsToDB([]models.Transaction{*transaction}, lib.RenewTransactionCollection)
 	if err != nil {
 		return "", nil, err
+	}
+
+	if err := consultancy.GenerateInvoice(policy, *transaction); err != nil {
+		log.Printf("error handling consultancy: %s", err.Error())
 	}
 
 	err = lib.SetFirestoreErr(lib.RenewPolicyCollection, policy.Uid, policy)

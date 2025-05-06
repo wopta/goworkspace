@@ -3,13 +3,13 @@ package transaction
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"sort"
 	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -20,7 +20,9 @@ type GetPolicyTransactionsResp struct {
 type Transactions []models.Transaction
 
 func GetTransactionsByPolicyUidFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.SetPrefix("[GetTransactionsByPolicyUidFx] ")
+	log.AddPrefix("GetTransactionsByPolicyUidFx")
+	defer log.PopPrefix()
+
 	log.Println("Handler start -----------------------------------------------")
 
 	var response GetPolicyTransactionsResp
@@ -99,7 +101,7 @@ func GetPolicyValidTransactions(policyUid string, isPaid *bool) []models.Transac
 
 	docsnap, err := q.FirestoreWherefields(models.TransactionsCollection)
 	if err != nil {
-		log.Printf("[GetPolicyValidTransactions] query error: %s", err.Error())
+		log.ErrorF("query error: %s", err.Error())
 		return transactions
 	}
 

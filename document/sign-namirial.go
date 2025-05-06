@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io/ioutil"
-	"log"
 	"mime/multipart"
 	"net/http"
 	"strings"
@@ -15,6 +15,7 @@ import (
 	"time"
 
 	lib "github.com/wopta/goworkspace/lib"
+	env "github.com/wopta/goworkspace/lib/environment"
 	model "github.com/wopta/goworkspace/models"
 )
 
@@ -39,7 +40,7 @@ type NamirialOtpResponse struct {
 
 func NamirialOtp(data model.Policy) (string, NamirialOtpResponse, error) {
 	var file []byte
-	if os.Getenv("env") == "local" {
+	if env.IsLocal() {
 		file = lib.ErrorByte(ioutil.ReadFile("document/contract.pdf"))
 
 	} else {

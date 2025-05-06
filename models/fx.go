@@ -3,12 +3,12 @@ package models
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"math"
 	"strings"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 )
 
 const (

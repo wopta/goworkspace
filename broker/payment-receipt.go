@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -45,13 +45,13 @@ func PaymentReceiptFx(w http.ResponseWriter, r *http.Request) (string, interface
 		isRenew bool
 	)
 
-	log.SetPrefix("[PaymentReceiptFx] ")
+	log.AddPrefix("[PaymentReceiptFx] ")
 	defer func() {
 		if err != nil {
-			log.Printf("error: %s", err.Error())
+			log.ErrorF("error: %s", err.Error())
 		}
 		log.Println("Handler end -------------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 
 	log.Println("Handler start -----------------------------------------------")
@@ -59,7 +59,7 @@ func PaymentReceiptFx(w http.ResponseWriter, r *http.Request) (string, interface
 	idToken := r.Header.Get("Authorization")
 	authToken, err := lib.GetAuthTokenFromIdToken(idToken)
 	if err != nil {
-		log.Println("error fetching authToken")
+		log.ErrorF("error fetching authToken")
 		return "", nil, err
 	}
 
@@ -71,13 +71,13 @@ func PaymentReceiptFx(w http.ResponseWriter, r *http.Request) (string, interface
 
 	param := r.URL.Query().Get("isRenew")
 	if isRenew, err = strconv.ParseBool(param); err != nil {
-		log.Println("error parsing isRenew")
+		log.ErrorF("error parsing isRenew")
 		return "", "", err
 	}
 
 	rawDoc, filename, err := paymentReceiptBuilder(transactionUid, authToken, isRenew)
 	if err != nil {
-		log.Println("error building raw doc")
+		log.ErrorF("error building raw doc")
 		return "", "", err
 	}
 

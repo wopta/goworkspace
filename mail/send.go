@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net"
 	"net/http"
 	"net/mail"
@@ -54,8 +54,8 @@ func (a *loginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
 func SendFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var obj MailRequest
 
-	log.SetPrefix("[SendFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("SendFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -113,7 +113,10 @@ func getContentType(ext string) string {
 }
 
 func sendmail(obj MailRequest) error {
-	log.Println("[SendMail] start --------------------------------------------")
+	log.AddPrefix("SendMail")
+	defer log.PopPrefix()
+
+	log.Println("start --------------------------------------------")
 	var (
 		username = os.Getenv("EMAIL_USERNAME")
 		password = os.Getenv("EMAIL_PASSWORD")
@@ -207,7 +210,7 @@ func sendmail(obj MailRequest) error {
 			}
 		}
 
-		log.Println("[SendMail] sending message...")
+		log.Println("sending message...")
 
 		// Connect to the SMTP Server
 		servername := "smtp.office365.com:587"
@@ -246,13 +249,13 @@ func sendmail(obj MailRequest) error {
 		}
 
 		// To, From and Cc
-		log.Printf("[SendMail] setting address from: %s", from.Address)
+		log.Printf("setting address from: %s", from.Address)
 		err = c.Mail(from.Address)
 		if err != nil {
 			return err
 		}
 
-		log.Printf("[SendMail] setting address to: %s", to.Address)
+		log.Printf("setting address to: %s", to.Address)
 		err = c.Rcpt(to.Address)
 		if err != nil {
 			return err
@@ -260,7 +263,7 @@ func sendmail(obj MailRequest) error {
 
 		if obj.Cc != "" {
 			// TODO: in the future we might need to handle multiple Ccs
-			log.Printf("[SendMail] setting cc to: %s", obj.Cc)
+			log.Printf("setting cc to: %s", obj.Cc)
 			err = c.Rcpt(obj.Cc)
 			if err != nil {
 				return err
@@ -269,7 +272,7 @@ func sendmail(obj MailRequest) error {
 
 		if obj.Bcc != "" {
 			// TODO: in the future we might need to handle multiple Bccs
-			log.Printf("[SendMail] setting bcc to: %s", obj.Bcc)
+			log.Printf("setting bcc to: %s", obj.Bcc)
 			err = c.Rcpt(obj.Bcc)
 			if err != nil {
 				return err
@@ -297,10 +300,10 @@ func sendmail(obj MailRequest) error {
 			return err
 		}
 
-		log.Println("[SendMail] message sent")
+		log.Println("message sent")
 	}
 
-	log.Println("[SendMail] end ----------------------------------------------")
+	log.Println("end ----------------------------------------------")
 
 	return nil
 }
@@ -314,12 +317,12 @@ func SendMail(obj MailRequest) {
 	err := sendmail(obj)
 
 	if err != nil {
-		log.Printf("error sending mail: %s", err.Error())
+		log.ErrorF("error sending mail: %s", err.Error())
 		reportError = err.Error()
 	}
 	mailErr := writeMailReport(obj.Policy, obj.FromName, reportRecip, lib.GetBigQueryNullDateTime(time.Now().UTC()), reportError)
 	if mailErr != nil {
-		log.Printf("error writing report: %s", mailErr.Error())
+		log.ErrorF("error writing report: %s", mailErr.Error())
 	}
 }
 

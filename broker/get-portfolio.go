@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"strings"
 
@@ -36,18 +36,20 @@ type policyInfo struct {
 	PaymentSplit   string         `json:"paymentSplit" bigquery:"paymentSplit"`
 	HasMandate     bool           `json:"hasMandate" bigquery:"hasMandate"`
 	ContractorType string         `json:"contractorType" bigquery:"contractorType"`
+	Consultancy    float64        `json:"consultancy" bigquery:"consultancy"`
+	Total          float64        `json:"total" bigquery:"total"`
 }
 
 func GetPortfolioFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var err error
 
-	log.SetPrefix("[GetPortfolioFx] ")
+	log.AddPrefix("GetPortfolioFx")
 	defer func() {
 		if err != nil {
-			log.Printf("error: %s", err)
+			log.ErrorF("error: %s", err)
 		}
 		log.Println("Handler end ---------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 	log.Println("Handler start -----------------------------------------------")
 
@@ -61,7 +63,7 @@ func GetPortfolioFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	log.Printf("input params: %v", paramsMap)
 
 	if err := populateProducerUidParam(r, paramsMap); err != nil {
-		log.Println("error populating producerUid param")
+		log.ErrorF("error populating producerUid param")
 		return "", nil, err
 	}
 
@@ -80,7 +82,7 @@ func GetPortfolioFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	policies, err := lib.QueryParametrizedRowsBigQuery[policyInfo](query, queryParams)
 	if err != nil {
-		log.Printf("error executing query: %s", err.Error())
+		log.ErrorF("error executing query: %s", err.Error())
 		return "", nil, err
 	}
 

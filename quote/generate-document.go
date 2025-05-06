@@ -3,7 +3,7 @@ package quote
 import (
 	"encoding/base64"
 	"encoding/json"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
 	"github.com/wopta/goworkspace/document"
@@ -26,19 +26,19 @@ func GenerateDocumentFx(_ http.ResponseWriter, r *http.Request) (string, any, er
 		responseBytes []byte
 	)
 
-	log.SetPrefix("[GenerateQuoteDocumentFx] ")
+	log.AddPrefix("GenerateQuoteDocumentFx")
 	defer func() {
 		r.Body.Close()
 		if err != nil {
-			log.Printf("error: %s", err.Error())
+			log.ErrorF("error: %s", err.Error())
 		}
 		log.Println("Handler end ---------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 	log.Println("Handler start -----------------------------------------------")
 
 	if err = json.NewDecoder(r.Body).Decode(&policy); err != nil {
-		log.Println("error decoding request body")
+		log.ErrorF("error decoding request body")
 		return "", nil, err
 	}
 
@@ -51,7 +51,7 @@ func GenerateDocumentFx(_ http.ResponseWriter, r *http.Request) (string, any, er
 	prd := product.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, nn, w)
 
 	if docBytes, err = document.Quote(&policy, prd); err != nil {
-		log.Println("error generating document")
+		log.ErrorF("error generating document")
 		return "", nil, err
 	}
 
@@ -60,7 +60,7 @@ func GenerateDocumentFx(_ http.ResponseWriter, r *http.Request) (string, any, er
 	}
 
 	if responseBytes, err = json.Marshal(response); err != nil {
-		log.Println("error marshaling response")
+		log.ErrorF("error marshaling response")
 		return "", nil, err
 	}
 

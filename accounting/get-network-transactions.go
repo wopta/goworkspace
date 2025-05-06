@@ -3,11 +3,11 @@ package accounting
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/transaction"
 )
@@ -19,8 +19,8 @@ type GetNetworkTransactionsResponse struct {
 func GetNetworkTransactionsFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var response GetNetworkTransactionsResponse
 
-	log.SetPrefix("[GetNetworkTransactionsFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("GetNetworkTransactionsFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -36,7 +36,7 @@ func GetNetworkTransactionsFx(w http.ResponseWriter, r *http.Request) (string, a
 	response.NetworkTransactions = netTranscations
 	responseByte, err := json.Marshal(response)
 	if err != nil {
-		log.Printf("error marshaling response: %s", err.Error())
+		log.ErrorF("error marshaling response: %s", err.Error())
 		return "", "", err
 	}
 

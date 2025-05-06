@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -19,6 +19,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/payment"
+	"github.com/wopta/goworkspace/payment/consultancy"
 	plc "github.com/wopta/goworkspace/policy"
 	"github.com/wopta/goworkspace/question"
 	"github.com/wopta/goworkspace/transaction"
@@ -53,8 +54,8 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		responseEmit EmitResponse
 	)
 
-	log.SetPrefix("[EmitFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("EmitFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -63,7 +64,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	token := r.Header.Get("Authorization")
 	authToken, err := lib.GetAuthTokenFromIdToken(token)
 	if err != nil {
-		log.Printf("error getting authToken")
+		log.ErrorF("error getting authToken")
 		return "", nil, err
 	}
 	log.Printf(
@@ -80,7 +81,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	err = json.Unmarshal([]byte(body), &request)
 	if err != nil {
-		log.Printf("error unmarshaling policy: %s", err.Error())
+		log.ErrorF("error unmarshaling policy: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -141,17 +142,19 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 }
 
 func emit(policy *models.Policy, request EmitRequest, origin string) EmitResponse {
-	log.Println("[Emit] start ------------------------------------------------")
+	log.AddPrefix("Emit")
+	defer log.PopPrefix()
+	log.Println("start ------------------------------------------------")
 	var responseEmit EmitResponse
 
 	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 	fireGuarantee := lib.GetDatasetByEnv(origin, lib.GuaranteeCollection)
 
-	log.Printf("[Emit] Emitting - Policy Uid %s", policy.Uid)
-	log.Println("[Emit] starting bpmn flow...")
+	log.Printf("Emitting - Policy Uid %s", policy.Uid)
+	log.Println("starting bpmn flow...")
 	state := runBrokerBpmn(policy, emitFlowKey)
 	if state == nil || state.Data == nil || state.IsFailed {
-		log.Println("[Emit] error bpmn - state not set correctly")
+		log.Println("error bpmn - state not set correctly")
 		return responseEmit
 	}
 	*policy = *state.Data
@@ -166,16 +169,16 @@ func emit(policy *models.Policy, request EmitRequest, origin string) EmitRespons
 
 	policy.Updated = time.Now().UTC()
 	policyJson, _ := policy.Marshal()
-	log.Printf("[Emit] Policy %s: %s", request.Uid, string(policyJson))
+	log.Printf("Policy %s: %s", request.Uid, string(policyJson))
 
-	log.Println("[Emit] saving policy to firestore...")
+	log.Println("saving policy to firestore...")
 	err := lib.SetFirestoreErr(firePolicy, request.Uid, policy)
 	lib.CheckError(err)
 
-	log.Println("[Emit] saving policy to bigquery...")
+	log.Println("saving policy to bigquery...")
 	policy.BigquerySave(origin)
 
-	log.Println("[Emit] saving guarantees to bigquery...")
+	log.Println("saving guarantees to bigquery...")
 	models.SetGuaranteBigquery(*policy, "emit", fireGuarantee)
 
 	callbackAction := callback_out.Emit
@@ -185,62 +188,67 @@ func emit(policy *models.Policy, request EmitRequest, origin string) EmitRespons
 
 	callback_out.Execute(networkNode, *policy, callbackAction)
 
-	log.Println("[Emit] end --------------------------------------------------")
+	log.Println("end --------------------------------------------------")
 	return responseEmit
 }
 
 func emitUpdatePolicy(policy *models.Policy, request EmitRequest) {
-	log.Println("[emitUpdatePolicy] start ------------------------------------")
+	log.AddPrefix("emitUpdatePolicy")
+	defer log.PopPrefix()
+	log.Println("start ------------------------------------")
 	if policy.Statements == nil || len(*policy.Statements) == 0 {
 		if request.Statements != nil {
-			log.Println("[emitUpdatePolicy] inject policy statements from request")
+			log.Println("inject policy statements from request")
 			policy.Statements = request.Statements
 		} else {
-			log.Println("[emitUpdatePolicy] inject policy statements from question module")
+			log.Println("inject policy statements from question module")
 			policy.Statements = new([]models.Statement)
 			*policy.Statements, _ = question.GetStatements(policy)
 		}
 	}
 	brokerUpdatePolicy(policy, request.BrokerBaseRequest)
-	log.Println("[emitUpdatePolicy] end --------------------------------------")
+	log.Println("end --------------------------------------")
 }
 
 func brokerUpdatePolicy(policy *models.Policy, request BrokerBaseRequest) {
-	log.Println("[brokerUpdatePolicy] start ------------------------------------")
+	log.AddPrefix("brokerUpdatePolicy")
+	defer log.PopPrefix()
+	log.Println("start ------------------------------------")
 	if policy.PaymentSplit == "" {
-		log.Println("[brokerUpdatePolicy] inject policy payment split from request")
+		log.Println("inject policy payment split from request")
 		policy.PaymentSplit = request.PaymentSplit
 	}
 
 	if policy.Payment == "" {
-		log.Println("[brokerUpdatePolicy] inject policy payment provider from request")
+		log.Println("inject policy payment provider from request")
 		policy.Payment = request.Payment
 	}
 
 	if policy.PaymentMode == "" {
-		log.Println("[brokerUpdatePolicy] inject policy payment mode from request")
+		log.Println("inject policy payment mode from request")
 		policy.PaymentMode = request.PaymentMode
 	}
 
 	if policy.TaxAmount == 0 {
-		log.Println("[brokerUpdatePolicy] calculate tax amount")
-		policy.TaxAmount = lib.RoundFloat(policy.PriceGross - policy.PriceNett, 2)
+		policy.TaxAmount = lib.RoundFloat(policy.PriceGross-policy.PriceNett, 2)
 	}
 
 	if policy.TaxAmountMonthly == 0 {
 		log.Println("[brokerUpdatePolicy] calculate tax amount monthly")
-		policy.TaxAmountMonthly = lib.RoundFloat(policy.PriceGrossMonthly - policy.PriceNettMonthly, 2)
+		policy.TaxAmountMonthly = lib.RoundFloat(policy.PriceGrossMonthly-policy.PriceNettMonthly, 2)
 	}
 
 	calculatePaymentComponents(policy)
 
 	policy.SanitizePaymentData()
 
-	log.Println("[brokerUpdatePolicy] end --------------------------------------")
+	log.Println("end --------------------------------------")
 }
 
 func emitBase(policy *models.Policy, origin string) {
-	log.Printf("[emitBase] Policy Uid %s", policy.Uid)
+	log.AddPrefix("emitBase")
+	defer log.PopPrefix()
+	log.Printf("Policy Uid %s", policy.Uid)
 	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 	now := time.Now().UTC()
 
@@ -249,9 +257,9 @@ func emitBase(policy *models.Policy, origin string) {
 	policy.EmitDate = now
 	policy.BigEmitDate = civil.DateTimeOf(now)
 	company, numb, tot := GetSequenceByCompany(strings.ToLower(policy.Company), firePolicy)
-	log.Printf("[emitBase] codeCompany: %s", company)
-	log.Printf("[emitBase] numberCompany: %d", numb)
-	log.Printf("[emitBase] number: %d", tot)
+	log.Printf("codeCompany: %s", company)
+	log.Printf("numberCompany: %d", numb)
+	log.Printf("number: %d", tot)
 	policy.Number = tot
 	policy.NumberCompany = numb
 	policy.CodeCompany = company
@@ -260,7 +268,9 @@ func emitBase(policy *models.Policy, origin string) {
 }
 
 func emitSign(policy *models.Policy, origin string) {
-	log.Printf("[emitSign] Policy Uid %s", policy.Uid)
+	log.AddPrefix("emitSign")
+	defer log.PopPrefix()
+	log.Printf("Policy Uid %s", policy.Uid)
 
 	policy.IsSign = false
 	policy.Status = models.PolicyStatusToSign
@@ -275,7 +285,9 @@ func emitSign(policy *models.Policy, origin string) {
 }
 
 func emitPay(policy *models.Policy, origin string) {
-	log.Printf("[emitPay] Policy Uid %s", policy.Uid)
+	log.AddPrefix("emitPay")
+	defer log.PopPrefix()
+	log.Printf("Policy Uid %s", policy.Uid)
 
 	policy.IsPay = false
 	payUrl, err := createPolicyTransactions(policy)
@@ -312,14 +324,14 @@ func createPolicyTransactions(policy *models.Policy) (string, error) {
 	client := payment.NewClient(policy.Payment, *policy, *product, transactions, false, "")
 	payUrl, updatedTransactions, err := client.NewBusiness()
 	if err != nil {
-		log.Printf("error emitPay policy %s: %s", policy.Uid, err.Error())
+		log.ErrorF("error emitPay policy %s: %s", policy.Uid, err.Error())
 		return "", err
 	}
 
 	for index, tr := range updatedTransactions {
 		err = lib.SetFirestoreErr(models.TransactionsCollection, tr.Uid, tr)
 		if err != nil {
-			log.Printf("error saving transaction %s to firestore: %s", tr.Uid, err.Error())
+			log.ErrorF("error saving transaction %s to firestore: %s", tr.Uid, err.Error())
 			return "", err
 		}
 		tr.BigQuerySave("")
@@ -327,8 +339,11 @@ func createPolicyTransactions(policy *models.Policy) (string, error) {
 		if tr.IsPay {
 			err = transaction.CreateNetworkTransactions(policy, &updatedTransactions[index], networkNode, mgaProduct)
 			if err != nil {
-				log.Printf("error creating network transactions: %s", err.Error())
+				log.ErrorF("error creating network transactions: %s", err.Error())
 				return "", err
+			}
+			if err := consultancy.GenerateInvoice(*policy, tr); err != nil {
+				log.Printf("error handling consultancy: %s", err.Error())
 			}
 		}
 	}

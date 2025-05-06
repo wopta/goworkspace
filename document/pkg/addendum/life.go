@@ -1,4 +1,4 @@
-package addedndum
+package addendum
 
 import (
 	"time"
@@ -16,16 +16,15 @@ type LifeAddendumGenerator struct {
 	dto *dto.AddendumBeneficiariesDTO
 }
 
-func NewLifeAddendumGenerator(engine *engine.Fpdf, policy *models.Policy, node *models.NetworkNode,
-	product models.Product) *LifeAddendumGenerator {
+func NewLifeAddendumGenerator(engine *engine.Fpdf, policy *models.Policy) *LifeAddendumGenerator {
+	now := time.Now()
 	LifeAddendumDTO := dto.NewBeneficiariesDto()
-	LifeAddendumDTO.FromPolicy(*policy, product)
+	LifeAddendumDTO.FromPolicy(policy, now)
 	return &LifeAddendumGenerator{
 		baseGenerator: &baseGenerator{
-			engine:      engine,
-			now:         time.Now(),
-			networkNode: node,
-			policy:      policy,
+			engine: engine,
+			now:    now,
+			policy: policy,
 		},
 		dto: LifeAddendumDTO,
 	}
@@ -59,6 +58,8 @@ func (lag *LifeAddendumGenerator) Generate() ([]byte, error) {
 	lag.beneficiaryReference()
 
 	lag.engine.NewLine(6)
+
+	lag.contractorSignature()
 
 	lag.woptaFooter()
 
@@ -154,33 +155,32 @@ func (lag *LifeAddendumGenerator) contract() {
 }
 
 func (lag *LifeAddendumGenerator) declarations() {
-	first := domain.TableCell{
-		Text:      "Dichiarazione di Variazione dati anagrafici Contraente-Assicurato-Beneficiario",
-		Height:    3.5,
-		Width:     190,
+	lag.engine.WriteText(domain.TableCell{
+		Text: "Dichiarazione di Variazione dati Anagrafici Contraente-" +
+			"Assicurato-Beneficiario-Referente Terzo",
+		Height:    constants.CellHeight,
+		Width:     constants.FullPageWidth,
 		FontStyle: constants.BoldFontStyle,
 		FontColor: constants.PinkColor,
-		FontSize:  constants.RegularFontSize,
-		Fill:      false,
-		FillColor: domain.Color{},
-		Align:     constants.LeftAlign,
-		Border:    "",
-	}
-	second := domain.TableCell{
-		Text:      "Come da richiesta sono state trasmesse all’assicuratore AXA France Vie S.A. – Rappresentanza Generale per l’Italia le seguenti variazioni Anagrafiche di Polizza:",
-		Height:    3.5,
-		Width:     190,
-		FontStyle: constants.RegularFontStyle,
-		FontColor: constants.BlackColor,
-		FontSize:  constants.RegularFontSize,
-		Fill:      false,
-		FillColor: domain.Color{},
-		Align:     constants.LeftAlign,
-		Border:    "",
-	}
-	lag.engine.WriteText(first)
+	})
 	lag.engine.NewLine(3)
-	lag.engine.WriteText(second)
+	lag.engine.WriteText(domain.TableCell{
+		Text: "Come da richiesta sono state trasmesse all’assicuratore " +
+			"AXA France Vie S.A. - Rappresentanza Generale per l’Italia le " +
+			"seguenti variazioni alla polizza sopra meglio evidenziata",
+		Height: constants.CellHeight,
+		Width:  constants.FullPageWidth,
+	})
+	lag.engine.NewLine(1)
+	lag.engine.WriteText(domain.TableCell{
+		Text: "Le modifiche non sono attive in assenza di firma da parte del " +
+			"Contraente, con allegata copia documento di riconoscimento " +
+			"(carta identità, passaporto, patente, in corso di validità alla " +
+			"data della firma).",
+		Height:    constants.CellHeight,
+		Width:     constants.FullPageWidth,
+		FontStyle: constants.BoldFontStyle,
+	})
 }
 
 func (lag *LifeAddendumGenerator) contractor() {
@@ -193,13 +193,13 @@ func (lag *LifeAddendumGenerator) contractor() {
 		checked = "X"
 		rows1 = [][]string{
 			{"Cognome e Nome ", cDTO.Surname + " " + cDTO.Name, "Cod. Fisc: ", cDTO.FiscalCode},
-			{"Residente in ", cDTO.StreetName + " " + cDTO.StreetNumber + " " + cDTO.City + " (" + cDTO.Province + ")", "Data nascita: ", cDTO.BirthDate},
+			{"Residente in ", cDTO.StreetName + " " + cDTO.StreetNumber + ", " + cDTO.PostalCode + " " + cDTO.City + " (" + cDTO.Province + ")", "Data nascita: ", cDTO.BirthDate},
 		}
 		rows2 = [][]string{
 			{"Mail ", cDTO.Mail, "Telefono: ", cDTO.Phone},
 		}
 		domTxt = [][]string{
-			{"Domicilio ", cDTO.DomStreetName + " " + cDTO.DomStreetNumber + " " + cDTO.DomCity + " (" + cDTO.DomProvince + ")"},
+			{"Domicilio ", cDTO.DomStreetName + " " + cDTO.DomStreetNumber + ", " + cDTO.DomPostalCode + " " + cDTO.DomCity + " (" + cDTO.DomProvince + ")"},
 		}
 	} else {
 		rows1 = [][]string{
@@ -372,13 +372,13 @@ func (lag *LifeAddendumGenerator) insured() {
 		checked = "X"
 		rows1 = [][]string{
 			{"Cognome e Nome ", iDTO.Surname + " " + iDTO.Name, "Cod. Fisc: ", iDTO.FiscalCode},
-			{"Residente in ", iDTO.StreetName + " " + iDTO.StreetNumber + " " + iDTO.City + " (" + iDTO.Province + ")", "Data nascita: ", iDTO.BirthDate},
+			{"Residente in ", iDTO.StreetName + " " + iDTO.StreetNumber + ", " + iDTO.PostalCode + " " + iDTO.City + " (" + iDTO.Province + ")", "Data nascita: ", iDTO.BirthDate},
 		}
 		rows2 = [][]string{
 			{"Mail ", iDTO.Mail, "Telefono: ", iDTO.Phone},
 		}
 		domTxt = [][]string{
-			{"Domicilio ", iDTO.DomStreetName + " " + iDTO.DomStreetNumber + " " + iDTO.DomCity + " (" + iDTO.DomProvince + ")"},
+			{"Domicilio ", iDTO.DomStreetName + " " + iDTO.DomStreetNumber + ", " + iDTO.DomPostalCode + " " + iDTO.DomCity + " (" + iDTO.DomProvince + ")"},
 		}
 	} else {
 		rows1 = [][]string{
@@ -697,21 +697,19 @@ func (lag *LifeAddendumGenerator) beneficiaries() {
 		if checked == "X" {
 			rows = [][]string{
 				{"Cognome e Nome ", (*bDTO)[i].Surname + " " + (*bDTO)[i].Name, "Cod. Fisc: ", (*bDTO)[i].FiscalCode},
-				{"Residente in ", (*bDTO)[i].StreetName + " " + (*bDTO)[i].StreetNumber + " " + (*bDTO)[i].City + " (" + (*bDTO)[i].Province + ")", "Data nascita: ", (*bDTO)[i].BirthDate},
+				{"Residente in ", (*bDTO)[i].StreetName + " " + (*bDTO)[i].StreetNumber + ", " + (*bDTO)[i].PostalCode + " " + (*bDTO)[i].City + " (" + (*bDTO)[i].Province + ")", "Data nascita: ", (*bDTO)[i].BirthDate},
 				{"Mail ", (*bDTO)[i].Mail, "Telefono ", (*bDTO)[i].Phone},
+				{"Relazione con Assicurato ", (*bDTO)[i].Relation, "Quota indennizzo", " "},
 			}
-			relTxt = [][]string{
-				{"Relazione con Assicurato ", (*bDTO)[i].Relation},
-			}
+			relTxt = [][]string{}
 		} else {
 			rows = [][]string{
 				{"Cognome e Nome ", " ", "Cod. Fisc: ", " "},
 				{"Residente in ", " ", "Data nascita: ", " "},
 				{"Mail ", " ", "Telefono ", " "},
+				{"Relazione con Assicurato ", " ", "Quota indennizzo", " "},
 			}
-			relTxt = [][]string{
-				{"Relazione con Assicurato ", " "},
-			}
+			relTxt = [][]string{}
 		}
 
 		table := parser(rows)
@@ -755,10 +753,19 @@ func (lag *LifeAddendumGenerator) beneficiaryReference() {
 		checked = "X"
 		rows = [][]string{
 			{"Cognome e Nome ", brDTO.Surname + " " + brDTO.Name, "Cod. Fisc: ", brDTO.FiscalCode},
-			{"Residente in ", brDTO.StreetName + " " + brDTO.StreetNumber + " " + brDTO.City + " (" + brDTO.Province + ")", "Data nascita: ", brDTO.BirthDate},
+			{"Residente in ", brDTO.StreetName + " " + brDTO.StreetNumber + ", " + brDTO.PostalCode + " " + brDTO.City + " (" + brDTO.Province + ")", "Data nascita: ", brDTO.BirthDate},
 			{"Mail ", brDTO.Mail, "Telefono: ", brDTO.Phone},
 		}
 	} else {
+		checked = "X"
+		rows = [][]string{
+			{"Cognome e Nome ", constants.EmptyField, "Cod. Fisc: ", constants.EmptyField},
+			{"Residente in ", constants.EmptyField, "Data nascita: ", constants.EmptyField},
+			{"Mail ", constants.EmptyField, "Telefono: ", constants.EmptyField},
+		}
+	}
+	if brDTO.Name == "" {
+		checked = " "
 		rows = [][]string{
 			{"Cognome e Nome ", " ", "Cod. Fisc: ", " "},
 			{"Residente in ", " ", "Data nascita: ", " "},
@@ -865,5 +872,38 @@ func (lag *LifeAddendumGenerator) beneficiaryReference() {
 	lag.engine.NewLine(2)
 	lag.engine.DrawLine(10, lag.engine.GetY(), 200, lag.engine.GetY(), 0.25, constants.BlackColor)
 	lag.engine.NewLine(2)
+	lag.engine.DrawTable(table)
+}
+
+func (lag *LifeAddendumGenerator) contractorSignature() {
+	var (
+		cellHeight   = 5
+		colWidth     = float64(50)
+		spacingWidth = constants.FullPageWidth - (2 * colWidth)
+	)
+	row := []domain.TableCell{
+		{
+			Text:   lag.dto.Contract.IssueDate,
+			Height: float64(cellHeight),
+			Width:  colWidth,
+		},
+		{
+			Text:   " ",
+			Height: float64(cellHeight),
+			Width:  spacingWidth,
+		},
+		{
+			Text:   "Firma Contraente",
+			Height: float64(cellHeight),
+			Width:  colWidth,
+			Align:  constants.CenterAlign,
+			Border: constants.BorderTop,
+		},
+	}
+	table := make([][]domain.TableCell, 0, 1)
+	table = append(table, row)
+
+	lag.engine.SetY(-40)
+
 	lag.engine.DrawTable(table)
 }

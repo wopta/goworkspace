@@ -3,18 +3,21 @@ package _script
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/policy"
-	"github.com/wopta/goworkspace/product"
-	"log"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
+	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/policy"
+	"github.com/wopta/goworkspace/product"
 )
 
 func RestoreTransactions(inputStatus string) {
 	outputTransactions := make(map[string][]models.Transaction)
+	log.AddPrefix("_updateTransactionCommission")
+	defer log.PopPrefix()
 
 	query := fmt.Sprintf(
 		"SELECT * FROM `%s.%s` WHERE status = '%s'",
@@ -71,7 +74,7 @@ func RestoreTransactions(inputStatus string) {
 
 		err = lib.SetFirestoreErr(models.TransactionsCollection, tr.Uid, tr)
 		if err != nil {
-			fmt.Printf("[_updateTransactionCommission] error saving transaction to firestore: %s", err.Error())
+			log.ErrorF("error saving transaction to firestore: %s", err.Error())
 			return
 		}
 		tr.BigQuerySave("")
@@ -91,7 +94,10 @@ func RestoreTransactions(inputStatus string) {
 
 func _updateTransactionCommission(tr *models.Transaction, policy *models.Policy, mgaProduct *models.Product) {
 	commissionMga := lib.RoundFloat(product.GetCommissionByProduct(policy, mgaProduct, false), 2)
-	fmt.Printf("[_updateTransactionCommission] new commission %.2f\n", commissionMga)
+	log.AddPrefix("_updateTransactionCommission")
+	defer log.PopPrefix()
+
+	fmt.Printf("new commission %.2f\n", commissionMga)
 
 	tr.Commissions = commissionMga
 	tr.UpdateDate = time.Now().UTC()

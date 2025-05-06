@@ -1,11 +1,11 @@
 package reserved
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 )
 
 var reservedRoutes []lib.Route = []lib.Route{
@@ -23,7 +23,6 @@ func init() {
 }
 
 func Reserved(w http.ResponseWriter, r *http.Request) {
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
 	router := lib.GetRouter("reserved", reservedRoutes)
 	router.ServeHTTP(w, r)

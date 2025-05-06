@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -24,8 +24,8 @@ func FiscalCodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		outJson string
 	)
 
-	log.SetPrefix("[FiscalCodeFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("FiscalCodeFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -350,14 +350,14 @@ func CheckFiscalCode(user models.User) error {
 	controlCharacter, err := calculateControlCharacter(normalizedFiscalCode[:3], normalizedFiscalCode[3:6],
 		normalizedFiscalCode[6:11], normalizedFiscalCode[11:])
 	if err != nil {
-		log.Printf("error getting control character: %s", err.Error())
+		log.ErrorF("error getting control character: %s", err.Error())
 		return err
 	}
 	normalizedFiscalCode += controlCharacter
 
 	_, computedUser, err := CalculateFiscalCode(user)
 	if err != nil {
-		log.Printf("errro computing user %s fiscalCode: %s", user.Uid, err.Error())
+		log.ErrorF("error computing user %s fiscalCode: %s", user.Uid, err.Error())
 		return err
 	}
 

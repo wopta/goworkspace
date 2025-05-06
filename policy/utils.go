@@ -3,13 +3,13 @@ package policy
 import (
 	"errors"
 	"fmt"
-	"log"
 	"slices"
 	"strings"
 	"time"
 
 	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -54,6 +54,8 @@ func promoteContractorDocumentsToUser(policy *models.Policy, origin string) erro
 		tempPathFormat = "temp/%s/%s"
 		userPathFormat = "assets/users/%s/%s"
 	)
+	log.AddPrefix("UpdateIdentityDocument")
+	defer log.PopPrefix()
 
 	for _, identityDocument := range policy.Contractor.IdentityDocuments {
 		frontGsLink, err := lib.PromoteFile(
@@ -61,7 +63,7 @@ func promoteContractorDocumentsToUser(policy *models.Policy, origin string) erro
 			fmt.Sprintf(userPathFormat, policy.Contractor.Uid, identityDocument.FrontMedia.FileName),
 		)
 		if err != nil {
-			log.Printf("[updateIdentityDocument] ERROR saving front file: %s", err.Error())
+			log.ErrorF("error saving front file: %s", err.Error())
 			return err
 		}
 		identityDocument.FrontMedia.Link = frontGsLink
@@ -72,7 +74,7 @@ func promoteContractorDocumentsToUser(policy *models.Policy, origin string) erro
 				fmt.Sprintf(userPathFormat, policy.Contractor.Uid, identityDocument.BackMedia.FileName),
 			)
 			if err != nil {
-				log.Printf("[updateIdentityDocument] ERROR saving back file: %s", err.Error())
+				log.ErrorF("error saving back file: %s", err.Error())
 				return err
 			}
 			identityDocument.BackMedia.Link = backGsLink
@@ -86,23 +88,25 @@ func promoteContractorDocumentsToUser(policy *models.Policy, origin string) erro
 }
 
 func SetUserIntoPolicyContractor(policy *models.Policy, origin string) error {
-	log.Printf("[setUserIntoPolicyContractor] Policy %s", policy.Uid)
+	log.AddPrefix("setUserIntoPolicyContractor")
+	defer log.PopPrefix()
+	log.Printf("Policy %s", policy.Uid)
 	userUid, newUser, err := models.GetUserUIDByFiscalCode(origin, policy.Contractor.FiscalCode)
 	if err != nil {
-		log.Printf("[setUserIntoPolicyContractor] ERROR finding user: %s", err.Error())
+		log.ErrorF("error finding user: %s", err.Error())
 		return err
 	}
 
 	policy.Contractor.Uid = userUid
 	err = promoteContractorDocumentsToUser(policy, origin)
 	if err != nil {
-		log.Printf("[setUserIntoPolicyContractor] ERROR updating documents: %s", err.Error())
+		log.ErrorF("error updating documents: %s", err.Error())
 		return err
 	}
 
 	err = promotePolicyAttachments(policy, origin)
 	if err != nil {
-		log.Printf("[setUserIntoPolicyContractor] ERROR updating attachments: %s", err.Error())
+		log.ErrorF("error updating attachments: %s", err.Error())
 		return err
 	}
 
@@ -112,7 +116,7 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) error {
 		fireUsers := lib.GetDatasetByEnv(origin, lib.UserCollection)
 		err = lib.SetFirestoreErr(fireUsers, userUid, policy.Contractor)
 		if err != nil {
-			log.Printf("[setUserIntoPolicyContractor] ERROR creating/updating user %s: %s", policy.Contractor.Uid,
+			log.ErrorF("error creating/updating user %s: %s", policy.Contractor.Uid,
 				err.Error())
 			return err
 		}
@@ -164,7 +168,8 @@ func promotePolicyAttachments(policy *models.Policy, origin string) error {
 		tempPathFormat string = "temp/%s/%s"
 		userPathFormat string = "assets/users/%s/%s"
 	)
-
+	log.AddPrefix("promotoPolicyAttachments")
+	defer log.PopPrefix()
 	if policy.Attachments == nil {
 		return nil
 	}
@@ -178,7 +183,7 @@ func promotePolicyAttachments(policy *models.Policy, origin string) error {
 			fmt.Sprintf(userPathFormat, policy.Contractor.Uid, attachment.FileName),
 		)
 		if err != nil {
-			log.Printf("[promotoPolicyAttachments] error: %s", err.Error())
+			log.Error(err)
 			return err
 		}
 		(*policy.Attachments)[index].Link = gsLink

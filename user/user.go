@@ -1,7 +1,7 @@
 package user
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 	"time"
@@ -86,7 +86,6 @@ func init() {
 }
 
 func User(w http.ResponseWriter, r *http.Request) {
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
 	router := lib.GetRouter("user", userRoutes)
 	router.ServeHTTP(w, r)
@@ -95,6 +94,8 @@ func User(w http.ResponseWriter, r *http.Request) {
 // Consider moving into policy, as User is a dependency of Policy
 // and User does not need to know what a Policy is.
 func SetUserIntoPolicyContractor(policy *models.Policy, origin string) {
+	log.AddPrefix("SetUserIntoPolicyContractor")
+	defer log.PopPrefix()
 	userUID, newUser, err := models.GetUserUIDByFiscalCode(origin, policy.Contractor.FiscalCode)
 	lib.CheckError(err)
 
@@ -130,7 +131,7 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) {
 		lib.SetFirestore(fireUsers, userUID, policy.Contractor)
 		err = policy.Contractor.BigquerySave(origin)
 		if err != nil {
-			log.Printf("[SetUserIntoPolicyContractor] error save user %s bigquery\n", policy.Contractor.Uid)
+			log.ErrorF("error save user %s bigquery\n", policy.Contractor.Uid)
 		}
 		return
 	}
