@@ -102,13 +102,8 @@ func catnatSellable(policy *models.Policy, channel string, networkNode *models.N
 		return true
 	}
 	if g, err := policy.ExtractGuarantee("landslides"); err == nil {
-		if g.Config == nil {
-			out.Msg += ("no config for landslides")
-			return out, err
-		}
-		if !isContenutoAndFabricato(g.Config) {
-			out.Msg += ("you need atleast fabricato and contenuto for landslide")
-			return out, err
+		if product.Companies[0].GuaranteesMap["landslides"].IsSelected && (g.Config == nil || !isContenutoAndFabricato(g.Config)) {
+			out.Msg += "You need atleast fabricato and contenuto for landslide"
 		}
 	} else {
 		out.Msg += ("you must have landslides")

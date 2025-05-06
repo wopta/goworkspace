@@ -128,7 +128,7 @@ func TestCatnatSellableLandSlideWithQuoteAndNOConf(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assertEqual(output.Msg, "you need atleast fabricato and contenuto for landslide", t, "")
+	assertEqual(output.Msg, "You need atleast fabricato and contenuto for flood", t, "")
 }
 func TestCatnatSellableLandSlideWithQuoteOnlyFabricato(t *testing.T) {
 	var policy = getPrePopulatedPolicyForCatnat()
@@ -144,7 +144,7 @@ func TestCatnatSellableLandSlideWithQuoteOnlyFabricato(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assertEqual(output.Msg, "you need atleast fabricato and contenuto for landslide", t, "")
+	assertEqual(output.Msg, "You need atleast fabricato and contenuto for flood", t, "")
 }
 
 func TestCatnatSellableLandSlideWithQuote(t *testing.T) {
@@ -164,6 +164,7 @@ func TestCatnatSellableLandSlideWithQuote(t *testing.T) {
 	}
 	assertEqual(output.Msg, "You need atleast fabricato and contenuto for flood", t, "")
 }
+
 func TestCatnatSellable(t *testing.T) {
 	var policy = getPrePopulatedPolicyForCatnat()
 	policy.Assets[0].Guarantees[2].Config = &models.GuaranteConfig{ //2 is landslides, hard coded for test
