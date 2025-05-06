@@ -2,6 +2,7 @@ package sellable
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -24,7 +25,6 @@ func CatnatFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		policy *models.Policy
 		err    error
-		pr     *models.Product
 	)
 	log.AddPrefix("[CatnatFx]")
 	defer log.PopPrefix()
@@ -55,36 +55,38 @@ func CatnatFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		warrant = networkNode.GetWarrant()
 	}
 
-	if pr, err = Catnat(policy, policy.Channel, networkNode, warrant, step); err == nil {
-		js, err := pr.Marshal()
+	if pr, err := catnatSellable(policy, policy.Channel, networkNode, warrant, step); err == nil {
+		js, err := pr.Product.Marshal()
 		return string(js), err, nil
 	}
-
 	return "", nil, fmt.Errorf("policy not sellable by: %v", err)
 }
 
-func Catnat(p *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant, step string) (*models.Product, error) {
+func catnatSellable(policy *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant, step string) (*SellableOutput, error) {
 	log.AddPrefix("CatnatSellalble")
 	defer log.PopPrefix()
 
-	in, err := getCatnatInputRules(p)
+	in, err := getCatnatInputRules(policy)
 	if err != nil {
 		return nil, err
 	}
 
-	rulesFile := lib.GetRulesFileV2(p.Name, p.ProductVersion, rulesFilename)
+	rulesFile := lib.GetRulesFileV2(policy.Name, policy.ProductVersion, rulesFilename)
 	fx := new(models.Fx)
-	product := product.GetProductV2(p.Name, p.ProductVersion, channel, networkNode, warrant)
+	product := product.GetProductV2(policy.Name, policy.ProductVersion, channel, networkNode, warrant)
+	if product == nil {
+		return nil, errors.New("Error getting catnat product")
+	}
 	out := &SellableOutput{
 		Msg:     "",
 		Product: product,
 	}
-
 	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, out, in, nil)
 
 	if step != quoteStep {
 		out = ruleOutput.(*SellableOutput)
-		return out.Product, nil
+		log.InfoF(out.Msg)
+		return out, nil
 	}
 
 	//you must have both SumInsuredTextField(Fabricato) and SumInsuredLimitOfIndemnityTextField(Contenuto)
@@ -99,26 +101,32 @@ func Catnat(p *models.Policy, channel string, networkNode *models.NetworkNode, w
 		}
 		return true
 	}
-	if g, err := p.ExtractGuarantee("landlides"); err == nil {
+	if g, err := policy.ExtractGuarantee("landslides"); err == nil {
+		if g.Config == nil {
+			out.Msg += ("no config for landslides")
+			return out, err
+		}
 		if !isContenutoAndFabricato(g.Config) {
-			return nil, fmt.Errorf("you need atleast fabricato or contenuto for landslide")
+			out.Msg += ("you need atleast fabricato and contenuto for landslide")
+			return out, err
 		}
 	} else {
-		return nil, fmt.Errorf("you must have landslide")
+		out.Msg += ("you must have landslides")
+		return out, err
 	}
-	var isValidResult bool = true
 
-	if g, err := p.ExtractGuarantee("earthquake"); err == nil {
-		isValidResult = isValidResult && isContenutoAndFabricato(g.Config)
+	if g, err := policy.ExtractGuarantee("earthQuake"); err == nil {
+		if product.Companies[0].GuaranteesMap["earthQuake"].IsSelected && (g.Config == nil || !isContenutoAndFabricato(g.Config)) {
+			out.Msg += "You need atleast fabricato and contenuto for earthquake"
+		}
 	}
-	if g, err := p.ExtractGuarantee("flood"); err == nil {
-		isValidResult = isValidResult && isContenutoAndFabricato(g.Config)
-	}
-	if !isValidResult {
-		return nil, fmt.Errorf("you need atleast fabricato or contenuto")
+	if g, err := policy.ExtractGuarantee("flood"); err == nil {
+		if product.Companies[0].GuaranteesMap["flood"].IsSelected && (g.Config == nil || !isContenutoAndFabricato(g.Config)) {
+			out.Msg += "You need atleast fabricato and contenuto for flood"
+		}
 	}
 	out = ruleOutput.(*SellableOutput)
-	return out.Product, nil
+	return out, nil
 }
 
 func getCatnatInputRules(p *models.Policy) ([]byte, error) {
