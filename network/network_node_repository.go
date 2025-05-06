@@ -281,7 +281,7 @@ func DeleteNetworkNodeByUid(origin, nodeUid string) error {
 		return fmt.Errorf("no nodeUid specified")
 	}
 
-	fireNetwork := lib.GetDatasetByEnv(origin, lib.NetworkNodesCollection)
+	fireNetwork := lib.NetworkNodesCollection
 	_, err := lib.DeleteFirestoreErr(fireNetwork, nodeUid)
 	return err
 }
@@ -306,7 +306,7 @@ func UpdateNetworkNodePortfolio(origin string, policy *models.Policy, networkNod
 	networkNode.UpdatedDate = time.Now().UTC()
 
 	log.Printf("saving networkNode %s to Firestore...", networkNode.Uid)
-	fireNetwork := lib.GetDatasetByEnv(origin, lib.NetworkNodesCollection)
+	fireNetwork := lib.NetworkNodesCollection
 	err := lib.SetFirestoreErr(fireNetwork, networkNode.Uid, networkNode)
 	if err != nil {
 		log.Printf("error saving networkNode %s to Firestore: %s", networkNode.Uid, err.Error())

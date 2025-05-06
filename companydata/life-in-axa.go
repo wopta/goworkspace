@@ -1297,7 +1297,7 @@ func policyBigquerySave(policy models.Policy, collectionPrefix string) {
 	defer log.PopPrefix()
 	log.Printf("parsing data for policy %s", policy.Uid)
 
-	policyBig := lib.GetDatasetByEnv("", fmt.Sprintf("%s%s", collectionPrefix, lib.PolicyCollection))
+	policyBig := fmt.Sprintf("%s%s", collectionPrefix, lib.PolicyCollection)
 	policyJson, err := policy.Marshal()
 	if err != nil {
 		log.Printf("error marshaling policy: %s", err.Error())
@@ -1325,7 +1325,7 @@ func policyBigquerySave(policy models.Policy, collectionPrefix string) {
 }
 
 func transactionBigQuerySave(transaction models.Transaction, collectionPrefix string) {
-	fireTransactions := lib.GetDatasetByEnv("", fmt.Sprintf("%s%s", collectionPrefix, lib.TransactionsCollection))
+	fireTransactions := fmt.Sprintf("%s%s", collectionPrefix, lib.TransactionsCollection)
 
 	transaction.BigQueryParse()
 
@@ -1469,7 +1469,7 @@ func parseBigQueryAgencyNode(agency *models.AgencyNode) *models.AgencyNode {
 }
 
 func userBigQuerySave(user models.User, collectionPrefix string) error {
-	table := lib.GetDatasetByEnv("", fmt.Sprintf("%s%s", collectionPrefix, lib.UserCollection))
+	table := fmt.Sprintf("%s%s", collectionPrefix, lib.UserCollection)
 
 	result, err := initBigqueryData(&user)
 	if err != nil {

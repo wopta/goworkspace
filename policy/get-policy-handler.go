@@ -22,7 +22,7 @@ func GetPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	log.Println("Handler start -----------------------------------------------")
 
-	firePolicy := lib.GetDatasetByEnv(r.Header.Get("Origin"), lib.PolicyCollection)
+	firePolicy := lib.PolicyCollection
 	uid := chi.URLParam(r, "uid")
 	log.Println(uid)
 
@@ -44,7 +44,7 @@ func GetPolicy(uid string, origin string) (models.Policy, error) {
 		policy models.Policy
 		err    error
 	)
-	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
+	firePolicy := lib.PolicyCollection
 	docsnap, err := lib.GetFirestoreErr(firePolicy, uid)
 	if err != nil {
 		return policy, err
@@ -55,7 +55,7 @@ func GetPolicy(uid string, origin string) (models.Policy, error) {
 
 // TODO: keep only one: GetPolicy or GetPolicyByUid
 func GetPolicyByUid(policyUid string, origin string) models.Policy {
-	firePolicy := lib.GetDatasetByEnv(origin, "policy")
+	firePolicy := "policy"
 	policyF := lib.GetFirestore(firePolicy, policyUid)
 	var policy models.Policy
 	policyF.DataTo(&policy)

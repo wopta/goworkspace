@@ -47,7 +47,7 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 		return "", nil, err
 	}
 
-	fireUsers := lib.GetDatasetByEnv(origin, lib.UserCollection)
+	fireUsers := lib.UserCollection
 	docsnap, err := lib.GetFirestoreErr(fireUsers, userAuthID)
 	if err != nil {
 		log.ErrorF("get user from DB error %s", err.Error())

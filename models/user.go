@@ -190,7 +190,7 @@ func (u *User) initBigqueryData() error {
 }
 
 func (u *User) BigquerySave(origin string) error {
-	table := lib.GetDatasetByEnv(origin, UserCollection)
+	table := UserCollection
 
 	if err := u.initBigqueryData(); err != nil {
 		return err
@@ -241,7 +241,7 @@ func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
 }
 
 func GetUserUIDByFiscalCode(origin string, fiscalCode string) (string, bool, error) {
-	usersFire := lib.GetDatasetByEnv(origin, "users")
+	usersFire := "users"
 	docSnap := lib.WhereFirestore(usersFire, "fiscalCode", "==", fiscalCode)
 	retrievedUser, err := FirestoreDocumentToUser(docSnap)
 	if err != nil && err.Error() != "no user found" {
@@ -255,7 +255,7 @@ func GetUserUIDByFiscalCode(origin string, fiscalCode string) (string, bool, err
 
 func UpdateUserByFiscalCode(origin string, user User) (string, error) {
 	var err error
-	fireUser := lib.GetDatasetByEnv(origin, UserCollection)
+	fireUser := UserCollection
 	docSnap := lib.WhereFirestore(fireUser, "fiscalCode", "==", user.FiscalCode)
 	retrievedUser, err := FirestoreDocumentToUser(docSnap)
 

@@ -62,7 +62,7 @@ func GetTransactionsByPolicyUidFx(w http.ResponseWriter, r *http.Request) (strin
 func GetPolicyTransactions(origin string, policyUid string) []models.Transaction {
 	var transactions Transactions
 
-	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
+	fireTransactions := models.TransactionsCollection
 
 	res := lib.WhereFirestore(fireTransactions, "policyUid", "==", policyUid)
 

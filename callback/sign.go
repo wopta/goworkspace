@@ -61,7 +61,7 @@ func namirialStepFinished(origin, policyUid string) {
 		err    error
 	)
 
-	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
+	firePolicy := lib.PolicyCollection
 
 	docSnap, err := lib.GetFirestoreErr(firePolicy, policyUid)
 	if err != nil {

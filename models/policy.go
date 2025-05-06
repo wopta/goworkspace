@@ -309,7 +309,7 @@ func (policy *Policy) BigquerySave(origin string) {
 	defer log.PopPrefix()
 	log.Printf("parsing data for policy %s", policy.Uid)
 
-	policyBig := lib.GetDatasetByEnv(origin, PolicyCollection)
+	policyBig := PolicyCollection
 
 	policy.BigQueryParse()
 

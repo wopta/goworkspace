@@ -44,7 +44,7 @@ func DeletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	deletePolicy(&policy, request)
 
-	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
+	firePolicy := lib.PolicyCollection
 
 	log.Println("setting policy to delete in firestore...")
 	err = lib.SetFirestoreErr(firePolicy, policyUid, policy)
@@ -57,7 +57,7 @@ func DeletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	log.Println("setting policy to delete in bigquery...")
 	policy.BigquerySave(origin)
 
-	guaranteFire := lib.GetDatasetByEnv(origin, lib.GuaranteeCollection)
+	guaranteFire := lib.GuaranteeCollection
 	log.Println("updating policy's guarantees to delete in bigquery...")
 	models.SetGuaranteBigquery(policy, "delete", guaranteFire)
 

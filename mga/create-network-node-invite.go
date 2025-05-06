@@ -86,7 +86,7 @@ func CreateNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, 
 }
 
 func createNetworkNodeInvite(origin, networkNodeUid, creatorUid string) (string, error) {
-	fireInvite := lib.GetDatasetByEnv(origin, models.InvitesCollection)
+	fireInvite := models.InvitesCollection
 	inviteUid := lib.NewDoc(fireInvite)
 
 	invite := NetworkNodeInvite{

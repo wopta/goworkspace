@@ -147,8 +147,8 @@ func emit(policy *models.Policy, request EmitRequest, origin string) EmitRespons
 	log.Println("start ------------------------------------------------")
 	var responseEmit EmitResponse
 
-	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
-	fireGuarantee := lib.GetDatasetByEnv(origin, lib.GuaranteeCollection)
+	firePolicy := lib.PolicyCollection
+	fireGuarantee := lib.GuaranteeCollection
 
 	log.Printf("Emitting - Policy Uid %s", policy.Uid)
 	log.Println("starting bpmn flow...")
@@ -249,7 +249,7 @@ func emitBase(policy *models.Policy, origin string) {
 	log.AddPrefix("emitBase")
 	defer log.PopPrefix()
 	log.Printf("Policy Uid %s", policy.Uid)
-	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
+	firePolicy := lib.PolicyCollection
 	now := time.Now().UTC()
 
 	policy.CompanyEmit = true

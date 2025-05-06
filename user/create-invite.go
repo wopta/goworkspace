@@ -94,7 +94,7 @@ func CreateInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) 
 	defer log.PopPrefix()
 	log.Printf("Creating invite for user %s with role %s", inviteRequest.Email, inviteRequest.Role)
 
-	collectionName := lib.GetDatasetByEnv(origin, lib.InvitesCollection)
+	collectionName := lib.InvitesCollection
 	inviteUid := lib.NewDoc(collectionName)
 
 	oneWeek := time.Hour * 168

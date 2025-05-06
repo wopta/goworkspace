@@ -168,7 +168,7 @@ func (c *Contractor) initBigqueryData() error {
 }
 
 func (c *Contractor) BigquerySave(origin string) error {
-	table := lib.GetDatasetByEnv(origin, UserCollection)
+	table := UserCollection
 
 	if err := c.initBigqueryData(); err != nil {
 		return err

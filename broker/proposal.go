@@ -198,7 +198,7 @@ func setProposalNumber(policy *models.Policy) {
 	}
 
 	log.Println("setting proposal number...")
-	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
+	firePolicy := lib.PolicyCollection
 	policy.ProposalNumber = GetSequenceProposal("", firePolicy)
 	log.Printf("proposal number %d", policy.ProposalNumber)
 }

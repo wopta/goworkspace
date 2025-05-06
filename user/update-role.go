@@ -54,7 +54,7 @@ func UpdateUserRoleFx(w http.ResponseWriter, r *http.Request) (string, interface
 	}
 
 	log.Println("get user from firestore")
-	fireUser := lib.GetDatasetByEnv(origin, lib.UserCollection)
+	fireUser := lib.UserCollection
 	docsnap, err := lib.GetFirestoreErr(fireUser, userUid)
 	lib.CheckError(err)
 	err = docsnap.DataTo(&user)

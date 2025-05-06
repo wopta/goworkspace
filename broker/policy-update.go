@@ -32,7 +32,7 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	origin := r.Header.Get("Origin")
 	policyUid := chi.URLParam(r, "uid")
-	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
+	firePolicy := lib.PolicyCollection
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
@@ -107,7 +107,7 @@ func PatchPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	log.Println("Handler start -----------------------------------------------")
 
-	firePolicy := lib.GetDatasetByEnv(r.Header.Get("Origin"), lib.PolicyCollection)
+	firePolicy := lib.PolicyCollection
 	policyUID = chi.URLParam(r, "uid")
 
 	b := lib.ErrorByte(io.ReadAll(r.Body))
@@ -146,7 +146,7 @@ func DeletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	log.Println("Handler start -----------------------------------------------")
 
 	policyUID = chi.URLParam(r, "uid")
-	guaranteFire := lib.GetDatasetByEnv(r.Header.Get("Origin"), lib.GuaranteeCollection)
+	guaranteFire := lib.GuaranteeCollection
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
@@ -155,7 +155,7 @@ func DeletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		log.Printf("DeletePolicy: unable to delete policy %s", policyUID)
 		return "", nil, err
 	}
-	firePolicy := lib.GetDatasetByEnv(r.Header.Get("Origin"), lib.PolicyCollection)
+	firePolicy := lib.PolicyCollection
 	docsnap := lib.GetFirestore(firePolicy, policyUID)
 	docsnap.DataTo(&policy)
 	if policy.IsDeleted || !policy.CompanyEmit {

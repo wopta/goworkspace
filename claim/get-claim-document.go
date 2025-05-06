@@ -67,7 +67,7 @@ func getClaimDocument(origin, userUid, claimUid, fileName string) (string, error
 	var user models.User
 	log.AddPrefix("getClaimDocument")
 	defer log.PopPrefix()
-	fireUser := lib.GetDatasetByEnv(origin, lib.UserCollection)
+	fireUser := lib.UserCollection
 	docsnap, err := lib.GetFirestoreErr(fireUser, userUid)
 	if err != nil {
 		log.Printf("error retrieving user %s from database, error message %s", userUid, err.Error())
