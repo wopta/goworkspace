@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
+	"os"
 	"regexp"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/wopta/goworkspace/lib/log"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -65,34 +67,25 @@ func getDefaultProduct(productName, channel string) *models.Product {
 	var (
 		result, product *models.Product
 	)
-<<<<<<< HEAD
 
-	log.Println("[GetDefaultProduct] function start --------------")
-	var filesList []string
-	var err error
-
-	if os.Getenv("env")=="local"{
-		filesList, err = lib.ListLocalFolderContent(fmt.Sprintf("%s/%s/", models.ProductsFolder, productName))
-	}else{
-		filesList,err=lib.ListGoogleStorageFolderContent(fmt.Sprintf("%s/%s/", models.ProductsFolder, productName))
-	}
-=======
 	log.AddPrefix("GetDefaultProduct")
 	defer log.PopPrefix()
 	log.Println("function start --------------")
->>>>>>> master
+	var filesList []string
+	var err error
+
+	if os.Getenv("env") == "local" {
+		filesList, err = lib.ListLocalFolderContent(fmt.Sprintf("%s/%s/", models.ProductsFolder, productName))
+	} else {
+		filesList, err = lib.ListGoogleStorageFolderContent(fmt.Sprintf("%s/%s/", models.ProductsFolder, productName))
+	}
 
 	if err != nil {
 		log.ErrorF("error: %s", err.Error())
 		return nil
 	}
 
-<<<<<<< HEAD
-	log.Println("[GetDefaultProduct] filtering file list by channel")
-	log.Print(channel)
-=======
 	log.Println("filtering file list by channel")
->>>>>>> master
 
 	filesList = lib.SliceFilter(filesList, func(filePath string) bool {
 		return strings.HasSuffix(filePath, fmt.Sprintf("%s.json", channel))
