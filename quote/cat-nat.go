@@ -9,6 +9,8 @@ import (
 	"github.com/wopta/goworkspace/models"
 	netclient "github.com/wopta/goworkspace/models/client"
 	"github.com/wopta/goworkspace/models/dto/net"
+	"github.com/wopta/goworkspace/network"
+	prd "github.com/wopta/goworkspace/product"
 )
 
 func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -75,6 +77,12 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	}
 
 	_ = resp.ToPolicy(reqPolicy)
+
+	networkNode := network.GetNetworkNodeByUid(reqPolicy.ProducerUid)
+	warrant := networkNode.GetWarrant()
+	product := prd.GetProductV2(reqPolicy.Name, reqPolicy.ProductVersion, reqPolicy.Channel, networkNode, warrant)
+	addConsultacyPrice(reqPolicy, product)
+
 	out, err = json.Marshal(reqPolicy)
 	if err != nil {
 		log.Println("error encoding response %w", err.Error())
