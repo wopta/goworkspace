@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
 )
@@ -28,12 +28,13 @@ func RenewMailFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		req             RenewReq
 	)
 
-	log.SetPrefix("[RenewMailFx] ")
+	log.AddPrefix("RenewMailFx")
 	defer func() {
 		if err != nil {
-			log.Printf("error: %s", err.Error())
+			log.ErrorF("error: %s", err.Error())
 		}
 		log.Println("Handler end -------------------------------------------------")
+		log.PopPrefix()
 	}()
 	log.Println("Handler start -----------------------------------------------")
 
@@ -41,14 +42,14 @@ func RenewMailFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	defer r.Body.Close()
 	err = json.Unmarshal(body, &req)
 	if err != nil {
-		log.Printf("error unmarshaling request: %s", err.Error())
+		log.ErrorF("error unmarshaling request: %s", err.Error())
 		return "", nil, err
 	}
 
 	if req.Date != "" {
 		tmpDate, err := time.Parse(time.DateOnly, req.Date)
 		if err != nil {
-			log.Printf("error parsing request date: %s", err.Error())
+			log.ErrorF("error parsing request date: %s", err.Error())
 			return "", nil, err
 		}
 		date = tmpDate
@@ -57,7 +58,7 @@ func RenewMailFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	if req.DaysBeforeRenew != "" {
 		tmpDays, err := strconv.Atoi(req.DaysBeforeRenew)
 		if err != nil {
-			log.Printf("error parsing target date: %s", err.Error())
+			log.ErrorF("error parsing target date: %s", err.Error())
 			return "", nil, err
 		}
 		daysBeforeRenew = tmpDays
@@ -67,7 +68,7 @@ func RenewMailFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	policies, err := getRenewPolicies(targetDate)
 	if err != nil {
-		log.Printf("error getting renew policies: %s", err.Error())
+		log.ErrorF("error getting renew policies: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -107,7 +108,7 @@ func getRenewPolicies(targetDate time.Time) ([]models.Policy, error) {
 
 	policies, err := lib.QueryParametrizedRowsBigQuery[models.Policy](query.String(), params)
 	if err != nil {
-		log.Printf("error fetching policies from BigQuery: %s", err.Error())
+		log.ErrorF("error fetching policies from BigQuery: %s", err.Error())
 		return nil, err
 	}
 

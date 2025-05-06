@@ -2,7 +2,7 @@ package partnership
 
 import (
 	"encoding/json"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -25,8 +25,8 @@ func GetPartnershipNodeAndProductsFx(w http.ResponseWriter, r *http.Request) (st
 		err      error
 	)
 
-	log.SetPrefix("[GetPartnershipNodeAndProductsFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("GetPartnershipNodeAndProductsFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -34,12 +34,12 @@ func GetPartnershipNodeAndProductsFx(w http.ResponseWriter, r *http.Request) (st
 	jwtData := r.URL.Query().Get("jwt")
 
 	if node, err = network.GetNodeByUid(partnershipUid); err != nil {
-		log.Printf("error getting node '%s': %s", partnershipUid, err.Error())
+		log.ErrorF("error getting node '%s': %s", partnershipUid, err.Error())
 		return "", nil, err
 	}
 
 	if _, err := node.DecryptJwt(jwtData); err != nil {
-		log.Printf("error decoding jwt: %s", err.Error())
+		log.ErrorF("error decoding jwt: %s", err.Error())
 		return "", nil, err
 	}
 

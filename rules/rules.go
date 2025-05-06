@@ -1,7 +1,7 @@
 package rules
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
@@ -23,7 +23,6 @@ func init() {
 }
 
 func Rules(w http.ResponseWriter, r *http.Request) {
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
 	router := lib.GetRouter("rules", rulesRoutes)
 	router.ServeHTTP(w, r)

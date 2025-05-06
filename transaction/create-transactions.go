@@ -12,11 +12,17 @@ import (
 
 func CreateTransactions(policy models.Policy, mgaProduct models.Product, uidGenerator func() string) []models.Transaction {
 	var (
+		split           = policy.PaymentComponents.Split
 		numTransactions int
 		transactions    = make([]models.Transaction, 0)
 	)
 
-	numTransactions = models.PaySplitRateMap[policy.PaymentComponents.Split]
+	// Retrocompatibility with policies without PaymentComponents
+	if split == "" {
+		split = models.PaySplit(policy.PaymentSplit)
+	}
+
+	numTransactions = models.PaySplitRateMap[split]
 	if numTransactions == 0 {
 		return transactions
 	}
@@ -45,6 +51,13 @@ func CreateTransactions(policy models.Policy, mgaProduct models.Product, uidGene
 
 func createTransaction(policy models.Policy, uidGenerator func() string) models.Transaction {
 	contractorName := lib.TrimSpace(fmt.Sprintf("%s %s", policy.Contractor.Name, policy.Contractor.Surname))
+
+	provider := policy.PaymentComponents.Provider
+	// Retrocompatibility with policies without PaymentComponents
+	if provider == "" {
+		provider = policy.Payment
+	}
+
 	return models.Transaction{
 		Uid:           uidGenerator(),
 		PolicyName:    policy.Name,
@@ -53,7 +66,7 @@ func createTransaction(policy models.Policy, uidGenerator func() string) models.
 		PolicyUid:     policy.Uid,
 		Company:       policy.Company,
 		NumberCompany: policy.CodeCompany,
-		ProviderName:  policy.PaymentComponents.Provider,
+		ProviderName:  provider,
 		Status:        models.TransactionStatusToPay,
 		StatusHistory: []string{models.TransactionStatusToPay},
 	}
@@ -74,7 +87,7 @@ func setDateInfo(index int, transaction models.Transaction, policy models.Policy
 }
 
 const (
-	ItemRate = "rate"
+	ItemRate        = "rate"
 	ItemConsultancy = "consultancy"
 )
 
@@ -86,6 +99,20 @@ func setPriceInfo(index int, transaction models.Transaction, policy models.Polic
 
 	transaction.Amount = priceComponent.Total
 	transaction.AmountNet = lib.RoundFloat(priceComponent.Total-priceComponent.Tax, 2)
+
+	// Retrocompatibility with policies without PaymentComponents
+	if transaction.Amount == 0 {
+		priceGross := policy.PriceGross
+		priceNet := policy.PriceNett
+
+		if policy.PaymentSplit == string(models.PaySplitMonthly) {
+			priceGross = policy.PriceGrossMonthly
+			priceNet = policy.PriceNettMonthly
+		}
+
+		transaction.Amount = priceGross
+		transaction.AmountNet = priceNet
+	}
 
 	if priceComponent.Consultancy > 0 {
 		transaction.Items = make([]models.Item, 0, 2)

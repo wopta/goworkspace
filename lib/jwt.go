@@ -3,7 +3,7 @@ package lib
 import (
 	b64 "encoding/base64"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"os"
 
 	"github.com/go-jose/go-jose/v4"
@@ -24,19 +24,22 @@ func ParseJwt(jwt string, jwtConfig JwtConfig) (bytes []byte, err error) {
 }
 
 func decryptJwt(jwt, key string, keyAlgorithm jose.KeyAlgorithm, contentEncription jose.ContentEncryption) ([]byte, error) {
+	log.AddPrefix("DecryptJwt")
+	defer log.PopPrefix()
 	object, err := jose.ParseEncrypted(
 		jwt,
 		[]jose.KeyAlgorithm{keyAlgorithm},
 		[]jose.ContentEncryption{contentEncription},
 	)
+
 	if err != nil {
-		log.Printf("[decryptJwt] could not parse jwt - %s", err.Error())
+		log.Printf("could not parse jwt - %s", err.Error())
 		return nil, fmt.Errorf("could not parse jwt")
 	}
 
 	decryptionKey, err := b64.StdEncoding.DecodeString(key)
 	if err != nil {
-		log.Printf("[decryptJwt] could not decode signing key - %s", err.Error())
+		log.Printf("could not decode signing key - %s", err.Error())
 		return nil, fmt.Errorf("could not decode jwt key")
 	}
 
@@ -44,15 +47,17 @@ func decryptJwt(jwt, key string, keyAlgorithm jose.KeyAlgorithm, contentEncripti
 }
 
 func parseSigned(jwt, key string, algorithm jose.SignatureAlgorithm) ([]byte, error) {
+	log.AddPrefix("DecryptJwt")
+	log.PopPrefix()
 	object, err := jose.ParseSigned(jwt, []jose.SignatureAlgorithm{algorithm})
 	if err != nil {
-		log.Printf("[DecryptJwt] could not parse jwt - %s", err.Error())
+		log.Printf("could not parse jwt - %s", err.Error())
 		return nil, fmt.Errorf("could not parse jwt")
 	}
 
 	decodedKey, err := b64.StdEncoding.DecodeString(key)
 	if err != nil {
-		log.Printf("[decryptJwt] could not decode signing key - %s", err.Error())
+		log.Printf("could not decode signing key - %s", err.Error())
 		return nil, fmt.Errorf("could not decode jwt key")
 	}
 

@@ -1,11 +1,11 @@
 package renew
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 )
 
 var routes []lib.Route = []lib.Route{

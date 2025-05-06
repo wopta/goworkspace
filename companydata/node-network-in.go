@@ -2,7 +2,7 @@ package companydata
 
 import (
 	"encoding/json"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 
@@ -48,19 +48,18 @@ func NodeNetworkIn(w http.ResponseWriter, r *http.Request) (string, interface{},
 		}
 
 		node := models.NetworkNode{
-			Type:d[0] ,
+			Type:        d[0],
 			Agent:       agent,
 			Agency:      agency,
 			Broker:      broker,
 			AreaManager: areaManager,
-			Code:  d[0],
-			NetworkCode:  d[0],
-			Mail:  d[0],
-			Warrant:  d[0],
-			ParentUid: "",
-			NetworkUid:"",
-			ManagerUid: "",
-			
+			Code:        d[0],
+			NetworkCode: d[0],
+			Mail:        d[0],
+			Warrant:     d[0],
+			ParentUid:   "",
+			NetworkUid:  "",
+			ManagerUid:  "",
 		}
 
 		b, e := json.Marshal(node)
@@ -68,7 +67,6 @@ func NodeNetworkIn(w http.ResponseWriter, r *http.Request) (string, interface{},
 		log.Println("LifeIn policy:", string(b))
 		docref, _, _ := lib.PutFirestoreErr("test-network-node", node)
 		log.Println("LifeIn doc id: ", docref.ID)
-	
 
 	}
 

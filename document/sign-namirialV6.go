@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"io/ioutil"
-	"log"
 	"mime/multipart"
 	"net/http"
 	"strconv"
@@ -16,6 +16,7 @@ import (
 	"time"
 
 	lib "github.com/wopta/goworkspace/lib"
+	env "github.com/wopta/goworkspace/lib/environment"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 )
@@ -36,7 +37,7 @@ func SignNamirialV6(w http.ResponseWriter, r *http.Request) (string, interface{}
 func NamirialOtpV6(data models.Policy, origin string, sendEmail bool) (string, NamirialOtpResponse, error) {
 	var file []byte
 
-	if os.Getenv("env") == "local" {
+	if env.IsLocal() {
 		file = lib.ErrorByte(os.ReadFile("document/contract.pdf"))
 	} else {
 		file = lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), data.DocumentName, "")
@@ -300,7 +301,7 @@ func getSendV6(id string, data models.Policy, prepare string, origin string, sen
 	lib.CheckError(e)
 	calbackurl := `"https://europe-west1-` + os.Getenv("GOOGLE_PROJECT_ID") + `.cloudfunctions.net/callback/v1/sign?envelope=##EnvelopeId##&action=##Action##&uid=` + data.Uid + `&token=` + os.Getenv("WOPTA_TOKEN_API") + `&origin=` + origin + `&sendEmail=` + strconv.FormatBool(sendEmail) + `"`
 	var testPin string
-	if os.Getenv("env") == "local" || os.Getenv("env") == "dev" {
+	if !env.IsProduction() {
 		testPin = `
 			"AccessCode": {
 			  "Code": "test"

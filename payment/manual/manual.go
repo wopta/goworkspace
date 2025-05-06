@@ -3,8 +3,8 @@ package manual
 import (
 	"errors"
 	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 	"time"
 
@@ -15,6 +15,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/payment/common"
+	"github.com/wopta/goworkspace/payment/consultancy"
 	plc "github.com/wopta/goworkspace/policy"
 	prd "github.com/wopta/goworkspace/product"
 	trn "github.com/wopta/goworkspace/transaction"
@@ -41,14 +42,14 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		toAddress   = mail.Address{}
 	)
 
-	log.SetPrefix("[ManualPaymentFx] ")
+	log.AddPrefix("ManualPaymentFx")
 	defer func() {
 		if err != nil {
-			log.Printf("error: %s", err.Error())
+			log.ErrorF("error: %s", err.Error())
 		}
 		r.Body.Close()
 		log.Println("Handler end -------------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 	log.Println("Handler start -----------------------------------------------")
 
@@ -163,34 +164,41 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	trn.CreateNetworkTransactions(&policy, &transaction, networkNode, mgaProduct)
 
+	isFirstTransactionAnnuity := lib.IsEqual(policy.StartDate.AddDate(policy.Annuity, 0, 0), transaction.EffectiveDate)
 	// Update policy if needed
 	if !policy.IsPay && policy.Annuity == 0 {
 		policy.SanitizePaymentData()
 		// Create/Update document on user collection based on contractor fiscalCode
 		err = plc.SetUserIntoPolicyContractor(&policy, "")
 		if err != nil {
-			log.Printf("ERROR set user into policy contractor: %s", err.Error())
+			log.ErrorF("error set user into policy contractor: %s", err.Error())
 			return "", nil, err
 		}
 
 		// Add contract to policy
 		err = plc.AddContract(&policy, "")
 		if err != nil {
-			log.Printf("ERROR add contract to policy: %s", err.Error())
+			log.ErrorF("error add contract to policy: %s", err.Error())
 			return "", nil, err
 		}
 
 		// Update Policy as paid
+		if isFirstTransactionAnnuity {
+			if err := consultancy.GenerateInvoice(policy, transaction); err != nil {
+				log.Printf("error handling consultancy: %s", err.Error())
+			}
+		}
+
 		err = plc.Pay(&policy, "")
 		if err != nil {
-			log.Printf("ERROR policy pay: %s", err.Error())
+			log.ErrorF("error policy pay: %s", err.Error())
 			return "", nil, err
 		}
 
 		// Update NetworkNode Portfolio
 		err = network.UpdateNetworkNodePortfolio("", &policy, networkNode)
 		if err != nil {
-			log.Printf("ERROR updating %s portfolio %s", networkNode.Type, err.Error())
+			log.ErrorF("error updating %s portfolio %s", networkNode.Type, err.Error())
 			return "", nil, err
 		}
 
@@ -214,7 +222,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 			ccAddress.String(),
 		)
 		mail.SendMailContract(policy, nil, fromAddress, toAddress, ccAddress, flowName)
-	} else if !policy.IsPay && policy.Annuity > 0 && lib.IsEqual(policy.StartDate.AddDate(policy.Annuity, 0, 0), transaction.EffectiveDate) {
+	} else if !policy.IsPay && policy.Annuity > 0 && isFirstTransactionAnnuity {
 		policy.SanitizePaymentData()
 		// Update Policy as paid and renewed
 		policy.IsPay = true
@@ -222,9 +230,15 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusPay, policy.Status)
 		policy.Updated = time.Now().UTC()
 
+		if isFirstTransactionAnnuity {
+			if err := consultancy.GenerateInvoice(policy, transaction); err != nil {
+				log.Printf("error handling consultancy: %s", err.Error())
+			}
+		}
+
 		err = lib.SetFirestoreErr(lib.PolicyCollection, policy.Uid, policy)
 		if err != nil {
-			log.Printf("ERROR saving policy %s to Firestore: %s", policy.Uid, err.Error())
+			log.ErrorF("error saving policy %s to Firestore: %s", policy.Uid, err.Error())
 			return "", nil, err
 		}
 		policy.BigquerySave("")

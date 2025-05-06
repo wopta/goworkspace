@@ -2,17 +2,17 @@ package test
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/wopta/goworkspace/lib/log"
 )
 
 func TestFabrickFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
-	log.SetPrefix("[TestFabrickFx] ")
+	log.AddPrefix("TestFabrickFx")
 	defer func() {
 		log.Printf("Handler end ----------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 	log.Println("Handler start -----------------------------------------------")
 

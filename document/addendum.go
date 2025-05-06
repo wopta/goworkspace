@@ -1,57 +1,57 @@
 package document
 
 import (
+	"errors"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
+	"strings"
+	"time"
 
 	"github.com/wopta/goworkspace/document/internal/engine"
-	"github.com/wopta/goworkspace/document/pkg/addedndum"
+	"github.com/wopta/goworkspace/document/pkg/addendum"
 	"github.com/wopta/goworkspace/models"
 )
 
-type AddendumResponse struct {
-	LinkGcs  string `json:"linkGcs"`
-	Filename string `json:"fileName"`
-}
+const (
+	addendumDocumentFormat = "%s_Appendice_%s_%s.pdf"
+)
 
-func Addendum(origin string, data models.Policy, networkNode *models.NetworkNode, product *models.Product) (AddendumResponse, error) {
+var (
+	ErrNotImplemented = errors.New("addendum document not implemented for product")
+)
+
+func Addendum(policy *models.Policy) (DocumentResp, error) {
 	var (
 		err      error
 		filename string
+		gsLink   string
 		out      []byte
 	)
 
-	log.Println("[AddendumObj] function start -------------------------------")
-
-	rawPolicy, _ := data.Marshal()
-	log.Printf("[AddendumObj] policy: %s", string(rawPolicy))
-
-	switch data.Name {
+	switch policy.Name {
 	case models.LifeProduct:
-		prod := models.Product{}
-		generator := addedndum.NewLifeAddendumGenerator(engine.NewFpdf(), &data, networkNode, prod)
-		out, err = generator.Generate()
-		if err != nil {
-			log.Printf("error generating addendum: %v", err)
-			return AddendumResponse{}, err
+		generator := addendum.NewLifeAddendumGenerator(engine.NewFpdf(), policy)
+		if out, err = generator.Generate(); err != nil {
+			log.ErrorF("error generating addendum: %v", err)
+			return DocumentResp{}, err
 		}
-		filename, err = generator.Save(out)
-		if err != nil {
-			log.Printf("error saving addendum: %v", err)
-			return AddendumResponse{}, err
+
+		filename = strings.ReplaceAll(fmt.Sprintf(addendumDocumentFormat, policy.NameDesc,
+			policy.CodeCompany, time.Now().Format("2006-01-02_15:04:05")), " ", "_")
+
+		if gsLink, err = generator.Save(filename, out); err != nil {
+			log.ErrorF("error saving addendum: %v", err)
+			return DocumentResp{}, err
 		}
 	default:
-		return AddendumResponse{}, fmt.Errorf("addendum not implemented for product %s", data.Name)
+		log.Printf("addendum not implemented for product %s", policy.Name)
+		return DocumentResp{}, ErrNotImplemented
 	}
 
-	data.DocumentName = filename
-	log.Println(data.Uid + " AddendumObj end")
-	res := AddendumResponse{
-		LinkGcs:  filename,
+	res := DocumentResp{
+		LinkGcs:  gsLink,
 		Filename: filename,
 	}
-
-	log.Println("[AddendumObj] function end -------------------------------..")
 
 	return res, nil
 }

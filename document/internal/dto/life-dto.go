@@ -1,11 +1,11 @@
 package dto
 
 import (
-	"time"
-
+	"fmt"
 	"github.com/wopta/goworkspace/document/internal/constants"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"time"
 )
 
 var splitPayment map[string]string = map[string]string{
@@ -15,57 +15,44 @@ var splitPayment map[string]string = map[string]string{
 }
 
 type LifeDTO struct {
-	Contractor       contractorDTO
+	Contractor       *contractorDTO
 	Channel          string
-	Prizes           priceDTO
+	Prizes           *priceDTO
 	PriceAnnuity     string
-	ConsultancyValue consultancyDTO
-	ValidityDate     validityDateDTO
+	ConsultancyValue *consultancyDTO
+	ValidityDate     *validityDateDTO
 	ProductorName    string
-	CodeCompany      string
-}
-
-type validityDateDTO struct {
-	StartDate          string
-	EndDate            string
-	FirstAnnuityExpiry string
-}
-
-func formatDate(t time.Time) string {
-	location, _ := time.LoadLocation("Europe/Rome")
-	time := t.In(location)
-	return time.In(location).Format(constants.DayMonthYearFormat)
-}
-
-func getSplit(split string) string {
-	if split, ok := splitPayment[split]; ok {
-		return split
-	}
-	return ""
+	ProposalNumber   string
 }
 
 func NewLifeDto() LifeDTO {
-	return LifeDTO{}
+	return LifeDTO{
+		Contractor:       newContractorDTO(),
+		Channel:          constants.EmptyField,
+		Prizes:           newPriceDTO(),
+		PriceAnnuity:     constants.EmptyField,
+		ConsultancyValue: newConsultacyDTO(),
+		ValidityDate:     newValidityDateDTO(),
+		ProductorName:    constants.EmptyField,
+		ProposalNumber:   constants.EmptyField,
+	}
 }
+
 
 func (n *LifeDTO) FromPolicy(policy *models.Policy, network *models.NetworkNode) {
 	n.Channel = policy.Channel
-	n.CodeCompany = policy.CodeCompany
-	(&n.Contractor).fromPolicy(policy.Contractor)
+	n.ProposalNumber = fmt.Sprint(policy.ProposalNumber)
 
-	n.Prizes = priceDTO{
-		Split: getSplit(policy.PaymentSplit),
-	}
+	n.Contractor.fromPolicy(policy.Contractor)
+
+	n.Prizes.Split=getSplit(policy.PaymentSplit)
 	n.Prizes.Gross.ValueFloat = policy.PriceGross
 	n.Prizes.Gross.Text = lib.HumanaizePriceEuro(policy.PriceGross)
-	n.ConsultancyValue.Price = lib.HumanaizePriceEuro(policy.ConsultancyValue.Price)
-	n.PriceAnnuity = lib.HumanaizePriceEuro(policy.PaymentComponents.PriceAnnuity.Total)
 
-	n.ValidityDate = validityDateDTO{
-		StartDate:          formatDate(policy.StartDate),
-		EndDate:            formatDate(policy.EndDate),
-		FirstAnnuityExpiry: formatDate(policy.StartDate.AddDate(1, 0, 0)),
-	}
+	n.ConsultancyValue.Price.FromValue(policy.ConsultancyValue.Price)
+
+	n.PriceAnnuity = lib.HumanaizePriceEuro(policy.PaymentComponents.PriceAnnuity.Total)
+	n.ValidityDate.fromPolicy(policy)
 
 	if policy.Channel == models.ECommerceChannel {
 		n.ProductorName = "Michele Lomazzi"
@@ -78,9 +65,24 @@ func (n *LifeDTO) FromPolicy(policy *models.Policy, network *models.NetworkNode)
 func (l *LifeDTO) GetAddressFirstPart() string {
 	return l.Contractor.StreetName + ", " + l.Contractor.StreetNumber
 }
+
 func (l *LifeDTO) GetAddressSecondPart() string {
 	return l.Contractor.PostalCode + " " + l.Contractor.City + " (" + l.Contractor.CityCode + ")"
 }
+
 func (l *LifeDTO) GetFullNameContractor() string {
 	return l.Contractor.Name + " " + l.Contractor.Surname
+}
+
+func formatDate(t time.Time) string {
+	location, _ := time.LoadLocation("Europe/Rome")
+	time := t.In(location)
+	return time.In(location).Format(constants.DayMonthYearFormat) + " ore 24:00"
+}
+
+func getSplit(split string) string {
+	if split, ok := splitPayment[split]; ok {
+		return split
+	}
+	return ""
 }

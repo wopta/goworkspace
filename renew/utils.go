@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"sort"
 	"strings"
@@ -13,6 +12,8 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
+	env "github.com/wopta/goworkspace/lib/environment"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
 	"google.golang.org/api/iterator"
@@ -57,17 +58,25 @@ func getProductsFileList() []string {
 	)
 
 	switch os.Getenv("env") {
-	case "local", "local-test":
+	case env.Local, env.LocalTest:
 		fileList, err = lib.ListLocalFolderContent(models.ProductsFolder)
 	default:
 		fileList, err = lib.ListGoogleStorageFolderContent(models.ProductsFolder)
 	}
 
 	if err != nil {
-		log.Printf("error getting file list: %s", err.Error())
+		log.ErrorF("error getting file list: %s", err.Error())
 	}
 
-	return fileList
+	checkedList := lib.SliceFilter(fileList, checkSlashes)
+
+	return checkedList
+}
+
+func checkSlashes(s string) bool {
+	// Correct path is: products/{{product_dir}}/{{version_number}}/{{filename.extension}}
+	// but this function supports further nesting
+	return strings.Count(s, "/") >= 3
 }
 
 func getProductsFromFileList(fileList []string) []models.Product {

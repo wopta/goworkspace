@@ -3,7 +3,7 @@ package fabrick
 import (
 	"errors"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"time"
 
 	"github.com/google/uuid"
@@ -33,7 +33,8 @@ func (c *Client) Validate() error {
 
 func (c *Client) getPaymentMethods() []string {
 	var paymentMethods = make([]string, 0)
-
+	log.AddPrefix("FabrickClient.getPaymentMethods")
+	defer log.PopPrefix()
 	for _, provider := range c.Product.PaymentProviders {
 		if provider.Name == c.Policy.Payment {
 			for _, config := range provider.Configs {
@@ -44,7 +45,7 @@ func (c *Client) getPaymentMethods() []string {
 		}
 	}
 
-	log.Printf("[FabrickClient.getPaymentMethods] found %v", paymentMethods)
+	log.Printf("found %v", paymentMethods)
 	return paymentMethods
 }
 
@@ -108,7 +109,7 @@ func (c Client) Renew() (string, bool, []models.Transaction, error) {
 	now := time.Now().UTC()
 
 	if hasMandate, err = fabrickHasMandate(c.CustomerId); err != nil {
-		log.Printf("error checking mandate: %s", err.Error())
+		log.ErrorF("error checking mandate: %s", err.Error())
 	}
 
 	// TODO: this might change in the future. It works as following:
@@ -136,7 +137,7 @@ func (c Client) Renew() (string, bool, []models.Transaction, error) {
 
 		scheduleDate, err := time.Parse(time.DateOnly, tr.ScheduleDate)
 		if err != nil {
-			log.Printf("error parsing scheduleDate: %s", err.Error())
+			log.ErrorF("error parsing scheduleDate: %s", err.Error())
 			return "", false, nil, err
 		}
 		if c.ScheduleFirstRate && scheduleDate.Before(now) {
@@ -189,7 +190,7 @@ func (c Client) Update() (string, []models.Transaction, error) {
 
 		scheduleDate, err := time.Parse(time.DateOnly, tr.ScheduleDate)
 		if err != nil {
-			log.Printf("error parsing scheduleDate: %s", err.Error())
+			log.ErrorF("error parsing scheduleDate: %s", err.Error())
 			return "", nil, err
 		}
 		if c.ScheduleFirstRate && scheduleDate.Before(now) {

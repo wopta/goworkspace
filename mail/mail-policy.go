@@ -3,11 +3,11 @@ package mail
 import (
 	"encoding/base64"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -164,6 +164,8 @@ func SendMailReserved(policy models.Policy, from, to, cc Address, flowName strin
 		rawDoc   []byte
 		err      error
 	)
+	log.AddPrefix("sendMailReserved")
+	defer log.PopPrefix()
 
 	bodyData = getBodyData(policy)
 
@@ -179,7 +181,7 @@ func SendMailReserved(policy models.Policy, from, to, cc Address, flowName strin
 				rawDoc, err = lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), attachment.Link)
 			}
 			if err != nil {
-				log.Printf("[sendMailReserved] error reading document %s from google storage: %s", attachment.Name, err.Error())
+				log.ErrorF("error reading document %s from google storage: %s", attachment.Name, err.Error())
 				return
 			}
 			attachment.Byte = base64.StdEncoding.EncodeToString(rawDoc)

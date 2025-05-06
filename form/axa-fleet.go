@@ -3,19 +3,18 @@ package form
 import (
 	"context"
 	"fmt"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
-	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/xuri/excelize/v2"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
-	//"google.golang.org/api/firebaseappcheck/v1"
 )
 
 // {"responses":{"TIPO MOVIMENTO":"Inserimento","Targa Inserimento":"test","MODELLO VEICOLO":"test mod","DATA IMMATRICOLAZIONE":"1212-12-02","DATA INIZIO VALIDITA' COPERTURA":"1212-12-12"}}
@@ -45,17 +44,8 @@ func AxaFleetTway(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		satusCol = "J"
 	)
 
-	switch os.Getenv("env") {
-	case "local":
-		path = lib.ErrorByte(os.ReadFile("function-data/sa/positive-apex-350507-33284d6fdd55.json"))
-	case "dev":
-		path = lib.GetFromStorage("function-data", "sa/positive-apex-350507-33284d6fdd55.json", "")
-	case "prod":
-		path = lib.GetFromStorage("core-350507-function-data", "sa/positive-apex-350507-33284d6fdd55.json", "")
+	path = lib.GetFilesByEnv("sa/positive-apex-350507-33284d6fdd55.json")
 
-	default:
-
-	}
 	ctx := context.Background()
 	srv, e := sheets.NewService(ctx, option.WithCredentialsJSON(path), option.WithScopes(sheets.SpreadsheetsScope))
 	// Prints the names and majors of students in a sample spreadsheet:
@@ -186,16 +176,8 @@ func SftpUpload(filePath string) {
 		pk []byte
 		e  error
 	)
-	switch os.Getenv("env") {
-	case "local":
-		pk = lib.ErrorByte(os.ReadFile("function-data/env/twayserviceKey.ssh"))
-	case "dev":
-		pk = lib.GetFromStorage("function-data", "env/twayserviceKey.ssh", "")
-	case "prod":
-		pk = lib.GetFromStorage("core-350507-function-data", "env/twayserviceKey.ssh", "")
-	default:
 
-	}
+	pk = lib.GetFilesByEnv("env/twayserviceKey.ssh")
 
 	lib.CheckError(e)
 

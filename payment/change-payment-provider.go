@@ -3,8 +3,8 @@ package payment
 import (
 	"encoding/json"
 	"errors"
+	"github.com/wopta/goworkspace/lib/log"
 	"io"
-	"log"
 	"net/http"
 
 	"github.com/wopta/goworkspace/lib"
@@ -43,8 +43,8 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 		unpaidTransactions   = make([]models.Transaction, 0)
 	)
 
-	log.SetPrefix("ChangePaymentProviderFx ")
-	defer log.SetPrefix("")
+	log.AddPrefix("ChangePaymentProviderFx ")
+	defer log.PopPrefix()
 	log.Println("Handler Start -----------------------------------------------")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
@@ -52,7 +52,7 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 
 	err = json.Unmarshal(body, &req)
 	if err != nil {
-		log.Printf("error unmarshaling request body: %s", string(body))
+		log.ErrorF("error unmarshaling request body: %s", string(body))
 		return "{}", nil, err
 	}
 
@@ -89,7 +89,7 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 	client := NewClient(policy.Payment, policy, *product, unpaidTransactions, req.ScheduleFirstRate, "")
 	payUrl, updatedTransactions, err = client.Update()
 	if err != nil {
-		log.Printf("error changing payment provider to %s: %s", req.ProviderName, err.Error())
+		log.ErrorF("error changing payment provider to %s: %s", req.ProviderName, err.Error())
 		return "{}", nil, err
 	}
 
@@ -112,7 +112,7 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 	resp.Transactions = responseTransactions
 	rawResp, err := json.Marshal(resp)
 	if err != nil {
-		log.Printf("error marshaling response: %s", err.Error())
+		log.ErrorF("error marshaling response: %s", err.Error())
 		return "{}", nil, err
 	}
 

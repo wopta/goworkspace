@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
@@ -43,7 +43,6 @@ func init() {
 }
 
 func Auth(w http.ResponseWriter, r *http.Request) {
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
 	router := lib.GetRouter("auth", authRoutes)
 	router.ServeHTTP(w, r)

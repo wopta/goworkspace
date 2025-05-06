@@ -8,6 +8,7 @@ git add .
 cd $1
 
 cd ..
+git add .
 git commit -m "$3"
 git push work master 
 git push google master 

@@ -2,10 +2,10 @@ package transaction
 
 import (
 	"errors"
-	"log"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -56,12 +56,12 @@ func SaveTransactionsToDB(transactions []models.Transaction, collection string) 
 	}
 
 	if err := lib.SetBatchFirestoreErr(batch); err != nil {
-		log.Printf("error saving transactions to firestore: %s", err.Error())
+		log.ErrorF("error saving transactions to firestore: %s", err.Error())
 		return err
 	}
 
 	if err := lib.InsertRowsBigQuery(lib.WoptaDataset, collection, transactions); err != nil {
-		log.Printf("error saving transactions to bigquery: %s", err.Error())
+		log.ErrorF("error saving transactions to bigquery: %s", err.Error())
 		return err
 	}
 

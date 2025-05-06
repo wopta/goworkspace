@@ -1,6 +1,11 @@
 package dto
 
 type consultancyDTO struct {
-	Percentage string
-	Price      string
+	Price      numeric
+}
+
+func newConsultacyDTO() *consultancyDTO {
+	return &consultancyDTO{
+		Price: newNumeric(),
+	}
 }

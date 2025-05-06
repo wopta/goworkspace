@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
+	"github.com/wopta/goworkspace/lib/log"
 	"html/template"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strings"
 

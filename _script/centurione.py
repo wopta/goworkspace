@@ -34,6 +34,7 @@ TRANSACTION = "transaction"
 USER = "user"
 RENEW = "renew"
 CALLBACK_OUT = "callback_out"
+ACCOUNTING = "accounting"
 
 # semver consts
 MAJOR = "major"
@@ -73,14 +74,20 @@ go_modules = [
     USER,
     RENEW,
     CALLBACK_OUT,
+    ACCOUNTING,
 ]
 changed_modules = [
 ]
 updateable_modules = [
     AUTH,
+    BPMN,
     BROKER,
     CALLBACK,
+    CLAIM,
+    COMPANY_DATA,
     DOCUMENT,
+    ENRICH,
+    FORM,
     LIB,
     MAIL,
     MGA,
@@ -93,17 +100,23 @@ updateable_modules = [
     QUESTION,
     QUOTE,
     RESERVED,
+    RULES,
     SELLABLE,
     TRANSACTION,
     USER,
     RENEW,
     CALLBACK_OUT,
+    ACCOUNTING,
 ]
 # TODO: improve me
 updateable_functions = [
     AUTH,
     BROKER,
     CALLBACK,
+    CLAIM,
+    COMPANY_DATA,
+    ENRICH,
+    FORM,
     MAIL,
     MGA,
     NETWORK,
@@ -113,6 +126,7 @@ updateable_functions = [
     QUESTION,
     QUOTE,
     RESERVED,
+    RULES,
     SELLABLE,
     TRANSACTION,
     USER,

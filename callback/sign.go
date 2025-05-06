@@ -1,7 +1,7 @@
 package callback
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -22,8 +22,8 @@ const (
 )
 
 func SignFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.SetPrefix("[SignFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("SignFx")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -53,7 +53,9 @@ func SignFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 }
 
 func namirialStepFinished(origin, policyUid string) {
-	log.Printf("[namirialStepFinished] Policy: %s", policyUid)
+	log.AddPrefix("namirialStepFinished")
+	defer log.PopPrefix()
+	log.Printf("Policy: %s", policyUid)
 	var (
 		policy models.Policy
 		err    error
@@ -63,31 +65,31 @@ func namirialStepFinished(origin, policyUid string) {
 
 	docSnap, err := lib.GetFirestoreErr(firePolicy, policyUid)
 	if err != nil {
-		log.Printf("[namirialStepFinished] ERROR getting policy from firestore: %s", err.Error())
+		log.ErrorF("error getting policy from firestore: %s", err.Error())
 		return
 	}
 	err = docSnap.DataTo(&policy)
 	if err != nil {
-		log.Printf("[namirialStepFinished] ERROR populating policy: %s", err.Error())
+		log.ErrorF("error populating policy: %s", err.Error())
 		return
 	}
 
 	if policy.IsSign || !lib.SliceContains(policy.StatusHistory, models.PolicyStatusToSign) {
 		log.Printf(
-			"[namirialStepFinished] ERROR cannot sign policy %s with isSign %t and statusHistory %s",
+			"ERROR cannot sign policy %s with isSign %t and statusHistory %s",
 			policy.Uid, policy.IsSign, strings.Join(policy.StatusHistory, ","),
 		)
 		return
 	}
 
-	log.Println("[namirialStepFinished] starting bpmn flow...")
+	log.Println("starting bpmn flow...")
 	state := runCallbackBpmn(&policy, signFlowKey)
 	if state == nil || state.Data == nil {
-		log.Println("[namirialStepFinished] error bpmn - state not set")
+		log.ErrorF("error bpmn - state not set")
 		return
 	}
 	if state.IsFailed {
-		log.Println("[namirialStepFinished] ERROR bpmn failed")
+		log.ErrorF("ERROR bpmn failed")
 		return
 	}
 	policy = *state.Data

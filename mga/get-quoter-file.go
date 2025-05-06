@@ -3,7 +3,7 @@ package mga
 import (
 	"encoding/base64"
 	"encoding/json"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 
@@ -17,14 +17,14 @@ func GetQuoterFileFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	)
 	var err error
 
-	log.SetPrefix("[GetQuoterFileFx] ")
+	log.AddPrefix("GetQuoterFileFx")
 	log.Printf("Handler start -------------------------------------------------")
 	defer func() {
 		if err != nil {
-			log.Printf("error: %s", err.Error())
+			log.ErrorF("error: %s", err.Error())
 		}
 		log.Printf("Handler end -----------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 
 	rawDoc := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, "")

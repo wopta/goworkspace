@@ -4,14 +4,15 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 	"time"
+
+	env "github.com/wopta/goworkspace/lib/environment"
 )
 
 func TriggerRenewDraft(dryRun bool, appCheckToken string) {
 	baseUrl := "https://api.dev.wopta.it/"
-	if os.Getenv("env") == "prod" {
+	if env.IsProduction() {
 		baseUrl = "https://api.prod.wopta.it/"
 	}
 
@@ -48,7 +49,7 @@ func TriggerRenewDraft(dryRun bool, appCheckToken string) {
 
 func TriggerRenewPromote(dryRun bool, appCheckToken string) {
 	baseUrl := "https://api.dev.wopta.it/"
-	if os.Getenv("env") == "prod" {
+	if env.IsProduction() {
 		baseUrl = "https://api.prod.wopta.it/"
 	}
 

@@ -1,7 +1,7 @@
 package lib
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"os"
 	"strconv"
 	"strings"
@@ -34,7 +34,7 @@ func GetDatasetByEnv(origin string, dataset string) string {
 func GetBoolEnv(key string) bool {
 	flag, err := strconv.ParseBool(os.Getenv(key))
 	if err != nil {
-		log.Printf("error loading %s environment variable", key)
+		log.ErrorF("error loading %s environment variable", key)
 		return false
 	}
 	return flag

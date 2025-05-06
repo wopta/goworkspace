@@ -1,46 +1,44 @@
 package document
 
 import (
-	"log"
+	"fmt"
+	"github.com/wopta/goworkspace/lib/log"
+	"strings"
 
 	"github.com/wopta/goworkspace/document/internal/engine"
 	"github.com/wopta/goworkspace/document/pkg/proforma"
 	"github.com/wopta/goworkspace/models"
 )
 
-type ProformaResponse struct {
-	FileName string
-	LinkGcs  string `json:"linkGcs"`
-}
+const (
+	proformaDocumentFormat = "nota_informativa_polizza_%s_%d.pdf"
+)
 
-func Proforma(policy models.Policy, networkNode *models.NetworkNode, product *models.Product) (ProformaResponse, error) {
+func Proforma(policy models.Policy) (DocumentResp, error) {
 	var (
-		err      error
-		filename string
-		out      []byte
+		err    error
+		gsLink string
+		out    []byte
 	)
 
-	log.Println("[ProformaObj] function start -------------------------------")
-
-	generator := proforma.NewProformaGenerator(engine.NewFpdf(), &policy, networkNode, *product)
-	out, err = generator.Generate()
-	if err != nil {
-		log.Printf("error generating proforma: %v", err)
-		return ProformaResponse{}, err
-	}
-	filename, err = generator.Save(out)
-	if err != nil {
-		log.Printf("error saving proforma: %v", err)
-		return ProformaResponse{}, err
+	generator := proforma.NewProformaGenerator(engine.NewFpdf(), &policy)
+	if out, err = generator.Generate(); err != nil {
+		log.ErrorF("error generating proforma: %v", err)
+		return DocumentResp{}, err
 	}
 
-	log.Println(policy.Uid + " ProformaObj end")
-	res := ProformaResponse{
-		LinkGcs:  filename,
-		FileName: filename,
+	filename := strings.ReplaceAll(fmt.Sprintf(proformaDocumentFormat,
+		policy.CodeCompany, policy.StartDate.AddDate(policy.Annuity, 0, 0).Year()), " ", "_")
+
+	if gsLink, err = generator.Save(filename, out); err != nil {
+		log.ErrorF("error saving proforma: %v", err)
+		return DocumentResp{}, err
 	}
 
-	log.Println("[ProformaObj] function end -------------------------------..")
+	res := DocumentResp{
+		LinkGcs:  gsLink,
+		Filename: filename,
+	}
 
 	return res, nil
 }

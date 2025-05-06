@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/wopta/goworkspace/lib/log"
 )
 
 type refreshTokenReq struct {
@@ -37,16 +38,16 @@ var requestBody refreshTokenReq = refreshTokenReq{
 }
 
 func RefreshTokenFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
-	log.SetPrefix("[RefreshTokenFx] ")
+	log.AddPrefix("RefreshTokenFx")
 	log.Println("Handler Start -----------------------------------------------")
 	defer func() {
 		log.Println("Handler end ---------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 
 	err := refreshToken()
 	if err != nil {
-		log.Printf("error: %s", err)
+		log.Error(err)
 	}
 
 	return "", nil, err

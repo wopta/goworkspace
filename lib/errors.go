@@ -3,13 +3,13 @@ package lib
 import (
 	"encoding/json"
 	"errors"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 )
 
 func CheckError(e error) {
 	if e != nil {
-		log.Fatal(e)
+		log.Error(e)
 		panic(e)
 
 	}
@@ -23,7 +23,7 @@ func ErrorByte(b []byte, e error) []byte {
 func CheckErrorResp(w http.ResponseWriter, e error) {
 
 	if e != nil {
-		log.Fatal(e)
+		log.Error(e)
 		http.Error(w, e.Error(), 500)
 		panic(e)
 

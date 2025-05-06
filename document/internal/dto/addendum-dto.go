@@ -1,7 +1,6 @@
 package dto
 
 import (
-	"bytes"
 	"fmt"
 	"time"
 
@@ -15,6 +14,7 @@ type addendumContractDTO struct {
 	StartDate   string
 	EndDate     string
 	Producer    string
+	IssueDate   string
 }
 type addendumContractorDTO struct {
 	Name            string
@@ -27,10 +27,12 @@ type addendumContractorDTO struct {
 	DomStreetName   string
 	DomStreetNumber string
 	DomCity         string
+	DomPostalCode   string
 	DomProvince     string
 	Mail            string
 	Phone           string
 	BirthDate       string
+	PostalCode      string
 }
 
 type addendumInsuredDTO struct {
@@ -40,10 +42,12 @@ type addendumInsuredDTO struct {
 	StreetName      string
 	StreetNumber    string
 	City            string
+	PostalCode      string
 	Province        string
 	DomStreetName   string
 	DomStreetNumber string
 	DomCity         string
+	DomPostalCode   string
 	DomProvince     string
 	Mail            string
 	Phone           string
@@ -57,6 +61,7 @@ type addendumBeneficiaryDTO struct {
 	StreetName   string
 	StreetNumber string
 	City         string
+	PostalCode   string
 	Province     string
 	Mail         string
 	Relation     string
@@ -71,6 +76,7 @@ type addendumBeneficiaryReferenceDTO struct {
 	StreetName   string
 	StreetNumber string
 	City         string
+	PostalCode   string
 	Province     string
 	Mail         string
 	Phone        string
@@ -93,12 +99,12 @@ func NewBeneficiariesDto() *AddendumBeneficiariesDTO {
 		Contractor:           newLifeContractorDTO(),
 		Insured:              newLifeInsuredDTO(),
 		Beneficiaries:        newLifeBeneficiariesDTO(),
-		BeneficiaryReference: newBeneficiaryReferenceDTO(),
+		BeneficiaryReference: &addendumBeneficiaryReferenceDTO{},
 	}
 }
 
-func (b *AddendumBeneficiariesDTO) FromPolicy(policy models.Policy, product models.Product) {
-	b.Contract.fromPolicy(policy)
+func (b *AddendumBeneficiariesDTO) FromPolicy(policy *models.Policy, now time.Time) {
+	b.Contract.fromPolicy(policy, now)
 	b.Contractor.fromPolicy(policy.Contractor)
 	for _, a := range policy.Assets {
 		if a.Person != nil {
@@ -134,10 +140,12 @@ func newLifeContractorDTO() *addendumContractorDTO {
 		StreetName:      constants.EmptyField,
 		StreetNumber:    constants.EmptyField,
 		City:            constants.EmptyField,
+		PostalCode:      constants.EmptyField,
 		Province:        constants.EmptyField,
 		DomStreetName:   constants.EmptyField,
 		DomStreetNumber: constants.EmptyField,
 		DomCity:         constants.EmptyField,
+		DomPostalCode:   constants.EmptyField,
 		DomProvince:     constants.EmptyField,
 		Mail:            constants.EmptyField,
 		Phone:           constants.EmptyField,
@@ -152,11 +160,13 @@ func newLifeInsuredDTO() *addendumInsuredDTO {
 		StreetName:      constants.EmptyField,
 		StreetNumber:    constants.EmptyField,
 		City:            constants.EmptyField,
+		PostalCode:      constants.EmptyField,
 		Province:        constants.EmptyField,
 		DomStreetName:   constants.EmptyField,
 		DomStreetNumber: constants.EmptyField,
 		DomCity:         constants.EmptyField,
 		DomProvince:     constants.EmptyField,
+		DomPostalCode:   constants.EmptyField,
 		Mail:            constants.EmptyField,
 		Phone:           constants.EmptyField,
 	}
@@ -171,6 +181,7 @@ func newLifeBeneficiariesDTO() *addendumBeneficiaries {
 		StreetName:   constants.EmptyField,
 		StreetNumber: constants.EmptyField,
 		City:         constants.EmptyField,
+		PostalCode:   constants.EmptyField,
 		Province:     constants.EmptyField,
 		Mail:         constants.EmptyField,
 		Relation:     constants.EmptyField,
@@ -197,9 +208,16 @@ func newBeneficiaryReferenceDTO() *addendumBeneficiaryReferenceDTO {
 	}
 }
 
-func (l *addendumContractDTO) fromPolicy(policy models.Policy) {
+func (l *addendumContractDTO) fromPolicy(policy *models.Policy, now time.Time) {
 	l.CodeHeading = "Variazione dati Anagrafici soggetti Polizza:"
 	l.Code = policy.CodeCompany
+	if !policy.CompanyEmit {
+		l.CodeHeading = "Variazione dati Anagrafici soggetti Proposta:"
+		l.Code = fmt.Sprintf("%d", policy.ProposalNumber)
+	}
+
+	location, _ := time.LoadLocation("Europe/Rome")
+	l.IssueDate = "Milano, il " + now.In(location).Format(constants.DayMonthYearFormat)
 
 	if !policy.StartDate.IsZero() {
 		l.StartDate = policy.StartDate.Format(constants.DayMonthYearFormat)
@@ -210,7 +228,6 @@ func (l *addendumContractDTO) fromPolicy(policy models.Policy) {
 	}
 
 	l.Producer = policy.Company
-
 }
 
 func parseBirthDate(dateString string) string {
@@ -233,12 +250,14 @@ func (lc *addendumContractorDTO) fromPolicy(contr models.Contractor) {
 		lc.StreetNumber = contr.Residence.StreetNumber
 		lc.City = contr.Residence.City
 		lc.Province = contr.Residence.CityCode
+		lc.PostalCode = contr.Residence.PostalCode
 	}
 	if contr.Domicile != nil {
 		lc.DomStreetName = contr.Domicile.StreetName
 		lc.DomStreetNumber = contr.Domicile.StreetNumber
 		lc.DomCity = contr.Domicile.City
 		lc.DomProvince = contr.Domicile.CityCode
+		lc.DomPostalCode = contr.Domicile.PostalCode
 	}
 	if contr.Mail != "" {
 		lc.Mail = contr.Mail
@@ -260,6 +279,7 @@ func (li *addendumInsuredDTO) fromPolicy(ins *models.User) {
 			li.StreetName = ins.Residence.StreetName
 			li.StreetNumber = ins.Residence.StreetNumber
 			li.City = ins.Residence.City
+			li.PostalCode = ins.Residence.PostalCode
 			li.Province = ins.Residence.CityCode
 		}
 
@@ -267,6 +287,7 @@ func (li *addendumInsuredDTO) fromPolicy(ins *models.User) {
 			li.DomStreetName = ins.Domicile.StreetName
 			li.DomStreetNumber = ins.Domicile.StreetNumber
 			li.DomCity = ins.Domicile.City
+			li.DomPostalCode = ins.Domicile.PostalCode
 			li.DomProvince = ins.Domicile.CityCode
 		}
 		if ins.Mail != "" {
@@ -286,46 +307,74 @@ func (b *addendumBeneficiaries) fromPolicy(bens *[]models.Beneficiary, opt map[s
 		if i > 1 {
 			break
 		}
-		buf := new(bytes.Buffer)
-		for _, value := range opt {
-			_, _ = fmt.Fprintf(buf, "%s ", value)
-		}
+
+		// TODO: improve me - shouldnt be needed
 		ben := addendumBeneficiaryDTO{
-			Name:         v.Name,
-			Surname:      v.Surname,
-			FiscalCode:   v.FiscalCode,
-			StreetName:   v.Residence.StreetName,
-			StreetNumber: v.Residence.StreetNumber,
-			City:         v.Residence.City,
-			Province:     v.Residence.CityCode,
-			Phone:        v.Phone,
-			Mail:         v.Mail,
-			BirthDate:    (*b)[i].BirthDate,
-			Contactable:  v.IsContactable,
-			Relation:     "\n" + buf.String(),
+			Name:         constants.EmptyField,
+			Surname:      constants.EmptyField,
+			FiscalCode:   constants.EmptyField,
+			StreetName:   constants.EmptyField,
+			StreetNumber: constants.EmptyField,
+			City:         constants.EmptyField,
+			PostalCode:   constants.EmptyField,
+			Province:     constants.EmptyField,
+			Mail:         constants.EmptyField,
+			Relation:     " \n" + constants.EmptyField,
+			BirthDate:    constants.EmptyField,
+			Phone:        constants.EmptyField,
+		}
+		ben.Relation = " \n" + opt[v.BeneficiaryType]
+
+		if v.BeneficiaryType == models.BeneficiaryChosenBeneficiary {
+			if v.Name != "" {
+				ben.Name = v.Name
+			}
+			if v.Surname != "" {
+				ben.Surname = v.Surname
+			}
+			if v.FiscalCode != "" {
+				ben.FiscalCode = v.FiscalCode
+			}
+			if v.FiscalCode != "" {
+				ben.FiscalCode = v.FiscalCode
+			}
+			if v.Phone != "" {
+				ben.Phone = v.Phone
+			}
+			if v.Mail != "" {
+				ben.Mail = v.Mail
+			}
+			ben.Contactable = v.IsContactable
+			if v.Residence != nil {
+				ben.StreetName = v.Residence.StreetName
+				ben.StreetNumber = v.Residence.StreetNumber
+				ben.City = v.Residence.City
+				ben.PostalCode = v.Residence.PostalCode
+				ben.Province = v.Residence.CityCode
+			}
 		}
 		(*b)[i] = ben
 	}
 }
 
 func (br *addendumBeneficiaryReferenceDTO) fromPolicy(benRef *models.User) {
-	if benRef != nil {
-		if benRef.FiscalCode != "" {
-			br.Name = benRef.Name
-			br.Surname = benRef.Surname
-			br.FiscalCode = benRef.FiscalCode
-		}
-		if benRef.Residence != nil {
-			br.StreetName = benRef.Residence.StreetName
-			br.StreetNumber = benRef.Residence.StreetNumber
-			br.City = benRef.Residence.City
-			br.Province = benRef.Residence.CityCode
-		}
-		if benRef.Mail != "" {
-			br.Mail = benRef.Mail
-		}
-		if benRef.Phone != "" {
-			br.Phone = benRef.Phone
-		}
+	*br = *newBeneficiaryReferenceDTO()
+	if benRef.FiscalCode != "" {
+		br.Name = benRef.Name
+		br.Surname = benRef.Surname
+		br.FiscalCode = benRef.FiscalCode
+	}
+	if benRef.Residence != nil {
+		br.StreetName = benRef.Residence.StreetName
+		br.StreetNumber = benRef.Residence.StreetNumber
+		br.City = benRef.Residence.City
+		br.PostalCode = benRef.Residence.PostalCode
+		br.Province = benRef.Residence.CityCode
+	}
+	if benRef.Mail != "" {
+		br.Mail = benRef.Mail
+	}
+	if benRef.Phone != "" {
+		br.Phone = benRef.Phone
 	}
 }

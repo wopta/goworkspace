@@ -2,7 +2,7 @@ package mga
 
 import (
 	"encoding/json"
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
 	"github.com/wopta/goworkspace/lib"
@@ -17,14 +17,14 @@ type GetAllNetworkNodesResponse struct {
 func GetAllNetworkNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var response GetAllNetworkNodesResponse
 
-	log.SetPrefix("[GetAllNetworkNodesFx] ")
-	defer log.SetPrefix("")
+	log.AddPrefix("[GetAllNetworkNodesFx] ")
+	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
 
 	networkNodes, err := network.GetAllNetworkNodes()
 	if err != nil {
-		log.Printf("error getting network nodes: %s", err.Error())
+		log.ErrorF("error getting network nodes: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -37,7 +37,7 @@ func GetAllNetworkNodesFx(w http.ResponseWriter, r *http.Request) (string, inter
 	response.NetworkNodes = networkNodes
 	responseBytes, err := json.Marshal(&response)
 	if err != nil {
-		log.Printf("error marshalling response: %s", err.Error())
+		log.ErrorF("error marshalling response: %s", err.Error())
 		return "", nil, err
 	}
 

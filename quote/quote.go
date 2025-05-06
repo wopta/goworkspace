@@ -1,7 +1,7 @@
 package quote
 
 import (
-	"log"
+	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
@@ -65,7 +65,6 @@ func init() {
 }
 
 func Quote(w http.ResponseWriter, r *http.Request) {
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
 	router := lib.GetRouter("quote", quoteRoutes)
 	router.ServeHTTP(w, r)

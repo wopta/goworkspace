@@ -295,9 +295,9 @@ func (f *Fpdf) GetStringWidth(text string) float64 {
 	return f.pdf.GetStringWidth(text)
 }
 
+// TODO: this shouldnt be a method from the generator but an action invoked by the callee
 func (f *Fpdf) Save(rawDoc []byte, filename string) (string, error) {
-	gsLink := lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, rawDoc)
-	return gsLink, nil
+	return lib.PutToStorageErr(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, rawDoc)
 }
 
 // get a tablecell personalized based on passed opts
@@ -326,6 +326,7 @@ func (e *Fpdf) WriteTexts(tables ...domain.TableCell) {
 	for _, text := range tables {
 		e.RawWriteText(text)
 	}
+	e.NewLine(constants.CellHeight)
 }
 
 func (f *Fpdf) CrossRemainingSpace() {

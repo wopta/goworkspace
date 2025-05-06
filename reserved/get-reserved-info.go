@@ -3,9 +3,9 @@ package reserved
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -38,7 +38,10 @@ func GetReservedInfoByCoverage(policy *models.Policy, origin string) (bool, *mod
 }
 
 func personAssetExecutor(wrapper *PolicyReservedWrapper) (bool, *models.ReservedInfo, error) {
-	log.Println("[personAssetExecutor] start ------------------------------")
+	log.AddPrefix("personAssetExecutor")
+	defer log.PopPrefix()
+
+	log.Println("start ------------------------------")
 
 	var output = ReservedRuleOutput{
 		IsReserved:   wrapper.Policy.IsReserved,
@@ -53,7 +56,7 @@ func personAssetExecutor(wrapper *PolicyReservedWrapper) (bool, *models.Reserved
 
 	isCovered, coveredPolicies, err := wrapper.AlreadyCovered.isCovered(wrapper)
 	if err != nil {
-		log.Printf("[personAssetExecutor] error calculating coverage: %s", err.Error())
+		log.ErrorF("error calculating coverage: %s", err.Error())
 		return false, nil, err
 	}
 
@@ -64,8 +67,8 @@ func personAssetExecutor(wrapper *PolicyReservedWrapper) (bool, *models.Reserved
 		output.ReservedInfo.Reasons = append(output.ReservedInfo.Reasons, reason)
 	}
 	jsonLog, _ := json.Marshal(output)
-	log.Printf("[personAssetExecutor] result: %v", string(jsonLog))
+	log.Printf("result: %v", string(jsonLog))
 
-	log.Println("[personAssetExecutor] end --------------------------------")
+	log.Println("end --------------------------------")
 	return output.IsReserved, output.ReservedInfo, nil
 }
