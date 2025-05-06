@@ -69,8 +69,8 @@ type RequestDTO struct {
 	Splitting           string              `json:"frazionamento"`
 	Emission            string              `json:"emissione"`
 	SalesChannel        string              `json:"canaleVendita"`
-	Contractor          Contractor          `json:"contraente"`
-	LegalRepresentative LegalRepresentative `json:"legaleRappresentante"`
+	Contractor          Contractor          `json:"contraente,omitempty"`
+	LegalRepresentative LegalRepresentative `json:"legaleRappresentante,omitempty"`
 	Asset               AssetRequest        `json:"bene"`
 }
 
@@ -139,7 +139,7 @@ const landslideSlug = "landslide"
 const yes = "si"
 const no = "no"
 
-func (d *RequestDTO) FromPolicy(p *models.Policy) error {
+func (d *RequestDTO) FromPolicy(p *models.Policy, fillEveryField bool) error {
 
 	const catNatProductCode = "007"
 	const catNatDistributorCode = "0155"
@@ -168,57 +168,58 @@ func (d *RequestDTO) FromPolicy(p *models.Policy) error {
 		}
 	}
 
-	var dt string
-	if p.Contractor.Type == "legalEntity" && p.Contractor.FiscalCode == "" {
-		dt = catNatLegalPerson
-	} else {
-		dt = catNatSoleProp
-	}
-	contr := Contractor{
-		PersonalDataType:          dt,
-		CompanyName:               p.Contractor.Name,
-		VatNumber:                 p.Contractor.VatCode,
-		FiscalCode:                p.Contractor.FiscalCode,
-		AtecoCode:                 baseAsset.Building.Ateco,
-		Phone:                     p.Contractor.Phone,
-		Email:                     p.Contractor.Mail,
-		PrivacyConsentDate:        p.StartDate.Format("2006-01-02"),
-		ProcessingConsent:         no,
-		GenericMarketingConsent:   no,
-		MarketingProfilingConsent: no,
-		MarketingActivityConsent:  no,
-		DocumentationFormat:       1,
-	}
-	if p.Contractor.Residence != nil {
-		contr.Address = formatAddress(p.Contractor.Residence)
-		contr.Locality = p.Contractor.Residence.Locality
-		contr.CityCode = p.Contractor.Residence.CityCode
-	}
+	if fillEveryField {
+		var dt string
+		if p.Contractor.Type == "legalEntity" && p.Contractor.FiscalCode == "" {
+			dt = catNatLegalPerson
+		} else {
+			dt = catNatSoleProp
+		}
+		contr := Contractor{
+			PersonalDataType:          dt,
+			CompanyName:               p.Contractor.Name,
+			VatNumber:                 p.Contractor.VatCode,
+			FiscalCode:                p.Contractor.FiscalCode,
+			AtecoCode:                 baseAsset.Building.Ateco,
+			Phone:                     p.Contractor.Phone,
+			Email:                     p.Contractor.Mail,
+			PrivacyConsentDate:        p.StartDate.Format("2006-01-02"),
+			ProcessingConsent:         no,
+			GenericMarketingConsent:   no,
+			MarketingProfilingConsent: no,
+			MarketingActivityConsent:  no,
+			DocumentationFormat:       1,
+		}
+		if p.Contractor.Residence != nil {
+			contr.Address = formatAddress(p.Contractor.Residence)
+			contr.Locality = p.Contractor.Residence.Locality
+			contr.CityCode = p.Contractor.Residence.CityCode
+		}
 
-	d.Contractor = contr
+		d.Contractor = contr
 
-	var legalRep LegalRepresentative
-	if p.Contractors != nil {
-		for _, v := range *p.Contractors {
-			if v.IsSignatory {
-				legalRep.Name = v.Name
-				legalRep.Surname = v.Surname
-				legalRep.FiscalCode = v.FiscalCode
-				legalRep.Phone = v.Phone
-				legalRep.Email = v.Mail
-				if v.Residence != nil {
-					legalRep.Address = formatAddress(v.Residence)
-					legalRep.PostalCode = v.Residence.PostalCode
-					legalRep.Locality = v.Residence.Locality
-					legalRep.CityCode = v.Residence.CityCode
+		var legalRep LegalRepresentative
+		if p.Contractors != nil {
+			for _, v := range *p.Contractors {
+				if v.IsSignatory {
+					legalRep.Name = v.Name
+					legalRep.Surname = v.Surname
+					legalRep.FiscalCode = v.FiscalCode
+					legalRep.Phone = v.Phone
+					legalRep.Email = v.Mail
+					if v.Residence != nil {
+						legalRep.Address = formatAddress(v.Residence)
+						legalRep.PostalCode = v.Residence.PostalCode
+						legalRep.Locality = v.Residence.Locality
+						legalRep.CityCode = v.Residence.CityCode
+					}
+					break
 				}
-				break
 			}
 		}
+
+		d.LegalRepresentative = legalRep
 	}
-
-	d.LegalRepresentative = legalRep
-
 	useTypeMap := map[string]string{
 		"owner-tenant": "si",
 		"tenant":       "no",

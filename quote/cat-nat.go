@@ -40,7 +40,7 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	}
 
 	var cnReq net.RequestDTO
-	err = cnReq.FromPolicy(reqPolicy)
+	err = cnReq.FromPolicy(reqPolicy, false)
 	if err != nil {
 		log.Printf("error building NetInsurance DTO: %s", err.Error())
 		return "", nil, err
