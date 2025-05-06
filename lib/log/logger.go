@@ -160,7 +160,7 @@ func parserMessageLocal(message string, severity SeverityType, prefix []string) 
 	if len(prefix) == 0 {
 		conPrefix = " "
 	}
-	return fmt.Appendf(nil, "%v%v%v\n", formatDate(time.Now()), conPrefix, message), nil
+	return fmt.Append(nil, formatDate(time.Now()), conPrefix, message, "\n"), nil
 }
 
 // Compose the final message using the given parameters to send to Google Cloud
@@ -173,7 +173,7 @@ func parserMessageGoogleCloud(message string, severity SeverityType, prefix []st
 	}
 
 	entry := MessageInformation{
-		fmt.Sprintf("%v%v%v", formatDate(time.Now()), conPrefix, message),
+		fmt.Sprint(conPrefix, message),
 		string(severity),
 	}
 	out, err := json.Marshal(entry)

@@ -68,8 +68,10 @@
 
     # === SET MEMORY BY FUNCTION ===============================================
     mem=256Mb
-    if [[ "${fx_name}" == "broker" ]]; then
+    if [[ "${fx_name}" == "broker" || "${fx_name}" == "quote" || "${fx_name}" == "mga" || "${fx_name}" == "payment" || "${fx_name}" == "callback" || "${fx_name}" == "inclusive" ]]; then
       mem=1Gb
+    elif [[ "${fx_name}" == "companydata" ]]; then
+      mem=2Gb
     fi
 
     # === COPY ASSETS FROM BUCKET ==============================================

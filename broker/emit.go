@@ -230,7 +230,6 @@ func brokerUpdatePolicy(policy *models.Policy, request BrokerBaseRequest) {
 	}
 
 	if policy.TaxAmount == 0 {
-		log.Println("[brokerUpdatePolicy] calculate tax amount")
 		policy.TaxAmount = lib.RoundFloat(policy.PriceGross-policy.PriceNett, 2)
 	}
 

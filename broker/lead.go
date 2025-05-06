@@ -135,11 +135,11 @@ func checkIfPolicyIsLead(policy *models.Policy) error {
 		return nil
 	}
 
-	//allowedStatus := []string{models.PolicyStatusInit, models.PolicyStatusPartnershipLead, models.PolicyStatusInitLead}
-	//	if !slices.Contains(allowedStatus, recoveredPolicy.Status) {
-	//		log.ErrorF("error policy %s is not a lead", policy.Uid)
-	//		return errors.New("policy is not a lead")
-	//	}
+	allowedStatus := []string{models.PolicyStatusInit, models.PolicyStatusPartnershipLead, models.PolicyStatusInitLead}
+	if !slices.Contains(allowedStatus, recoveredPolicy.Status) {
+		log.ErrorF("error policy %s is not a lead", policy.Uid)
+		return errors.New("policy is not a lead")
+	}
 
 	log.Printf("found lead for existing policy %s", policy.Uid)
 

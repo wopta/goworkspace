@@ -337,12 +337,12 @@ func buildWarrantsCompatibilityMap(warrants []models.Warrant) map[string][]strin
 
 func normalizeFields(row []string) []string {
 	trimFields := []int{codeCol, externalNetworkCodeCol, parentUidCol, agencyRuiRegistrationCol, agencyVatCodeCol,
-		agencyPhoneCol, agentVatCodeCol, agentPhoneCol, worksForUidCol}
+		agencyPhoneCol, agentVatCodeCol, agentPhoneCol, worksForUidCol, warrantCol}
 	toUpperFields := []int{mailCol, agencyNameCol, agencyRuiCodeCol, agencyRuiSectionCol, agencyPecCol,
 		agencyWebsiteCol, agencyStreetNameCol, agencyStreetNumberCol, agencyLocalityCol, agencyCityCol,
 		agencyPostalCodeCol, agencyCityCodeCol, agentNameCol, agentSurnameCol, agentFiscalCodeCol, agentRuiCodeCol,
 		agentRuiSectionCol, isMgaProponentCol, hasAnnexCol, isActiveCol, networkNameCol}
-	toLowerFields := []int{typeCol, warrantCol}
+	toLowerFields := []int{typeCol}
 
 	row = lib.SliceMap(row, func(field string) string {
 		if strings.EqualFold(field, "NaN") {

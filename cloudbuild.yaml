@@ -1,11 +1,19 @@
 steps:
-
-- name: 'gcr.io/cloud-builders/gsutil'
-  args: ['cp', 'gs://function-data/env/dev.yaml', '.']
-- name: 'gcr.io/cloud-builders/gsutil'
-  args: ['cp', 'gs://core-350507-function-data/env/prod.yaml', '.']
+- name: gcr.io/cloud-builders/gsutil
+  id: 'Load env variables'
+  env:
+    - '_ENV=$_ENV'
+    - '_PRIVATE_BUCKET_NAME=$_PRIVATE_BUCKET_NAME'
+  args: [
+    'cp',
+    'gs://${_PRIVATE_BUCKET_NAME}/env/${_ENV}.yaml',
+    '.'
+  ]
 - name: gcr.io/cloud-builders/gcloud:latest
-  entrypoint: "bash"
+  id: 'Deploy'
+  entrypoint: 'bash'
+  waitFor:
+    - 'Load env variables'
   args:
   - '-c'
   - | 
@@ -25,25 +33,15 @@ steps:
     tag_version=$(echo "${tag}" | sed -r 's/\./_/g')
     echo "fx_entrypoint: ${fx_entrypoint}"
     echo "tag_version: ${tag_version}"
-    # === RUN DEV =====================================================
-    if [[ "${tag}" == *"dev"* ]]; then
-       chmod +x ./deploy-dev.sh
-       ./deploy-dev.sh ${TAG_NAME} ${fx_name} ${fx_entrypoint} ${tag_version}
-    fi
-    # === RUN UAT =====================================================
-    if [[ "${tag}" == *"uat"* ]]; then
-       chmod +x ./deploy.sh
-       ./deploy.sh ${TAG_NAME} ${fx_name} ${fx_entrypoint} ${tag_version}
-    fi
-    # === RUN PROD ENV VARS ====================================================
+
+    # === SWITCH BY ENV ========================================================
     if [[ "${tag}" == *"prod"* ]]; then
-    chmod +x ./deploy.sh
-       ./deploy.sh ${TAG_NAME} ${fx_name} ${fx_entrypoint} ${tag_version}
+      chmod +x ./deploy.sh
+      ./deploy.sh ${TAG_NAME} ${fx_name} ${fx_entrypoint} ${tag_version}
+    else
+      chmod +x ./deploy-envs.sh
+      ./deploy-envs.sh ${TAG_NAME}
     fi
-    
-- name: gcr.io/cloud-builders/gcloud:latest
-  entrypoint: "ls"
-  args: ["-lah","/workspace"]
 
 options:
   logging: CLOUD_LOGGING_ONLY

@@ -80,22 +80,22 @@ func TestAddPopPrefix(t *testing.T) {
 
 	log.Println("fjklsd")
 	if ok, _ := regexp.MatchString(fmt.Sprintf("%v", "prefix1|prefix2"), string(mockW.sended)); !ok {
-		t.Fatal("no prefix founded")
+		t.Fatal("no prefix found")
 	}
 
 	log.PopPrefix()
 	log.Println("fjklsd")
 	if ok, _ := regexp.MatchString(fmt.Sprintf("%v", `prefix1`), string(mockW.sended)); !ok {
-		t.Fatal("no prefix founded")
+		t.Fatal("no prefix found")
 	}
 	if ok, _ := regexp.MatchString(fmt.Sprintf("%v", `prefix2`), string(mockW.sended)); ok {
-		t.Fatal("prefix founded when it shouldn't")
+		t.Fatal("prefix found when it shouldn't")
 	}
 
 	log.PopPrefix()
 	log.Println("fjklsd")
 	if ok, _ := regexp.MatchString(fmt.Sprintf("%v", `prefix1`), string(mockW.sended)); ok {
-		t.Fatal("prefix founded when it shouldn't")
+		t.Fatal("prefix found when it shouldn't")
 	}
 
 	log.PopPrefix()
@@ -104,10 +104,10 @@ func TestAddPopPrefix(t *testing.T) {
 	log.PopPrefix()
 	log.Println("fjklsd")
 	if ok, _ := regexp.MatchString(fmt.Sprintf("%v", `prefix1`), string(mockW.sended)); ok {
-		t.Fatal("prefix founded when it shouldn't")
+		t.Fatal("prefix found when it shouldn't")
 	}
 	if ok, _ := regexp.MatchString(fmt.Sprintf("%v", `prefix2`), string(mockW.sended)); ok {
-		t.Fatal("prefix founded when it shouldn't")
+		t.Fatal("prefix found when it shouldn't")
 	}
 
 }
