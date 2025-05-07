@@ -17,7 +17,7 @@ func assertEqual[t comparable](a, exp t, test *testing.T, namefield string) {
 }
 func getPrePopulatedPolicyForCatnat() models.Policy {
 	return models.Policy{
-		Name:           "catnat",
+		Name:           "cat-nat",
 		ProductVersion: "v1",
 		Channel:        "mga",
 		Assets: []models.Asset{
