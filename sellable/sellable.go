@@ -32,7 +32,7 @@ var sellableRoutes []lib.Route = []lib.Route{
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
-		Route:   "/v1/catnat/{step}",
+		Route:   "/v1/catnat",
 		Handler: lib.ResponseLoggerWrapper(CatnatFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},

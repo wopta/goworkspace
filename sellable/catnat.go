@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
@@ -29,8 +28,6 @@ func CatnatFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	log.AddPrefix("[CatnatFx]")
 	defer log.PopPrefix()
 	log.Println("Handler start -----------------------------------------------")
-
-	step := chi.URLParam(r, "step")
 
 	defer func() {
 		r.Body.Close()
@@ -55,14 +52,14 @@ func CatnatFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		warrant = networkNode.GetWarrant()
 	}
 
-	if pr, err := catnatSellable(policy, policy.Channel, networkNode, warrant, step); err == nil {
+	if pr, err := catnatSellable(policy, policy.Channel, networkNode, warrant, false); err == nil {
 		js, err := pr.Product.Marshal()
 		return string(js), err, nil
 	}
 	return "", nil, fmt.Errorf("policy not sellable by: %v", err)
 }
 
-func catnatSellable(policy *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant, step string) (*SellableOutput, error) {
+func catnatSellable(policy *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant, lastValidation bool) (*SellableOutput, error) {
 	log.AddPrefix("CatnatSellalble")
 	defer log.PopPrefix()
 
@@ -83,7 +80,7 @@ func catnatSellable(policy *models.Policy, channel string, networkNode *models.N
 	}
 	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, out, in, nil)
 
-	if step != quoteStep {
+	if !lastValidation {
 		out = ruleOutput.(*SellableOutput)
 		log.InfoF(out.Msg)
 		return out, nil

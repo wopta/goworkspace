@@ -43,7 +43,7 @@ func TestCatnatSellableNoAssets(t *testing.T) {
 
 	os.Setenv("env", env.LocalTest)
 	policy.Assets = []models.Asset{}
-	output, err := catnatSellable(&policy, policy.Channel, nil, nil, "fjkds")
+	output, err := catnatSellable(&policy, policy.Channel, nil, nil, false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -58,7 +58,7 @@ func TestCatnatSellableWrongQuoteQuestionsAnswer(t *testing.T) {
 		"isEarthQuakeSelected": false,
 		"isFloodSelected":      false,
 	}
-	output, err := catnatSellable(&policy, policy.Channel, nil, nil, "fjkds")
+	output, err := catnatSellable(&policy, policy.Channel, nil, nil, false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -73,7 +73,7 @@ func TestCatnatSellableEarthQuakeConf(t *testing.T) {
 		"isEarthQuakeSelected": true,
 		"isFloodSelected":      false,
 	}
-	output, err := catnatSellable(&policy, policy.Channel, nil, nil, "fjkds")
+	output, err := catnatSellable(&policy, policy.Channel, nil, nil, false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -101,7 +101,7 @@ func TestCatnatSellableFlood(t *testing.T) {
 		"isEarthQuakeSelected": false,
 		"isFloodSelected":      true,
 	}
-	output, err := catnatSellable(&policy, policy.Channel, nil, nil, "fjkds")
+	output, err := catnatSellable(&policy, policy.Channel, nil, nil, false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -124,7 +124,7 @@ func TestCatnatSellableLandSlideWithQuoteAndNOConf(t *testing.T) {
 		"isEarthQuakeSelected": false,
 		"isFloodSelected":      true,
 	}
-	output, err := catnatSellable(&policy, policy.Channel, nil, nil, "quote")
+	output, err := catnatSellable(&policy, policy.Channel, nil, nil, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -140,7 +140,7 @@ func TestCatnatSellableLandSlideWithQuoteOnlyFabricato(t *testing.T) {
 		"isEarthQuakeSelected": false,
 		"isFloodSelected":      true,
 	}
-	output, err := catnatSellable(&policy, policy.Channel, nil, nil, "quote")
+	output, err := catnatSellable(&policy, policy.Channel, nil, nil, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -158,7 +158,7 @@ func TestCatnatSellableLandSlideWithQuote(t *testing.T) {
 		"isEarthQuakeSelected": false,
 		"isFloodSelected":      true,
 	}
-	output, err := catnatSellable(&policy, policy.Channel, nil, nil, "quote")
+	output, err := catnatSellable(&policy, policy.Channel, nil, nil, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -180,7 +180,7 @@ func TestCatnatSellable(t *testing.T) {
 		"isEarthQuakeSelected": false,
 		"isFloodSelected":      true,
 	}
-	output, err := catnatSellable(&policy, policy.Channel, nil, nil, "quote")
+	output, err := catnatSellable(&policy, policy.Channel, nil, nil, true)
 	if err != nil {
 		t.Fatal(err)
 	}
