@@ -52,14 +52,14 @@ func CatnatFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		warrant = networkNode.GetWarrant()
 	}
 
-	if pr, err := catnatSellable(policy, policy.Channel, networkNode, warrant, false); err == nil {
+	if pr, err := CatnatSellable(policy, policy.Channel, networkNode, warrant, false); err == nil {
 		js, err := pr.Product.Marshal()
 		return string(js), err, nil
 	}
 	return "", nil, fmt.Errorf("policy not sellable by: %v", err)
 }
 
-func catnatSellable(policy *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant, lastValidation bool) (*SellableOutput, error) {
+func CatnatSellable(policy *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant, lastValidation bool) (*SellableOutput, error) {
 	log.AddPrefix("CatnatSellalble")
 	defer log.PopPrefix()
 
