@@ -25,7 +25,7 @@ func CatnatFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		policy *models.Policy
 		err    error
 	)
-	log.AddPrefix("[CatnatFx]")
+	log.AddPrefix("CatnatFx")
 	defer log.PopPrefix()
 	log.Println("Handler start -----------------------------------------------")
 
