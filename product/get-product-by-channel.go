@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
+	"os"
 	"regexp"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/wopta/goworkspace/lib/log"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -65,11 +67,19 @@ func getDefaultProduct(productName, channel string) *models.Product {
 	var (
 		result, product *models.Product
 	)
+
 	log.AddPrefix("GetDefaultProduct")
 	defer log.PopPrefix()
 	log.Println("function start --------------")
+	var filesList []string
+	var err error
 
-	filesList, err := lib.ListGoogleStorageFolderContent(fmt.Sprintf("%s/%s/", models.ProductsFolder, productName))
+	if os.Getenv("env") == "local" {
+		filesList, err = lib.ListLocalFolderContent(fmt.Sprintf("%s/%s/", models.ProductsFolder, productName))
+	} else {
+		filesList, err = lib.ListGoogleStorageFolderContent(fmt.Sprintf("%s/%s/", models.ProductsFolder, productName))
+	}
+
 	if err != nil {
 		log.ErrorF("error: %s", err.Error())
 		return nil
