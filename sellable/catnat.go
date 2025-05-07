@@ -32,12 +32,11 @@ func CatnatFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	defer func() {
 		r.Body.Close()
 		if err != nil {
-			log.Printf("error: %s", err.Error())
+			log.Error(err)
 		}
 		log.Println("Handler end ---------------------------------------------")
 	}()
 
-	log.Println("error decoding request body")
 	if err = json.NewDecoder(r.Body).Decode(&policy); err != nil {
 		return "", nil, err
 	}
