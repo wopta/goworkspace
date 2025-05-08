@@ -102,7 +102,7 @@ func CatnatSellable(policy *models.Policy, channel string, networkNode *models.N
 	}
 	if g, err := policy.ExtractGuarantee("landslides"); err == nil {
 		if g.Value == nil || !isContenutoAndFabricato(g.Value) {
-			out.Msg += "You need atleast fabricato and contenuto for landslides"
+			out.Msg += "You need atleast fabricato and contenuto for landslides,"
 		}
 	} else {
 		out.Msg += ("you must have landslides")
@@ -111,12 +111,12 @@ func CatnatSellable(policy *models.Policy, channel string, networkNode *models.N
 
 	if g, err := policy.ExtractGuarantee("earthquake"); err == nil {
 		if policy.QuoteQuestions["isEarthquakeSelected"].(bool) && (g.Value == nil || !isContenutoAndFabricato(g.Value)) {
-			out.Msg += "You need atleast fabricato and contenuto for earthquake"
+			out.Msg += "You need atleast fabricato and contenuto for earthquake,"
 		}
 	}
 	if g, err := policy.ExtractGuarantee("flood"); err == nil {
 		if policy.QuoteQuestions["isFloodSelected"].(bool) && (g.Value == nil || !isContenutoAndFabricato(g.Value)) {
-			out.Msg += "You need atleast fabricato and contenuto for flood"
+			out.Msg += "You need atleast fabricato and contenuto for flood,"
 		}
 	}
 	out = ruleOutput.(*SellableOutput)
