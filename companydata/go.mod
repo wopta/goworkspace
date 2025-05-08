@@ -12,12 +12,12 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/oliveagle/jsonpath v0.0.0-20180606110733-2e52cf6e6852
 	github.com/wopta/goworkspace/inclusive v0.0.5
-	github.com/wopta/goworkspace/lib v1.0.144
-	github.com/wopta/goworkspace/mail v1.0.155
-	github.com/wopta/goworkspace/models v1.2.40
-	github.com/wopta/goworkspace/network v1.0.105
-	github.com/wopta/goworkspace/product v1.1.37
-	github.com/wopta/goworkspace/user v1.0.140
+	github.com/wopta/goworkspace/lib v1.0.145
+	github.com/wopta/goworkspace/mail v1.0.156
+	github.com/wopta/goworkspace/models v1.2.41
+	github.com/wopta/goworkspace/network v1.0.106
+	github.com/wopta/goworkspace/product v1.1.38
+	github.com/wopta/goworkspace/user v1.0.141
 	github.com/xuri/excelize/v2 v2.9.0
 	google.golang.org/api v0.206.0
 )
