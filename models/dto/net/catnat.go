@@ -1,7 +1,6 @@
 package net
 
 import (
-	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -253,8 +252,8 @@ func (d *RequestDTO) FromPolicy(p *models.Policy, fillEveryField bool) error {
 	}
 	asset := AssetRequest{
 		ContractorAndTenant:  useTypeMap[baseAsset.Building.UseType],
-		EarthquakeCoverage:   quoteQuestionMap[p.QuoteQuestions["hasEarthquake"].(bool)],
-		FloodCoverage:        quoteQuestionMap[p.QuoteQuestions["hasFlood"].(bool)],
+		EarthquakeCoverage:   quoteQuestionMap[p.QuoteQuestions["isEarthQuakeSelected"].(bool)],
+		FloodCoverage:        quoteQuestionMap[p.QuoteQuestions["isFloodSelected"].(bool)],
 		EarthquakePurchase:   no,
 		FloodPurchase:        no,
 		LandSlidePurchase:    no,
@@ -264,7 +263,6 @@ func (d *RequestDTO) FromPolicy(p *models.Policy, fillEveryField bool) error {
 		LowestFloor:          lowestFloorMap[baseAsset.Building.LowestFloor],
 		GuaranteeList:        make([]GuaranteeList, 0),
 	}
-	log.ErrorF("", asset)
 	if baseAsset.Building.BuildingAddress != nil {
 		asset.PostalCode = baseAsset.Building.BuildingAddress.PostalCode
 		asset.Address = formatAddress(baseAsset.Building.BuildingAddress)
