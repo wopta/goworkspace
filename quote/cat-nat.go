@@ -79,7 +79,10 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	_ = resp.ToPolicy(reqPolicy)
 
 	networkNode := network.GetNetworkNodeByUid(reqPolicy.ProducerUid)
-	warrant := networkNode.GetWarrant()
+	var warrant *models.Warrant
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+	}
 	product := prd.GetProductV2(reqPolicy.Name, reqPolicy.ProductVersion, reqPolicy.Channel, networkNode, warrant)
 	addConsultacyPrice(reqPolicy, product)
 
