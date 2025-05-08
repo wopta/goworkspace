@@ -53,7 +53,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	origin := r.Header.Get("origin")
 	policyUid := chi.URLParam(r, "policyUid")
-	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
+	firePolicy := lib.PolicyCollection
 
 	log.Printf("Policy Uid %s", policyUid)
 

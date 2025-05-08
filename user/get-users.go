@@ -52,7 +52,7 @@ func GetUsersFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		limitValue = req.Limit
 	}
 
-	fireUser := lib.GetDatasetByEnv(r.Header.Get("origin"), lib.UserCollection)
+	fireUser := lib.UserCollection
 
 	fireQueries := lib.Firequeries{
 		Queries: make([]lib.Firequery, 0),
@@ -104,7 +104,7 @@ func GetUserByAuthIdFx(resp http.ResponseWriter, r *http.Request) (string, inter
 }
 
 func GetUserByAuthId(origin, authId string) (models.User, error) {
-	fireUsers := lib.GetDatasetByEnv(origin, lib.UserCollection)
+	fireUsers := lib.UserCollection
 	userFirebase := lib.WhereLimitFirestore(fireUsers, "authId", "==", authId, 1)
 	return models.FirestoreDocumentToUser(userFirebase)
 }

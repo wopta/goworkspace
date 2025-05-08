@@ -16,7 +16,7 @@ func GetTransactionByUid(transactionUid, origin string) *models.Transaction {
 		err         error
 	)
 
-	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
+	fireTransactions := models.TransactionsCollection
 	docsnap, err := lib.GetFirestoreErr(fireTransactions, transactionUid)
 	if err != nil {
 		log.ErrorF("error getting transaction from firestore: %s", err.Error())

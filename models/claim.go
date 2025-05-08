@@ -60,7 +60,7 @@ func (claim *Claim) BigquerySave(origin string) error {
 	claim.Data = string(data)
 
 	log.Println("claim save big query: " + claim.ClaimUid)
-	table := lib.GetDatasetByEnv(origin, ClaimsCollection)
+	table := ClaimsCollection
 
 	return lib.InsertRowsBigQuery(WoptaDataset, table, claim)
 }

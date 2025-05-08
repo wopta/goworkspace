@@ -29,7 +29,7 @@ func SetCoverageReservedFx(w http.ResponseWriter, r *http.Request) (string, inte
 
 	origin := r.Header.Get("Origin")
 	policyUid := chi.URLParam(r, "policyUid")
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	firePolicy := models.PolicyCollection
 
 	log.Printf("getting policy %s from firestore...", policyUid)
 	originalPolicy, err := plc.GetPolicy(policyUid, origin)

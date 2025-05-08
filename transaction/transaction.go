@@ -69,7 +69,7 @@ func SetPolicyFirstTransactionPaid(policyUid string, scheduleDate string, origin
 			},
 		},
 	}
-	fireTransactions := lib.GetDatasetByEnv(origin, "transactions")
+	fireTransactions := "transactions"
 	query, _ := q.FirestoreWherefields(fireTransactions)
 	transactions := models.TransactionToListData(query)
 	transaction := transactions[0]
@@ -172,7 +172,7 @@ func getTransactionByPolicyUidAndScheduleDate(policyUid, scheduleDate, collectio
 }
 
 func Pay(transaction *models.Transaction, origin, paymentMethod string) error {
-	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
+	fireTransactions := models.TransactionsCollection
 
 	transaction.IsDelete = false
 	transaction.IsPay = true

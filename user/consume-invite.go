@@ -52,7 +52,7 @@ func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 	log.Printf("Consuming invite %s", inviteUid)
 
 	// Get the invite
-	collection := lib.GetDatasetByEnv(origin, lib.InvitesCollection)
+	collection := lib.InvitesCollection
 	docSnapshot, err := lib.GetFirestoreErr(collection, inviteUid)
 	if err != nil {
 		log.ErrorF("error retrieving data from firestore: %s", err.Error())
@@ -76,7 +76,7 @@ func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 	collection = ""
 	switch invite.Role {
 	case models.UserRoleAgent:
-		collection = lib.GetDatasetByEnv(origin, models.AgentCollection)
+		collection = models.AgentCollection
 		docUid = lib.NewDoc(collection) + "_agent"
 		agentRecord, err := lib.CreateUserWithEmailAndPassword(invite.Email, password, &docUid)
 		if err != nil {
@@ -84,7 +84,7 @@ func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 		}
 		createAgent(collection, origin, agentRecord, invite)
 	case models.UserRoleAgency:
-		collection = lib.GetDatasetByEnv(origin, models.AgencyCollection)
+		collection = models.AgencyCollection
 		docUid = lib.NewDoc(collection) + "_agency"
 		agencyRecord, err := lib.CreateUserWithEmailAndPassword(invite.Email, password, &docUid)
 		if err != nil {
@@ -92,7 +92,7 @@ func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 		}
 		createAgency(collection, origin, agencyRecord, invite)
 	default:
-		collection = lib.GetDatasetByEnv(origin, lib.UserCollection)
+		collection = lib.UserCollection
 		userRecord, err := lib.CreateUserWithEmailAndPassword(invite.Email, password, &docUid)
 		if err != nil {
 			return false, err
@@ -102,7 +102,7 @@ func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 
 	// update the invite to consumed
 	invite.Consumed = true
-	invitesCollectionName := lib.GetDatasetByEnv(origin, lib.InvitesCollection)
+	invitesCollectionName := lib.InvitesCollection
 	lib.SetFirestore(invitesCollectionName, invite.Uid, invite)
 
 	log.Printf("Consumed invite with uid %s", invite.Uid)

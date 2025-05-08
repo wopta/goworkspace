@@ -37,7 +37,7 @@ func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface
 	onboardUserRequest.FiscalCode = lib.ToUpper(onboardUserRequest.FiscalCode)
 
 	origin := r.Header.Get("Origin")
-	fireUser := lib.GetDatasetByEnv(origin, lib.UserCollection)
+	fireUser := lib.UserCollection
 
 	canRegister, user, userId, email := CanUserRegisterUseCase(onboardUserRequest.FiscalCode)
 

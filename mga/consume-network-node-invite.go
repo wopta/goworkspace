@@ -61,7 +61,7 @@ func consumeNetworkNodeInvite(origin, inviteUid, password string) error {
 	defer log.PopPrefix()
 	log.Printf("getting invite %s from Firestore...", inviteUid)
 
-	fireInvites := lib.GetDatasetByEnv(origin, models.InvitesCollection)
+	fireInvites := models.InvitesCollection
 	docsnap, err := lib.GetFirestoreErr(fireInvites, inviteUid)
 	if err != nil {
 		log.ErrorF("error getting invite %s from Firestore", inviteUid)
@@ -98,7 +98,7 @@ func consumeNetworkNodeInvite(origin, inviteUid, password string) error {
 
 	log.Printf("updating network node %s in Firestore...", networkNode.Uid)
 
-	fireNetworkNode := lib.GetDatasetByEnv(origin, models.NetworkNodesCollection)
+	fireNetworkNode := models.NetworkNodesCollection
 	err = lib.SetFirestoreErr(fireNetworkNode, networkNode.Uid, networkNode)
 	if err != nil {
 		log.ErrorF("error update network node %s in Firestore", networkNode.Uid)

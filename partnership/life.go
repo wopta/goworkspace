@@ -262,7 +262,7 @@ func savePartnershipLead(policy *models.Policy, node *models.NetworkNode, origin
 
 	log.Println("start --------------------------------------------")
 
-	policyFire := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
+	policyFire := lib.PolicyCollection
 
 	policy.Channel = lib.ECommerceChannel
 	now := time.Now().UTC()

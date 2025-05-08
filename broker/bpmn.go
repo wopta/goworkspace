@@ -149,7 +149,7 @@ func setProposalBpm(state *bpmn.State) error {
 
 	log.Printf("saving proposal n. %d to firestore...", policy.ProposalNumber)
 
-	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
+	firePolicy := lib.PolicyCollection
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
@@ -197,7 +197,7 @@ func setRequestApprovalBpmn(state *bpmn.State) error {
 	policy := state.Data
 	log.AddPrefix("SendRequestApproval")
 	defer log.PopPrefix()
-	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
+	firePolicy := lib.PolicyCollection
 
 	setRequestApprovalData(policy)
 
@@ -249,7 +249,7 @@ func addEmitHandlers(state *bpmn.State) {
 }
 
 func emitData(state *bpmn.State) error {
-	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
+	firePolicy := lib.PolicyCollection
 	policy := state.Data
 	emitBase(policy, origin)
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)

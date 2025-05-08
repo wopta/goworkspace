@@ -88,7 +88,7 @@ func (agent *Agent) BigquerySave(origin string) error {
 	}
 	agent.Data = string(data) // includes agent.User data
 
-	table := lib.GetDatasetByEnv(origin, AgentCollection)
+	table := AgentCollection
 	log.Println("agent save big query: " + agent.Uid)
 
 	return lib.InsertRowsBigQuery(WoptaDataset, table, agent)
@@ -140,7 +140,7 @@ func UpdateAgentPortfolio(policy *Policy, origin string) error {
 	}
 
 	var agent Agent
-	fireAgent := lib.GetDatasetByEnv(origin, AgentCollection)
+	fireAgent := AgentCollection
 	docsnap, err := lib.GetFirestoreErr(fireAgent, policy.AgentUid)
 	if err != nil {
 		log.ErrorF("ERROR getting agent from firestore: %s", err.Error())

@@ -61,7 +61,7 @@ func (agency *Agency) BigquerySave(origin string) error {
 	data, _ := json.Marshal(agency)
 	agency.Data = string(data)
 
-	table := lib.GetDatasetByEnv(origin, AgencyCollection)
+	table := AgencyCollection
 	log.Println("save big query: " + agency.Uid)
 
 	return lib.InsertRowsBigQuery(WoptaDataset, table, agency)
@@ -114,7 +114,7 @@ func UpdateAgencyPortfolio(policy *Policy, origin string) error {
 	}
 
 	var agency Agency
-	fireAgency := lib.GetDatasetByEnv(origin, AgencyCollection)
+	fireAgency := AgencyCollection
 	docsnap, err := lib.GetFirestoreErr(fireAgency, policy.AgencyUid)
 	if err != nil {
 		log.ErrorF("error getting agency from firestore: %s", err.Error())

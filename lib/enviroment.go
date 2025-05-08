@@ -1,10 +1,11 @@
 package lib
 
 import (
-	"github.com/wopta/goworkspace/lib/log"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/wopta/goworkspace/lib/log"
 )
 
 func GetDatasetByContractorName(name string, dataset string) string {
@@ -19,6 +20,7 @@ func GetDatasetByContractorName(name string, dataset string) string {
 	return result
 }
 
+// DEPRECATED
 func GetDatasetByEnv(origin string, dataset string) string {
 	var result string
 	if strings.Contains(origin, "uat") {

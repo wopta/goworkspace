@@ -127,7 +127,7 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) {
 	if newUser {
 		policy.Contractor.CreationDate = time.Now().UTC()
 		policy.Contractor.UpdatedDate = policy.Contractor.CreationDate
-		fireUsers := lib.GetDatasetByEnv(origin, lib.UserCollection)
+		fireUsers := lib.UserCollection
 		lib.SetFirestore(fireUsers, userUID, policy.Contractor)
 		err = policy.Contractor.BigquerySave(origin)
 		if err != nil {
