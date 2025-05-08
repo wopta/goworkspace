@@ -1,20 +1,20 @@
 package models
 
 type Asset struct {
-	Name                   string      `firestore:"name,omitempty" json:"name,omitempty"`
-	Type                   string      `firestore:"type,omitempty" json:"type,omitempty"`
-	Uuid                   string      `firestore:"uuid,omitempty" json:"uuid,omitempty"`
-	Building               *Building   `firestore:"building,omitempty" json:"building,omitempty"`
-	Person                 *User       `firestore:"person,omitempty" json:"person,omitempty"`
-	Enterprise             *Enterprise `firestore:"enterprise,omitempty" json:"enterprise,omitempty"`
-	IsContractor           bool        `firestore:"isContractor,omitempty" json:"isContractor,omitempty"`
-	Guarantees             []Guarante  `firestore:"guarantees,omitempty" json:"guarantees,omitempty"`
-	Vehicle                *Vehicle    `firestore:"vehicle,omitempty" json:"vehicle,omitempty"`
-	TypeUseOfAsset         *string     `firestore:"typeUseOfAsset,omitempty" json:"typeUseOfAsset,omitempty"`
-	NumberOfFloors         *int        `firestore:"numberOfFloors,omitempty" json:"numberOfFloors,omitempty"`
-	GroundFloor            *string     `firestore:"groundFloor,omitempty" json:"groundFloor,omitempty"`
-	CatastrophicEarthQuake *bool       `firestore:"catastrophicEarthQuake,omitempty" json:"catastrophicEarthQuake,omitempty"`
-	CatastrophicFlood      *bool       `firestore:"catastrophicFlood,omitempty" json:"catastrophicEarthFlood,omitempty"`
+	Name                 string      `firestore:"name,omitempty" json:"name,omitempty"`
+	Type                 string      `firestore:"type,omitempty" json:"type,omitempty"`
+	Uuid                 string      `firestore:"uuid,omitempty" json:"uuid,omitempty"`
+	Building             *Building   `firestore:"building,omitempty" json:"building,omitempty"`
+	Person               *User       `firestore:"person,omitempty" json:"person,omitempty"`
+	Enterprise           *Enterprise `firestore:"enterprise,omitempty" json:"enterprise,omitempty"`
+	IsContractor         bool        `firestore:"isContractor,omitempty" json:"isContractor,omitempty"`
+	Guarantees           []Guarante  `firestore:"guarantees,omitempty" json:"guarantees,omitempty"`
+	Vehicle              *Vehicle    `firestore:"vehicle,omitempty" json:"vehicle,omitempty"`
+	TypeUseOfAsset       *string     `firestore:"typeUseOfAsset,omitempty" json:"typeUseOfAsset,omitempty"`
+	RangeNumbesrOfFloors *string     `firestore:"rangeNumbersOfFloors,omitempty" json:"rangeNumbersOfFloors,omitempty"`
+	GroundFloor          *string     `firestore:"theGroundFloor,omitempty" json:"theGroundFloor,omitempty"`
+	EarthquakeCoverage   *bool       `firestore:"earthquakeCoverage,omitempty" json:"earthquakeCoverage,omitempty"`
+	FloodCoverage        *bool       `firestore:"floodCoverage,omitempty" json:"floodCoverage,omitempty"`
 }
 
 type Building struct {
