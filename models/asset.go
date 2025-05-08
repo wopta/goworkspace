@@ -41,6 +41,8 @@ type Building struct {
 	HasSandwichPanel bool     `firestore:"hasSandwichPanel" json:"hasSandwichPanel"`
 	HasSprinkler     bool     `firestore:"hasSprinkler" json:"hasSprinkler"`
 	BuildingAddress  *Address `firestore:"buildingAddress,omitempty" json:"buildingAddress,omitempty"`
+	UseType          string   `firestore:"useType,omitempty" json:"useType,omitempty"`
+	LowestFloor      string   `firestore:"lowestFloor,omitempty" json:"lowestFloor,omitempty"`
 }
 
 type Enterprise struct {

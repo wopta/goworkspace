@@ -3,11 +3,11 @@ package client
 import (
 	"bytes"
 	"encoding/json"
-	"log"
 	"net/http"
 	"os"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models/dto/net"
 )
 
@@ -31,6 +31,7 @@ func (c *NetClient) Quote(dto net.RequestDTO) (net.ResponseDTO, *net.ErrorRespon
 	url := "https://apigatewaydigital.netinsurance.it/PolizzeGateway24/emettiPolizza/441-029-007"
 	rBuff := new(bytes.Buffer)
 	err := json.NewEncoder(rBuff).Encode(dto)
+
 	if err != nil {
 		return net.ResponseDTO{}, nil, err
 	}
@@ -47,14 +48,14 @@ func (c *NetClient) Quote(dto net.RequestDTO) (net.ResponseDTO, *net.ErrorRespon
 			Errors: make(map[string]any),
 		}
 		if err = json.NewDecoder(resp.Body).Decode(&errResp); err != nil {
-			log.Println("error decoding catnat error response")
+			log.ErrorF("error decoding catnat error response")
 			return net.ResponseDTO{}, nil, err
 		}
 		return net.ResponseDTO{}, &errResp, nil
 	}
 	cndto := net.ResponseDTO{}
 	if err = json.NewDecoder(resp.Body).Decode(&cndto); err != nil {
-		log.Println("error decoding catnat response")
+		log.ErrorF("error decoding catnat response")
 		return net.ResponseDTO{}, nil, err
 	}
 

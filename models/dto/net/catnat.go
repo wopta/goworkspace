@@ -1,6 +1,7 @@
 package net
 
 import (
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -69,8 +70,8 @@ type RequestDTO struct {
 	Splitting           string              `json:"frazionamento"`
 	Emission            string              `json:"emissione"`
 	SalesChannel        string              `json:"canaleVendita"`
-	Contractor          Contractor          `json:"contraente,omitempty"`
-	LegalRepresentative LegalRepresentative `json:"legaleRappresentante,omitempty"`
+	Contractor          Contractor          `json:"contraente"`
+	LegalRepresentative LegalRepresentative `json:"legaleRappresentante"`
 	Asset               AssetRequest        `json:"bene"`
 }
 
@@ -250,9 +251,8 @@ func (d *RequestDTO) FromPolicy(p *models.Policy, fillEveryField bool) error {
 		true:  "si",
 		false: "no",
 	}
-
 	asset := AssetRequest{
-		ContractorAndTenant:  useTypeMap[baseAsset.Building.Type],
+		ContractorAndTenant:  useTypeMap[baseAsset.Building.UseType],
 		EarthquakeCoverage:   quoteQuestionMap[p.QuoteQuestions["hasEarthquake"].(bool)],
 		FloodCoverage:        quoteQuestionMap[p.QuoteQuestions["hasFlood"].(bool)],
 		EarthquakePurchase:   no,
@@ -261,10 +261,10 @@ func (d *RequestDTO) FromPolicy(p *models.Policy, fillEveryField bool) error {
 		ConstructionMaterial: buildingMaterialMap[baseAsset.Building.BuildingMaterial],
 		ConstructionYear:     buildingYearMap[baseAsset.Building.BuildingYear],
 		FloorNumber:          floorMap[baseAsset.Building.Floor],
-		LowestFloor:          lowestFloorMap[baseAsset.Building.Floor],
+		LowestFloor:          lowestFloorMap[baseAsset.Building.LowestFloor],
 		GuaranteeList:        make([]GuaranteeList, 0),
 	}
-
+	log.ErrorF("", asset)
 	if baseAsset.Building.BuildingAddress != nil {
 		asset.PostalCode = baseAsset.Building.BuildingAddress.PostalCode
 		asset.Address = formatAddress(baseAsset.Building.BuildingAddress)
@@ -331,6 +331,9 @@ func (d *ResponseDTO) ToPolicy(p *models.Policy) error {
 	fOffer := make(map[string]*models.GuaranteValue)
 	lOffer := make(map[string]*models.GuaranteValue)
 
+	eOffer["default"] = new(models.GuaranteValue)
+	fOffer["default"] = new(models.GuaranteValue)
+	lOffer["default"] = new(models.GuaranteValue)
 	for _, a := range d.AssetDetail {
 		for _, g := range a.GuaranteeDetail {
 			if g.GuaranteeCode == earthquakeBuildingCode {
@@ -376,10 +379,14 @@ func (d *ResponseDTO) ToPolicy(p *models.Policy) error {
 			}
 		}
 	}
-
 	p.PriceGross = d.AnnualGross
 	p.PriceNett = d.AnnualNet
 	p.TaxAmount = d.AnnualTax
+	p.OffersPrices = map[string]map[string]*models.Price{
+		"default": {
+			"yearly": &models.Price{},
+		},
+	}
 	p.OffersPrices["default"]["yearly"].Gross = p.PriceGross
 	p.OffersPrices["default"]["yearly"].Net = p.PriceNett
 	p.OffersPrices["default"]["yearly"].Tax = p.TaxAmount
