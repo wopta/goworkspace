@@ -2,8 +2,9 @@ package quote
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
+
+	"github.com/wopta/goworkspace/lib/log"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -19,14 +20,14 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		reqPolicy *models.Policy
 	)
 
-	log.SetPrefix("[CatNatFx] ")
+	log.AddPrefix("[CatNatFx] ")
 	defer func() {
 		r.Body.Close()
 		if err != nil {
 			log.Printf("error: %s", err.Error())
 		}
 		log.Println("Handler end ---------------------------------------------")
-		log.SetPrefix("")
+		log.PopPrefix()
 	}()
 	log.Println("Handler start -----------------------------------------------")
 
