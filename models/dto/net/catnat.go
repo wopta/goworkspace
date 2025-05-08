@@ -134,7 +134,7 @@ const landslideStockCode = landslideCode + stockCode
 
 const earthquakeSlug = "earthquake"
 const floodSlug = "flood"
-const landslideSlug = "landslide"
+const landslideSlug = "landslides"
 
 const yes = "si"
 const no = "no"
@@ -252,7 +252,7 @@ func (d *RequestDTO) FromPolicy(p *models.Policy, fillEveryField bool) error {
 	}
 	asset := AssetRequest{
 		ContractorAndTenant:  useTypeMap[baseAsset.Building.UseType],
-		EarthquakeCoverage:   quoteQuestionMap[p.QuoteQuestions["isEarthQuakeSelected"].(bool)],
+		EarthquakeCoverage:   quoteQuestionMap[p.QuoteQuestions["isEarthquakeSelected"].(bool)],
 		FloodCoverage:        quoteQuestionMap[p.QuoteQuestions["isFloodSelected"].(bool)],
 		EarthquakePurchase:   no,
 		FloodPurchase:        no,

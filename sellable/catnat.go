@@ -84,21 +84,24 @@ func CatnatSellable(policy *models.Policy, channel string, networkNode *models.N
 		log.InfoF(out.Msg)
 		return out, nil
 	}
-
+	if len(out.Msg) != 0 {
+		out = ruleOutput.(*SellableOutput)
+		return nil, errors.New(out.Msg)
+	}
 	//you must have both SumInsuredTextField(Fabricato) and SumInsuredLimitOfIndemnityTextField(Contenuto)
-	isContenutoAndFabricato := func(conf *models.GuaranteConfig) bool {
-		val := conf.SumInsuredTextField
-		if val == nil || len(val.Values) == 0 || val.Values[0] == 0 {
+	isContenutoAndFabricato := func(value *models.GuaranteValue) bool {
+		val := value.SumInsured
+		if val == 0 {
 			return false
 		}
-		val = conf.SumInsuredLimitOfIndemnityTextField
-		if val == nil || len(val.Values) == 0 || val.Values[0] == 0 {
+		val = value.SumInsuredLimitOfIndemnity
+		if val == 0 {
 			return false
 		}
 		return true
 	}
 	if g, err := policy.ExtractGuarantee("landslides"); err == nil {
-		if product.Companies[0].GuaranteesMap["landslides"].IsSelected && (g.Config == nil || !isContenutoAndFabricato(g.Config)) {
+		if g.Value == nil || !isContenutoAndFabricato(g.Value) {
 			out.Msg += "You need atleast fabricato and contenuto for landslides"
 		}
 	} else {
@@ -106,13 +109,13 @@ func CatnatSellable(policy *models.Policy, channel string, networkNode *models.N
 		return out, err
 	}
 
-	if g, err := policy.ExtractGuarantee("earthQuake"); err == nil {
-		if product.Companies[0].GuaranteesMap["earthQuake"].IsSelected && (g.Config == nil || !isContenutoAndFabricato(g.Config)) {
+	if g, err := policy.ExtractGuarantee("earthquake"); err == nil {
+		if policy.QuoteQuestions["isEarthquakeSelected"].(bool) && (g.Value == nil || !isContenutoAndFabricato(g.Value)) {
 			out.Msg += "You need atleast fabricato and contenuto for earthquake"
 		}
 	}
 	if g, err := policy.ExtractGuarantee("flood"); err == nil {
-		if product.Companies[0].GuaranteesMap["flood"].IsSelected && (g.Config == nil || !isContenutoAndFabricato(g.Config)) {
+		if policy.QuoteQuestions["isFloodSelected"].(bool) && (g.Value == nil || !isContenutoAndFabricato(g.Value)) {
 			out.Msg += "You need atleast fabricato and contenuto for flood"
 		}
 	}
@@ -124,11 +127,11 @@ func getCatnatInputRules(p *models.Policy) ([]byte, error) {
 	var res []byte
 	out := make(map[string]any)
 	locationlen := 0
-	out["isEarthQuakeSelected"] = false
+	out["isEarthquakeSelected"] = false
 	out["isFloodSelected"] = false
 
-	if val, ok := p.QuoteQuestions["isEarthQuakeSelected"]; ok {
-		out["isEarthQuakeSelected"] = val
+	if val, ok := p.QuoteQuestions["isEarthquakeSelected"]; ok {
+		out["isEarthquakeSelected"] = val
 	}
 	if val, ok := p.QuoteQuestions["isFloodSelected"]; ok {
 		out["isFloodSelected"] = val

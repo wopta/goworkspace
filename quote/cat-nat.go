@@ -2,9 +2,11 @@ package quote
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/wopta/goworkspace/lib/log"
+	"github.com/wopta/goworkspace/sellable"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -41,11 +43,23 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		log.Println("error decoding request body")
 		return "", nil, err
 	}
+	networkNode := network.GetNetworkNodeByUid(reqPolicy.ProducerUid)
+	var warrant *models.Warrant
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+	}
 
+	outSellable, err := sellable.CatnatSellable(reqPolicy, reqPolicy.Channel, networkNode, warrant, true)
+	if err != nil {
+		return "", nil, err
+	}
+	if len(outSellable.Msg) != 0 {
+		return "", nil, errors.New(outSellable.Msg)
+	}
 	var cnReq net.RequestDTO
 	err = cnReq.FromPolicy(reqPolicy, false)
 	if err != nil {
-		log.Printf("error building NetInsurance DTO: %s", err.Error())
+		log.ErrorF("error building NetInsurance DTO: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -54,14 +68,14 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 	resp, errResp, err := netClient.Quote(cnReq)
 	if err != nil {
-		log.Printf("error calling NetInsurance api: %s", err.Error())
+		log.ErrorF("error calling NetInsurance api: %s", err.Error())
 		return "", nil, err
 	}
 	var out []byte
 	if errResp != nil {
 		out, err = json.Marshal(errResp)
 		if err != nil {
-			log.Println("error encoding response %w", err.Error())
+			log.ErrorF("error encoding response %v", err.Error())
 			return "", nil, err
 		}
 
@@ -71,7 +85,7 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	if resp.Result != "OK" {
 		out, err = json.Marshal(resp)
 		if err != nil {
-			log.Println("error encoding response %w", err.Error())
+			log.ErrorF("error encoding response %v", err.Error())
 			return "", nil, err
 		}
 		return string(out), out, err
@@ -79,11 +93,6 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 	_ = resp.ToPolicy(reqPolicy)
 
-	networkNode := network.GetNetworkNodeByUid(reqPolicy.ProducerUid)
-	var warrant *models.Warrant
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
-	}
 	product := prd.GetProductV2(reqPolicy.Name, reqPolicy.ProductVersion, reqPolicy.Channel, networkNode, warrant)
 	addConsultacyPrice(reqPolicy, product)
 
