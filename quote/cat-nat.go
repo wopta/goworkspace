@@ -22,11 +22,11 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		reqPolicy *models.Policy
 	)
 
-	log.AddPrefix("[CatNatFx] ")
+	log.AddPrefix("CatNatFx")
 	defer func() {
 		r.Body.Close()
 		if err != nil {
-			log.Printf("error: %s", err.Error())
+			log.Error(err)
 		}
 		log.Println("Handler end ---------------------------------------------")
 		log.PopPrefix()
@@ -35,12 +35,12 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 	_, err = lib.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	if err != nil {
-		log.Printf("error getting authToken")
+		log.ErrorF("error getting authToken")
 		return "", nil, err
 	}
 
 	if err = json.NewDecoder(r.Body).Decode(&reqPolicy); err != nil {
-		log.Println("error decoding request body")
+		log.ErrorF("error decoding request body")
 		return "", nil, err
 	}
 	networkNode := network.GetNetworkNodeByUid(reqPolicy.ProducerUid)
@@ -79,7 +79,7 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 			return "", nil, err
 		}
 
-		return string(out), out, err
+		return string(out), out, nil
 	}
 
 	if resp.Result != "OK" {
@@ -88,7 +88,7 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 			log.ErrorF("error encoding response %v", err.Error())
 			return "", nil, err
 		}
-		return string(out), out, err
+		return string(out), out, nil
 	}
 
 	_ = resp.ToPolicy(reqPolicy)
@@ -98,7 +98,7 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 	out, err = json.Marshal(reqPolicy)
 	if err != nil {
-		log.Println("error encoding response %w", err.Error())
+		log.ErrorF("error encoding response %v", err.Error())
 		return "", nil, err
 	}
 
