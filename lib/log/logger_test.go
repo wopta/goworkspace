@@ -130,8 +130,10 @@ func isLocalMessageCorrect(writer mockWriter, message ...string) bool {
 	if len(message) != len(chunks) {
 		return false
 	}
+	datePattern := `\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}`
 	for i, chunk := range chunks {
-		patter := fmt.Sprintf(`\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} .*%v.*`, message[i])
+
+		patter := fmt.Sprintf(`%v .*%v.*`, datePattern, message[i])
 		if ok, _ := regexp.MatchString(patter, chunk); !ok {
 			return false
 		}
