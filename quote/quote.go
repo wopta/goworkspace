@@ -40,7 +40,7 @@ var quoteRoutes []lib.Route = []lib.Route{
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
-		Route:   "/v1/combined",
+		Route:   "/quote/v1/commercial-combined",
 		Handler: lib.ResponseLoggerWrapper(CombinedQbeFx),
 		Method:  http.MethodPost,
 		Roles:   []string{},
