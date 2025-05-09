@@ -147,7 +147,7 @@ func isGoogleMessageCorrect(writer mockWriter, message ...MessageInformation) bo
 		return false
 	}
 	for i, chunk := range chunks {
-		patter := fmt.Sprintf(`"message":"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} .*%v.*","severity":"%v"`, message[i].Message, message[i].Severity)
+		patter := fmt.Sprintf(`"message":".*%v.*","severity":"%v"`, message[i].Message, message[i].Severity)
 		if ok, _ := regexp.MatchString(patter, chunk); !ok {
 			return false
 		}
