@@ -19,6 +19,7 @@ func getFlow(policy *models.Policy, originStr string, storage bpmn.StorageData) 
 	if err != nil {
 		return nil, err
 	}
+
 	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
 	var warrant *models.Warrant
 	if networkNode != nil {
@@ -30,9 +31,7 @@ func getFlow(policy *models.Policy, originStr string, storage bpmn.StorageData) 
 	policyDraft := flow.PolicyDraft{Policy: policy}
 	productDraft := flow.ProductDraft{Product: product}
 	mgaProduct := flow.ProductDraft{Product: prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)}
-
 	flowName := flow.StringBpmn{String: flowNameStr}
-
 	networkDraft := flow.NetworkDraft{NetworkNode: networkNode}
 	if product.Flow == "" {
 		product.Flow = policy.Channel
@@ -46,17 +45,17 @@ func getFlow(policy *models.Policy, originStr string, storage bpmn.StorageData) 
 	storage.AddGlobal("origin", &flow.StringBpmn{String: originStr})
 	builder.SetStorage(storage)
 
-	if networkNode == nil || networkNode.CallbackConfig == nil {
+	if networkNode != nil && networkNode.CallbackConfig != nil {
+		injected, err := getNodeFlow()
+		if err != nil {
+			return nil, err
+		}
+		err = builder.Inject(injected)
+		if err != nil {
+			return nil, err
+		}
+	} else {
 		log.InfoF("no node or callback config available, no callback")
-		return builder.Build()
-	}
-	injected, err := getNodeFlow()
-	if err != nil {
-		return nil, err
-	}
-	err = builder.Inject(injected)
-	if err != nil {
-		return nil, err
 	}
 	return builder.Build()
 }
