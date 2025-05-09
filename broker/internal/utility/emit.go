@@ -1,0 +1,90 @@
+package utility
+
+import (
+	"errors"
+
+	"github.com/wopta/goworkspace/document"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
+	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/payment"
+	"github.com/wopta/goworkspace/payment/consultancy"
+	"github.com/wopta/goworkspace/transaction"
+)
+
+func EmitSign(policy *models.Policy, product *models.Product, networkNode *models.NetworkNode, sendEmail bool, origin string) {
+	log.Printf("[emitSign] Policy Uid %s", policy.Uid)
+
+	policy.IsSign = false
+	policy.Status = models.PolicyStatusToSign
+	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusContact, models.PolicyStatusToSign)
+
+	p := <-document.ContractObj(origin, *policy, networkNode, product)
+	policy.DocumentName = p.LinkGcs
+	_, signResponse, _ := document.NamirialOtpV6(*policy, origin, sendEmail)
+	policy.ContractFileId = signResponse.FileId
+	policy.IdSign = signResponse.EnvelopeId
+	policy.SignUrl = signResponse.Url
+}
+func EmitPay(policy *models.Policy, origin string, productP, mgaProductP *models.Product, networkNode *models.NetworkNode) {
+	log.Printf("[emitPay] Policy Uid %s", policy.Uid)
+
+	policy.IsPay = false
+	payUrl, err := CreatePolicyTransactions(policy, productP, mgaProductP, networkNode)
+	if err != nil {
+		return
+	}
+	policy.PayUrl = payUrl
+}
+
+func CreatePolicyTransactions(policy *models.Policy, product *models.Product, mgaProduct *models.Product, networkNode *models.NetworkNode) (string, error) {
+	transactions := transaction.CreateTransactions(*policy, *mgaProduct, func() string { return lib.NewDoc(models.TransactionsCollection) })
+	if len(transactions) == 0 {
+		log.Println("no transactions created")
+		return "", errors.New("no transactions created")
+	}
+
+	client := payment.NewClient(policy.Payment, *policy, *product, transactions, false, "")
+	payUrl, updatedTransactions, err := client.NewBusiness()
+	if err != nil {
+		log.ErrorF("error emitPay policy %s: %s", policy.Uid, err.Error())
+		return "", err
+	}
+
+	for index, tr := range updatedTransactions {
+		err = lib.SetFirestoreErr(models.TransactionsCollection, tr.Uid, tr)
+		if err != nil {
+			log.ErrorF("error saving transaction %s to firestore: %s", tr.Uid, err.Error())
+			return "", err
+		}
+		tr.BigQuerySave("")
+
+		if tr.IsPay {
+			err = transaction.CreateNetworkTransactions(policy, &updatedTransactions[index], networkNode, mgaProduct)
+			if err != nil {
+				log.ErrorF("error creating network transactions: %s", err.Error())
+				return "", err
+			}
+			if err := consultancy.GenerateInvoice(*policy, tr); err != nil {
+				log.Printf("error handling consultancy: %s", err.Error())
+			}
+		}
+	}
+	return payUrl, err
+}
+
+func SetAdvance(policy *models.Policy, origin string, product *models.Product, mgaProduct *models.Product, networkNode *models.NetworkNode, paymentSplit string, paymentMode string) {
+	policy.Payment = models.ManualPaymentProvider
+	policy.IsPay = true
+	policy.Status = models.PolicyStatusPay
+	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay, models.PolicyStatusPay)
+
+	//TODO: fix me someday in the future
+	if paymentSplit != "" && policy.PaymentSplit == "" {
+		policy.PaymentSplit = paymentSplit
+	}
+	if paymentMode != "" && policy.PaymentMode == "" {
+		policy.PaymentMode = paymentMode
+	}
+	CreatePolicyTransactions(policy, product, mgaProduct, networkNode)
+}

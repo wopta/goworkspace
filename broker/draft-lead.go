@@ -6,7 +6,9 @@ import (
 	"net/http"
 
 	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
+	"github.com/wopta/goworkspace/broker/draftBpmn/flow"
 	"github.com/wopta/goworkspace/lib/log"
+	"github.com/wopta/goworkspace/mail"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -95,7 +97,10 @@ func leaddraft(authToken models.AuthToken, policy *models.Policy) error {
 
 	log.Println("starting bpmn flow...")
 	storage := bpmn.NewStorageBpnm()
-	flowLead, e := getFlow(policy, networkNode, storage)
+	storage.AddGlobal("addresses", &flow.Addresses{
+		FromAddress: mail.AddressAnna,
+	})
+	flowLead, e := getFlow(policy, origin, storage)
 	if e != nil {
 		return e
 	}

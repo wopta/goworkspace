@@ -2,7 +2,6 @@ package broker
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/wopta/goworkspace/callback"
 	"github.com/wopta/goworkspace/lib/log"
+	"github.com/wopta/goworkspace/mail"
 	tr "github.com/wopta/goworkspace/transaction"
 
 	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
@@ -98,7 +98,10 @@ func fabrickPayment(origin, providerId string, policy *models.Policy, paymentInf
 	}
 	storage := bpmn.NewStorageBpnm()
 	storage.AddGlobal("paymentInfo", &paymentInfo)
-	flowPayment, err := getFlow(policy, networkNode, storage)
+	storage.AddGlobal("addresses", &flow.Addresses{
+		FromAddress: mail.AddressAnna,
+	})
+	flowPayment, err := getFlow(policy, origin, storage)
 	if err != nil {
 		return err
 	}

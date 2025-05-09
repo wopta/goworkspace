@@ -61,7 +61,7 @@ var (
 func TestEmitForWinNodeWithConfigTrue(t *testing.T) {
 	store := bpmn.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
-	store.AddGlobal("node", &winNode)
+	store.AddGlobal("networkNode", &winNode)
 
 	store.AddLocal("config", &CallbackConfig{Emit: true})
 	exps := []string{
@@ -74,7 +74,7 @@ func TestEmitForWinNodeWithConfigTrue(t *testing.T) {
 func TestEmitForWinNodeWithConfigFalse(t *testing.T) {
 	store := bpmn.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
-	store.AddGlobal("node", &winNode)
+	store.AddGlobal("networkNode", &winNode)
 
 	exps := []string{}
 	store.AddLocal("config", &CallbackConfig{Emit: false})

@@ -1,11 +1,11 @@
-package broker
+package utility
 
 import (
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 
 	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -64,18 +64,4 @@ func GetSequenceByCompany(name string, firePolicy string) (string, int, int) {
 	log.Println("GetSequenceByCompany: ", codeCompany)
 
 	return codeCompany, numberCompany, number
-}
-func GetSequenceProposal(name string, firePolicy string) int {
-	var number int
-	r, e := lib.OrderLimitFirestoreErr(firePolicy, "proposalNumber", firestore.Desc, 1)
-	lib.CheckError(e)
-	policyCompany := models.PolicyToListData(r)
-	if len(policyCompany) == 0 {
-		number = 1
-	} else {
-
-		number = policyCompany[0].ProposalNumber + 1
-	}
-	log.Println("GetSequenceProposal: ", number)
-	return number
 }

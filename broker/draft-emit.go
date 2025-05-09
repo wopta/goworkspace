@@ -2,15 +2,16 @@ package broker
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"time"
 
 	draftbpnm "github.com/wopta/goworkspace/broker/draftBpmn"
+	"github.com/wopta/goworkspace/broker/draftBpmn/flow"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/lib/log"
+	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
@@ -73,31 +74,22 @@ func DraftEmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	uid := request.Uid
 	log.Printf("Uid: %s", uid)
 
-	paymentSplit = request.PaymentSplit
-	log.Printf("paymentSplit: %s", paymentSplit)
-
 	paymentMode = request.PaymentMode
 	log.Printf("paymentMode: %s", paymentMode)
 
 	policy, err = plc.GetPolicy(uid, origin)
 	lib.CheckError(err)
-	if policy.Channel == models.NetworkChannel && policy.ProducerUid != authToken.UserID {
-		log.Printf("user %s cannot emit policy %s because producer not equal to request user", authToken.UserID, policy.Uid)
-		return "", nil, errors.New("operation not allowed")
-	}
+	//	if policy.Channel == models.NetworkChannel && policy.ProducerUid != authToken.UserID {
+	//		log.Printf("user %s cannot emit policy %s because producer not equal to request user", authToken.UserID, policy.Uid)
+	//		return "", nil, errors.New("operation not allowed")
+	//	}
 
 	policyJsonLog, _ := policy.Marshal()
 	log.Printf("Policy %s JSON: %s", uid, string(policyJsonLog))
-	if policy.IsPay || policy.IsSign || policy.CompanyEmit || policy.CompanyEmitted || policy.IsDeleted {
-		log.Printf("cannot emit policy %s because state is not correct", policy.Uid)
-		return "", nil, errors.New("operation not allowed")
-	}
-
-	if request.SendEmail == nil {
-		sendEmail = true
-	} else {
-		sendEmail = *request.SendEmail
-	}
+	//	if policy.IsPay || policy.IsSign || policy.CompanyEmit || policy.CompanyEmitted || policy.IsDeleted {
+	//		log.Printf("cannot emit policy %s because state is not correct", policy.Uid)
+	//		return "", nil, errors.New("operation not allowed")
+	//	}
 
 	productConfig := prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 	if err = policy.CheckStartDateValidity(productConfig.EmitMaxElapsedDays); err != nil {
@@ -135,7 +127,22 @@ func emitDraft(policy *models.Policy, request EmitRequest, origin string) (EmitR
 
 	log.Printf("[Emit] Emitting - Policy Uid %s", policy.Uid)
 	log.Println("[Emit] starting bpmn flow...")
-	flow, err := getFlow(policy, nil, draftbpnm.NewStorageBpnm())
+
+	paymentSplit = request.PaymentSplit
+	log.Printf("paymentSplit: %s", paymentSplit)
+
+	storage := draftbpnm.NewStorageBpnm()
+	if request.SendEmail == nil {
+		storage.AddGlobal("sendEmail", &flow.BoolBpmn{Bool: true})
+	} else {
+		storage.AddGlobal("sendEmail", &flow.BoolBpmn{Bool: *request.SendEmail})
+	}
+	storage.AddGlobal("paymentSplit", &flow.StringBpmn{String: request.PaymentSplit})
+	storage.AddGlobal("paymentMode", &flow.StringBpmn{String: request.PaymentMode})
+	storage.AddGlobal("addresses", &flow.Addresses{FromAddress: mail.AddressAnna})
+
+	log.Printf("paymentMode: %s", paymentMode)
+	flow, err := getFlow(policy, origin, storage)
 	if err != nil {
 		return responseEmit, err
 	}

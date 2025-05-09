@@ -78,3 +78,19 @@ type Addresses struct {
 func (*Addresses) GetType() string {
 	return "addresses"
 }
+
+type StringBpmn struct {
+	String string
+}
+
+func (*StringBpmn) GetType() string {
+	return "string"
+}
+
+type BoolBpmn struct {
+	Bool bool
+}
+
+func (*BoolBpmn) GetType() string {
+	return "bool"
+}
