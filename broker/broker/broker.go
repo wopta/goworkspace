@@ -1,7 +1,7 @@
 package broker
 
 import (
-	"github.com/wopta/goworkspace/lib/log"
+	"log"
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
@@ -55,36 +55,6 @@ var brokerRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/v1/policy/emit",
 		Handler: lib.ResponseLoggerWrapper(EmitFx),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
-	},
-	{
-		Route:   "/draft/policy/emit",
-		Handler: lib.ResponseLoggerWrapper(DraftEmitFx),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
-	},
-	{
-		Route:   "/draft/policy/lead",
-		Handler: lib.ResponseLoggerWrapper(DraftLeadFx),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
-	},
-	{
-		Route:   "/draft/policy/pay",
-		Handler: lib.ResponseLoggerWrapper(DraftPaymentFx),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
-	},
-	{
-		Route:   "/draft/policy/sign",
-		Handler: lib.ResponseLoggerWrapper(DraftSignFx),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
-	},
-	{
-		Route:   "/draft/policy/acceptance/{policyUid}",
-		Handler: lib.ResponseLoggerWrapper(DraftAcceptanceFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
@@ -155,7 +125,7 @@ var brokerRoutes []lib.Route = []lib.Route{
 		Roles:   []string{lib.UserRoleAdmin},
 	},
 	{
-		Route:   "/policy/v1/duplicate/{uid}",
+		Route: "/policy/v1/duplicate/{uid}",
 		Handler: lib.ResponseLoggerWrapper(DuplicateFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAdmin},
@@ -168,6 +138,7 @@ func init() {
 }
 
 func Broker(w http.ResponseWriter, r *http.Request) {
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
 	router := lib.GetRouter("broker", brokerRoutes)
 	router.ServeHTTP(w, r)

@@ -1,0 +1,91 @@
+{
+	"processes": [
+		{
+			"name": "provaPost",
+			"globalData": [
+				{
+					"name": "policyPr",
+					"type": "policy"
+				}
+			],
+			"order": {
+				"inWhatProcessInjected": "emit",
+				"inWhatActivityInjected": "AEvent",
+				"order": "Post"
+			},
+			"defaultStart": "initPost",
+			"description": "",
+			"activities": [
+				{
+					"name": "initPost",
+					"inputData": [],
+					"outputData": [
+						{
+							"name": "error",
+							"type": "error"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "provaPre",
+			"order": {
+				"inWhatProcessInjected": "emit",
+				"inWhatActivityInjected": "BEvent",
+				"order": "pre"
+			},
+			"globalData": [
+				{
+					"name": "policyPr",
+					"type": "policy"
+				}
+			],
+			"defaultStart": "initPre",
+			"description": "",
+			"activities": [
+				{
+					"name": "initPre",
+					"inputData": [
+						{
+							"name": "validationObject",
+							"type": "validity"
+						}
+					],
+					"outputData": [
+						{
+							"name": "error",
+							"type": "error"
+						}
+					],
+					"gateways": [
+						{
+							"nextActivities": [
+								"pre-B"
+							]
+						}
+					]
+				},
+				{
+					"name": "pre-B",
+					"description": "download doc policy"
+				}
+			]
+		},
+		{
+			"name": "provaEndProcess",
+			"order": {
+				"inWhatProcessInjected": "emit",
+				"inWhatActivityInjected": "end",
+				"order": "post"
+			},
+			"defaultStart": "save",
+			"description": "",
+			"activities": [
+				{
+					"name": "save"
+				}
+			]
+		}
+	]
+}

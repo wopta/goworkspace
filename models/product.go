@@ -49,6 +49,10 @@ type Product struct {
 	IsAgentActive     bool `json:"isAgentActive" firestore:"isAgentActive"`         // DEPRECATED
 }
 
+func (p *Product) GetType() string {
+	return "product"
+}
+
 type Company struct {
 	Name                      string               `firestore:"name,omitempty" json:"name,omitempty"`
 	Code                      string               `firestore:"code,omitempty" json:"code,omitempty"`

@@ -1,0 +1,114 @@
+{
+	"processes": [
+		{
+			"name": "emit",
+			"globalData": [
+				{
+					"name": "policyPr",
+					"type": "policy"
+				}
+			],
+			"defaultStart": "init",
+			"description": "",
+			"activities": [
+				{
+					"name": "init",
+					"callEndIfStop": false,
+					"outputData": [
+						{
+							"name": "validationObject",
+							"type": "validity"
+						}
+					],
+					"gateways": [
+						{
+							"nextActivities": [
+								"BEvent",
+								"AEvent"
+							],
+							"decision": "policyPr.age==3"
+						},
+						{
+							"nextActivities": [
+								"AEvent"
+							],
+							"decision": "policyPr.age<3"
+						},
+						{
+							"nextActivities": [
+								"CEvent"
+							],
+							"decision": "policyPr.age==10"
+						}
+					]
+				},
+				{
+					"name": "AEvent",
+					"description": "validation policy",
+					"outputData": [
+						{
+							"name": "error",
+							"type": "error"
+						},
+						{
+							"name": "validationObject",
+							"type": "validity"
+						}
+					],
+					"inputData": [
+						{
+							"name": "validationObject",
+							"type": "validity"
+						}
+					],
+					"gateways": [
+						{
+							"nextActivities": [
+								"BEvent"
+							],
+							"decision": "validationObject.Step==3"
+						}
+					]
+				},
+				{
+					"name": "BEvent",
+					"handlerless": true,
+					"description": "emit policy",
+					"inputData": [
+						{
+							"name": "validationObject",
+							"type": "validity"
+						}
+					],
+					"outputData": [
+						{
+							"name": "error",
+							"type": "error"
+						},
+						{
+							"name": "validationObject",
+							"type": "validity"
+						}
+					],
+					"gateways": [
+						{
+							"nextActivities": [
+								"AEvent"
+							],
+							"decision": "error.Result==false"
+						}
+					]
+				},
+				{
+					"name": "CEvent",
+					"description": "emit policy"
+				},
+				{
+					"name": "DEventWithRec",
+					"description": "emit policy",
+					"recover": "DRec"
+				}
+			]
+		}
+	]
+}

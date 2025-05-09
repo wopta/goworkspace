@@ -283,6 +283,7 @@ func replaceGapDates(product *models.Product, channel string) error {
 func overrideProductInfo(product *models.Product, networkNode *models.NetworkNode, warrant *models.Warrant, channel string) {
 	if networkNode == nil {
 		product.Steps = filterProductStepsByFlow(product.Steps, channel)
+
 		return
 	}
 
