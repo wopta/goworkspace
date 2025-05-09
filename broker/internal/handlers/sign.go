@@ -11,16 +11,16 @@ import (
 
 func AddSignHandlers(builder *bpmn.BpnmBuilder) error {
 	return bpmn.IsError(
-		builder.AddHandler("setSign", setSignDraft),
-		builder.AddHandler("addContract", addContractDraft),
-		builder.AddHandler("sendMailContract", sendMailContractDraft),
-		builder.AddHandler("fillAttachments", fillAttachmentsDraft),
-		builder.AddHandler("setToPay", setToPayDraft),
-		builder.AddHandler("sendMailPay", sendMailPayDraft),
+		builder.AddHandler("setSign", setSign),
+		builder.AddHandler("addContract", addContract),
+		builder.AddHandler("sendMailContract", sendMailContract),
+		builder.AddHandler("fillAttachments", fillAttachments),
+		builder.AddHandler("setToPay", setToPay),
+		builder.AddHandler("sendMailPay", sendMailPay),
 	)
 }
 
-func setSignDraft(state bpmn.StorageData) error {
+func setSign(state bpmn.StorageData) error {
 	var policy *flow.PolicyDraft
 	var origin *flow.StringBpmn
 	err := bpmn.IsError(
@@ -39,7 +39,7 @@ func setSignDraft(state bpmn.StorageData) error {
 
 	return nil
 }
-func addContractDraft(state bpmn.StorageData) error {
+func addContract(state bpmn.StorageData) error {
 	var policy *flow.PolicyDraft
 	var origin *flow.StringBpmn
 	err := bpmn.IsError(
@@ -54,7 +54,7 @@ func addContractDraft(state bpmn.StorageData) error {
 
 	return nil
 }
-func sendMailContractDraft(state bpmn.StorageData) error {
+func sendMailContract(state bpmn.StorageData) error {
 	var policy *flow.PolicyDraft
 	var networkNode *flow.NetworkDraft
 	var flowName *flow.StringBpmn
@@ -67,6 +67,7 @@ func sendMailContractDraft(state bpmn.StorageData) error {
 		bpmn.GetDataRef("flowName", &flowName, state),
 		bpmn.GetDataRef("networkNode", &networkNode, state),
 		bpmn.GetDataRef("addresses", &addresses, state),
+		bpmn.GetDataRef("sendEmail", &sendEmail, state),
 	)
 	if err != nil {
 		return err
@@ -95,7 +96,7 @@ func sendMailContractDraft(state bpmn.StorageData) error {
 	return nil
 }
 
-func fillAttachmentsDraft(state bpmn.StorageData) error {
+func fillAttachments(state bpmn.StorageData) error {
 	var policy *flow.PolicyDraft
 	var origin *flow.StringBpmn
 	err := bpmn.IsError(
@@ -114,7 +115,7 @@ func fillAttachmentsDraft(state bpmn.StorageData) error {
 	return nil
 }
 
-func setToPayDraft(state bpmn.StorageData) error {
+func setToPay(state bpmn.StorageData) error {
 	var policy *flow.PolicyDraft
 	var origin *flow.StringBpmn
 	err := bpmn.IsError(
@@ -133,7 +134,7 @@ func setToPayDraft(state bpmn.StorageData) error {
 	return nil
 }
 
-func sendMailPayDraft(state bpmn.StorageData) error {
+func sendMailPay(state bpmn.StorageData) error {
 	log.AddPrefix("sendMailPay")
 	defer log.PopPrefix()
 

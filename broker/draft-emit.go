@@ -2,6 +2,7 @@ package broker
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -29,7 +30,7 @@ var (
 	Rejected        string = "Rejected"
 )
 
-func DraftEmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func DraftEmitFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		request      EmitRequest
 		err          error
@@ -67,7 +68,7 @@ func DraftEmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	err = json.Unmarshal([]byte(body), &request)
 	if err != nil {
-		log.Printf("error unmarshaling policy: %s", err.Error())
+		log.Printf("error unmarshalling policy: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -79,17 +80,17 @@ func DraftEmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	policy, err = plc.GetPolicy(uid, origin)
 	lib.CheckError(err)
-	//	if policy.Channel == models.NetworkChannel && policy.ProducerUid != authToken.UserID {
-	//		log.Printf("user %s cannot emit policy %s because producer not equal to request user", authToken.UserID, policy.Uid)
-	//		return "", nil, errors.New("operation not allowed")
-	//	}
+	if policy.Channel == models.NetworkChannel && policy.ProducerUid != authToken.UserID {
+		log.Printf("user %s cannot emit policy %s because producer not equal to request user", authToken.UserID, policy.Uid)
+		return "", nil, errors.New("operation not allowed")
+	}
 
 	policyJsonLog, _ := policy.Marshal()
 	log.Printf("Policy %s JSON: %s", uid, string(policyJsonLog))
-	//	if policy.IsPay || policy.IsSign || policy.CompanyEmit || policy.CompanyEmitted || policy.IsDeleted {
-	//		log.Printf("cannot emit policy %s because state is not correct", policy.Uid)
-	//		return "", nil, errors.New("operation not allowed")
-	//	}
+	if policy.IsPay || policy.IsSign || policy.CompanyEmit || policy.CompanyEmitted || policy.IsDeleted {
+		log.Printf("cannot emit policy %s because state is not correct", policy.Uid)
+		return "", nil, errors.New("operation not allowed")
+	}
 
 	productConfig := prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 	if err = policy.CheckStartDateValidity(productConfig.EmitMaxElapsedDays); err != nil {

@@ -60,6 +60,7 @@ func sendProposalMail(state bpmn.StorageData) error {
 		bpmn.GetDataRef("addresses", &addresses, state),
 		bpmn.GetDataRef("sendEmail", &sendEmail, state),
 		bpmn.GetDataRef("flowName", &flowName, state),
+		bpmn.GetDataRef("networkNode", &networkNode, state),
 	)
 	if err != nil {
 		return err

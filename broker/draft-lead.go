@@ -15,7 +15,7 @@ import (
 	"github.com/wopta/goworkspace/network"
 )
 
-func DraftLeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func DraftLeadFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		err    error
 		policy models.Policy
@@ -48,7 +48,7 @@ func DraftLeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	err = json.Unmarshal([]byte(body), &policy)
 	if err != nil {
-		log.ErrorF("error unmarshaling policy: %s", err.Error())
+		log.ErrorF("error unmarshalling policy: %s", err.Error())
 		return "", nil, err
 	}
 

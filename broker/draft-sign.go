@@ -19,7 +19,7 @@ const (
 	namirialFinished string = "workstepFinished" // when the workstep was finished
 )
 
-func DraftSignFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func DraftSignFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	log.AddPrefix("SignFx")
 	defer log.PopPrefix()
 

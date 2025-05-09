@@ -17,19 +17,6 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
-type auditSchema struct {
-	CreationDate  bigquery.NullDateTime `bigquery:"creationDate"`
-	Client        string                `bigquery:"client"`
-	NodeUid       string                `bigquery:"nodeUid"`
-	Action        string                `bigquery:"action"`
-	ReqMethod     string                `bigquery:"reqMethod"`
-	ReqPath       string                `bigquery:"reqPath"`
-	ReqBody       string                `bigquery:"reqBody"`
-	ResStatusCode int                   `bigquery:"resStatusCode"`
-	ResBody       string                `bigquery:"resBody"`
-	Error         string                `bigquery:"error"`
-}
-
 func getNodeFlow() (*bpmn.BpnmBuilder, error) {
 	store := bpmn.NewStorageBpnm()
 	builder, e := bpmn.NewBpnmBuilder("flows/draft/node_flows.json")
@@ -265,6 +252,19 @@ func baseRequest(store bpmn.StorageData) error {
 }
 
 func saveAudit(st bpmn.StorageData) error {
+	type auditSchema struct {
+		CreationDate  bigquery.NullDateTime `bigquery:"creationDate"`
+		Client        string                `bigquery:"client"`
+		NodeUid       string                `bigquery:"nodeUid"`
+		Action        string                `bigquery:"action"`
+		ReqMethod     string                `bigquery:"reqMethod"`
+		ReqPath       string                `bigquery:"reqPath"`
+		ReqBody       string                `bigquery:"reqBody"`
+		ResStatusCode int                   `bigquery:"resStatusCode"`
+		ResBody       string                `bigquery:"resBody"`
+		Error         string                `bigquery:"error"`
+	}
+
 	node, err := bpmn.GetData[*flow.NetworkDraft]("networkNode", st)
 	if err != nil {
 		return err

@@ -13,14 +13,14 @@ import (
 
 func AddAcceptanceHandlers(builder *bpmn.BpnmBuilder) error {
 	return bpmn.IsError(
-		builder.AddHandler("rejected", draftrejectPolicy),
-		builder.AddHandler("approved", draftapprovePolicy),
+		builder.AddHandler("rejected", draftRejectPolicy),
+		builder.AddHandler("approved", draftApprovePolicy),
 		builder.AddHandler("sendAcceptanceMail", sendAcceptanceMail),
 		builder.AddHandler("end_accepance", savePolicy),
 	)
 }
 
-func draftrejectPolicy(storage draftbpmn.StorageData) error {
+func draftRejectPolicy(storage draftbpmn.StorageData) error {
 	var policy *flow.PolicyDraft
 	var action *flow.StringBpmn
 	err := bpmn.IsError(
@@ -39,16 +39,13 @@ func draftrejectPolicy(storage draftbpmn.StorageData) error {
 	return nil
 }
 
-func draftapprovePolicy(storage draftbpmn.StorageData) error {
+func draftApprovePolicy(storage draftbpmn.StorageData) error {
 	var policy *flow.PolicyDraft
 	var action *flow.StringBpmn
 	err := bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, storage),
 		bpmn.GetDataRef("action", &action, storage),
 	)
-	if err != nil {
-		return err
-	}
 	if err != nil {
 		return err
 	}
@@ -76,8 +73,6 @@ func sendAcceptanceMail(state bpmn.StorageData) error {
 		return err
 	}
 	log.Printf("toAddress '%s'", addresses.ToAddress.String())
-	//TODO: to remove after test
-	return nil
 	var warrant *models.Warrant
 	if node.NetworkNode != nil {
 		warrant = node.GetWarrant()

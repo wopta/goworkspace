@@ -14,13 +14,12 @@ import (
 
 func AddRequestApprovaHandlers(builder *bpmn.BpnmBuilder) error {
 	return bpmn.IsError(
-
-		builder.AddHandler("setRequestApprovalData", setRequestApprovalBpmnDraft),
-		builder.AddHandler("sendRequestApprovalMail", sendRequestApprovalMailDraft),
+		builder.AddHandler("setRequestApprovalData", setRequestApprova),
+		builder.AddHandler("sendRequestApprovalMail", sendRequestApprovalMail),
 	)
 }
 
-func setRequestApprovalBpmnDraft(state bpmn.StorageData) error {
+func setRequestApprova(state bpmn.StorageData) error {
 	var policy *flow.PolicyDraft
 	var networkNode *flow.NetworkDraft
 	var origin *flow.StringBpmn
@@ -42,7 +41,7 @@ func setRequestApprovalBpmnDraft(state bpmn.StorageData) error {
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
-func sendRequestApprovalMailDraft(state bpmn.StorageData) error {
+func sendRequestApprovalMail(state bpmn.StorageData) error {
 	var policy *flow.PolicyDraft
 	var addresses *flow.Addresses
 	var flowName *flow.StringBpmn

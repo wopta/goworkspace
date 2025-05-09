@@ -12,13 +12,13 @@ import (
 
 func AddLeadHandlers(builder *bpmn.BpnmBuilder) error {
 	return bpmn.IsError(
-		builder.AddHandler("setLeadData", setLeadBpmn),
+		builder.AddHandler("setLeadData", setLead),
 		builder.AddHandler("sendLeadMail", sendLeadMail),
 		builder.AddHandler("end_lead", savePolicy),
 	)
 }
 
-func setLeadBpmn(state bpmn.StorageData) error {
+func setLead(state bpmn.StorageData) error {
 	var policy *flow.PolicyDraft
 	var networkNode *flow.NetworkDraft
 	err := bpmn.IsError(
