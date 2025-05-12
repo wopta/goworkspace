@@ -3,7 +3,6 @@ package sellable
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/wopta/goworkspace/lib"
@@ -51,11 +50,12 @@ func CatnatFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		warrant = networkNode.GetWarrant()
 	}
 
-	if pr, err := CatnatSellable(policy, policy.Channel, networkNode, warrant, false); err == nil {
-		js, err := pr.Product.Marshal()
-		return string(js), err, nil
+	pr, err := CatnatSellable(policy, policy.Channel, networkNode, warrant, false)
+	if err != nil {
+		return "", nil, err
 	}
-	return "", nil, fmt.Errorf("policy not sellable by: %v", err)
+	js, err := pr.Product.Marshal()
+	return string(js), nil, nil
 }
 
 func CatnatSellable(policy *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant, lastValidation bool) (*SellableOutput, error) {
@@ -79,14 +79,15 @@ func CatnatSellable(policy *models.Policy, channel string, networkNode *models.N
 	}
 	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, out, in, nil)
 
+	if len(out.Msg) != 0 {
+		out = ruleOutput.(*SellableOutput)
+		return nil, errors.New(out.Msg)
+	}
+
 	if !lastValidation {
 		out = ruleOutput.(*SellableOutput)
 		log.InfoF(out.Msg)
 		return out, nil
-	}
-	if len(out.Msg) != 0 {
-		out = ruleOutput.(*SellableOutput)
-		return nil, errors.New(out.Msg)
 	}
 	//you must have both SumInsuredTextField(Fabricato) and SumInsuredLimitOfIndemnityTextField(Contenuto)
 	isContenutoAndFabricato := func(value *models.GuaranteValue) bool {
