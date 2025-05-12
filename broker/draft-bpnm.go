@@ -57,6 +57,14 @@ func getFlow(policy *models.Policy, originStr string, storage bpmn.StorageData) 
 	} else {
 		log.InfoF("no node or callback config available, no callback")
 	}
+	injected, err := getProductFlow()
+	if err != nil {
+		return nil, err
+	}
+	err = builder.Inject(injected)
+	if err != nil {
+		return nil, err
+	}
 	return builder.Build()
 }
 
