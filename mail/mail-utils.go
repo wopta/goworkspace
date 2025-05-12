@@ -213,7 +213,6 @@ func getMailAttachments(policy models.Policy, attachmentNames []string) []Attach
 	}
 
 	at = make([]Attachment, 0)
-
 	for _, attachment := range *policy.Attachments {
 		if lib.SliceContains(attachmentNames, attachment.Name) {
 			if strings.HasPrefix(attachment.Link, "gs://") {

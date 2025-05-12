@@ -96,7 +96,6 @@ func sendMailSign(state bpmn.StorageData) error {
 	case models.MgaFlow, models.ECommerceFlow:
 		addresses.ToAddress = mail.GetContractorEmail(policy.Policy)
 	}
-
 	log.Printf(
 		"[sendMailSign] from '%s', to '%s', cc '%s'",
 		addresses.FromAddress.String(),
@@ -224,7 +223,7 @@ func sendEmitProposalMail(state bpmn.StorageData) error {
 	if policy.IsReserved {
 		return nil
 	}
-
+	policy.Attachments = nil
 	addresses.ToAddress = mail.GetContractorEmail(policy.Policy)
 	addresses.CcAddress = mail.Address{}
 	switch flowName.String {

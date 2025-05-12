@@ -59,8 +59,8 @@ var brokerRoutes []lib.Route = []lib.Route{
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
-		Route:   "/draft/policy/emit",
-		Handler: lib.ResponseLoggerWrapper(DraftEmitFx),
+		Route:   "/draft/policy/emit/catnat",
+		Handler: lib.ResponseLoggerWrapper(DraftEmitWithPolicyFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},

@@ -5,6 +5,8 @@ import (
 )
 
 type Contractor struct {
+	Name                      string `json:"nome,omitempty"`
+	Surname                   string `json:"cognome,omitempty"`
 	PersonalDataType          string `json:"tipoAnagrafica,omitempty"`
 	CompanyName               string `json:"ragioneSociale,omitempty"`
 	VatNumber                 string `json:"partitaIva,omitempty"`
@@ -22,6 +24,7 @@ type Contractor struct {
 	MarketingProfilingConsent string `json:"consensoProfilazioneMarketing,omitempty"`
 	MarketingActivityConsent  string `json:"consensoAttivitaMarketing,omitempty"`
 	DocumentationFormat       int    `json:"formatoDocumentazione"`
+	ConsensoTrattamento       string `json:"ConsensoTrattamento,omitempty"`
 }
 
 type LegalRepresentative struct {
@@ -177,6 +180,9 @@ func (d *RequestDTO) FromPolicy(p *models.Policy, fillEveryField bool) error {
 		}
 		contr := Contractor{
 			PersonalDataType:          dt,
+			Name:                      p.Contractor.Name,
+			Surname:                   p.Contractor.Surname,
+			PostalCode:                p.Contractor.Residence.PostalCode,
 			CompanyName:               p.Contractor.Name,
 			VatNumber:                 p.Contractor.VatCode,
 			FiscalCode:                p.Contractor.FiscalCode,
@@ -189,6 +195,7 @@ func (d *RequestDTO) FromPolicy(p *models.Policy, fillEveryField bool) error {
 			MarketingProfilingConsent: no,
 			MarketingActivityConsent:  no,
 			DocumentationFormat:       1,
+			ConsensoTrattamento:       "si",
 		}
 		if p.Contractor.Residence != nil {
 			contr.Address = formatAddress(p.Contractor.Residence)
