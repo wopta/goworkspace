@@ -13,8 +13,6 @@ type Asset struct {
 	TypeUseOfAsset       *string     `firestore:"typeUseOfAsset,omitempty" json:"typeUseOfAsset,omitempty"`
 	RangeNumbesrOfFloors *string     `firestore:"rangeNumbersOfFloors,omitempty" json:"rangeNumbersOfFloors,omitempty"`
 	GroundFloor          *string     `firestore:"theGroundFloor,omitempty" json:"theGroundFloor,omitempty"`
-	EarthquakeCoverage   *bool       `firestore:"earthquakeCoverage,omitempty" json:"earthquakeCoverage,omitempty"`
-	FloodCoverage        *bool       `firestore:"floodCoverage,omitempty" json:"floodCoverage,omitempty"`
 }
 
 type Building struct {
