@@ -93,7 +93,8 @@ func (p *processBpnm) loop(nameActivity string) error {
 }
 
 func (act *activity) runActivity(nameProcess string, storage StorageData) error {
-	log.InfoF("Run process '%v', activity '%v'", nameProcess, act.name)
+	log.InfoF("Run process '%v',start activity '%v'", nameProcess, act.name)
+	defer log.InfoF("Run process '%v',stop activity '%v'", nameProcess, act.name)
 	if pre := act.preActivity; pre != nil {
 		if err := pre.loop(pre.defaultStart); err != nil {
 			return err
