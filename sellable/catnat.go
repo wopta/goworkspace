@@ -79,14 +79,15 @@ func CatnatSellable(policy *models.Policy, channel string, networkNode *models.N
 	}
 	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, out, in, nil)
 
+	if len(out.Msg) != 0 {
+		out = ruleOutput.(*SellableOutput)
+		return nil, errors.New(out.Msg)
+	}
+
 	if !lastValidation {
 		out = ruleOutput.(*SellableOutput)
 		log.InfoF(out.Msg)
 		return out, nil
-	}
-	if len(out.Msg) != 0 {
-		out = ruleOutput.(*SellableOutput)
-		return nil, errors.New(out.Msg)
 	}
 	//you must have both SumInsuredTextField(Fabricato) and SumInsuredLimitOfIndemnityTextField(Contenuto)
 	isContenutoAndFabricato := func(value *models.GuaranteValue) bool {
