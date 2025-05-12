@@ -8,16 +8,16 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/google/uuid v1.6.0
-	github.com/wopta/goworkspace/accounting v1.0.9
-	github.com/wopta/goworkspace/callback_out v1.0.52
-	github.com/wopta/goworkspace/document v1.1.149
-	github.com/wopta/goworkspace/lib v1.0.145
-	github.com/wopta/goworkspace/mail v1.0.156
-	github.com/wopta/goworkspace/models v1.2.41
-	github.com/wopta/goworkspace/network v1.0.106
-	github.com/wopta/goworkspace/policy v1.0.189
-	github.com/wopta/goworkspace/product v1.1.38
-	github.com/wopta/goworkspace/transaction v1.0.182
+	github.com/wopta/goworkspace/accounting v1.0.10
+	github.com/wopta/goworkspace/callback_out v1.0.53
+	github.com/wopta/goworkspace/document v1.1.150
+	github.com/wopta/goworkspace/lib v1.0.146
+	github.com/wopta/goworkspace/mail v1.0.157
+	github.com/wopta/goworkspace/models v1.2.42
+	github.com/wopta/goworkspace/network v1.0.107
+	github.com/wopta/goworkspace/policy v1.0.190
+	github.com/wopta/goworkspace/product v1.1.39
+	github.com/wopta/goworkspace/transaction v1.0.183
 )
 
 require (
