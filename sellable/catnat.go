@@ -92,6 +92,9 @@ func CatnatSellable(policy *models.Policy, channel string, networkNode *models.N
 
 	//you must have both SumInsuredTextField(Fabricato) and SumInsuredLimitOfIndemnityTextField(Contenuto)
 	isContenutoAndFabricato := func(value *models.GuaranteValue) bool {
+		if value == nil {
+			return false
+		}
 		val := value.SumInsured
 		if val == 0 {
 			return false
@@ -104,20 +107,20 @@ func CatnatSellable(policy *models.Policy, channel string, networkNode *models.N
 	}
 
 	if g, err := policy.ExtractGuarantee("landslide"); err == nil {
-		if g.Value == nil || !isContenutoAndFabricato(g.Value) {
-			out.Msg += "You need atleast fabricato and contenuto for landSlide,"
+		if !isContenutoAndFabricato(g.Value) && g.IsSelected {
+			return nil, errors.New("You need atleast fabricato and contenuto for landSlide")
 		}
 	}
 
 	if g, err := policy.ExtractGuarantee("earthquake"); err == nil {
-		if g.Value == nil || !isContenutoAndFabricato(g.Value) {
-			out.Msg += "You need atleast fabricato and contenuto for earthquake,"
+		if !isContenutoAndFabricato(g.Value) && g.IsSelected {
+			return nil, errors.New("You need atleast fabricato and contenuto for earthquake")
 		}
 	}
 
 	if g, err := policy.ExtractGuarantee("flood"); err == nil {
-		if g.Value == nil || !isContenutoAndFabricato(g.Value) {
-			out.Msg += "You need atleast fabricato and contenuto for flood,"
+		if !isContenutoAndFabricato(g.Value) && g.IsSelected {
+			return nil, errors.New("You need atleast fabricato and contenuto for flood")
 		}
 	}
 	out = ruleOutput.(*SellableOutput)
@@ -126,29 +129,32 @@ func CatnatSellable(policy *models.Policy, channel string, networkNode *models.N
 
 func getCatnatInputRules(p *models.Policy) ([]byte, error) {
 	var res []byte
-	out := make(map[string]any)
-	out["isEarthquakeSelected"] = false
-	out["isFloodSelected"] = false
+	in := make(map[string]any)
+	in["isEarthquakeSelected"] = false
+	in["isFloodSelected"] = false
 	locationlen := 0
 
 	alreadyEarthquake := p.QuoteQuestions["alreadyEarthquake"]
 	if alreadyEarthquake == nil {
-		alreadyEarthquake = false
-	}
-	alreadyFlood := p.QuoteQuestions["alreadyFlood"]
-	if alreadyFlood == nil {
-		alreadyFlood = false
+		return nil, errors.New("missing field alreadyEarthquake")
 	}
 	wantEarthquake := p.QuoteQuestions["wantEarthquake"]
 	if wantEarthquake == nil {
 		wantEarthquake = false
 	}
+	alreadyFlood := p.QuoteQuestions["alreadyFlood"]
+	if alreadyFlood == nil {
+		return nil, errors.New("missing field alreadyFlood")
+	}
 	wantFlood := p.QuoteQuestions["wantFlood"]
 	if wantFlood == nil {
 		wantFlood = false
 	}
-	out["isEarthquakeSelected"] = (alreadyEarthquake.(bool) && wantEarthquake.(bool)) || !alreadyEarthquake.(bool)
-	out["isFloodSelected"] = ((alreadyFlood).(bool) && wantFlood.(bool)) || !alreadyFlood.(bool)
+	in["alreadyFlood"] = alreadyFlood
+	in["wantFlood"] = wantFlood
+
+	in["alreadyEarthquake"] = alreadyEarthquake
+	in["wantEarthquake"] = wantEarthquake
 
 	for _, a := range p.Assets {
 		if a.Type == models.AssetTypeBuilding {
@@ -156,8 +162,8 @@ func getCatnatInputRules(p *models.Policy) ([]byte, error) {
 		}
 	}
 
-	out["locationlen"] = locationlen
-	res, err := json.Marshal(out)
+	in["locationlen"] = locationlen
+	res, err := json.Marshal(in)
 	if err != nil {
 		return nil, err
 	}
