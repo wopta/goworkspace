@@ -45,6 +45,8 @@ func UpdatePolicy(policy *models.Policy) (map[string]any, error) {
 		input["clause"] = policy.Clause
 		input["contractors"] = policy.Contractors
 		input["priceGroup"] = policy.PriceGroup
+	case models.CatNatProduct:
+		input["quoteQuestions"] = policy.QuoteQuestions
 	}
 
 	input["updated"] = time.Now().UTC()
