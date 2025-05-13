@@ -57,7 +57,6 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		return "", nil, errors.New(outSellable.Msg)
 	}
 	for i, guaranteeReq := range reqPolicy.Assets[0].Guarantees {
-		log.ErrorF(guaranteeReq.Slug)
 		if guarantee, ok := outSellable.Product.Companies[0].GuaranteesMap[guaranteeReq.Slug]; ok && guarantee != nil {
 			reqPolicy.Assets[0].Guarantees[i].IsSelected = outSellable.Product.Companies[0].GuaranteesMap[guaranteeReq.Slug].IsSelected
 			reqPolicy.Assets[0].Guarantees[i].IsMandatory = outSellable.Product.Companies[0].GuaranteesMap[guaranteeReq.Slug].IsMandatory
