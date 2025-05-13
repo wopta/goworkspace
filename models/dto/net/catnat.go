@@ -252,8 +252,8 @@ func (d *RequestDTO) FromPolicy(p *models.Policy, fillEveryField bool) error {
 	}
 	asset := AssetRequest{
 		ContractorAndTenant:  useTypeMap[baseAsset.Building.UseType],
-		EarthquakeCoverage:   quoteQuestionMap[p.QuoteQuestions["isEarthquakeSelected"].(bool)],
-		FloodCoverage:        quoteQuestionMap[p.QuoteQuestions["isFloodSelected"].(bool)],
+		EarthquakeCoverage:   quoteQuestionMap[p.QuoteQuestions["alreadyEarthquake"].(bool)],
+		FloodCoverage:        quoteQuestionMap[p.QuoteQuestions["alreadyFlood"].(bool)],
 		EarthquakePurchase:   no,
 		FloodPurchase:        no,
 		LandSlidePurchase:    no,
