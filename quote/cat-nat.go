@@ -56,6 +56,15 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	if len(outSellable.Msg) != 0 {
 		return "", nil, errors.New(outSellable.Msg)
 	}
+	for i, guaranteeReq := range reqPolicy.Assets[0].Guarantees {
+		log.ErrorF(guaranteeReq.Slug)
+		if guarantee, ok := outSellable.Product.Companies[0].GuaranteesMap[guaranteeReq.Slug]; ok && guarantee != nil {
+			reqPolicy.Assets[0].Guarantees[i].IsSelected = outSellable.Product.Companies[0].GuaranteesMap[guaranteeReq.Slug].IsSelected
+			reqPolicy.Assets[0].Guarantees[i].IsMandatory = outSellable.Product.Companies[0].GuaranteesMap[guaranteeReq.Slug].IsMandatory
+			reqPolicy.Assets[0].Guarantees[i].IsSellable = outSellable.Product.Companies[0].GuaranteesMap[guaranteeReq.Slug].IsSellable
+			reqPolicy.Assets[0].Guarantees[i].IsConfigurable = outSellable.Product.Companies[0].GuaranteesMap[guaranteeReq.Slug].IsConfigurable
+		}
+	}
 	var cnReq net.RequestDTO
 	err = cnReq.FromPolicy(reqPolicy, false)
 	if err != nil {
@@ -67,6 +76,8 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	netClient.Authenticate()
 
 	resp, errResp, err := netClient.Quote(cnReq)
+	cnReqStr, _ := json.Marshal(cnReq)
+	log.InfoF(string(cnReqStr))
 	if err != nil {
 		log.ErrorF("error calling NetInsurance api: %s", err.Error())
 		return "", nil, err

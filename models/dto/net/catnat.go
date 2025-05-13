@@ -1,10 +1,15 @@
 package net
 
 import (
+	"errors"
+	"log"
+
 	"github.com/wopta/goworkspace/models"
 )
 
 type Contractor struct {
+	Name                      string `json:"nome,omitempty"`
+	Surname                   string `json:"cognome,omitempty"`
 	PersonalDataType          string `json:"tipoAnagrafica,omitempty"`
 	CompanyName               string `json:"ragioneSociale,omitempty"`
 	VatNumber                 string `json:"partitaIva,omitempty"`
@@ -22,6 +27,7 @@ type Contractor struct {
 	MarketingProfilingConsent string `json:"consensoProfilazioneMarketing,omitempty"`
 	MarketingActivityConsent  string `json:"consensoAttivitaMarketing,omitempty"`
 	DocumentationFormat       int    `json:"formatoDocumentazione"`
+	ConsensoTrattamento       string `json:"ConsensoTrattamento,omitempty"`
 }
 
 type LegalRepresentative struct {
@@ -177,6 +183,9 @@ func (d *RequestDTO) FromPolicy(p *models.Policy, fillEveryField bool) error {
 		}
 		contr := Contractor{
 			PersonalDataType:          dt,
+			Name:                      p.Contractor.Name,
+			Surname:                   p.Contractor.Surname,
+			PostalCode:                p.Contractor.Residence.PostalCode,
 			CompanyName:               p.Contractor.Name,
 			VatNumber:                 p.Contractor.VatCode,
 			FiscalCode:                p.Contractor.FiscalCode,
@@ -189,6 +198,7 @@ func (d *RequestDTO) FromPolicy(p *models.Policy, fillEveryField bool) error {
 			MarketingProfilingConsent: no,
 			MarketingActivityConsent:  no,
 			DocumentationFormat:       1,
+			ConsensoTrattamento:       "si",
 		}
 		if p.Contractor.Residence != nil {
 			contr.Address = formatAddress(p.Contractor.Residence)
@@ -250,12 +260,29 @@ func (d *RequestDTO) FromPolicy(p *models.Policy, fillEveryField bool) error {
 		true:  "si",
 		false: "no",
 	}
+
+	alreadyEarthquake := p.QuoteQuestions["alreadyEarthquake"]
+	if alreadyEarthquake == nil {
+		return errors.New("missing field alreadyEarthquake")
+	}
+	wantEarthquake := p.QuoteQuestions["wantEarthquake"]
+	if wantEarthquake == nil {
+		wantEarthquake = false
+	}
+	alreadyFlood := p.QuoteQuestions["alreadyFlood"]
+	if alreadyFlood == nil {
+		return errors.New("missing field alreadyFlood")
+	}
+	wantFlood := p.QuoteQuestions["wantFlood"]
+	if wantFlood == nil {
+		wantFlood = false
+	}
 	asset := AssetRequest{
 		ContractorAndTenant:  useTypeMap[baseAsset.Building.UseType],
-		EarthquakeCoverage:   quoteQuestionMap[p.QuoteQuestions["alreadyEarthquake"].(bool)],
-		FloodCoverage:        quoteQuestionMap[p.QuoteQuestions["alreadyFlood"].(bool)],
-		EarthquakePurchase:   no,
-		FloodPurchase:        no,
+		EarthquakeCoverage:   quoteQuestionMap[alreadyEarthquake.(bool)],
+		FloodCoverage:        quoteQuestionMap[alreadyFlood.(bool)],
+		EarthquakePurchase:   quoteQuestionMap[(alreadyEarthquake.(bool) && wantEarthquake.(bool)) || !alreadyEarthquake.(bool)],
+		FloodPurchase:        quoteQuestionMap[(alreadyFlood.(bool) && wantFlood.(bool)) || !alreadyFlood.(bool)],
 		LandSlidePurchase:    no,
 		ConstructionMaterial: buildingMaterialMap[baseAsset.Building.BuildingMaterial],
 		ConstructionYear:     buildingYearMap[baseAsset.Building.BuildingYear],
@@ -269,27 +296,15 @@ func (d *RequestDTO) FromPolicy(p *models.Policy, fillEveryField bool) error {
 		asset.Locality = baseAsset.Building.BuildingAddress.Locality
 		asset.CityCode = baseAsset.Building.BuildingAddress.CityCode
 	}
+	log.Println("Managing slug guarantees")
 	for _, g := range baseAsset.Guarantees {
-		setGuarantee(&asset, g)
+		if g.IsSelected {
+			setGuaranteeValue(&asset, g, mapCodeFromSlug(g.Slug))
+		}
 	}
 	d.Asset = asset
 
 	return nil
-}
-
-func setGuarantee(asset *AssetRequest, guarantee models.Guarante) {
-	if guarantee.Value == nil {
-		return
-	}
-	switch guarantee.Slug {
-	case earthquakeSlug:
-		asset.EarthquakePurchase = yes
-	case floodSlug:
-		asset.FloodPurchase = yes
-	case landslideSlug:
-		asset.LandSlidePurchase = yes
-	}
-	setGuaranteeValue(asset, guarantee, mapCodeFromSlug(guarantee.Slug))
 }
 
 func mapCodeFromSlug(slug string) string {
@@ -297,10 +312,13 @@ func mapCodeFromSlug(slug string) string {
 	switch slug {
 	case earthquakeSlug:
 		code = earthquakeCode
+		log.Println("adding earthquake ")
 	case floodSlug:
 		code = floodCode
+		log.Println("adding flood")
 	case landslideSlug:
 		code = landslideCode
+		log.Println("adding landslides")
 	}
 	return code
 }
