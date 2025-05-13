@@ -13,7 +13,7 @@ require (
 	github.com/wopta/goworkspace/models v1.2.42
 	github.com/wopta/goworkspace/network v1.0.107
 	github.com/wopta/goworkspace/product v1.1.39
-	github.com/wopta/goworkspace/quote v1.0.144
+	github.com/wopta/goworkspace/quote v1.0.145
 	github.com/wopta/goworkspace/user v1.0.142
 )
 
@@ -70,7 +70,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/wopta/goworkspace/mail v1.0.157 // indirect
-	github.com/wopta/goworkspace/sellable v1.0.139 // indirect
+	github.com/wopta/goworkspace/sellable v1.0.140 // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20230802181842-ad255f2331ca // indirect
