@@ -157,6 +157,7 @@ const (
 	PersonaProduct            string = "persona"
 	GapProduct                string = "gap"
 	CommercialCombinedProduct string = "commercial-combined"
+	CatNatProduct             string = "cat-nat"
 )
 
 const (

@@ -3,66 +3,56 @@ package client
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
 	"net/http"
 	"os"
 
 	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models/dto/net"
 )
 
+const scope = "emettiPolizza_441-029-007"
+const basePath = "https://apigatewaydigital.netinsurance.it"
+const authEndpoint = "/Identity/connect/token"
+
 type NetClient struct {
-	httpC *http.Client
+	*http.Client
 }
 
 func NewNetClient() *NetClient {
-	return &NetClient{}
-}
-
-func (c *NetClient) Authenticate() {
-	const scope = "emettiPolizza_441-029-007"
-	const basePath = "https://apigatewaydigital.netinsurance.it"
-	const authEndpoint = "/Identity/connect/token"
+	client := &NetClient{}
 	const tokenUrl = basePath + authEndpoint
-	c.httpC = lib.ClientCredentials(os.Getenv("NETINS_ID"), os.Getenv("NETINS_SECRET"), scope, tokenUrl)
+	client.Client = lib.ClientCredentials(os.Getenv("NETINS_ID"), os.Getenv("NETINS_SECRET"), scope, tokenUrl)
+	return client
 }
 
-func (c *NetClient) Quote(dto net.RequestDTO) (net.ResponseDTO, *net.ErrorResponse, error) {
-	url := "https://apigatewaydigital.netinsurance.it/PolizzeGateway24/emettiPolizza/441-029-007"
+func (c *NetClient) Quote(dto net.RequestDTO) (net.ResponseDTO, error) {
+	var result net.ResponseDTO
+	url := os.Getenv("NET_BASEURL") + "/PolizzeGateway24/emettiPolizza/441-029-007"
 	rBuff := new(bytes.Buffer)
 	err := json.NewEncoder(rBuff).Encode(dto)
 
 	if err != nil {
-		return net.ResponseDTO{}, nil, err
+		return result, err
 	}
 	req, _ := http.NewRequest(http.MethodPost, url, rBuff)
 	req.Header.Set("Content-Type", "application/json")
-	resp, err := c.httpC.Do(req)
+	resp, err := c.Do(req)
 	if err != nil {
-		return net.ResponseDTO{}, nil, err
+		return result, err
 	}
 	defer resp.Body.Close()
-
 	if resp.StatusCode != http.StatusOK {
-		errResp := net.ErrorResponse{
-			Errors: make(map[string]any),
-		}
-		if err = json.NewDecoder(resp.Body).Decode(&errResp); err != nil {
-			log.ErrorF("error decoding catnat error response")
-			return net.ResponseDTO{}, nil, err
-		}
-		return net.ResponseDTO{}, &errResp, nil
+		errByte, _ := io.ReadAll(resp.Body)
+		return result, errors.New(string(errByte))
 	}
-	cndto := net.ResponseDTO{}
-	if err = json.NewDecoder(resp.Body).Decode(&cndto); err != nil {
-		log.ErrorF("error decoding catnat response")
-		return net.ResponseDTO{}, nil, err
+	if err = json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return result, err
 	}
-
-	return cndto, nil, nil
-}
-
-func (c *NetClient) Emit() error {
-
-	return nil
+	if len(result.Errors) != 0 {
+		return result, errors.New(fmt.Sprintln(result.Errors))
+	}
+	return result, nil
 }

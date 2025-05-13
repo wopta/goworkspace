@@ -1,8 +1,6 @@
 package net
 
-import (
-	"github.com/wopta/goworkspace/models"
-)
+import "github.com/wopta/goworkspace/models"
 
 type Contractor struct {
 	Name                      string `json:"nome,omitempty"`

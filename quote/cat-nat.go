@@ -2,7 +2,6 @@ package quote
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 
 	"github.com/wopta/goworkspace/lib/log"
@@ -49,13 +48,11 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		warrant = networkNode.GetWarrant()
 	}
 
-	outSellable, err := sellable.CatnatSellable(reqPolicy, reqPolicy.Channel, networkNode, warrant, true)
+	_, err = sellable.CatnatSellable(reqPolicy, reqPolicy.Channel, networkNode, warrant, true)
 	if err != nil {
 		return "", nil, err
 	}
-	if len(outSellable.Msg) != 0 {
-		return "", nil, errors.New(outSellable.Msg)
-	}
+
 	var cnReq net.RequestDTO
 	err = cnReq.FromPolicy(reqPolicy, false)
 	if err != nil {
@@ -64,23 +61,13 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	}
 
 	netClient := netclient.NewNetClient()
-	netClient.Authenticate()
 
-	resp, errResp, err := netClient.Quote(cnReq)
+	resp, err := netClient.Quote(cnReq)
 	if err != nil {
 		log.ErrorF("error calling NetInsurance api: %s", err.Error())
 		return "", nil, err
 	}
 	var out []byte
-	if errResp != nil {
-		out, err = json.Marshal(errResp)
-		if err != nil {
-			log.ErrorF("error encoding response %v", err.Error())
-			return "", nil, err
-		}
-
-		return string(out), out, nil
-	}
 
 	if resp.Result != "OK" {
 		out, err = json.Marshal(resp)
@@ -91,7 +78,10 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		return string(out), out, nil
 	}
 
-	_ = resp.ToPolicy(reqPolicy)
+	err = resp.ToPolicy(reqPolicy)
+	if err != nil {
+		return "", nil, err
+	}
 
 	product := prd.GetProductV2(reqPolicy.Name, reqPolicy.ProductVersion, reqPolicy.Channel, networkNode, warrant)
 	addConsultacyPrice(reqPolicy, product)

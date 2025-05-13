@@ -58,7 +58,7 @@ func CatnatFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	return string(js), nil, nil
 }
 
-func CatnatSellable(policy *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant, lastValidation bool) (*SellableOutput, error) {
+func CatnatSellable(policy *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant, isValidationForQuote bool) (*SellableOutput, error) {
 	log.AddPrefix("CatnatSellalble")
 	defer log.PopPrefix()
 
@@ -84,11 +84,12 @@ func CatnatSellable(policy *models.Policy, channel string, networkNode *models.N
 		return nil, errors.New(out.Msg)
 	}
 
-	if !lastValidation {
+	if !isValidationForQuote {
 		out = ruleOutput.(*SellableOutput)
 		log.InfoF(out.Msg)
 		return out, nil
 	}
+
 	//you must have both SumInsuredTextField(Fabricato) and SumInsuredLimitOfIndemnityTextField(Contenuto)
 	isContenutoAndFabricato := func(value *models.GuaranteValue) bool {
 		val := value.SumInsured
@@ -101,22 +102,21 @@ func CatnatSellable(policy *models.Policy, channel string, networkNode *models.N
 		}
 		return true
 	}
-	if g, err := policy.ExtractGuarantee("landslides"); err == nil {
+
+	if g, err := policy.ExtractGuarantee("landslide"); err == nil {
 		if g.Value == nil || !isContenutoAndFabricato(g.Value) {
-			out.Msg += "You need atleast fabricato and contenuto for landslides,"
+			out.Msg += "You need atleast fabricato and contenuto for landSlide,"
 		}
-	} else {
-		out.Msg += ("you must have landslides")
-		return out, err
 	}
 
 	if g, err := policy.ExtractGuarantee("earthquake"); err == nil {
-		if policy.QuoteQuestions["isEarthquakeSelected"].(bool) && (g.Value == nil || !isContenutoAndFabricato(g.Value)) {
+		if g.Value == nil || !isContenutoAndFabricato(g.Value) {
 			out.Msg += "You need atleast fabricato and contenuto for earthquake,"
 		}
 	}
+
 	if g, err := policy.ExtractGuarantee("flood"); err == nil {
-		if policy.QuoteQuestions["isFloodSelected"].(bool) && (g.Value == nil || !isContenutoAndFabricato(g.Value)) {
+		if g.Value == nil || !isContenutoAndFabricato(g.Value) {
 			out.Msg += "You need atleast fabricato and contenuto for flood,"
 		}
 	}
@@ -127,16 +127,29 @@ func CatnatSellable(policy *models.Policy, channel string, networkNode *models.N
 func getCatnatInputRules(p *models.Policy) ([]byte, error) {
 	var res []byte
 	out := make(map[string]any)
-	locationlen := 0
 	out["isEarthquakeSelected"] = false
 	out["isFloodSelected"] = false
+	locationlen := 0
 
-	if val, ok := p.QuoteQuestions["isEarthquakeSelected"]; ok {
-		out["isEarthquakeSelected"] = val
+	alreadyEarthquake := p.QuoteQuestions["alreadyEarthquake"]
+	if alreadyEarthquake == nil {
+		alreadyEarthquake = false
 	}
-	if val, ok := p.QuoteQuestions["isFloodSelected"]; ok {
-		out["isFloodSelected"] = val
+	alreadyFlood := p.QuoteQuestions["alreadyFlood"]
+	if alreadyFlood == nil {
+		alreadyFlood = false
 	}
+	wantEarthquake := p.QuoteQuestions["wantEarthquake"]
+	if wantEarthquake == nil {
+		wantEarthquake = false
+	}
+	wantFlood := p.QuoteQuestions["wantFlood"]
+	if wantFlood == nil {
+		wantFlood = false
+	}
+	out["isEarthquakeSelected"] = (alreadyEarthquake.(bool) && wantEarthquake.(bool)) || !alreadyEarthquake.(bool)
+	out["isFloodSelected"] = ((alreadyFlood).(bool) && wantFlood.(bool)) || !alreadyFlood.(bool)
+
 	for _, a := range p.Assets {
 		if a.Type == models.AssetTypeBuilding {
 			locationlen += 1

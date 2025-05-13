@@ -33,11 +33,10 @@ func catnatIntegration(store bpmn.StorageData) error {
 		return err
 	}
 	client := client.NewNetClient()
-	client.Authenticate()
 	requestDto := net.RequestDTO{}
 	requestDto.FromPolicy(policy.Policy, true)
 	requestDto.Emission = "si"
-	res, _, e := client.Quote(requestDto)
+	res, e := client.Quote(requestDto)
 	if e != nil {
 		return e
 	}
