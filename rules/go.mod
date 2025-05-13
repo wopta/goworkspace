@@ -10,7 +10,7 @@ require (
 	github.com/go-gota/gota v0.12.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/wopta/goworkspace/lib v1.0.146
-	github.com/wopta/goworkspace/quote v1.0.144
+	github.com/wopta/goworkspace/quote v1.0.145
 )
 
 require (
@@ -77,7 +77,7 @@ require (
 	github.com/wopta/goworkspace/network v1.0.107 // indirect
 	github.com/wopta/goworkspace/policy v1.0.190 // indirect
 	github.com/wopta/goworkspace/product v1.1.39 // indirect
-	github.com/wopta/goworkspace/sellable v1.0.139 // indirect
+	github.com/wopta/goworkspace/sellable v1.0.140 // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20231025114914-d1ff6096ae53 // indirect
