@@ -1,7 +1,9 @@
 package sellable
 
 import (
+	"maps"
 	"os"
+	"slices"
 	"testing"
 
 	env "github.com/wopta/goworkspace/lib/environment"
@@ -15,35 +17,41 @@ func assertEqual[t comparable](got, exp t, test *testing.T, namefield string) {
 		test.Fail()
 	}
 }
+func fromGuaranteeMapToSlice(mapG map[string]*models.Guarante) (res []models.Guarante) {
+	for _, m := range mapG {
+		log.ErrorF("jfdsklfjd %v", m.Name)
+		res = append(res, *m)
+	}
+	return
+}
 func getPrePopulatedPolicyForCatnat() models.Policy {
 	return models.Policy{
 		Name:           "cat-nat",
 		ProductVersion: "v1",
 		Channel:        "mga",
-		Assets: []models.Asset{
+		Assets: slices.Clone([]models.Asset{
 			{
 				Type: models.AssetTypeBuilding,
 				Guarantees: []models.Guarante{
 					{Slug: "landslides"},
 				}},
-		},
-		QuoteQuestions: map[string]any{
-			"isEarthquakeSelected": false,
-			"isFloodSelected":      true,
-		},
+		}),
+		QuoteQuestions: maps.Clone(map[string]any{}),
 	}
 }
 
 func TestCatnatSellableNoAssets(t *testing.T) {
 	var policy = getPrePopulatedPolicyForCatnat()
 
+	policy.QuoteQuestions = map[string]any{
+		"alreadyEarthquake": true,
+		"alreadyFlood":      true,
+		"wantEarthquake":    false,
+	}
 	os.Setenv("env", env.LocalTest)
 	policy.Assets = []models.Asset{}
-	output, err := CatnatSellable(&policy, policy.Channel, nil, nil, false)
-	if err != nil {
-		t.Fatal(err)
-	}
-	assertEqual(output.Msg, "Wrong numbers of locations", t, "")
+	_, err := CatnatSellable(&policy, policy.Channel, nil, nil, false)
+	assertEqual(err.Error(), "Wrong numbers of locations", t, "")
 }
 
 func TestCatnatSellableWrongQuoteQuestionsAnswer(t *testing.T) {
@@ -51,14 +59,12 @@ func TestCatnatSellableWrongQuoteQuestionsAnswer(t *testing.T) {
 
 	os.Setenv("env", env.LocalTest)
 	policy.QuoteQuestions = map[string]any{
-		"isEarthquakeSelected": false,
-		"isFloodSelected":      false,
+		"alreadyEarthquake": true,
+		"alreadyFlood":      true,
+		"wantEarthquake":    false,
 	}
-	output, err := CatnatSellable(&policy, policy.Channel, nil, nil, false)
-	if err != nil {
-		t.Fatal(err)
-	}
-	assertEqual(output.Msg, "have to select at least earthquake or flood", t, "")
+	_, err := CatnatSellable(&policy, policy.Channel, nil, nil, false)
+	assertEqual(err.Error(), "have to select at least earthquake or flood", t, "")
 }
 
 func TestCatnatSellableEarthQuakeConf(t *testing.T) {
@@ -66,8 +72,9 @@ func TestCatnatSellableEarthQuakeConf(t *testing.T) {
 
 	os.Setenv("env", env.LocalTest)
 	policy.QuoteQuestions = map[string]any{
-		"isEarthquakeSelected": true,
-		"isFloodSelected":      false,
+		"alreadyEarthquake": false,
+		"alreadyFlood":      true,
+		"wantFlood":         false,
 	}
 	output, err := CatnatSellable(&policy, policy.Channel, nil, nil, false)
 	if err != nil {
@@ -94,8 +101,9 @@ func TestCatnatSellableFlood(t *testing.T) {
 
 	os.Setenv("env", env.LocalTest)
 	policy.QuoteQuestions = map[string]any{
-		"isEarthquakeSelected": false,
-		"isFloodSelected":      true,
+		"alreadyEarthquake": true,
+		"alreadyFlood":      true,
+		"wantFlood":         true,
 	}
 	output, err := CatnatSellable(&policy, policy.Channel, nil, nil, false)
 	if err != nil {
@@ -112,41 +120,42 @@ func TestCatnatSellableFlood(t *testing.T) {
 	assertEqual(output.Product.Companies[0].GuaranteesMap["earthquake"].IsConfigurable, false, t, "earthquake_isConfigurable")
 	assertEqual(output.Product.Companies[0].GuaranteesMap["earthquake"].IsMandatory, false, t, "earthquake_isMandatory")
 }
-func TestCatnatSellableLandSlideWithQuoteAndNOConf(t *testing.T) {
+func TestCatnatSellableFloodWithQuoteAndNOConf(t *testing.T) {
 	var policy = getPrePopulatedPolicyForCatnat()
 
 	os.Setenv("env", env.LocalTest)
 	policy.QuoteQuestions = map[string]any{
-		"isEarthquakeSelected": false,
-		"isFloodSelected":      true,
+		"alreadyEarthquake": true,
+		"wantEarthquake":    false,
+		"alreadyFlood":      true,
+		"wantFlood":         true,
 	}
-	output, err := CatnatSellable(&policy, policy.Channel, nil, nil, true)
+	out, err := CatnatSellable(&policy, policy.Channel, nil, nil, false)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assertEqual(output.Msg, "You need atleast fabricato and contenuto for landslides,", t, "")
+	policy.Assets[0].Guarantees = fromGuaranteeMapToSlice(out.Product.Companies[0].GuaranteesMap)
+	_, err = CatnatSellable(&policy, policy.Channel, nil, nil, true)
+	assertEqual(err.Error(), "You need atleast fabricato and contenuto for flood", t, "")
 }
-func TestCatnatSellableLandSlideWithQuoteOnlyFabricato(t *testing.T) {
+func TestCatnatSellableEartquakeWithQuoteOnlyFabricato(t *testing.T) {
 	var policy = getPrePopulatedPolicyForCatnat()
-	policy.Assets[0].Guarantees = append(policy.Assets[0].Guarantees,
-		models.Guarante{Slug: "flood"},
-	)
-	policy.Assets[0].Guarantees[1].Value = &models.GuaranteValue{
-		SumInsured: 2,
-	}
 	os.Setenv("env", env.LocalTest)
 	policy.QuoteQuestions = map[string]any{
-		"isEarthquakeSelected": false,
-		"isFloodSelected":      true,
+		"alreadyEarthquake": false,
+		"alreadyFlood":      true,
+		"wantFlood":         false,
 	}
-	output, err := CatnatSellable(&policy, policy.Channel, nil, nil, true)
+	out, err := CatnatSellable(&policy, policy.Channel, nil, nil, false)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assertEqual(output.Msg, "You need atleast fabricato and contenuto for landslides,You need atleast fabricato and contenuto for flood,", t, "")
+	policy.Assets[0].Guarantees = fromGuaranteeMapToSlice(out.Product.Companies[0].GuaranteesMap)
+	_, err = CatnatSellable(&policy, policy.Channel, nil, nil, true)
+	assertEqual(err.Error(), "You need atleast fabricato and contenuto for earthquake", t, "")
 }
 
-func TestCatnatSellableLandSlideWithQuote(t *testing.T) {
+func TestCatnatSellableFloodWithQuote(t *testing.T) {
 	var policy = getPrePopulatedPolicyForCatnat()
 	policy.Assets[0].Guarantees = append(policy.Assets[0].Guarantees,
 		models.Guarante{Slug: "flood"},
@@ -157,37 +166,40 @@ func TestCatnatSellableLandSlideWithQuote(t *testing.T) {
 	}
 	os.Setenv("env", env.LocalTest)
 	policy.QuoteQuestions = map[string]any{
-		"isEarthquakeSelected": false,
-		"isFloodSelected":      true,
+		"alreadyFlood":      false,
+		"alreadyEarthquake": true,
+		"wantEartquake":     false,
 	}
-	output, err := CatnatSellable(&policy, policy.Channel, nil, nil, true)
+	out, err := CatnatSellable(&policy, policy.Channel, nil, nil, false)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assertEqual(output.Msg, "You need atleast fabricato and contenuto for flood,", t, "")
+	policy.Assets[0].Guarantees = fromGuaranteeMapToSlice(out.Product.Companies[0].GuaranteesMap)
+	_, err = CatnatSellable(&policy, policy.Channel, nil, nil, true)
+	assertEqual(err.Error(), "You need atleast fabricato and contenuto for flood", t, "")
 }
 
 func TestCatnatSellable(t *testing.T) {
 	var policy = getPrePopulatedPolicyForCatnat()
-	policy.Assets[0].Guarantees = append(policy.Assets[0].Guarantees,
-		models.Guarante{Slug: "flood"},
-	)
-	policy.Assets[0].Guarantees[1].Value = &models.GuaranteValue{
-		SumInsured:                 2,
-		SumInsuredLimitOfIndemnity: 2,
+	os.Setenv("env", env.LocalTest)
+	policy.QuoteQuestions = map[string]any{
+		"alreadyFlood":      false,
+		"alreadyEarthquake": true,
+		"wantEartquake":     false,
 	}
+	out, err := CatnatSellable(&policy, policy.Channel, nil, nil, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	policy.Assets[0].Guarantees = fromGuaranteeMapToSlice(out.Product.Companies[0].GuaranteesMap)
 	policy.Assets[0].Guarantees[0].Value = &models.GuaranteValue{
 		SumInsured:                 2,
 		SumInsuredLimitOfIndemnity: 2,
 	}
-	os.Setenv("env", env.LocalTest)
-	policy.QuoteQuestions = map[string]any{
-		"isEarthquakeSelected": false,
-		"isFloodSelected":      true,
+	policy.Assets[0].Guarantees[1].Value = &models.GuaranteValue{
+		SumInsured:                 2,
+		SumInsuredLimitOfIndemnity: 2,
 	}
-	output, err := CatnatSellable(&policy, policy.Channel, nil, nil, true)
-	if err != nil {
-		t.Fatal(err)
-	}
-	assertEqual(output.Msg, "", t, "")
+	_, err = CatnatSellable(&policy, policy.Channel, nil, nil, true)
+	assertEqual(err, nil, t, "")
 }
