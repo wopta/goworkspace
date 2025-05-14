@@ -1,4 +1,4 @@
-package net
+package catnat
 
 import (
 	"errors"
@@ -142,19 +142,50 @@ const earthquakeSlug = "earthquake"
 const floodSlug = "flood"
 const landslideSlug = "landslides"
 
+const catNatProductCode = "007"
+const catNatDistributorCode = "0155"
+const catNatSecondLevelCode = "0001"
+const catNatThirdLevelCode = "00180"
+const catNatSplitting = "01"
+const catNatLegalPerson = "2"
+const catNatSalesChannel = "3"
+const catNatSoleProp = "3"
+
 const yes = "si"
 const no = "no"
 
-func (d *RequestDTO) FromPolicy(p *models.Policy, fillEveryField bool) error {
+var useTypeMap = map[string]string{
+	"owner-tenant": "si",
+	"tenant":       "no",
+}
+var buildingYearMap = map[string]int{
+	"before_1950":       1,
+	"from_1950_to_1990": 2,
+	"after_1990":        3,
+	"unknown":           4,
+}
+var floorMap = map[string]int{
+	"up_to_2":     2,
+	"more_than_3": 1,
+}
+var lowestFloorMap = map[string]int{
+	"first_floor":  1,
+	"upper_floor":  2,
+	"ground_floor": 3,
+	"underground":  4,
+}
+var buildingMaterialMap = map[string]int{
+	"brick":    1,
+	"concrete": 2,
+	"steel":    3,
+	"unknown":  4,
+}
+var quoteQuestionMap = map[bool]string{
+	true:  "si",
+	false: "no",
+}
 
-	const catNatProductCode = "007"
-	const catNatDistributorCode = "0155"
-	const catNatSecondLevelCode = "0001"
-	const catNatThirdLevelCode = "00180"
-	const catNatSplitting = "01"
-	const catNatSalesChannel = "3"
-	const catNatLegalPerson = "2"
-	const catNatSoleProp = "3"
+func (d *RequestDTO) FromPolicy(p *models.Policy, fillEveryField bool) error {
 
 	d.ProductCode = catNatProductCode
 	d.Date = p.StartDate.Format("2006-01-02")
@@ -229,36 +260,6 @@ func (d *RequestDTO) FromPolicy(p *models.Policy, fillEveryField bool) error {
 		}
 
 		d.LegalRepresentative = legalRep
-	}
-	useTypeMap := map[string]string{
-		"owner-tenant": "si",
-		"tenant":       "no",
-	}
-	buildingYearMap := map[string]int{
-		"before_1950":       1,
-		"from_1950_to_1990": 2,
-		"after_1990":        3,
-		"unknown":           4,
-	}
-	floorMap := map[string]int{
-		"up_to_2":     2,
-		"more_than_3": 1,
-	}
-	lowestFloorMap := map[string]int{
-		"first_floor":  1,
-		"upper_floor":  2,
-		"ground_floor": 3,
-		"underground":  4,
-	}
-	buildingMaterialMap := map[string]int{
-		"brick":    1,
-		"concrete": 2,
-		"steel":    3,
-		"unknown":  4,
-	}
-	quoteQuestionMap := map[bool]string{
-		true:  "si",
-		false: "no",
 	}
 
 	alreadyEarthquake := p.QuoteQuestions["alreadyEarthquake"]
