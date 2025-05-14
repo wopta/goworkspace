@@ -343,7 +343,7 @@ func setGuaranteeValue(asset *AssetRequest, guarantee models.Guarante, code stri
 	}
 }
 
-func (d *ResponseDTO) ToPolicy(p *models.Policy) error {
+func (d *ResponseDTO) ToPolicy(p *models.Policy) {
 	eOffer := make(map[string]*models.GuaranteValue)
 	fOffer := make(map[string]*models.GuaranteValue)
 	lOffer := make(map[string]*models.GuaranteValue)
@@ -408,7 +408,6 @@ func (d *ResponseDTO) ToPolicy(p *models.Policy) error {
 	p.OffersPrices["default"]["yearly"].Net = p.PriceNett
 	p.OffersPrices["default"]["yearly"].Tax = p.TaxAmount
 
-	return nil
 }
 
 func formatAddress(addr *models.Address) string {

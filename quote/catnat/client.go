@@ -20,6 +20,11 @@ type NetClient struct {
 	*http.Client
 }
 
+type INetClient interface {
+	Quote(dto RequestDTO) (response ResponseDTO, err error)
+	Emit(dto RequestDTO) (response any, err error)
+}
+
 func NewNetClient() (client *NetClient) {
 	client = &NetClient{}
 	tokenUrl := os.Getenv("NET_BASEURL") + authEndpoint
