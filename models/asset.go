@@ -13,38 +13,37 @@ type Asset struct {
 }
 
 type Building struct {
-	Name                 string   `firestore:"name,omitempty" json:"name,omitempty"`
-	Type                 string   `firestore:"type,omitempty" json:"type,omitempty"`
-	StreetNumber         string   `firestore:"streetNumber,omitempty" json:"streetNumber,omitempty"`
-	CityCode             string   `firestore:"cityCode,omitempty" json:"cityCode,omitempty"`
-	PostalCode           string   `firestore:"postalCode" json:"postalCode,omitempty"`
-	City                 string   `firestore:"city" json:"city,omitempty"`
-	Locality             string   `firestore:"locality" json:"locality,omitempty"`
-	Location             Location `firestore:"location" json:"location,omitempty"`
-	Address              string   `firestore:"address,omitempty"         json:"address,omitempty"         bigquery:"-"`
-	BuildingType         string   `firestore:"buildingType,omitempty" json:"buildingType,omitempty"`
-	BuildingMaterial     string   `firestore:"buildingMaterial,omitempty" json:"buildingMaterial,omitempty"`
-	BuildingYear         string   `firestore:"buildingYear,omitempty" json:"buildingYear,omitempty"`
-	Employer             int64    `firestore:"employer,omitempty" json:"employer,omitempty"`
-	HasAlarm             bool     `firestore:"hasAlarm" json:"hasAlarm"`
-	Floor                string   `firestore:"floor,omitempty" json:"floor,omitempty"`
-	Ateco                string   `firestore:"ateco,omitempty" json:"ateco,omitempty"`
-	AtecoDesc            string   `firestore:"atecoDesc,omitempty" json:"atecoDesc,omitempty"`
-	AtecoMacro           string   `firestore:"atecoMacro,omitempty" json:"atecoMacro,omitempty"`
-	AtecoSub             string   `firestore:"atecoSub,omitempty" json:"atecoSub,omitempty"`
-	Costruction          string   `firestore:"costruction,omitempty" json:"costruction,omitempty"`
-	IsHolder             bool     `firestore:"isHolder,omitempty" json:"isHolder,omitempty"`
-	NaicsDetail          string   `firestore:"naicsDetail,omitempty" json:"naicsDetail,omitempty"`
-	NaicsCategory        string   `firestore:"naicsCategory,omitempty" json:"naicsCategory,omitempty"`
-	Naics                string   `firestore:"naics,omitempty" json:"naics,omitempty"`
-	IsNaicsSellable      bool     `firestore:"isNaicsSellable,omitempty" json:"isNaicsSellable,omitempty"`
-	HasSandwichPanel     bool     `firestore:"hasSandwichPanel" json:"hasSandwichPanel"`
-	HasSprinkler         bool     `firestore:"hasSprinkler" json:"hasSprinkler"`
-	BuildingAddress      *Address `firestore:"buildingAddress,omitempty" json:"buildingAddress,omitempty"`
-	UseType              string   `firestore:"useType,omitempty" json:"useType,omitempty"`
-	LowestFloor          string   `firestore:"lowestFloor,omitempty" json:"lowestFloor,omitempty"`
-	RangeNumbesrOfFloors *string  `firestore:"rangeNumbersOfFloors,omitempty" json:"rangeNumbersOfFloors,omitempty"`
-	GroundFloor          *string  `firestore:"theGroundFloor,omitempty" json:"theGroundFloor,omitempty"`
+	Name             string   `firestore:"name,omitempty" json:"name,omitempty"`
+	Type             string   `firestore:"type,omitempty" json:"type,omitempty"`
+	StreetNumber     string   `firestore:"streetNumber,omitempty" json:"streetNumber,omitempty"`
+	CityCode         string   `firestore:"cityCode,omitempty" json:"cityCode,omitempty"`
+	PostalCode       string   `firestore:"postalCode" json:"postalCode,omitempty"`
+	City             string   `firestore:"city" json:"city,omitempty"`
+	Locality         string   `firestore:"locality" json:"locality,omitempty"`
+	Location         Location `firestore:"location" json:"location,omitempty"`
+	Address          string   `firestore:"address,omitempty"         json:"address,omitempty"         bigquery:"-"`
+	BuildingType     string   `firestore:"buildingType,omitempty" json:"buildingType,omitempty"`
+	BuildingMaterial string   `firestore:"buildingMaterial,omitempty" json:"buildingMaterial,omitempty"`
+	BuildingYear     string   `firestore:"buildingYear,omitempty" json:"buildingYear,omitempty"`
+	Employer         int64    `firestore:"employer,omitempty" json:"employer,omitempty"`
+	HasAlarm         bool     `firestore:"hasAlarm" json:"hasAlarm"`
+	Floor            string   `firestore:"floor,omitempty" json:"floor,omitempty"`
+	Ateco            string   `firestore:"ateco,omitempty" json:"ateco,omitempty"`
+	AtecoDesc        string   `firestore:"atecoDesc,omitempty" json:"atecoDesc,omitempty"`
+	AtecoMacro       string   `firestore:"atecoMacro,omitempty" json:"atecoMacro,omitempty"`
+	AtecoSub         string   `firestore:"atecoSub,omitempty" json:"atecoSub,omitempty"`
+	Costruction      string   `firestore:"costruction,omitempty" json:"costruction,omitempty"`
+	IsHolder         bool     `firestore:"isHolder,omitempty" json:"isHolder,omitempty"`
+	NaicsDetail      string   `firestore:"naicsDetail,omitempty" json:"naicsDetail,omitempty"`
+	NaicsCategory    string   `firestore:"naicsCategory,omitempty" json:"naicsCategory,omitempty"`
+	Naics            string   `firestore:"naics,omitempty" json:"naics,omitempty"`
+	IsNaicsSellable  bool     `firestore:"isNaicsSellable,omitempty" json:"isNaicsSellable,omitempty"`
+	HasSandwichPanel bool     `firestore:"hasSandwichPanel" json:"hasSandwichPanel"`
+	HasSprinkler     bool     `firestore:"hasSprinkler" json:"hasSprinkler"`
+	BuildingAddress  *Address `firestore:"buildingAddress,omitempty" json:"buildingAddress,omitempty"`
+	UseType          string   `firestore:"useType,omitempty" json:"useType,omitempty"`
+	LowestFloor      string   `firestore:"lowestFloor,omitempty" json:"lowestFloor,omitempty"`
+	GroundFloor      *string  `firestore:"theGroundFloor,omitempty" json:"theGroundFloor,omitempty"`
 }
 
 type Enterprise struct {

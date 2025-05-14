@@ -70,6 +70,7 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		log.ErrorF("error building NetInsurance DTO: %s", err.Error())
 		return "", nil, err
 	}
+	log.PrintStruct("requestQuote", cnReq)
 
 	netClient := netclient.NewNetClient()
 	netClient.Authenticate()
@@ -91,7 +92,7 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 		return string(out), out, nil
 	}
-
+	log.PrintStruct("result quote", resp)
 	if resp.Result != "OK" {
 		out, err = json.Marshal(resp)
 		if err != nil {

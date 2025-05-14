@@ -1,6 +1,7 @@
 package log
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
@@ -52,5 +53,10 @@ func ErrorF(format string, a ...any) {
 
 // Log a struct
 func PrintStruct(message string, object any) {
-	Printf(message+": %+v", object)
+	bytes, err := json.Marshal(object)
+	if err != nil {
+		Error(err)
+		return
+	}
+	Printf(message+": %v", string(bytes))
 }
