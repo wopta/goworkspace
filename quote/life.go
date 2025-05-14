@@ -3,7 +3,6 @@ package quote
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"math"
 	"net/http"
@@ -11,6 +10,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/wopta/goworkspace/lib/log"
+	"github.com/wopta/goworkspace/quote/internal"
 
 	"github.com/dustin/go-humanize"
 	"github.com/wopta/goworkspace/lib"
@@ -107,7 +109,7 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 
 	log.Printf("loading available rates for flow %s", flow)
 
-	availableRates := getAvailableRates(ruleProduct, flow)
+	availableRates := internal.GetAvailableRates(ruleProduct, flow)
 
 	log.Printf("available rates: %s", availableRates)
 
@@ -196,7 +198,7 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 
 	log.Println("filtering available rates")
 
-	removeOfferRate(&data, availableRates)
+	internal.RemoveOfferRate(&data, availableRates)
 
 	log.Println("round offers prices")
 
@@ -208,7 +210,7 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 
 	log.Println("apply consultacy price")
 
-	addConsultacyPrice(&data, ruleProduct)
+	internal.AddConsultacyPrice(&data, ruleProduct)
 
 	log.Println("sort guarantees list")
 

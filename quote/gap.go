@@ -14,6 +14,7 @@ import (
 	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
+	"github.com/wopta/goworkspace/quote/internal"
 	"github.com/wopta/goworkspace/sellable"
 )
 
@@ -67,7 +68,7 @@ func Gap(policy *models.Policy, channel string, networkNode *models.NetworkNode,
 	product, err := sellable.Gap(policy, channel, networkNode, warrant)
 	lib.CheckError(err)
 
-	availableRates := getAvailableRates(product, flow)
+	availableRates := internal.GetAvailableRates(product, flow)
 
 	policy.Assets[0].Guarantees = getGuarantees(*product)
 
@@ -75,9 +76,9 @@ func Gap(policy *models.Policy, channel string, networkNode *models.NetworkNode,
 
 	log.Println("apply consultacy price")
 
-	addConsultacyPrice(policy, product)
+	internal.AddConsultacyPrice(policy, product)
 
-	removeOfferRate(policy, availableRates)
+	internal.RemoveOfferRate(policy, availableRates)
 }
 
 func calculateGapOfferPrices(policy *models.Policy, product models.Product) {

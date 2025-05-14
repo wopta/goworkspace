@@ -2,17 +2,16 @@ package quote
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 
 	"github.com/wopta/goworkspace/lib/log"
+	"github.com/wopta/goworkspace/network"
+	prd "github.com/wopta/goworkspace/product"
 	"github.com/wopta/goworkspace/quote/catnat"
 	"github.com/wopta/goworkspace/sellable"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
-	prd "github.com/wopta/goworkspace/product"
 )
 
 func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -42,54 +41,24 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		log.ErrorF("error decoding request body")
 		return "", nil, err
 	}
+	client := catnat.NewNetClient()
+
 	networkNode := network.GetNetworkNodeByUid(reqPolicy.ProducerUid)
 	var warrant *models.Warrant
 	if networkNode != nil {
 		warrant = networkNode.GetWarrant()
 	}
-
-	outSellable, err := sellable.CatnatSellable(reqPolicy, reqPolicy.Channel, networkNode, warrant, true)
-	if err != nil {
-		return "", nil, err
-	}
-	if len(outSellable.Msg) != 0 {
-		return "", nil, errors.New(outSellable.Msg)
-	}
-	addGuaranteesSettingsFromProduct(reqPolicy, outSellable.Product)
-
-	var cnReq catnat.RequestDTO
-	err = cnReq.FromPolicy(reqPolicy, false)
-	if err != nil {
-		log.ErrorF("error building NetInsurance DTO: %s", err.Error())
-		return "", nil, err
-	}
-	log.PrintStruct("requestQuote", cnReq)
-
-	netClient := catnat.NewNetClient()
-
-	resp, err := netClient.Quote(cnReq)
-	cnReqStr, _ := json.Marshal(cnReq)
-	log.InfoF(string(cnReqStr))
-	if err != nil {
-		log.ErrorF("error calling NetInsurance api: %s", err.Error())
-		return "", nil, err
-	}
-	var out []byte
-	log.PrintStruct("result quote", resp)
-	if resp.Result != "OK" {
-		out, err = json.Marshal(resp)
-		if err != nil {
-			log.ErrorF("error encoding response %v", err.Error())
-			return "", nil, err
-		}
-		return string(out), out, nil
-	}
-
-	_ = resp.ToPolicy(reqPolicy)
-
 	product := prd.GetProductV2(reqPolicy.Name, reqPolicy.ProductVersion, reqPolicy.Channel, networkNode, warrant)
-	addConsultacyPrice(reqPolicy, product)
-
+	resp, err := catnat.CatnatQuote(reqPolicy, product, sellable.CatnatSellable, client)
+	if err != nil {
+		return "", nil, err
+	}
+	cnReqStr, err := json.Marshal(resp)
+	if err != nil {
+		return "", nil, err
+	}
+	log.InfoF(string(cnReqStr))
+	var out []byte
 	out, err = json.Marshal(reqPolicy)
 	if err != nil {
 		log.ErrorF("error encoding response %v", err.Error())
@@ -97,15 +66,4 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	}
 
 	return string(out), out, err
-}
-
-func addGuaranteesSettingsFromProduct(policy *models.Policy, product *models.Product) {
-	for i, guaranteeReq := range policy.Assets[0].Guarantees {
-		if guarantee, ok := product.Companies[0].GuaranteesMap[guaranteeReq.Slug]; ok && guarantee != nil {
-			policy.Assets[0].Guarantees[i].IsSelected = product.Companies[0].GuaranteesMap[guaranteeReq.Slug].IsSelected
-			policy.Assets[0].Guarantees[i].IsMandatory = product.Companies[0].GuaranteesMap[guaranteeReq.Slug].IsMandatory
-			policy.Assets[0].Guarantees[i].IsSellable = product.Companies[0].GuaranteesMap[guaranteeReq.Slug].IsSellable
-			policy.Assets[0].Guarantees[i].IsConfigurable = product.Companies[0].GuaranteesMap[guaranteeReq.Slug].IsConfigurable
-		}
-	}
 }
