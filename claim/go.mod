@@ -8,9 +8,9 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/google/uuid v1.6.0
-	github.com/wopta/goworkspace/lib v1.0.149
-	github.com/wopta/goworkspace/mail v1.0.160
-	github.com/wopta/goworkspace/models v1.2.45
+	github.com/wopta/goworkspace/lib v1.0.150
+	github.com/wopta/goworkspace/mail v1.0.161
+	github.com/wopta/goworkspace/models v1.2.46
 )
 
 require (
@@ -65,7 +65,7 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/network v1.0.110 // indirect
+	github.com/wopta/goworkspace/network v1.0.111 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
