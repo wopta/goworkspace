@@ -50,7 +50,12 @@ func CatnatFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		warrant = networkNode.GetWarrant()
 	}
 
-	pr, err := CatnatSellable(policy, policy.Channel, networkNode, warrant, false)
+	product := product.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode, warrant)
+	if product == nil {
+		return "", nil, errors.New("Error getting catnat product")
+	}
+
+	pr, err := CatnatSellable(policy, product, false)
 	if err != nil {
 		return "", nil, err
 	}
@@ -58,7 +63,7 @@ func CatnatFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	return string(js), nil, nil
 }
 
-func CatnatSellable(policy *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant, isValidationForQuote bool) (*SellableOutput, error) {
+func CatnatSellable(policy *models.Policy, product *models.Product, isValidationForQuote bool) (*SellableOutput, error) {
 	log.AddPrefix("CatnatSellalble")
 	defer log.PopPrefix()
 
@@ -69,7 +74,6 @@ func CatnatSellable(policy *models.Policy, channel string, networkNode *models.N
 
 	rulesFile := lib.GetRulesFileV2(policy.Name, policy.ProductVersion, rulesFilename)
 	fx := new(models.Fx)
-	product := product.GetProductV2(policy.Name, policy.ProductVersion, channel, networkNode, warrant)
 	if product == nil {
 		return nil, errors.New("Error getting catnat product")
 	}
