@@ -1213,14 +1213,14 @@ func allegato4Section(pdf *fpdf.Fpdf, producerInfo, proponentInfo map[string]str
 	pdf.MultiCell(0, 3, "SEZIONE III - Informazioni relative alle remunerazioni", "", "", false)
 	pdf.Ln(1)
 	setBlackRegularFont(pdf, standardTextSize)
-	commisionText := "Per il prodotto intermediato, è corrisposto all’intermediario, da parte "+
-		"dell’impresa di assicurazione, un compenso sotto forma di commissione inclusa nel premio "+
+	commisionText := "Per il prodotto intermediato, è corrisposto all’intermediario, da parte " +
+		"dell’impresa di assicurazione, un compenso sotto forma di commissione inclusa nel premio " +
 		"assicurativo."
 	if consultacyPrice > 0 {
-		commisionText = "Per il prodotto intermediato, è corrisposto all’intermediario, da parte "+
-			"dell’impresa di assicurazione, sotto forma di commissione inclusa nel premio assicurativo "+
-			"e un contributo per servizi di intermediazione, a carico del cliente, pari ad € "+
-			humanize.FormatFloat("#.###,##", consultacyPrice)+"."
+		commisionText = "Per il prodotto intermediato, è corrisposto un compenso all’intermediario, da parte " +
+			"dell’impresa di assicurazione, sotto forma di commissione inclusa nel premio assicurativo " +
+			"e un contributo per servizi di intermediazione, a carico del cliente, pari ad € " +
+			humanize.FormatFloat("#.###,##", consultacyPrice) + "."
 	}
 	pdf.MultiCell(0, 3, commisionText, "", "", false)
 	pdf.Ln(1)

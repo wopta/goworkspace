@@ -124,7 +124,7 @@ func (bg *baseGenerator) priceSummary() {
 	})
 	bg.engine.NewLine(5)
 	bg.engine.RawWriteText(domain.TableCell{
-		Text:      "Dettaglio dei costi ",
+		Text:      "Contributo servizi di intermediazione annuale ",
 		Height:    constants.CellHeight,
 		FontStyle: constants.BoldFontStyle,
 		FontColor: constants.BlackColor,

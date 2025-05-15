@@ -42,7 +42,7 @@ func (el *LifeGenerator) Generate() {
 	el.engine.NewLine(constants.CellHeight)
 	el.addHeading()
 
-	el.engine.NewLine(constants.CellHeight*2)
+	el.engine.NewLine(constants.CellHeight * 2)
 	el.addWelcomeSection()
 	el.engine.NewLine(constants.CellHeight)
 
@@ -193,11 +193,11 @@ func (el *LifeGenerator) addWelcomeSection() {
 func (el *LifeGenerator) addEmailSection() {
 	el.engine.WriteText(el.engine.GetTableCell(
 		"In allegato trovi:\n"+
-		"- modulo di Polizza\n"+
-		"- informativa precontrattuale di Wopta, prevista per legge\n"+
-		"- modulistica antiriciclaggio\n\n"+
-		"- informativa e dichiarazioni privacy per l’Assicuratore\n"+
-		"- informativa e dichiarazioni privacy per l’Intermediario", constants.BlackColor,
+			"- modulo di Polizza\n"+
+			"- informativa precontrattuale di Wopta, prevista per legge\n"+
+			"- modulistica antiriciclaggio\n\n"+
+			"- informativa e dichiarazioni privacy per l’Assicuratore\n"+
+			"- informativa e dichiarazioni privacy per l’Intermediario", constants.BlackColor,
 	))
 
 	el.engine.WriteText(el.engine.GetTableCell("Verifica la correttezza di tutti i dati inseriti (anagrafici, indirizzi, codice fiscale, contatti) e delle prestazioni scelte (durata, importi, eventuali opzioni).", constants.BlackColor))
@@ -221,15 +221,15 @@ func (el *LifeGenerator) addSignSection() {
 }
 
 func (el *LifeGenerator) addPolicyInformationSection() {
-	if el.dtoLife.ConsultancyValue.Price.ValueFloat == 0{
+	if el.dtoLife.ConsultancyValue.Price.ValueFloat == 0 {
 		return
 	}
 	el.engine.NewLine(constants.CellHeight)
 	text :=
-	"Infine, ti ricordiamo la presente polizza prevede il pagamento dei seguenti costi:\n" +
-	fmt.Sprintf("- Premio di polizza: euro %v con frazionamento %v\n", el.dtoLife.Prizes.Gross.Text, el.dtoLife.Prizes.Split) +
-	fmt.Sprintf("- Dettaglio dei costi: euro %v corrisposti con il pagamento della prima rata di polizza\n", el.dtoLife.ConsultancyValue.Price.Text) +
-	fmt.Sprintf("- Per un totale annuo di euro %v", el.dtoLife.PriceAnnuity)
+		"Infine, ti ricordiamo la presente polizza prevede il pagamento dei seguenti costi:\n" +
+			fmt.Sprintf("- Premio di polizza: euro %v con frazionamento %v\n", el.dtoLife.Prizes.Gross.Text, el.dtoLife.Prizes.Split) +
+			fmt.Sprintf("- Contributo servizi di intermediazione annuale: euro %v corrisposti con il pagamento della prima rata di polizza\n", el.dtoLife.ConsultancyValue.Price.Text) +
+			fmt.Sprintf("- Per un totale annuo di euro %v", el.dtoLife.PriceAnnuity)
 
 	el.engine.WriteText(el.engine.GetTableCell(text, constants.BlackColor))
 }
