@@ -5,8 +5,8 @@ go 1.21
 replace github.com/wopta/goworkspace/product => ./
 
 require (
-	github.com/wopta/goworkspace/lib v1.0.151
-	github.com/wopta/goworkspace/models v1.2.47
+	github.com/wopta/goworkspace/lib v1.0.152
+	github.com/wopta/goworkspace/models v1.2.48
 )
 
 require (
