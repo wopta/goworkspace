@@ -5,11 +5,11 @@ go 1.21
 require (
 	cloud.google.com/go/firestore v1.15.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
-	github.com/wopta/goworkspace/lib v1.0.150
-	github.com/wopta/goworkspace/mail v1.0.161
-	github.com/wopta/goworkspace/models v1.2.46
-	github.com/wopta/goworkspace/payment v1.0.332
-	github.com/wopta/goworkspace/transaction v1.0.188
+	github.com/wopta/goworkspace/lib v1.0.151
+	github.com/wopta/goworkspace/mail v1.0.162
+	github.com/wopta/goworkspace/models v1.2.47
+	github.com/wopta/goworkspace/payment v1.0.333
+	github.com/wopta/goworkspace/transaction v1.0.189
 	google.golang.org/api v0.181.0
 )
 
@@ -73,10 +73,10 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	github.com/wopta/goworkspace/document v1.1.155 // indirect
-	github.com/wopta/goworkspace/network v1.0.111 // indirect
-	github.com/wopta/goworkspace/policy v1.0.195 // indirect
-	github.com/wopta/goworkspace/product v1.1.43 // indirect
+	github.com/wopta/goworkspace/document v1.1.156 // indirect
+	github.com/wopta/goworkspace/network v1.0.112 // indirect
+	github.com/wopta/goworkspace/policy v1.0.196 // indirect
+	github.com/wopta/goworkspace/product v1.1.44 // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
