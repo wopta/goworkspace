@@ -28,12 +28,12 @@ type mock_clientCatnat struct {
 func (c *mock_clientCatnat) Download(_ string) (response catnat.DownloadResponse, err error) {
 	return catnat.DownloadResponse{}, nil
 }
-func (c *mock_clientCatnat) Quote(dto catnat.RequestDTO) (response catnat.QuoteResponse, err error) {
+func (c *mock_clientCatnat) Quote(dto catnat.QuoteRequest) (response catnat.QuoteResponse, err error) {
 	if c.withError {
 		return response, errors.New("quote error")
 	}
 	var bytes []byte
-	var dtoExpected catnat.RequestDTO
+	var dtoExpected catnat.QuoteRequest
 	bytes, e := lib.GetFilesByEnvV2("data/test/quote/catnat/" + c.nameFileToCompare)
 	if e != nil {
 		panic(e)
@@ -46,7 +46,7 @@ func (c *mock_clientCatnat) Quote(dto catnat.RequestDTO) (response catnat.QuoteR
 	return response, nil
 }
 
-func (c *mock_clientCatnat) Emit(dto catnat.RequestDTO) (response catnat.QuoteResponse, err error) {
+func (c *mock_clientCatnat) Emit(dto catnat.QuoteRequest) (response catnat.QuoteResponse, err error) {
 	return response, nil
 }
 

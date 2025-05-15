@@ -23,8 +23,8 @@ type NetClient struct {
 }
 
 type INetClient interface {
-	Quote(dto RequestDTO) (response QuoteResponse, err error)
-	Emit(dto RequestDTO) (response QuoteResponse, err error)
+	Quote(dto QuoteRequest) (response QuoteResponse, err error)
+	Emit(dto QuoteRequest) (response QuoteResponse, err error)
 	Download(numeroPoliza string) (response DownloadResponse, err error)
 }
 
@@ -44,7 +44,7 @@ func NewNetClient() (client *NetClient) {
 	return client
 }
 
-func (c *NetClient) Quote(dto RequestDTO) (response QuoteResponse, err error) {
+func (c *NetClient) Quote(dto QuoteRequest) (response QuoteResponse, err error) {
 	url := os.Getenv("NET_BASEURL") + "/PolizzeGateway24/emettiPolizza/441-029-007"
 	rBuff := new(bytes.Buffer)
 	log.PrintStruct("request: ", dto)
@@ -78,7 +78,7 @@ func (c *NetClient) Quote(dto RequestDTO) (response QuoteResponse, err error) {
 	return response, nil
 }
 
-func (c *NetClient) Emit(dto RequestDTO) (response QuoteResponse, err error) {
+func (c *NetClient) Emit(dto QuoteRequest) (response QuoteResponse, err error) {
 	dto.Emission = "si"
 	url := os.Getenv("NET_BASEURL") + "/PolizzeGateway24/emettiPolizza/441-029-007"
 	rBuff := new(bytes.Buffer)

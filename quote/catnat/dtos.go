@@ -8,6 +8,46 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+type QuoteResponse struct {
+	PolicyNumber   string          `json:"numeroPolizza,omitempty"`
+	ProposalNumber string          `json:"numeroProposta,omitempty"`
+	Result         string          `json:"esito,omitempty"`
+	AnnualGross    float64         `json:"imp_Lordo_Annuo,omitempty"`
+	AnnualNet      float64         `json:"imp_Netto_Annuo,omitempty"`
+	AnnualTax      float64         `json:"imp_Tasse_Annuo,omitempty"`
+	AssetDetail    []AssetResponse `json:"dettaglioBeni,omitempty"`
+	Errors         []Detail        `json:"errori,omitempty"`
+	Reports        []Detail        `json:"segnalazioni,omitempty"`
+}
+
+type QuoteRequest struct {
+	ProductCode         string              `json:"codiceProdotto"`
+	Date                string              `json:"dataEffetto"`
+	ExternalReference   string              `json:"riferimentoEsterno"`
+	DistributorCode     string              `json:"codiceDistributore"`
+	SecondLevelCode     string              `json:"codiceSecondoLivello"`
+	ThirdLevelCode      string              `json:"codiceTerzoLivello"`
+	Splitting           string              `json:"frazionamento"`
+	Emission            string              `json:"emissione"`
+	SalesChannel        string              `json:"canaleVendita"`
+	Contractor          Contractor          `json:"contraente"`
+	LegalRepresentative LegalRepresentative `json:"legaleRappresentante"`
+	Asset               AssetRequest        `json:"bene"`
+}
+
+type DownloadRequest struct {
+	CodiceCompagnia string    `json:"codiceCompagnia"`
+	NumeroPolizza   string    `json:"NumeroPolizza"`
+	TipoOperazione  string    `json:"TipoOperazione"`
+	DataOperazione  time.Time `json:"DataOperazione"`
+}
+
+type DownloadResponse struct {
+	Result        string      `json:"esito"`
+	NumeroPolizza string      `json:"numeroPolizza"`
+	Documento     []Documento `json:"documento"`
+	Errors        interface{} `json:"errori"` // or *string if it's always null or a string
+}
 type Contractor struct {
 	Name                      string `json:"nome,omitempty"`
 	Surname                   string `json:"cognome,omitempty"`
@@ -66,33 +106,6 @@ type AssetRequest struct {
 	GuaranteeList        []GuaranteeList `json:"elencoGaranzia"`
 }
 
-type RequestDTO struct {
-	ProductCode         string              `json:"codiceProdotto"`
-	Date                string              `json:"dataEffetto"`
-	ExternalReference   string              `json:"riferimentoEsterno"`
-	DistributorCode     string              `json:"codiceDistributore"`
-	SecondLevelCode     string              `json:"codiceSecondoLivello"`
-	ThirdLevelCode      string              `json:"codiceTerzoLivello"`
-	Splitting           string              `json:"frazionamento"`
-	Emission            string              `json:"emissione"`
-	SalesChannel        string              `json:"canaleVendita"`
-	Contractor          Contractor          `json:"contraente"`
-	LegalRepresentative LegalRepresentative `json:"legaleRappresentante"`
-	Asset               AssetRequest        `json:"bene"`
-}
-
-type QuoteResponse struct {
-	PolicyNumber   string          `json:"numeroPolizza,omitempty"`
-	ProposalNumber string          `json:"numeroProposta,omitempty"`
-	Result         string          `json:"esito,omitempty"`
-	AnnualGross    float64         `json:"imp_Lordo_Annuo,omitempty"`
-	AnnualNet      float64         `json:"imp_Netto_Annuo,omitempty"`
-	AnnualTax      float64         `json:"imp_Tasse_Annuo,omitempty"`
-	AssetDetail    []AssetResponse `json:"dettaglioBeni,omitempty"`
-	Errors         []Detail        `json:"errori,omitempty"`
-	Reports        []Detail        `json:"segnalazioni,omitempty"`
-}
-
 type AssetResponse struct {
 	ProgressiveNumber string            `json:"progressivoBene,omitempty"`
 	GrossAmount       float64           `json:"imp_Lordo_Bene,omitempty"`
@@ -111,29 +124,6 @@ type GuaranteeDetail struct {
 type Detail struct {
 	Code        string `json:"codice,omitempty"`
 	Description string `json:"descrizione,omitempty"`
-}
-
-type ErrorResponse struct {
-	Type     string         `json:"type"`
-	Title    string         `json:"title"`
-	Status   int            `json:"status"`
-	Detail   string         `json:"detail"`
-	Instance string         `json:"instance"`
-	Errors   map[string]any `json:"errors"`
-}
-
-type DownloadRequest struct {
-	CodiceCompagnia string    `json:"codiceCompagnia"`
-	NumeroPolizza   string    `json:"NumeroPolizza"`
-	TipoOperazione  string    `json:"TipoOperazione"`
-	DataOperazione  time.Time `json:"DataOperazione"`
-}
-
-type DownloadResponse struct {
-	Result        string      `json:"esito"`
-	NumeroPolizza string      `json:"numeroPolizza"`
-	Documento     []Documento `json:"documento"`
-	Errors        interface{} `json:"errori"` // or *string if it's always null or a string
 }
 
 type Documento struct {
@@ -203,7 +193,7 @@ var quoteQuestionMap = map[bool]string{
 	false: "no",
 }
 
-func (d *RequestDTO) FromPolicy(p *models.Policy, fillEveryField bool) error {
+func (d *QuoteRequest) FromPolicy(p *models.Policy, fillEveryField bool) error {
 
 	d.ProductCode = catNatProductCode
 	d.Date = p.StartDate.Format("2006-01-02")
