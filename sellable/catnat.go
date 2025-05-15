@@ -3,13 +3,12 @@ package sellable
 import (
 	"encoding/json"
 	"errors"
-	"net/http"
-
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/product"
+	"net/http"
 )
 
 const quoteStep = "quote"
@@ -115,7 +114,12 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 		}
 		return true
 	}
-
+	if policy.StartDate.IsZero() {
+		return nil, errors.New("Start date can't be 0")
+	}
+	if policy.EndDate.IsZero() {
+		return nil, errors.New("End date can't be 0")
+	}
 	if g, err := policy.ExtractGuarantee("landslides"); err == nil {
 		if !isContenutoAndFabricato(g.Value) && g.IsSelected {
 			return nil, errors.New("You need atleast fabricato and contenuto for landSlide")
