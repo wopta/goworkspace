@@ -46,6 +46,8 @@ func UpdatePolicy(policy *models.Policy) (map[string]any, error) {
 		input["contractors"] = policy.Contractors
 		input["priceGroup"] = policy.PriceGroup
 	case models.CatNatProduct:
+		input["startDate"] = policy.StartDate
+		input["endDate"] = policy.EndDate
 		input["quoteQuestions"] = policy.QuoteQuestions
 	}
 
