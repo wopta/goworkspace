@@ -22,7 +22,6 @@ func CatnatQuote(policy *models.Policy, product *models.Product, sellable sellab
 		log.ErrorF("error building NetInsurance DTO: %s", err.Error())
 		return resp, err
 	}
-	log.PrintStruct("requestQuote", cnReq)
 
 	resp, err = catnatClient.Quote(cnReq)
 	if err != nil {
