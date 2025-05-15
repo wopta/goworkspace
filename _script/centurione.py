@@ -77,34 +77,6 @@ go_modules = [
     ACCOUNTING,
 ]
 changed_modules = [
-    AUTH,
-    BPMN,
-    BROKER,
-    CALLBACK,
-    CLAIM,
-    COMPANY_DATA,
-    DOCUMENT,
-    ENRICH,
-    FORM,
-    LIB,
-    MAIL,
-    MGA,
-    MODELS,
-    NETWORK,
-    PARTNERSHIP,
-    PAYMENT,
-    POLICY,
-    PRODUCT,
-    QUESTION,
-    QUOTE,
-    RESERVED,
-    RULES,
-    SELLABLE,
-    TRANSACTION,
-    USER,
-    RENEW,
-    CALLBACK_OUT,
-    ACCOUNTING,
 ]
 updateable_modules = [
     AUTH,
@@ -163,7 +135,7 @@ updateable_functions = [
 
 increment_version_key = PATCH
 environment = DEV  # Replace with your desired environment
-dry_run = False
+dry_run = True
 google_repository = "google"
 gitlab_repository = "gitlab"
 github_repository = "origin"
