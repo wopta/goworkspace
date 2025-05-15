@@ -316,19 +316,18 @@ func (d *QuoteRequest) FromPolicy(p *models.Policy, isEmission bool) error {
 }
 
 func mapCodeFromSlug(slug string) string {
-	var code string
 	switch slug {
 	case earthquakeSlug:
-		code = earthquakeCode
 		log.Println("adding earthquake ")
+		return earthquakeCode
 	case floodSlug:
-		code = floodCode
 		log.Println("adding flood")
+		return floodCode
 	case landslideSlug:
-		code = landslideCode
 		log.Println("adding landslides")
+		return landslideCode
 	}
-	return code
+	return ""
 }
 
 func setGuaranteeValue(asset *AssetRequest, guarantee models.Guarante, code string) {
