@@ -35,6 +35,7 @@ func NewNetClient() (client *NetClient) {
 func (c *NetClient) Quote(dto RequestDTO) (response ResponseDTO, err error) {
 	url := os.Getenv("NET_BASEURL") + "/PolizzeGateway24/emettiPolizza/441-029-007"
 	rBuff := new(bytes.Buffer)
+	log.PrintStruct("request: ", dto)
 	err = json.NewEncoder(rBuff).Encode(dto)
 
 	if err != nil {
@@ -62,7 +63,6 @@ func (c *NetClient) Quote(dto RequestDTO) (response ResponseDTO, err error) {
 	if response.Result != "OK" {
 		return response, fmt.Errorf("%+v", response.Errors)
 	}
-
 	return response, nil
 }
 
