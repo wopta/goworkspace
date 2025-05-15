@@ -193,7 +193,7 @@ var quoteQuestionMap = map[bool]string{
 	false: "no",
 }
 
-func (d *QuoteRequest) FromPolicy(p *models.Policy, fillEveryField bool) error {
+func (d *QuoteRequest) FromPolicy(p *models.Policy, isEmission bool) error {
 
 	d.ProductCode = catNatProductCode
 	d.Date = p.StartDate.Format("2006-01-02")
@@ -211,7 +211,8 @@ func (d *QuoteRequest) FromPolicy(p *models.Policy, fillEveryField bool) error {
 		}
 	}
 
-	if fillEveryField {
+	if isEmission {
+		d.Emission = yes
 		var dt string
 		if p.Contractor.Type == "legalEntity" && p.Contractor.FiscalCode == "" {
 			dt = catNatLegalPerson
