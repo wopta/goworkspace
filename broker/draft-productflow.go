@@ -1,9 +1,11 @@
 package broker
 
 import (
+	"encoding/base64"
+	"os"
+
 	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
 	"github.com/wopta/goworkspace/broker/draftBpmn/flow"
-	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/quote/catnat"
 )
 
@@ -16,6 +18,7 @@ func getProductFlow() (*bpmn.BpnmBuilder, error) {
 	builder.SetStorage(store)
 	err := bpmn.IsError(
 		builder.AddHandler("catnatIntegration", catnatIntegration),
+		builder.AddHandler("catnatdownloadPolicy", catnatDownloadCertification),
 	)
 	if err != nil {
 		return nil, err
@@ -34,11 +37,35 @@ func catnatIntegration(store bpmn.StorageData) error {
 	if err != nil {
 		return err
 	}
-	log.PrintStruct("-----------------------dto for quote", requestDto)
 	res, e := client.Emit(requestDto)
 	if e != nil {
 		return e
 	}
-	log.PrintStruct("emit catnat response", res)
+	store.AddLocal("numeroPoliza", &flow.StringBpmn{String: res.PolicyNumber})
+	return nil
+}
+
+func catnatDownloadCertification(store bpmn.StorageData) error {
+	var policy *flow.PolicyDraft
+	var numeroPoliza *flow.StringBpmn
+	err := bpmn.IsError(
+		bpmn.GetDataRef("policy", &policy, store),
+		bpmn.GetDataRef("numeroPoliza", &numeroPoliza, store),
+	)
+	if err != nil {
+		return err
+	}
+
+	client := catnat.NewNetClient()
+	resp, err := client.Download(numeroPoliza.String)
+	if err != nil {
+		return err
+	}
+	bytes, err := base64.StdEncoding.DecodeString(resp.Documento[0].DatiDocumento)
+	if err != nil {
+		return err
+	}
+	os.WriteFile("prova.pdf", bytes, 0644)
+
 	return nil
 }
