@@ -2,6 +2,7 @@ package catnat
 
 import (
 	"errors"
+	"time"
 
 	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
@@ -80,7 +81,7 @@ type RequestDTO struct {
 	Asset               AssetRequest        `json:"bene"`
 }
 
-type ResponseDTO struct {
+type QuoteResponse struct {
 	PolicyNumber   string          `json:"numeroPolizza,omitempty"`
 	ProposalNumber string          `json:"numeroProposta,omitempty"`
 	Result         string          `json:"esito,omitempty"`
@@ -121,6 +122,25 @@ type ErrorResponse struct {
 	Errors   map[string]any `json:"errors"`
 }
 
+type DownloadRequest struct {
+	CodiceCompagnia string    `json:"codiceCompagnia"`
+	NumeroPolizza   string    `json:"NumeroPolizza"`
+	TipoOperazione  string    `json:"TipoOperazione"`
+	DataOperazione  time.Time `json:"DataOperazione"`
+}
+
+type DownloadResponse struct {
+	Esito         string      `json:"esito"`
+	NumeroPolizza string      `json:"numeroPolizza"`
+	Documento     []Documento `json:"documento"`
+	Errori        interface{} `json:"errori"` // or *string if it's always null or a string
+}
+
+type Documento struct {
+	DescrizioneDocumento string `json:"descrizioneDocumento"`
+	DatiDocumento        string `json:"datiDocumento"`
+}
+
 const earthquakeCode = "211"
 const floodCode = "212"
 const landslideCode = "209"
@@ -143,9 +163,7 @@ const floodSlug = "flood"
 const landslideSlug = "landslides"
 
 const catNatProductCode = "007"
-const catNatDistributorCode = "0155"
-const catNatSecondLevelCode = "0001"
-const catNatThirdLevelCode = "00180"
+const catNatDistributorCode = "0168"
 const catNatSplitting = "01"
 const catNatLegalPerson = "2"
 const catNatSalesChannel = "3"
@@ -191,8 +209,6 @@ func (d *RequestDTO) FromPolicy(p *models.Policy, fillEveryField bool) error {
 	d.Date = p.StartDate.Format("2006-01-02")
 	d.ExternalReference = p.Uid
 	d.DistributorCode = catNatDistributorCode
-	d.SecondLevelCode = catNatSecondLevelCode
-	d.ThirdLevelCode = catNatThirdLevelCode
 	d.Splitting = catNatSplitting
 	d.Emission = no
 	d.SalesChannel = catNatSalesChannel
@@ -342,7 +358,7 @@ func setGuaranteeValue(asset *AssetRequest, guarantee models.Guarante, code stri
 	}
 }
 
-func (d *ResponseDTO) ToPolicy(p *models.Policy) {
+func (d *QuoteResponse) ToPolicy(p *models.Policy) {
 	eOffer := make(map[string]*models.GuaranteValue)
 	fOffer := make(map[string]*models.GuaranteValue)
 	lOffer := make(map[string]*models.GuaranteValue)

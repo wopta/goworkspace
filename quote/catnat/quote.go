@@ -9,7 +9,7 @@ import (
 
 type sellableCatnat func(policy *models.Policy, product *models.Product, isValidationForQuote bool) (*sellable.SellableOutput, error)
 
-func CatnatQuote(policy *models.Policy, product *models.Product, sellable sellableCatnat, catnatClient INetClient) (resp ResponseDTO, err error) {
+func CatnatQuote(policy *models.Policy, product *models.Product, sellable sellableCatnat, catnatClient INetClient) (resp QuoteResponse, err error) {
 	outSellable, err := sellable(policy, product, true)
 	if err != nil {
 		return resp, err

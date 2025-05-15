@@ -25,7 +25,10 @@ type mock_clientCatnat struct {
 	nameFileToCompare string
 }
 
-func (c *mock_clientCatnat) Quote(dto catnat.RequestDTO) (response catnat.ResponseDTO, err error) {
+func (c *mock_clientCatnat) Download(_ string) (response catnat.DownloadResponse, err error) {
+	return catnat.DownloadResponse{}, nil
+}
+func (c *mock_clientCatnat) Quote(dto catnat.RequestDTO) (response catnat.QuoteResponse, err error) {
 	if c.withError {
 		return response, errors.New("quote error")
 	}
@@ -43,7 +46,7 @@ func (c *mock_clientCatnat) Quote(dto catnat.RequestDTO) (response catnat.Respon
 	return response, nil
 }
 
-func (c *mock_clientCatnat) Emit(dto catnat.RequestDTO) (response catnat.ResponseDTO, err error) {
+func (c *mock_clientCatnat) Emit(dto catnat.RequestDTO) (response catnat.QuoteResponse, err error) {
 	return response, nil
 }
 
