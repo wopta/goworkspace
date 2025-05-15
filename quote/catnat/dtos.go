@@ -130,10 +130,10 @@ type DownloadRequest struct {
 }
 
 type DownloadResponse struct {
-	Esito         string      `json:"esito"`
+	Result        string      `json:"esito"`
 	NumeroPolizza string      `json:"numeroPolizza"`
 	Documento     []Documento `json:"documento"`
-	Errori        interface{} `json:"errori"` // or *string if it's always null or a string
+	Errors        interface{} `json:"errori"` // or *string if it's always null or a string
 }
 
 type Documento struct {

@@ -106,11 +106,9 @@ func (c *NetClient) Emit(dto RequestDTO) (response QuoteResponse, err error) {
 		log.ErrorF("error decoding catnat response")
 		return response, err
 	}
-	//TODO: to adpta when emit catnat will be merged
-	//	if response.Result != "OK" {
-	//		return response, fmt.Errorf("%+v", response.Errors)
-	//	}
-
+	if response.Result != "OK" {
+		return response, fmt.Errorf("%+v", response.Errors)
+	}
 	return response, nil
 }
 
@@ -146,6 +144,9 @@ func (c *NetClient) Download(numeroPolizza string) (response DownloadResponse, e
 	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		log.ErrorF("error decoding catnat response")
 		return response, err
+	}
+	if response.Result != "OK" {
+		return response, fmt.Errorf("%+v", response.Errors)
 	}
 	return response, nil
 }
