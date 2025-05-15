@@ -78,6 +78,10 @@ type Contractor struct {
 	CompanyAddress           *Address               `firestore:"companyAddress,omitempty" json:"companyAddress,omitempty" bigquery:"-"`
 	Data                     string                 `firestore:"-"                           json:"-"                           bigquery:"data"`
 	YearOfEstablishment      int                    `firestore:"yearOfEstablishment,omitempty" json:"yearOfEstablishment,omitempty" bigquery:"-"`
+	IsFamilyMember           bool                   `firestore:"isFamilyMember"              json:"isFamilyMember"`
+	IsContactable            bool                   `firestore:"isContactable"               json:"isContactable"`
+	Ateco                    string                 `firestore:"ateco"                       json:"ateco"`
+	CompanyName              string                 `firestore:"companyName"                 son:"companyName"`
 }
 
 func (c *Contractor) Normalize() {
