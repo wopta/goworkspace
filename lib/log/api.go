@@ -1,6 +1,9 @@
 package log
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 // Append the prefix, ex: [prefix1] -> [prefix1|prefix2]
 // Remember to use PopPrefix to remove eventually
@@ -46,4 +49,14 @@ func Error(err error) {
 // Log a formatted message with severity 'ERROR'
 func ErrorF(format string, a ...any) {
 	Log().ErrorF(format, a...)
+}
+
+// Log a struct
+func PrintStruct(message string, object any) {
+	bytes, err := json.Marshal(object)
+	if err != nil {
+		Error(err)
+		return
+	}
+	Printf(message+": %v", string(bytes))
 }

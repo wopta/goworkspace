@@ -1,14 +1,10 @@
 package broker
 
 import (
-	"encoding/json"
-	"errors"
-	"fmt"
-
 	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
 	"github.com/wopta/goworkspace/broker/draftBpmn/flow"
-	"github.com/wopta/goworkspace/models/client"
-	"github.com/wopta/goworkspace/models/dto/net"
+	"github.com/wopta/goworkspace/lib/log"
+	"github.com/wopta/goworkspace/quote/catnat"
 )
 
 func getProductFlow() (*bpmn.BpnmBuilder, error) {
@@ -32,19 +28,17 @@ func catnatIntegration(store bpmn.StorageData) error {
 	if err != nil {
 		return err
 	}
-	client := client.NewNetClient()
-	requestDto := net.RequestDTO{}
-	requestDto.FromPolicy(policy.Policy, true)
-	requestDto.Emission = "si"
-	res, e := client.Quote(requestDto)
+	client := catnat.NewNetClient()
+	requestDto := catnat.RequestDTO{}
+	err = requestDto.FromPolicy(policy.Policy, true)
+	if err != nil {
+		return err
+	}
+	log.PrintStruct("-----------------------dto for quote", requestDto)
+	res, e := client.Emit(requestDto)
 	if e != nil {
 		return e
 	}
-	if len(res.Errors) != 0 {
-		return errors.New(fmt.Sprintln(res.Errors))
-	}
-	var resString []byte
-	resString, _ = json.Marshal(res)
-	println(string(resString))
+	log.PrintStruct("emit catnat response", res)
 	return nil
 }

@@ -3,13 +3,15 @@ package quote
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"math"
 	"net/http"
 	"slices"
 	"strconv"
 	"time"
+
+	"github.com/wopta/goworkspace/lib/log"
+	"github.com/wopta/goworkspace/quote/internal"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -77,7 +79,7 @@ func Persona(policy *models.Policy, channel string, networkNode *models.NetworkN
 
 	personProduct := sellable.Persona(*policy, channel, networkNode, warrant)
 
-	availableRate := getAvailableRates(personProduct, flow)
+	availableRate := internal.GetAvailableRates(personProduct, flow)
 
 	b := lib.GetFilesByEnv(fmt.Sprintf("%s/%s/%s/taxes.json", models.ProductsFolder,
 		policy.Name, policy.ProductVersion))
@@ -148,7 +150,7 @@ func Persona(policy *models.Policy, channel string, networkNode *models.NetworkN
 
 	log.Println("apply consultacy price")
 
-	addConsultacyPrice(policy, personProduct)
+	internal.AddConsultacyPrice(policy, personProduct)
 
 	log.Println("filter by minimum price")
 
@@ -160,7 +162,7 @@ func Persona(policy *models.Policy, channel string, networkNode *models.NetworkN
 
 	log.Println("filtering available rates")
 
-	removeOfferRate(policy, availableRate)
+	internal.RemoveOfferRate(policy, availableRate)
 
 	log.Println("function end -----------------------------------")
 

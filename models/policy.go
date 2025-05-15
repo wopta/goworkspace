@@ -126,10 +126,6 @@ type Policy struct {
 	AgencyUid     string `json:"agencyUid,omitempty" firestore:"agencyUid,omitempty" bigquery:"agencyUid"` // DEPRECATED
 }
 
-func (p *Policy) GetType() string {
-	return "policy"
-}
-
 type DeclaredClaims struct {
 	GuaranteeSlug string          `json:"guaranteeSlug,omitempty" firestore:"guaranteeSlug,omitempty"`
 	History       []DeclaredClaim `json:"history,omitempty" firestore:"history,omitempty"`

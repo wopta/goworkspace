@@ -1,6 +1,11 @@
-package net
+package catnat
 
-import "github.com/wopta/goworkspace/models"
+import (
+	"errors"
+
+	"github.com/wopta/goworkspace/lib/log"
+	"github.com/wopta/goworkspace/models"
+)
 
 type Contractor struct {
 	Name                      string `json:"nome,omitempty"`
@@ -137,19 +142,50 @@ const earthquakeSlug = "earthquake"
 const floodSlug = "flood"
 const landslideSlug = "landslides"
 
+const catNatProductCode = "007"
+const catNatDistributorCode = "0155"
+const catNatSecondLevelCode = "0001"
+const catNatThirdLevelCode = "00180"
+const catNatSplitting = "01"
+const catNatLegalPerson = "2"
+const catNatSalesChannel = "3"
+const catNatSoleProp = "3"
+
 const yes = "si"
 const no = "no"
 
-func (d *RequestDTO) FromPolicy(p *models.Policy, fillEveryField bool) error {
+var useTypeMap = map[string]string{
+	"owner-tenant": "si",
+	"tenant":       "no",
+}
+var buildingYearMap = map[string]int{
+	"before_1950":       1,
+	"from_1950_to_1990": 2,
+	"after_1990":        3,
+	"unknown":           4,
+}
+var floorMap = map[string]int{
+	"up_to_2":     2,
+	"more_than_3": 1,
+}
+var lowestFloorMap = map[string]int{
+	"first_floor":  1,
+	"upper_floor":  2,
+	"ground_floor": 3,
+	"underground":  4,
+}
+var buildingMaterialMap = map[string]int{
+	"brick":    1,
+	"concrete": 2,
+	"steel":    3,
+	"unknown":  4,
+}
+var quoteQuestionMap = map[bool]string{
+	true:  "si",
+	false: "no",
+}
 
-	const catNatProductCode = "007"
-	const catNatDistributorCode = "0155"
-	const catNatSecondLevelCode = "0001"
-	const catNatThirdLevelCode = "00180"
-	const catNatSplitting = "01"
-	const catNatSalesChannel = "3"
-	const catNatLegalPerson = "2"
-	const catNatSoleProp = "3"
+func (d *RequestDTO) FromPolicy(p *models.Policy, fillEveryField bool) error {
 
 	d.ProductCode = catNatProductCode
 	d.Date = p.StartDate.Format("2006-01-02")
@@ -225,42 +261,29 @@ func (d *RequestDTO) FromPolicy(p *models.Policy, fillEveryField bool) error {
 
 		d.LegalRepresentative = legalRep
 	}
-	useTypeMap := map[string]string{
-		"owner-tenant": "si",
-		"tenant":       "no",
+
+	alreadyEarthquake := p.QuoteQuestions["alreadyEarthquake"]
+	if alreadyEarthquake == nil {
+		return errors.New("missing field alreadyEarthquake")
 	}
-	buildingYearMap := map[string]int{
-		"before_1950":       1,
-		"from_1950_to_1990": 2,
-		"after_1990":        3,
-		"unknown":           4,
+	wantEarthquake := p.QuoteQuestions["wantEarthquake"]
+	if wantEarthquake == nil {
+		wantEarthquake = false
 	}
-	floorMap := map[string]int{
-		"up_to_2":     2,
-		"more_than_3": 1,
+	alreadyFlood := p.QuoteQuestions["alreadyFlood"]
+	if alreadyFlood == nil {
+		return errors.New("missing field alreadyFlood")
 	}
-	lowestFloorMap := map[string]int{
-		"first_floor":  1,
-		"upper_floor":  2,
-		"ground_floor": 3,
-		"underground":  4,
-	}
-	buildingMaterialMap := map[string]int{
-		"brick":    1,
-		"concrete": 2,
-		"steel":    3,
-		"unknown":  4,
-	}
-	quoteQuestionMap := map[bool]string{
-		true:  "si",
-		false: "no",
+	wantFlood := p.QuoteQuestions["wantFlood"]
+	if wantFlood == nil {
+		wantFlood = false
 	}
 	asset := AssetRequest{
 		ContractorAndTenant:  useTypeMap[baseAsset.Building.UseType],
-		EarthquakeCoverage:   quoteQuestionMap[p.QuoteQuestions["isEarthquakeSelected"].(bool)],
-		FloodCoverage:        quoteQuestionMap[p.QuoteQuestions["isFloodSelected"].(bool)],
-		EarthquakePurchase:   no,
-		FloodPurchase:        no,
+		EarthquakeCoverage:   quoteQuestionMap[alreadyEarthquake.(bool)],
+		FloodCoverage:        quoteQuestionMap[alreadyFlood.(bool)],
+		EarthquakePurchase:   quoteQuestionMap[(alreadyEarthquake.(bool) && wantEarthquake.(bool)) || !alreadyEarthquake.(bool)],
+		FloodPurchase:        quoteQuestionMap[(alreadyFlood.(bool) && wantFlood.(bool)) || !alreadyFlood.(bool)],
 		LandSlidePurchase:    no,
 		ConstructionMaterial: buildingMaterialMap[baseAsset.Building.BuildingMaterial],
 		ConstructionYear:     buildingYearMap[baseAsset.Building.BuildingYear],
@@ -274,27 +297,14 @@ func (d *RequestDTO) FromPolicy(p *models.Policy, fillEveryField bool) error {
 		asset.Locality = baseAsset.Building.BuildingAddress.Locality
 		asset.CityCode = baseAsset.Building.BuildingAddress.CityCode
 	}
+	log.Println("Managing slug guarantees")
 	for _, g := range baseAsset.Guarantees {
-		setGuarantee(&asset, g)
+		if g.IsSelected {
+			setGuaranteeValue(&asset, g, mapCodeFromSlug(g.Slug))
+		}
 	}
 	d.Asset = asset
-
 	return nil
-}
-
-func setGuarantee(asset *AssetRequest, guarantee models.Guarante) {
-	if guarantee.Value == nil {
-		return
-	}
-	switch guarantee.Slug {
-	case earthquakeSlug:
-		asset.EarthquakePurchase = yes
-	case floodSlug:
-		asset.FloodPurchase = yes
-	case landslideSlug:
-		asset.LandSlidePurchase = yes
-	}
-	setGuaranteeValue(asset, guarantee, mapCodeFromSlug(guarantee.Slug))
 }
 
 func mapCodeFromSlug(slug string) string {
@@ -302,10 +312,13 @@ func mapCodeFromSlug(slug string) string {
 	switch slug {
 	case earthquakeSlug:
 		code = earthquakeCode
+		log.Println("adding earthquake ")
 	case floodSlug:
 		code = floodCode
+		log.Println("adding flood")
 	case landslideSlug:
 		code = landslideCode
+		log.Println("adding landslides")
 	}
 	return code
 }
@@ -329,7 +342,7 @@ func setGuaranteeValue(asset *AssetRequest, guarantee models.Guarante, code stri
 	}
 }
 
-func (d *ResponseDTO) ToPolicy(p *models.Policy) error {
+func (d *ResponseDTO) ToPolicy(p *models.Policy) {
 	eOffer := make(map[string]*models.GuaranteValue)
 	fOffer := make(map[string]*models.GuaranteValue)
 	lOffer := make(map[string]*models.GuaranteValue)
@@ -394,7 +407,6 @@ func (d *ResponseDTO) ToPolicy(p *models.Policy) error {
 	p.OffersPrices["default"]["yearly"].Net = p.PriceNett
 	p.OffersPrices["default"]["yearly"].Tax = p.TaxAmount
 
-	return nil
 }
 
 func formatAddress(addr *models.Address) string {

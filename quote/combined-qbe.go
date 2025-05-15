@@ -3,11 +3,13 @@ package quote
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"slices"
 	"strconv"
 	"strings"
+
+	"github.com/wopta/goworkspace/lib/log"
+	"github.com/wopta/goworkspace/quote/internal"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -286,7 +288,7 @@ func mapCellPolicy(policy *models.Policy, baseProduct *models.Product, cells []C
 
 	log.Println("apply consultacy price")
 
-	addConsultacyPrice(policy, baseProduct)
+	internal.AddConsultacyPrice(policy, baseProduct)
 
 	if hasQuoteError {
 		reserved := models.ReservedData{
