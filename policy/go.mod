@@ -7,7 +7,7 @@ replace github.com/wopta/goworkspace/policy => ./
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
-	github.com/wopta/goworkspace/document v1.1.154
+	github.com/wopta/goworkspace/document v1.1.155
 	github.com/wopta/goworkspace/lib v1.0.150
 	github.com/wopta/goworkspace/models v1.2.46
 	github.com/wopta/goworkspace/network v1.0.111
