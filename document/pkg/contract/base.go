@@ -2,10 +2,11 @@ package contract
 
 import (
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"math"
 	"strings"
 	"time"
+
+	"github.com/wopta/goworkspace/lib/log"
 
 	"github.com/wopta/goworkspace/document/internal/constants"
 	"github.com/wopta/goworkspace/document/internal/domain"
@@ -880,7 +881,7 @@ func (bg *baseGenerator) annex4Info() (section1Info, section3Info string) {
 		withoutConsultacy = "Per il prodotto intermediato, è corrisposto all’intermediario, da parte " +
 			"dell’impresa di assicurazione, un compenso sotto forma di commissione inclusa nel premio " +
 			"assicurativo."
-		withConsultacyFormat = "Per il prodotto intermediato, è corrisposto all’intermediario, da parte " +
+		withConsultacyFormat = "Per il prodotto intermediato, è corrisposto un compenso all’intermediario, da parte " +
 			"dell’impresa di assicurazione, sotto forma di commissione inclusa nel premio assicurativo " +
 			"e un contributo per servizi di intermediazione, a carico del cliente, pari ad %s."
 	)
