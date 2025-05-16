@@ -445,16 +445,48 @@ type Action struct {
 
 type Sign struct {
 	Elements Elements `json:"Elements"`
+	RecipientConfiguration RecipientConfiguration
 }
 
+type RecipientConfiguration struct {
+	SendEmails                  bool                        `json:"SendEmails"`
+	AllowAccessAfterFinish      bool                        `json:"AllowAccessAfterFinish"`
+	AllowDelegation             bool                        `json:"AllowDelegation"`
+	ContactInformation          ContactInformation         `json:"ContactInformation"`
+	PersonalMessage             string                      `json:"PersonalMessage"`
+	AuthenticationConfiguration AuthenticationConfiguration `json:"AuthenticationConfiguration"`
+}
+
+type ContactInformation struct {
+	Email        string `json:"Email"`
+	GivenName    string `json:"GivenName"`
+	Surname      string `json:"Surname"`
+	PhoneNumber  string `json:"PhoneNumber"`
+	LanguageCode string `json:"LanguageCode"`
+}
+
+type AuthenticationConfiguration struct {
+	SmsOneTimePassword SmsOneTimePassword `json:"SmsOneTimePassword"`
+	AccessCode AccessCode
+}
+
+type AccessCode struct{
+	Code string
+}
+
+type SmsOneTimePassword struct {
+	PhoneNumber string `json:"PhoneNumber"`
+}
 type Elements struct {
+	//TO implement if needed
 	TextBoxes         []interface{}     `json:"TextBoxes"`
 	CheckBoxes        []interface{}     `json:"CheckBoxes"`
 	ComboBoxes        []interface{}     `json:"ComboBoxes"`
 	RadioButtons      []interface{}     `json:"RadioButtons"`
 	ListBoxes         []interface{}     `json:"ListBoxes"`
-	Signatures        []Signature       `json:"Signatures"`
 	Attachments       []interface{}     `json:"Attachments"`
+
+	Signatures        []Signature       `json:"Signatures"`
 	LinkConfiguration LinkConfiguration `json:"LinkConfiguration"`
 }
 

@@ -69,10 +69,22 @@ func loadCustomFonts(pdf *fpdf.Fpdf) {
 }
 
 func saveContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
-	var filename string
-	if env.IsLocal() {
-		err := pdf.OutputFileAndClose("./document/contract.pdf")
+	var (
+		filename string
+		out      bytes.Buffer
+	)
+	if os.Getenv("env") == "local" {
+		err := pdf.Output(&out)
+		defer pdf.Close()
+
+		pdfFile, err := os.Create("./document/proposal.pdf")
 		lib.CheckError(err)
+		pdfFile.Write(out.Bytes())
+		defer pdfFile.Close()
+
+		pdf.Output(pdfFile)
+		return filename, out.Bytes()
+
 	} else {
 		var out bytes.Buffer
 		err := pdf.Output(&out)
@@ -83,7 +95,6 @@ func saveContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 		lib.CheckError(err)
 		return filename, out.Bytes()
 	}
-	return filename, nil
 }
 
 func saveProposal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
@@ -92,9 +103,18 @@ func saveProposal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 		out      bytes.Buffer
 	)
 
-	if env.IsLocal() {
-		err := pdf.OutputFileAndClose("./document/proposal.pdf")
+	if os.Getenv("env") == "local" {
+		err := pdf.Output(&out)
+		defer pdf.Close()
+
+		pdfFile, err := os.Create("./document/proposal.pdf")
 		lib.CheckError(err)
+		pdfFile.Write(out.Bytes())
+		defer pdfFile.Close()
+
+		pdf.Output(pdfFile)
+
+		return "./document/proposal.pdf", out.Bytes()
 	} else {
 		err := pdf.Output(&out)
 		lib.CheckError(err)
