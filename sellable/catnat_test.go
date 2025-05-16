@@ -5,6 +5,7 @@ import (
 	"os"
 	"slices"
 	"testing"
+	"time"
 
 	env "github.com/wopta/goworkspace/lib/environment"
 	"github.com/wopta/goworkspace/lib/log"
@@ -39,6 +40,8 @@ func getPrePopulatedPolicyForCatnat() models.Policy {
 		Name:           "cat-nat",
 		ProductVersion: "v1",
 		Channel:        "mga",
+		StartDate:      time.Now(),
+		EndDate:        time.Now(),
 		Assets: slices.Clone([]models.Asset{
 			{
 				Type: models.AssetTypeBuilding,
