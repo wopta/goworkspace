@@ -91,6 +91,9 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 				Section:   models.DocumentSectionContracts,
 				Note:      "",
 			}
+			if modifiedPolicy.Attachments == nil {
+				modifiedPolicy.Attachments = new([]models.Attachment)
+			}
 			*modifiedPolicy.Attachments = append(*modifiedPolicy.Attachments, addendumAtt)
 		} else if !errors.Is(err, document.ErrNotImplemented) {
 			log.Printf("error generating addendum for policy %s: %s", inputPolicy.Uid, err.Error())
