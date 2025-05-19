@@ -17,6 +17,7 @@ import (
 	prd "github.com/wopta/goworkspace/product"
 )
 
+// TO remove
 func DraftEmitWithPolicyFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		err          error
