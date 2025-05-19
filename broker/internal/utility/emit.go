@@ -2,8 +2,10 @@ package utility
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/wopta/goworkspace/document"
+	namirial "github.com/wopta/goworkspace/document/draft-namirial"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/models"
@@ -13,7 +15,9 @@ import (
 )
 
 func EmitSign(policy *models.Policy, product *models.Product, networkNode *models.NetworkNode, sendEmail bool, origin string) {
-	log.Printf("[emitSign] Policy Uid %s", policy.Uid)
+	log.AddPrefix("emitSign")
+	defer log.PopPrefix()
+	log.Printf("Policy Uid %s", policy.Uid)
 
 	policy.IsSign = false
 	policy.Status = models.PolicyStatusToSign
@@ -26,6 +30,41 @@ func EmitSign(policy *models.Policy, product *models.Product, networkNode *model
 	policy.IdSign = signResponse.EnvelopeId
 	policy.SignUrl = signResponse.Url
 }
+
+func EmitSignWithNewNamirial(policy *models.Policy, product *models.Product, networkNode *models.NetworkNode, sendEmail bool, origin string) error {
+	log.AddPrefix("emitSign")
+	defer log.PopPrefix()
+	//TODO: implement callback
+	///Users/luca/WoptaProject/goworkspace/document/pkg riga 302
+	log.Printf("Policy Uid %s", policy.Uid)
+
+	policy.IsSign = false
+	policy.Status = models.PolicyStatusToSign
+	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusContact, models.PolicyStatusToSign)
+
+	p := <-document.ContractObj(origin, *policy, networkNode, product)
+	policy.DocumentName = p.LinkGcs
+	namirialInput := namirial.NamirialInput{
+		CodeCompany: policy.CodeCompany,
+		Contractor:  policy.Contractor,
+		FilesName:   make([]string, 0),
+	}
+	namirialInput.FilesName = append(namirialInput.FilesName, p.LinkGcs)
+	for _, document := range *policy.Attachments {
+		if strings.HasPrefix(document.Name, models.ContractAttachmentName) {
+			namirialInput.FilesName = append(namirialInput.FilesName, document.FileName)
+		}
+	}
+	envelope, err := namirial.Sign(namirialInput)
+	if err != nil {
+		return err
+	}
+	policy.IdSign = envelope.IdEnvelope
+	policy.SignUrl = envelope.Url
+	policy.ContractFileId = envelope.FileIds[0] //this field is deprecated
+	return nil
+}
+
 func EmitPay(policy *models.Policy, origin string, productP, mgaProductP *models.Product, networkNode *models.NetworkNode) {
 	log.Printf("[emitPay] Policy Uid %s", policy.Uid)
 

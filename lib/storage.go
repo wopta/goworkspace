@@ -53,6 +53,9 @@ func GetFromGoogleStorage(bucket string, file string) ([]byte, error) {
 	log.Println("GetFromGoogleStorage")
 	client, ctx, err := GetGoogleStorageClient()
 	rc, err := client.Bucket(bucket).Object(file).NewReader(ctx)
+	if err != nil {
+		return nil, err
+	}
 	slurp, err := ioutil.ReadAll(rc)
 
 	return slurp, err

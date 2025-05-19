@@ -37,7 +37,8 @@ func getBuilderFlowChannel(log *mockLog, store bpmn.StorageData) (*bpmn.BpnmBuil
 	builder.SetStorage(store)
 	e = bpmn.IsError(
 		builder.AddHandler("setProposalData", funcTest("setProposalData", log)),
-		builder.AddHandler("emitData", funcTest("emitData", log)),
+		builder.AddHandler("emitWithSequence", funcTest("emitWithSequence", log)),
+		builder.AddHandler("emitNoSequence", funcTest("emitNoSequence", log)),
 		builder.AddHandler("sendMailSign", funcTest("sendMailSign", log)),
 		builder.AddHandler("pay", funcTest("pay", log)),
 		builder.AddHandler("setAdvice", funcTest("setAdvice", log)),
@@ -132,7 +133,7 @@ func TestEmitForEcommerce(t *testing.T) {
 
 	exps := []string{
 		"setProposalData",
-		"emitData",
+		"emitWithSequence",
 		"sign",
 		"pay",
 		"sendEmitProposalMail",
@@ -282,7 +283,7 @@ func TestEmitForProviderMga(t *testing.T) {
 
 	exps := []string{
 		"setProposalData",
-		"emitData",
+		"emitWithSequence",
 		"sign",
 		"pay",
 		"sendEmitProposalMail",
@@ -371,7 +372,7 @@ func TestEmitForRemittanceMga(t *testing.T) {
 
 	exps := []string{
 		"setProposalData",
-		"emitData",
+		"emitWithSequence",
 		"sign",
 		"sendMailSign",
 		"setAdvice",
@@ -492,7 +493,7 @@ func TestEmitForEcommerceWithNodeFlow(t *testing.T) {
 
 	exps := []string{
 		"setProposalData",
-		"emitData",
+		"emitWithSequence",
 		"sign",
 		"pay",
 		"sendEmitProposalMail",
@@ -556,7 +557,7 @@ func TestEmitForEcommerceWithNodeFlowConfFalse(t *testing.T) {
 
 	exps := []string{
 		"setProposalData",
-		"emitData",
+		"emitWithSequence",
 		"sign",
 		"pay",
 		"sendEmitProposalMail",

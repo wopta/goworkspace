@@ -31,11 +31,6 @@ var testRoutes []lib.Route = []lib.Route{
 		Handler: lib.ResponseLoggerWrapper(ImportScalapay),
 		Method:  http.MethodPost,
 		Roles:   []string{},
-	},{
-		Route:   "/namirial/envelop",
-		Handler: lib.ResponseLoggerWrapper(HandlerEnvelop),
-		Method:  http.MethodPost,
-		Roles:   []string{},
 	},
 	{
 		Route:   "/accounting/createinvoice",

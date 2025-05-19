@@ -5,15 +5,17 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-type StatusNamirial string
+type NamirialInput struct {
+	FilesName   []string
+	Contractor  models.Contractor
+	CodeCompany string
+}
 
-const (
-	Idle        StatusNamirial = "Idle"
-	Upload      StatusNamirial = "Uploaded Files"
-	Prepared    StatusNamirial = "Prepared Files"
-	Sended      StatusNamirial = "Sended Files"
-	GetEnvelope StatusNamirial = "Get Envelope"
-)
+type NamirialOutput struct {
+	Url        string
+	IdEnvelope string
+	FileIds    []string
+}
 
 type dataForDocument struct {
 	policy     *models.Policy
@@ -50,7 +52,7 @@ type responseSendDocuments struct {
 	EnvelopeId string `json:"EnvelopeId"`
 }
 
-type ResponeGetEvelop struct {
+type ResponseGetEvelop struct {
 	ViewerLinks []viewerLink `json:"ViewerLinks"`
 }
 

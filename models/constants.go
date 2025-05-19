@@ -180,10 +180,11 @@ const (
 )
 
 const (
-	AxaCompany      string = "axa"
-	GlobalCompany   string = "global"
-	SogessurCompany string = "sogessur"
-	QBECompany      string = "qbe"
+	AxaCompany          string = "axa"
+	GlobalCompany       string = "global"
+	SogessurCompany     string = "sogessur"
+	QBECompany          string = "qbe"
+	NetInsuranceCompany string = "net-insurance"
 )
 
 const (
@@ -232,6 +233,7 @@ const (
 	WarrantFormat                 = "warrants/%s.json"
 	WarrantsFolder                = "warrants/"
 	ProductsFolder                = "products"
+	NetInsuranceDocument          = "%s_Net_Insurance"
 )
 
 const (
@@ -240,9 +242,11 @@ const (
 )
 
 const (
-	InformationSetAttachmentName     = "Precontrattuale"
-	ProposalAttachmentName           = "Proposta"
-	ContractAttachmentName           = "Contratto"
+	InformationSetAttachmentName = "Precontrattuale"
+	ProposalAttachmentName       = "Proposta"
+	//to use with namirial, to sign
+	ContractAttachmentName = "Contratto"
+	//
 	ContractNonDigitalAttachmentName = "Contratto non digitale"
 	RvmInstructionsAttachmentName    = "Scheda Rapporto Visita Medica"
 	RvmSurveyAttachmentName          = "Rapporto Visita Medica"

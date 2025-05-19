@@ -84,6 +84,10 @@ func Proposal(origin string, policy *models.Policy, networkNode *models.NetworkN
 	case models.PersonaProduct:
 		log.Println("call personaProposal...")
 		filename, rawDoc = personaProposal(pdf, policy, networkNode, product)
+	case models.CatNatProduct:
+		//to change
+		pdf := initFpdf()
+		filename, rawDoc = saveProposal(pdf, policy)
 	case models.CommercialCombinedProduct:
 		generator := contract.NewCommercialCombinedGenerator(engine.NewFpdf(), policy, networkNode, *product, true)
 		rawDoc, err = generator.Contract()

@@ -19,7 +19,8 @@ import (
 
 func AddEmitHandlers(builder *bpmn.BpnmBuilder) error {
 	return bpmn.IsError(
-		builder.AddHandler("emitData", emitData),
+		builder.AddHandler("emitWithSequence", emitBaseWithSequence),
+		builder.AddHandler("emitNoSequence", emitBaseNoSequence),
 		builder.AddHandler("sendMailSign", sendMailSign),
 		builder.AddHandler("sign", sign),
 		builder.AddHandler("pay", pay),
@@ -30,7 +31,7 @@ func AddEmitHandlers(builder *bpmn.BpnmBuilder) error {
 	)
 }
 
-func emitData(state bpmn.StorageData) error {
+func emitBaseWithSequence(state bpmn.StorageData) error {
 	var origin *flow.StringBpmn
 	var policy *flow.PolicyDraft
 	var err = bpmn.IsError(
@@ -40,23 +41,19 @@ func emitData(state bpmn.StorageData) error {
 	if err != nil {
 		return err
 	}
-
-	firePolicy := lib.GetDatasetByEnv(origin.String, lib.PolicyCollection)
-	emitBase(policy.Policy)
-	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
-}
-
-func emitBase(policy *models.Policy) {
 	log.AddPrefix("emitBase")
 	defer log.PopPrefix()
+
 	log.Printf("Policy Uid %s", policy.Uid)
-	firePolicy := lib.PolicyCollection
+	firePolicy := lib.GetDatasetByEnv(origin.String, lib.PolicyCollection)
 	now := time.Now().UTC()
 
 	policy.CompanyEmit = true
 	policy.CompanyEmitted = false
 	policy.EmitDate = now
 	policy.BigEmitDate = civil.DateTimeOf(now)
+	policy.RenewDate = policy.StartDate.AddDate(1, 0, 0)
+	policy.BigRenewDate = civil.DateTimeOf(policy.RenewDate)
 	company, numb, tot := utility.GetSequenceByCompany(strings.ToLower(policy.Company), firePolicy)
 	log.Printf("codeCompany: %s", company)
 	log.Printf("numberCompany: %d", numb)
@@ -64,8 +61,32 @@ func emitBase(policy *models.Policy) {
 	policy.Number = tot
 	policy.NumberCompany = numb
 	policy.CodeCompany = company
+	return nil
+}
+
+func emitBaseNoSequence(state bpmn.StorageData) error {
+	var origin *flow.StringBpmn
+	var policy *flow.PolicyDraft
+	var err = bpmn.IsError(
+		bpmn.GetDataRef("origin", &origin, state),
+		bpmn.GetDataRef("policy", &policy, state),
+	)
+	if err != nil {
+		return err
+	}
+	log.AddPrefix("emitBase")
+	defer log.PopPrefix()
+
+	log.Printf("Policy Uid %s", policy.Uid)
+	now := time.Now().UTC()
+
+	policy.CompanyEmit = true
+	policy.CompanyEmitted = false
+	policy.EmitDate = now
+	policy.BigEmitDate = civil.DateTimeOf(now)
 	policy.RenewDate = policy.StartDate.AddDate(1, 0, 0)
 	policy.BigRenewDate = civil.DateTimeOf(policy.RenewDate)
+	return nil
 }
 
 func sendMailSign(state bpmn.StorageData) error {
@@ -126,7 +147,10 @@ func sign(state bpmn.StorageData) error {
 	if err != nil {
 		return err
 	}
-	utility.EmitSign(policy.Policy, product.Product, networkNode.NetworkNode, sendEmail.Bool, origin.String)
+	err = utility.EmitSignWithNewNamirial(policy.Policy, product.Product, networkNode.NetworkNode, sendEmail.Bool, origin.String)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -223,7 +247,7 @@ func sendEmitProposalMail(state bpmn.StorageData) error {
 	if policy.IsReserved {
 		return nil
 	}
-	policy.Attachments = nil
+
 	addresses.ToAddress = mail.GetContractorEmail(policy.Policy)
 	addresses.CcAddress = mail.Address{}
 	switch flowName.String {
@@ -237,7 +261,6 @@ func sendEmitProposalMail(state bpmn.StorageData) error {
 		addresses.ToAddress.String(),
 		addresses.CcAddress.String(),
 	)
-
-	mail.SendMailProposal(*policy.Policy, addresses.FromAddress, addresses.ToAddress, addresses.CcAddress, flowName.String, []string{models.ProposalAttachmentName})
+	mail.SendMailProposal(*policy.Policy, addresses.FromAddress, addresses.ToAddress, addresses.CcAddress, flowName.String, []string{models.ContractDocumentFormat})
 	return nil
 }

@@ -2,10 +2,14 @@ package broker
 
 import (
 	"encoding/base64"
+	"fmt"
 	"os"
+	"strings"
 
 	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
 	"github.com/wopta/goworkspace/broker/draftBpmn/flow"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/quote/catnat"
 )
 
@@ -65,7 +69,20 @@ func catnatDownloadCertification(store bpmn.StorageData) error {
 	if err != nil {
 		return err
 	}
-	os.WriteFile("prova.pdf", bytes, 0644)
-
-	return nil
+	filename := fmt.Sprintf(models.NetInsuranceDocument, policy.NameDesc)
+	filePath := strings.ReplaceAll(fmt.Sprintf("%s/%s/%s", "temp", policy.Uid, filename), " ", "_")
+	link, err := lib.PutToStorageErr(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, bytes)
+	if err != nil {
+		return err
+	}
+	if policy.Attachments == nil {
+		policy.Attachments = new([]models.Attachment)
+	}
+	*policy.Attachments = append(*policy.Attachments, models.Attachment{
+		Name:     models.ContractAttachmentName + "NetInsurance",
+		FileName: filename + ".pdf",
+		Link:     link,
+		MimeType: "application/pdf",
+	})
+	return err
 }
