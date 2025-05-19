@@ -3,7 +3,7 @@ package document
 import (
 	"bytes"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
+	"log"
 	"math"
 	"os"
 	"strings"
@@ -13,7 +13,6 @@ import (
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/ttacon/libphonenumber"
 	"github.com/wopta/goworkspace/lib"
-	env "github.com/wopta/goworkspace/lib/environment"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -69,10 +68,22 @@ func loadCustomFonts(pdf *fpdf.Fpdf) {
 }
 
 func saveContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
-	var filename string
-	if env.IsLocal() {
-		err := pdf.OutputFileAndClose("./document/contract.pdf")
+	var (
+		filename string
+		out      bytes.Buffer
+	)
+	if os.Getenv("env") == "local" {
+		err := pdf.Output(&out)
+		defer pdf.Close()
+
+		pdfFile, err := os.Create("./document/proposal.pdf")
 		lib.CheckError(err)
+		pdfFile.Write(out.Bytes())
+		defer pdfFile.Close()
+
+		pdf.Output(pdfFile)
+		return filename, out.Bytes()
+
 	} else {
 		var out bytes.Buffer
 		err := pdf.Output(&out)
@@ -83,7 +94,6 @@ func saveContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 		lib.CheckError(err)
 		return filename, out.Bytes()
 	}
-	return filename, nil
 }
 
 func saveProposal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
@@ -92,9 +102,18 @@ func saveProposal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 		out      bytes.Buffer
 	)
 
-	if env.IsLocal() {
-		err := pdf.OutputFileAndClose("./document/proposal.pdf")
+	if os.Getenv("env") == "local" && false {
+		err := pdf.Output(&out)
+		defer pdf.Close()
+
+		pdfFile, err := os.Create("./document/proposal.pdf")
 		lib.CheckError(err)
+		pdfFile.Write(out.Bytes())
+		defer pdfFile.Close()
+
+		pdf.Output(pdfFile)
+
+		return "./document/proposal.pdf", out.Bytes()
 	} else {
 		err := pdf.Output(&out)
 		lib.CheckError(err)
@@ -113,7 +132,7 @@ func saveReservedDocument(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte
 		out      bytes.Buffer
 	)
 
-	if env.IsLocal() {
+	if os.Getenv("env") == "local" {
 		err := pdf.OutputFileAndClose("./document/reserved_document.pdf")
 		lib.CheckError(err)
 	} else {
@@ -525,10 +544,8 @@ func drawDynamicCell(pdf *fpdf.Fpdf, fontSize, cellHeight, cellWidth, rowLines, 
 
 func formatPhoneNumber(phone string) string {
 	num, err := libphonenumber.Parse(phone, "IT")
-	log.AddPrefix("DisplayPhoneNumber")
-	defer log.PopPrefix()
 	if err != nil {
-		log.ErrorF("error parsing phone %s", phone)
+		log.Printf("[DisplayPhoneNumber] error parsing phone %s", phone)
 		return "================"
 	}
 	return libphonenumber.Format(num, libphonenumber.INTERNATIONAL)

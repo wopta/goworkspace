@@ -75,6 +75,9 @@ func ContractObj(origin string, data models.Policy, networkNode *models.NetworkN
 		case models.LifeProduct:
 			pdf := initFpdf()
 			filename, out = lifeContract(pdf, origin, &data, networkNode, product)
+		case models.CatNatProduct:
+			//to change
+			filename, out = "prova catnat contratto", []byte{}
 		case models.PersonaProduct:
 			pdf := initFpdf()
 			filename, out = personaContract(pdf, &data, networkNode, product)

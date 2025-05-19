@@ -56,11 +56,20 @@ func GetData[t DataBpnm](name string, storage StorageData) (t, error) {
 		return *new(t), err
 	}
 
-	result = data.(t)
-	if data.GetType() != result.GetType() {
+	result, ok := data.(t)
+	if !ok {
 		return *new(t), fmt.Errorf("Data '%v' has type %v, which differs from expected type '%v'", name, result.GetType(), data.GetType())
 	}
+
 	return result, nil
+}
+
+func GetDataRef[t DataBpnm](name string, data *t, storage StorageData) (err error) {
+	if data == nil {
+		return errors.New("No reference passed")
+	}
+	*data, err = GetData[t](name, storage)
+	return
 }
 
 // IsError gathers all errors(whether there are) and return them, otherwise return nil

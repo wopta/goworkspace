@@ -102,13 +102,17 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 		if value == nil {
 			return false
 		}
+		val := value.SumInsured
+		if val == 0 {
+			return false
+		}
 		if alreadyEarthquake && alreadyFlood && useType == "tenant" {
 			val := value.SumInsuredLimitOfIndemnity
 			if val == 0 {
 				return false
 			}
 		}
-		val := value.SumInsured
+		val = value.SumInsured
 		if val == 0 {
 			return false
 		}

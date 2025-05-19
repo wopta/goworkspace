@@ -10,6 +10,7 @@ import (
 
 	"github.com/wopta/goworkspace/callback"
 	"github.com/wopta/goworkspace/lib/log"
+	"github.com/wopta/goworkspace/mail"
 	tr "github.com/wopta/goworkspace/transaction"
 
 	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
@@ -21,7 +22,7 @@ import (
 
 const fabrickBillPaid string = "PAID"
 
-func DraftPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func DraftPaymentFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		responseFormat  string = `{"result":%t,"requestPayload":%s,"locale": "it"}`
 		err             error
@@ -41,7 +42,7 @@ func DraftPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	err = json.Unmarshal([]byte(request), &fabrickCallback)
 	if err != nil {
-		log.ErrorF("error unmarshaling request (%s): %s", string(request), err.Error())
+		log.ErrorF("error unmarshalling request (%s): %s", string(request), err.Error())
 		return fmt.Sprintf(responseFormat, false, string(request)), nil, nil
 	}
 
@@ -98,7 +99,10 @@ func fabrickPayment(origin, providerId string, policy *models.Policy, paymentInf
 	}
 	storage := bpmn.NewStorageBpnm()
 	storage.AddGlobal("paymentInfo", &paymentInfo)
-	flowPayment, err := getFlow(policy, networkNode, storage)
+	storage.AddGlobal("addresses", &flow.Addresses{
+		FromAddress: mail.AddressAnna,
+	})
+	flowPayment, err := getFlow(policy, origin, storage)
 	if err != nil {
 		return err
 	}

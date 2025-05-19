@@ -2,9 +2,11 @@ package broker
 
 import (
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"os"
 	"strings"
+
+	"github.com/wopta/goworkspace/broker/internal/utility"
+	"github.com/wopta/goworkspace/lib/log"
 
 	"github.com/wopta/goworkspace/bpmn"
 	"github.com/wopta/goworkspace/lib"
@@ -97,7 +99,7 @@ func addLeadHandlers(state *bpmn.State) {
 
 func setLeadBpmn(state *bpmn.State) error {
 	policy := state.Data
-	setLeadData(policy, *mgaProduct)
+	utility.SetLeadData(policy, *product, networkNode)
 	return nil
 }
 
@@ -145,7 +147,7 @@ func setProposalBpm(state *bpmn.State) error {
 		return nil
 	}
 
-	setProposalData(policy)
+	utility.SetProposalData(policy, origin, networkNode, mgaProduct)
 
 	log.Printf("saving proposal n. %d to firestore...", policy.ProposalNumber)
 
@@ -199,7 +201,7 @@ func setRequestApprovalBpmn(state *bpmn.State) error {
 	defer log.PopPrefix()
 	firePolicy := lib.PolicyCollection
 
-	setRequestApprovalData(policy)
+	utility.SetRequestApprovalData(policy, networkNode, mgaProduct, origin)
 
 	log.Printf("saving policy with uid %s to Firestore....", policy.Uid)
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
@@ -285,7 +287,7 @@ func sendMailSign(state *bpmn.State) error {
 
 func sign(state *bpmn.State) error {
 	policy := state.Data
-	emitSign(policy, origin)
+	utility.EmitSign(policy, product, networkNode, sendEmail, origin)
 	return nil
 }
 
@@ -300,7 +302,7 @@ func pay(state *bpmn.State) error {
 
 func setAdvanceBpm(state *bpmn.State) error {
 	policy := state.Data
-	SetAdvance(policy, origin)
+	utility.SetAdvance(policy, origin, product, mgaProduct, networkNode, paymentSplit, paymentMode)
 	return nil
 }
 

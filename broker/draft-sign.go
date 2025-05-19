@@ -7,16 +7,19 @@ import (
 	"strings"
 
 	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
+	"github.com/wopta/goworkspace/broker/draftBpmn/flow"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/lib/log"
+	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 )
 
 const (
 	namirialFinished string = "workstepFinished" // when the workstep was finished
 )
 
-func DraftSignFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func DraftSignFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	log.AddPrefix("SignFx")
 	defer log.PopPrefix()
 
@@ -38,7 +41,7 @@ func DraftSignFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	switch action {
 	case namirialFinished:
-		if e := namirialStepFinished(origin, policyUid); e != nil {
+		if e := namirialStepFinished(origin, policyUid, sendEmail); e != nil {
 			return "", nil, e
 		}
 
@@ -50,7 +53,7 @@ func DraftSignFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	return "", nil, nil
 }
 
-func namirialStepFinished(origin, policyUid string) error {
+func namirialStepFinished(origin, policyUid string, sendEmail bool) error {
 	log.AddPrefix("namirialStepFinished")
 	defer log.PopPrefix()
 	log.Printf("Policy: %s", policyUid)
@@ -78,8 +81,15 @@ func namirialStepFinished(origin, policyUid string) error {
 	}
 
 	log.Println("starting bpmn flow...")
-
-	flow, err := getFlow(&policy, networkNode, bpmn.NewStorageBpnm())
+	storage := bpmn.NewStorageBpnm()
+	storage.AddGlobal("addresses", &flow.Addresses{
+		FromAddress: mail.AddressAnna,
+	})
+	storage.AddGlobal("sendEmail", &flow.BoolBpmn{
+		Bool: sendEmail,
+	})
+	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+	flow, err := getFlow(&policy, origin, storage)
 	if err != nil {
 		return err
 	}

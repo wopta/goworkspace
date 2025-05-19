@@ -23,7 +23,6 @@ type Policy struct {
 	IdSign            string                       `firestore:"idSign,omitempty" json:"idSign,omitempty" bigquery:"idSign"`
 	IdPay             string                       `firestore:"idPay,omitempty" json:"idPay,omitempty" bigquery:"idPay"`
 	QuoteQuestions    map[string]interface{}       `firestore:"quoteQuestions,omitempty" json:"quoteQuestions,omitempty" bigquery:"-"`
-	ContractFileId    string                       `firestore:"contractFileId,omitempty" json:"contractFileId,omitempty" bigquery:"contractFileId"`
 	Uid               string                       `firestore:"uid,omitempty" json:"uid,omitempty" bigquery:"uid"`
 	ProductUid        string                       `firestore:"productUid,omitempty" json:"productUid,omitempty" bigquery:"productUid"`
 	PayUrl            string                       `firestore:"payUrl,omitempty" json:"payUrl,omitempty" bigquery:"-"`
@@ -120,10 +119,10 @@ type Policy struct {
 	PaymentComponents PaymentComponents            `json:"paymentComponents" firestore:"paymentComponents" bigquery:"-"`
 
 	// DEPRECATED FIELDS
-
-	RejectReasons string `json:"rejectReasons,omitempty" firestore:"rejectReasons,omitempty" bigquery:"-"` // DEPRECATED
-	AgentUid      string `json:"agentUid,omitempty" firestore:"agentUid,omitempty" bigquery:"agentUid"`    // DEPRECATED
-	AgencyUid     string `json:"agencyUid,omitempty" firestore:"agencyUid,omitempty" bigquery:"agencyUid"` // DEPRECATED
+	ContractFileId string `firestore:"contractFileId,omitempty" json:"contractFileId,omitempty" bigquery:"contractFileId"`
+	RejectReasons  string `json:"rejectReasons,omitempty" firestore:"rejectReasons,omitempty" bigquery:"-"` // DEPRECATED
+	AgentUid       string `json:"agentUid,omitempty" firestore:"agentUid,omitempty" bigquery:"agentUid"`    // DEPRECATED
+	AgencyUid      string `json:"agencyUid,omitempty" firestore:"agencyUid,omitempty" bigquery:"agencyUid"` // DEPRECATED
 }
 
 type DeclaredClaims struct {

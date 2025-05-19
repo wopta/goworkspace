@@ -1,11 +1,10 @@
 package flow
 
 import (
-	"testing"
-
 	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"testing"
 )
 
 type mockLog struct {
@@ -37,7 +36,8 @@ func getBuilderFlowChannel(log *mockLog, store bpmn.StorageData) (*bpmn.BpnmBuil
 	builder.SetStorage(store)
 	e = bpmn.IsError(
 		builder.AddHandler("setProposalData", funcTest("setProposalData", log)),
-		builder.AddHandler("emitData", funcTest("emitData", log)),
+		builder.AddHandler("emitWithSequence", funcTest("emitWithSequence", log)),
+		builder.AddHandler("emitNoSequence", funcTest("emitNoSequence", log)),
 		builder.AddHandler("sendMailSign", funcTest("sendMailSign", log)),
 		builder.AddHandler("pay", funcTest("pay", log)),
 		builder.AddHandler("setAdvice", funcTest("setAdvice", log)),
@@ -96,9 +96,10 @@ func testFlow(t *testing.T, process string, expectedACtivities []string, store b
 }
 
 var (
-	policyEcommerce = PolicyDraft{&models.Policy{Channel: lib.ECommerceChannel}}
-	policyMga       = PolicyDraft{&models.Policy{Channel: lib.MgaChannel}}
-	policyNetwork   = PolicyDraft{&models.Policy{Channel: lib.NetworkChannel}}
+	policyEcommerce = PolicyDraft{&models.Policy{Channel: lib.ECommerceChannel, Name: "test policy"}}
+	policyMga       = PolicyDraft{&models.Policy{Channel: lib.MgaChannel, Name: "test policy"}}
+	policyNetwork   = PolicyDraft{&models.Policy{Channel: lib.NetworkChannel, Name: "test policy"}}
+	policyCatnat    = PolicyDraft{&models.Policy{Channel: lib.NetworkChannel, Name: models.CatNatProduct}}
 )
 
 var (
@@ -123,7 +124,8 @@ func initBaseStorage(storage bpmn.StorageData) {
 	storage.AddGlobal("paymentMode", &StringBpmn{})
 	storage.AddGlobal("sendEmail", &BoolBpmn{})
 }
-func TestEmitForEcommerce(t *testing.T) {
+
+func TestEmitForEcommerceForCatnat(t *testing.T) {
 	store := bpmn.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("product", &productEcommerce)
@@ -132,7 +134,7 @@ func TestEmitForEcommerce(t *testing.T) {
 
 	exps := []string{
 		"setProposalData",
-		"emitData",
+		"emitWithSequence",
 		"sign",
 		"pay",
 		"sendEmitProposalMail",
@@ -140,7 +142,6 @@ func TestEmitForEcommerce(t *testing.T) {
 	}
 	testFlow(t, "emit", exps, store, getBuilderFlowChannel)
 }
-
 func TestLeadForEcommerce(t *testing.T) {
 	store := bpmn.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
@@ -282,7 +283,7 @@ func TestEmitForProviderMga(t *testing.T) {
 
 	exps := []string{
 		"setProposalData",
-		"emitData",
+		"emitWithSequence",
 		"sign",
 		"pay",
 		"sendEmitProposalMail",
@@ -371,7 +372,7 @@ func TestEmitForRemittanceMga(t *testing.T) {
 
 	exps := []string{
 		"setProposalData",
-		"emitData",
+		"emitWithSequence",
 		"sign",
 		"sendMailSign",
 		"setAdvice",
@@ -492,7 +493,7 @@ func TestEmitForEcommerceWithNodeFlow(t *testing.T) {
 
 	exps := []string{
 		"setProposalData",
-		"emitData",
+		"emitWithSequence",
 		"sign",
 		"pay",
 		"sendEmitProposalMail",
@@ -556,7 +557,41 @@ func TestEmitForEcommerceWithNodeFlowConfFalse(t *testing.T) {
 
 	exps := []string{
 		"setProposalData",
-		"emitData",
+		"emitWithSequence",
+		"sign",
+		"pay",
+		"sendEmitProposalMail",
+		"sendMailSign",
+	}
+	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpmn.StorageData) (*bpmn.BpnmBuilder, error) {
+		build, e := getBuilderFlowChannel(log, storeFlowChannel)
+		if e != nil {
+			return nil, e
+		}
+		nodeBuild, e := getBuilderFlowNode(log, storeNode)
+		if e != nil {
+			return nil, e
+		}
+		if e := build.Inject(nodeBuild); e != nil {
+			return nil, e
+		}
+
+		return build, nil
+	})
+}
+func TestEmitForEcommerceCatnat(t *testing.T) {
+	storeFlowChannel := bpmn.NewStorageBpnm()
+	storeFlowChannel.AddGlobal("policy", &policyCatnat)
+	storeFlowChannel.AddGlobal("product", &productEcommerce)
+	storeFlowChannel.AddGlobal("networkNode", &winNode)
+	initBaseStorage(storeFlowChannel)
+
+	storeNode := bpmn.NewStorageBpnm()
+	storeNode.AddLocal("config", &CallbackConfig{Emit: false})
+
+	exps := []string{
+		"setProposalData",
+		"emitNoSequence",
 		"sign",
 		"pay",
 		"sendEmitProposalMail",

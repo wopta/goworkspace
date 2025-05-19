@@ -16,6 +16,10 @@ func IsLocal() bool {
 	return os.Getenv("env") == Local
 }
 
+func IsDevelopment() bool {
+	return os.Getenv("env") == Development
+}
+
 func IsProduction() bool {
 	return os.Getenv("env") == Production
 }

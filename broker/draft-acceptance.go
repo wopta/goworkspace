@@ -4,17 +4,14 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"time"
 
 	"github.com/go-chi/chi/v5"
-	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
 	draftbpmn "github.com/wopta/goworkspace/broker/draftBpmn"
 	"github.com/wopta/goworkspace/broker/draftBpmn/flow"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/lib/log"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
 
 	plc "github.com/wopta/goworkspace/policy"
 )
@@ -23,7 +20,7 @@ func (*AcceptancePayload) GetType() string {
 	return "acceptanceInfo"
 }
 
-func DraftAcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func DraftAcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		err     error
 		payload AcceptancePayload
@@ -59,7 +56,7 @@ func DraftAcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
-	err = lib.CheckPayload[AcceptancePayload](body, &payload, []string{"action"})
+	err = lib.CheckPayload(body, &payload, []string{"action"})
 	if err != nil {
 		log.ErrorF("error: %s", err.Error())
 		return "", nil, err
@@ -87,11 +84,10 @@ func DraftAcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	}
 
 	storage := draftbpmn.NewStorageBpnm()
-	networkNode := network.GetNetworkNodeByUid(policy.ProducerUid)
 	storage.AddGlobal("addresses", addresses)
-	storage.AddLocal("acceptanceInfo", &payload)
+	storage.AddGlobal("action", &flow.StringBpmn{String: payload.Action})
 
-	flow, err := getFlow(&policy, networkNode, storage)
+	flow, err := getFlow(&policy, origin, storage)
 	if err != nil {
 		return "", nil, err
 	}
@@ -103,40 +99,4 @@ func DraftAcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	log.Println("Handler end -------------------------------------------------")
 
 	return "{}", nil, nil
-}
-
-func draftrejectPolicy(storage draftbpmn.StorageData) error {
-	policy, err := bpmn.GetData[*flow.PolicyDraft]("policy", storage)
-	if err != nil {
-		return err
-	}
-	acceptanceInfo, err := bpmn.GetData[*AcceptancePayload]("acceptanceInfo", storage)
-	if err != nil {
-		return err
-	}
-	policy.Status = models.PolicyStatusRejected
-	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
-	policy.ReservedInfo.AcceptanceNote = acceptanceInfo.Action
-	policy.ReservedInfo.AcceptanceDate = time.Now().UTC()
-	log.Printf("Policy Uid %s REJECTED", policy.Uid)
-	policy.Updated = time.Now().UTC()
-	return nil
-}
-
-func draftapprovePolicy(storage draftbpmn.StorageData) error {
-	policy, err := bpmn.GetData[*flow.PolicyDraft]("policy", storage)
-	if err != nil {
-		return err
-	}
-	acceptanceInfo, err := bpmn.GetData[*AcceptancePayload]("acceptanceInfo", storage)
-	if err != nil {
-		return err
-	}
-	policy.Status = models.PolicyStatusApproved
-	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
-	policy.ReservedInfo.AcceptanceNote = acceptanceInfo.Action
-	policy.ReservedInfo.AcceptanceDate = time.Now().UTC()
-	log.Printf("Policy Uid %s APPROVED", policy.Uid)
-	policy.Updated = time.Now().UTC()
-	return nil
 }

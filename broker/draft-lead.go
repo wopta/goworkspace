@@ -6,14 +6,16 @@ import (
 	"net/http"
 
 	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
+	"github.com/wopta/goworkspace/broker/draftBpmn/flow"
 	"github.com/wopta/goworkspace/lib/log"
+	"github.com/wopta/goworkspace/mail"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 )
 
-func DraftLeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func DraftLeadFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		err    error
 		policy models.Policy
@@ -46,7 +48,7 @@ func DraftLeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	err = json.Unmarshal([]byte(body), &policy)
 	if err != nil {
-		log.ErrorF("error unmarshaling policy: %s", err.Error())
+		log.ErrorF("error unmarshalling policy: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -95,7 +97,10 @@ func leaddraft(authToken models.AuthToken, policy *models.Policy) error {
 
 	log.Println("starting bpmn flow...")
 	storage := bpmn.NewStorageBpnm()
-	flowLead, e := getFlow(policy, networkNode, storage)
+	storage.AddGlobal("addresses", &flow.Addresses{
+		FromAddress: mail.AddressAnna,
+	})
+	flowLead, e := getFlow(policy, origin, storage)
 	if e != nil {
 		return e
 	}

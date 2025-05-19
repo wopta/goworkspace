@@ -194,7 +194,6 @@ var quoteQuestionMap = map[bool]string{
 }
 
 func (d *QuoteRequest) FromPolicy(p *models.Policy, isEmission bool) error {
-
 	d.ProductCode = catNatProductCode
 	d.Date = p.StartDate.Format("2006-01-02")
 	d.ExternalReference = p.Uid
@@ -311,7 +310,6 @@ func (d *QuoteRequest) FromPolicy(p *models.Policy, isEmission bool) error {
 		}
 	}
 	d.Asset = asset
-
 	return nil
 }
 

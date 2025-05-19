@@ -4,25 +4,23 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/wopta/goworkspace/broker/internal/utility"
+	"github.com/wopta/goworkspace/lib/log"
+
 	prd "github.com/wopta/goworkspace/product"
 
 	"cloud.google.com/go/civil"
 	"github.com/wopta/goworkspace/callback_out"
-	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
-	"github.com/wopta/goworkspace/payment"
-	"github.com/wopta/goworkspace/payment/consultancy"
 	plc "github.com/wopta/goworkspace/policy"
 	"github.com/wopta/goworkspace/question"
-	"github.com/wopta/goworkspace/transaction"
 )
 
 const (
@@ -256,7 +254,7 @@ func emitBase(policy *models.Policy, origin string) {
 	policy.CompanyEmitted = false
 	policy.EmitDate = now
 	policy.BigEmitDate = civil.DateTimeOf(now)
-	company, numb, tot := GetSequenceByCompany(strings.ToLower(policy.Company), firePolicy)
+	company, numb, tot := utility.GetSequenceByCompany(strings.ToLower(policy.Company), firePolicy)
 	log.Printf("codeCompany: %s", company)
 	log.Printf("numberCompany: %d", numb)
 	log.Printf("number: %d", tot)
@@ -267,100 +265,17 @@ func emitBase(policy *models.Policy, origin string) {
 	policy.BigRenewDate = civil.DateTimeOf(policy.RenewDate)
 }
 
-func emitSign(policy *models.Policy, origin string) {
-	log.AddPrefix("emitSign")
-	defer log.PopPrefix()
-	log.Printf("Policy Uid %s", policy.Uid)
-
-	policy.IsSign = false
-	policy.Status = models.PolicyStatusToSign
-	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusContact, models.PolicyStatusToSign)
-
-	p := <-document.ContractObj(origin, *policy, networkNode, mgaProduct)
-	policy.DocumentName = p.LinkGcs
-	_, signResponse, _ := document.NamirialOtpV6(*policy, origin, sendEmail)
-	policy.ContractFileId = signResponse.FileId
-	policy.IdSign = signResponse.EnvelopeId
-	policy.SignUrl = signResponse.Url
-}
-
 func emitPay(policy *models.Policy, origin string) {
 	log.AddPrefix("emitPay")
 	defer log.PopPrefix()
 	log.Printf("Policy Uid %s", policy.Uid)
 
 	policy.IsPay = false
-	payUrl, err := createPolicyTransactions(policy)
+	payUrl, err := utility.CreatePolicyTransactions(policy, product, mgaProduct, networkNode)
 	if err != nil {
 		return
 	}
 	policy.PayUrl = payUrl
-}
-
-func EmitPayCustom(policy *models.Policy, origin string, productP, mgaProductP *models.Product) {
-	log.Printf("[emitPay] Policy Uid %s", policy.Uid)
-
-	policy.IsPay = false
-	mgaProduct = mgaProductP
-	product = productP
-	payUrl, err := createPolicyTransactions(policy)
-	if err != nil {
-		return
-	}
-	policy.PayUrl = payUrl
-}
-
-func SetAdvance(policy *models.Policy, origin string) {
-	policy.Payment = models.ManualPaymentProvider
-	policy.IsPay = true
-	policy.Status = models.PolicyStatusPay
-	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay, models.PolicyStatusPay)
-
-	//TODO: fix me someday in the future
-	if paymentSplit != "" && policy.PaymentSplit == "" {
-		policy.PaymentSplit = paymentSplit
-	}
-	if paymentMode != "" && policy.PaymentMode == "" {
-		policy.PaymentMode = paymentMode
-	}
-
-	createPolicyTransactions(policy)
-}
-
-func createPolicyTransactions(policy *models.Policy) (string, error) {
-	transactions := transaction.CreateTransactions(*policy, *mgaProduct, func() string { return lib.NewDoc(models.TransactionsCollection) })
-	if len(transactions) == 0 {
-		log.Println("no transactions created")
-		return "", errors.New("no transactions created")
-	}
-
-	client := payment.NewClient(policy.Payment, *policy, *product, transactions, false, "")
-	payUrl, updatedTransactions, err := client.NewBusiness()
-	if err != nil {
-		log.ErrorF("error emitPay policy %s: %s", policy.Uid, err.Error())
-		return "", err
-	}
-
-	for index, tr := range updatedTransactions {
-		err = lib.SetFirestoreErr(models.TransactionsCollection, tr.Uid, tr)
-		if err != nil {
-			log.ErrorF("error saving transaction %s to firestore: %s", tr.Uid, err.Error())
-			return "", err
-		}
-		tr.BigQuerySave("")
-
-		if tr.IsPay {
-			err = transaction.CreateNetworkTransactions(policy, &updatedTransactions[index], networkNode, mgaProduct)
-			if err != nil {
-				log.ErrorF("error creating network transactions: %s", err.Error())
-				return "", err
-			}
-			if err := consultancy.GenerateInvoice(*policy, tr); err != nil {
-				log.Printf("error handling consultancy: %s", err.Error())
-			}
-		}
-	}
-	return payUrl, err
 }
 
 func calculatePaymentComponents(policy *models.Policy) {

@@ -268,18 +268,18 @@ func GetFilesV6(envelopeId string) chan NamirialFiles {
 func getPrepareV6(id string) string {
 	return `{
 		"FileIds": [
-			"` + id + `"
+		"` + id + `"
 		],
 		"ClearFieldMarkupString": true,
 		"SigStringConfigurations": [
-		  {
+		{
 			"StartPattern": "string",
 			"EndPattern": "string",
 			"ClearSigString": true,
 			"SearchEntireWordOnly": true
-		  }
+		}
 		]
-	  }`
+	}`
 }
 
 func getSendV6(id string, data models.Policy, prepare string, origin string, sendEmail bool) string {
@@ -303,9 +303,9 @@ func getSendV6(id string, data models.Policy, prepare string, origin string, sen
 	var testPin string
 	if !env.IsProduction() {
 		testPin = `
-			"AccessCode": {
-			  "Code": "test"
-			}, `
+		"AccessCode": {
+			"Code": "test"
+		}, `
 	}
 
 	nn := network.GetNetworkNodeByUid(data.ProducerUid)
@@ -333,10 +333,10 @@ func getSendV6(id string, data models.Policy, prepare string, origin string, sen
 
 	return `{
 		"Documents": [
-			{
-				"FileId": "` + id + `",
-				"DocumentNumber": 1
-			}
+		{
+			"FileId": "` + id + `",
+			"DocumentNumber": 1
+		}
 		],
 		"Name": "` + data.CodeCompany + `",
 		"MetaData": "string",
@@ -345,88 +345,88 @@ func getSendV6(id string, data models.Policy, prepare string, origin string, sen
 		"LockFormFieldsOnFinish": true,
 		"UnassignedElements": ` + string(unassignedJson) + `,
 		"Activities": [
-			{
-				"Action": {
-					"Sign": {
-                        "RequireViewContentBeforeFormFilling": false,
-						"RecipientConfiguration": {
-							"SendEmails": false,
-						    "AllowAccessAfterFinish": false,
-						    "AllowDelegation": false,
-							"ContactInformation": {
-								"Email": "` + data.Contractor.Mail + `",
-								"GivenName": "` + data.Contractor.Name + `",
-								"Surname": "` + data.Contractor.Surname + `",
-								"PhoneNumber": "` + data.Contractor.Phone + `",
-								"LanguageCode": "IT"
-							},
-							"PersonalMessage": "FIRMA LA TUA POLIZZA",
-							"AuthenticationConfiguration": {
-								` + testPin + `
-							  "SmsOneTimePassword": {
-								"PhoneNumber": "` + data.Contractor.Phone + `"
-							  }
-							}
+		{
+			"Action": {
+				"Sign": {
+					"RequireViewContentBeforeFormFilling": false,
+					"RecipientConfiguration": {
+						"SendEmails": false,
+						"AllowAccessAfterFinish": false,
+						"AllowDelegation": false,
+						"ContactInformation": {
+							"Email": "` + data.Contractor.Mail + `",
+							"GivenName": "` + data.Contractor.Name + `",
+							"Surname": "` + data.Contractor.Surname + `",
+							"PhoneNumber": "` + data.Contractor.Phone + `",
+							"LanguageCode": "IT"
 						},
-						"Elements": ` + string(elementsJson) + `,
-						` + redirectUrl + `
-						"SigningGroup": "CONTRAENTE"
-					}
+						"PersonalMessage": "FIRMA LA TUA POLIZZA",
+						"AuthenticationConfiguration": {
+							` + testPin + `
+							"SmsOneTimePassword": {
+								"PhoneNumber": "` + data.Contractor.Phone + `"
+							}
+						}
+					},
+					"Elements": ` + string(elementsJson) + `,
+					` + redirectUrl + `
+					"SigningGroup": "CONTRAENTE"
 				}
 			}
-		
+		}
+
 		],
 		"AgentRedirectConfiguration": {
 			"Policy": "None",
 			"Allow": true,
 			"IframeWhitelisting": [
-			  "dev.wopta.it", "wopta.it"
+			"dev.wopta.it", "wopta.it"
 			]
-		  },
+		},
 		"ReminderConfiguration": {
 			"Enabled": true,
 			"FirstReminderInDays": 2,
 			"ReminderResendIntervalInDays": 1,
 			"BeforeExpirationInDays": 1
-		  },
+		},
 		"CallbackConfiguration": {
 			"CallbackUrl": ` + calbackurl + `,
 			"StatusUpdateCallbackUrl":` + calbackurl + ` ,
 			"ActivityActionCallbackConfiguration": {
-			  "Url": ` + calbackurl + `,
-			  "ActionCallbackSelection": {
-				"ConfirmTransactionCode": false,
-				"AgreementAccepted": false,
-				"AgreementRejected": false,
-				"PrepareAuthenticationSuccess": false,
-				"AuthenticationFailed":false,
-				"AuthenticationSuccess":false,
-				"AuditTrailRequested": false,
-				"AuditTrailXmlRequested": false,
-				"CalledPage": false,
-				"DocumentDownloaded": false,
-				"FlattenedDocumentDownloaded": false,
-				"AddedAnnotation": false,
-				"AddedAttachment": false,
-				"AppendedDocument": false,
-				"FormsFilled": false,
-				"ConfirmReading": false,
-				"SendTransactionCode": false,
-				"PrepareSignWorkstepDocument": false,
-				"SignWorkstepDocument": false,
-				"UndoAction": false,
-				"WorkstepCreated": false,
-				"WorkstepFinished": true,
-				"WorkstepRejected": true,
-				"DisablePolicyAndValidityChecks": true,
-				"EnablePolicyAndValidityChecks": true,
-				"AppendFileToWorkstep": false,
-				"AppendTasksToWorkstep": false,
-				"SetOptionalDocumentState": false,
-				"PreparePayloadForBatch": false
-			  }
+				"Url": ` + calbackurl + `,
+				"ActionCallbackSelection": {
+					"ConfirmTransactionCode": false,
+					"AgreementAccepted": false,
+					"AgreementRejected": false,
+					"PrepareAuthenticationSuccess": false,
+					"AuthenticationFailed":false,
+					"AuthenticationSuccess":false,
+					"AuditTrailRequested": false,
+					"AuditTrailXmlRequested": false,
+					"CalledPage": false,
+					"DocumentDownloaded": false,
+					"FlattenedDocumentDownloaded": false,
+					"AddedAnnotation": false,
+					"AddedAttachment": false,
+					"AppendedDocument": false,
+					"FormsFilled": false,
+					"ConfirmReading": false,
+					"SendTransactionCode": false,
+					"PrepareSignWorkstepDocument": false,
+					"SignWorkstepDocument": false,
+					"UndoAction": false,
+					"WorkstepCreated": false,
+					"WorkstepFinished": true,
+					"WorkstepRejected": true,
+					"DisablePolicyAndValidityChecks": true,
+					"EnablePolicyAndValidityChecks": true,
+					"AppendFileToWorkstep": false,
+					"AppendTasksToWorkstep": false,
+					"SetOptionalDocumentState": false,
+					"PreparePayloadForBatch": false
+				}
 			}
-		  }
+		}
 	}`
 }
 
@@ -444,17 +444,49 @@ type Action struct {
 }
 
 type Sign struct {
-	Elements Elements `json:"Elements"`
+	Elements               Elements `json:"Elements"`
+	RecipientConfiguration RecipientConfiguration
 }
 
+type RecipientConfiguration struct {
+	SendEmails                  bool                        `json:"SendEmails"`
+	AllowAccessAfterFinish      bool                        `json:"AllowAccessAfterFinish"`
+	AllowDelegation             bool                        `json:"AllowDelegation"`
+	ContactInformation          ContactInformation          `json:"ContactInformation"`
+	PersonalMessage             string                      `json:"PersonalMessage"`
+	AuthenticationConfiguration AuthenticationConfiguration `json:"AuthenticationConfiguration"`
+}
+
+type ContactInformation struct {
+	Email        string `json:"Email"`
+	GivenName    string `json:"GivenName"`
+	Surname      string `json:"Surname"`
+	PhoneNumber  string `json:"PhoneNumber"`
+	LanguageCode string `json:"LanguageCode"`
+}
+
+type AuthenticationConfiguration struct {
+	SmsOneTimePassword SmsOneTimePassword `json:"SmsOneTimePassword"`
+	AccessCode         AccessCode
+}
+
+type AccessCode struct {
+	Code string
+}
+
+type SmsOneTimePassword struct {
+	PhoneNumber string `json:"PhoneNumber"`
+}
 type Elements struct {
-	TextBoxes         []interface{}     `json:"TextBoxes"`
-	CheckBoxes        []interface{}     `json:"CheckBoxes"`
-	ComboBoxes        []interface{}     `json:"ComboBoxes"`
-	RadioButtons      []interface{}     `json:"RadioButtons"`
-	ListBoxes         []interface{}     `json:"ListBoxes"`
+	//TO implement if needed
+	TextBoxes    []interface{} `json:"TextBoxes"`
+	CheckBoxes   []interface{} `json:"CheckBoxes"`
+	ComboBoxes   []interface{} `json:"ComboBoxes"`
+	RadioButtons []interface{} `json:"RadioButtons"`
+	ListBoxes    []interface{} `json:"ListBoxes"`
+	Attachments  []interface{} `json:"Attachments"`
+
 	Signatures        []Signature       `json:"Signatures"`
-	Attachments       []interface{}     `json:"Attachments"`
 	LinkConfiguration LinkConfiguration `json:"LinkConfiguration"`
 }
 

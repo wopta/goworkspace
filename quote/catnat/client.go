@@ -145,8 +145,5 @@ func (c *NetClient) Download(numeroPolizza string) (response DownloadResponse, e
 		log.ErrorF("error decoding catnat response")
 		return response, err
 	}
-	if response.Result != "OK" {
-		return response, fmt.Errorf("%+v", response.Errors)
-	}
 	return response, nil
 }

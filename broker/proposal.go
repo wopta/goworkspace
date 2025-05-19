@@ -4,19 +4,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"net/http"
-	"strings"
-	"time"
+
+	"github.com/wopta/goworkspace/broker/internal/utility"
+	"github.com/wopta/goworkspace/lib/log"
 
 	"github.com/wopta/goworkspace/callback_out"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
-	"github.com/wopta/goworkspace/question"
-	"github.com/wopta/goworkspace/reserved"
 )
 
 type ProposalReq struct {
@@ -99,7 +97,7 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 			log.ErrorF("error creating lead: %s", err.Error())
 			return "", nil, err
 		}
-		setProposalNumber(&policy)
+		utility.SetProposalNumber(&policy)
 		policy.RenewDate = policy.CreationDate.AddDate(1, 0, 0)
 	}
 
@@ -144,61 +142,4 @@ func proposal(policy *models.Policy) error {
 	}
 
 	return nil
-}
-
-func setProposalData(policy *models.Policy) {
-	log.AddPrefix("setProposalData")
-	defer log.PopPrefix()
-	setProposalNumber(policy)
-	policy.Status = models.PolicyStatusProposal
-
-	if policy.IsReserved {
-		log.Println("setting NeedsApproval status")
-		policy.Status = models.PolicyStatusNeedsApproval
-
-		for _, reason := range policy.ReservedInfo.Reasons {
-			// TODO: add key/id for reasons so we do not have to cjeck string equallity
-			if !strings.HasPrefix(reason, "Cliente già assicurato") {
-				reserved.SetReservedInfo(policy)
-				break
-			}
-		}
-	}
-
-	if policy.Statements == nil || len(*policy.Statements) == 0 {
-		var err error
-		policy.Statements = new([]models.Statement)
-
-		log.Println("setting policy statements")
-
-		*policy.Statements, err = question.GetStatements(policy)
-		if err != nil {
-			log.ErrorF("error setting policy statements: %s", err.Error())
-			return
-		}
-
-	}
-
-	plc.AddProposalDoc(origin, policy, networkNode, mgaProduct)
-
-	log.Printf("policy status %s", policy.Status)
-
-	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
-	policy.Updated = time.Now().UTC()
-}
-
-func setProposalNumber(policy *models.Policy) {
-	log.AddPrefix("SetProposalNumber")
-	defer log.PopPrefix()
-	log.Println("set proposal number start ---------------")
-
-	if policy.ProposalNumber != 0 {
-		log.Printf("proposal number already set %d", policy.ProposalNumber)
-		return
-	}
-
-	log.Println("setting proposal number...")
-	firePolicy := lib.PolicyCollection
-	policy.ProposalNumber = GetSequenceProposal("", firePolicy)
-	log.Printf("proposal number %d", policy.ProposalNumber)
 }
