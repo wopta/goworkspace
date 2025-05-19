@@ -34,8 +34,6 @@ func EmitSign(policy *models.Policy, product *models.Product, networkNode *model
 func EmitSignWithNewNamirial(policy *models.Policy, product *models.Product, networkNode *models.NetworkNode, sendEmail bool, origin string) error {
 	log.AddPrefix("emitSign")
 	defer log.PopPrefix()
-	//TODO: implement callback
-	///Users/luca/WoptaProject/goworkspace/document/pkg riga 302
 	log.Printf("Policy Uid %s", policy.Uid)
 
 	policy.IsSign = false
@@ -45,9 +43,8 @@ func EmitSignWithNewNamirial(policy *models.Policy, product *models.Product, net
 	p := <-document.ContractObj(origin, *policy, networkNode, product)
 	policy.DocumentName = p.LinkGcs
 	namirialInput := namirial.NamirialInput{
-		CodeCompany: policy.CodeCompany,
-		Contractor:  policy.Contractor,
-		FilesName:   make([]string, 0),
+		Policy:    *policy,
+		FilesName: make([]string, 0),
 	}
 	namirialInput.FilesName = append(namirialInput.FilesName, p.LinkGcs)
 	for _, document := range *policy.Attachments {

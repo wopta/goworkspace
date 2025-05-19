@@ -6,6 +6,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
@@ -26,7 +27,8 @@ func Sign(input NamirialInput) (response NamirialOutput, err error) {
 	if err != nil {
 		return response, err
 	}
-	idEnvelope, err := sendDocuments(resp, fileIds, input.Contractor, input.CodeCompany)
+	callbackurl := `"https://europe-west1-` + os.Getenv("GOOGLE_PROJECT_ID") + `.cloudfunctions.net/callback/v1/sign?envelope=##EnvelopeId##&action=##Action##&uid=` + input.Policy.Uid + `&token=` + os.Getenv("WOPTA_TOKEN_API") + `&origin=` + input.Origin + `&sendEmail=` + strconv.FormatBool(input.SendEmail) + `"`
+	idEnvelope, err := sendDocuments(resp, fileIds, input.Policy, callbackurl)
 	if err != nil {
 		return response, err
 	}
@@ -126,7 +128,7 @@ func prepareDocuments(idsDocument ...string) (resp document.PrepareResponse, err
 	return resp, nil
 }
 
-func sendDocuments(preSendBody document.PrepareResponse, idFiles []string, contractor models.Contractor, codeCompany string) (idEnvelope string, err error) {
+func sendDocuments(preSendBody document.PrepareResponse, idFiles []string, policy models.Policy, callbackUrl string) (idEnvelope string, err error) {
 	var url = os.Getenv("ESIGN_BASEURL") + "v6/envelope/send"
 	var body sendNamirialRequest
 	log.Println("Sending documents")
@@ -136,7 +138,12 @@ func sendDocuments(preSendBody document.PrepareResponse, idFiles []string, contr
 	for i := range idFiles {
 		body.Documents[i] = documentDescription{FileId: idFiles[i], DocumentNumber: i + 1} //the document number has to start from 1
 	}
-	setContractorDataInSendBody(&body, contractor, codeCompany)
+	body.CallbackConfiguration.CallbackUrl = callbackUrl
+	body.CallbackConfiguration.StatusUpdateCallbackUrl = callbackUrl
+	body.CallbackConfiguration.ActivityActionCallbackConfig = activityActionCallbackConfiguration{
+		Url: callbackUrl,
+	}
+	setContractorDataInSendBody(&body, policy)
 	req, err := doNamirialRequest("POST", url, body)
 	if err != nil {
 		return idEnvelope, err
@@ -154,7 +161,8 @@ func sendDocuments(preSendBody document.PrepareResponse, idFiles []string, contr
 }
 
 // adjust the request to insert information regard the contractor
-func setContractorDataInSendBody(bodySend *sendNamirialRequest, contractor models.Contractor, codeCompany string) {
+func setContractorDataInSendBody(bodySend *sendNamirialRequest, policy models.Policy) {
+	contractor := policy.Contractor
 	for i := range bodySend.Activities {
 		for range bodySend.Activities[i].Action.Sign.Elements.Signatures {
 			contactInfo := &bodySend.Activities[i].Action.Sign.RecipientConfiguration.ContactInformation
@@ -167,7 +175,7 @@ func setContractorDataInSendBody(bodySend *sendNamirialRequest, contractor model
 		}
 	}
 	//TODO: i dont know if it is correct
-	bodySend.Name = fmt.Sprint(bodySend.Name, ",", codeCompany)
+	bodySend.Name = fmt.Sprint(bodySend.Name, ",", policy.CodeCompany)
 }
 
 // return an object that contains a link to open and sign the documents
