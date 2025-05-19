@@ -79,7 +79,7 @@ func catnatDownloadCertification(store bpmn.StorageData) error {
 		policy.Attachments = new([]models.Attachment)
 	}
 	*policy.Attachments = append(*policy.Attachments, models.Attachment{
-		Name:     models.ContractAttachmentName + "NetInsurance",
+		Name:     models.ContractAttachmentName + " NetInsurance",
 		FileName: filename + ".pdf",
 		Link:     link,
 		MimeType: "application/pdf",
