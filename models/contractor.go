@@ -81,7 +81,7 @@ type Contractor struct {
 	IsFamilyMember           bool                   `firestore:"isFamilyMember"              json:"isFamilyMember"`
 	IsContactable            bool                   `firestore:"isContactable"               json:"isContactable"`
 	Ateco                    string                 `firestore:"ateco"                       json:"ateco"`
-	CompanyName              string                 `firestore:"companyName"                 son:"companyName"`
+	CompanyName              string                 `firestore:"companyName"                 json:"companyName"`
 }
 
 func (c *Contractor) Normalize() {
