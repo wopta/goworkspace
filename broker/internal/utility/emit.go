@@ -63,7 +63,9 @@ func EmitSignWithNewNamirial(policy *models.Policy, product *models.Product, net
 }
 
 func EmitPay(policy *models.Policy, origin string, productP, mgaProductP *models.Product, networkNode *models.NetworkNode) {
-	log.Printf("[emitPay] Policy Uid %s", policy.Uid)
+	log.AddPrefix("emitPay")
+	defer log.PopPrefix()
+	log.Printf("Policy Uid %s", policy.Uid)
 
 	policy.IsPay = false
 	payUrl, err := CreatePolicyTransactions(policy, productP, mgaProductP, networkNode)

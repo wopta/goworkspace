@@ -37,13 +37,13 @@ func setProposalData(state bpmn.StorageData) error {
 	}
 
 	if policy.ProposalNumber != 0 {
-		log.Printf("[setProposalData] policy '%s' already has proposal with number '%d'", policy.Uid, policy.ProposalNumber)
+		log.Printf("policy '%s' already has proposal with number '%d'", policy.Uid, policy.ProposalNumber)
 		return nil
 	}
 
 	utility.SetProposalData(policy.Policy, origin.String, networkNode.NetworkNode, mgaProduct.Product)
 
-	log.Printf("[setProposalData] saving proposal n. %d to firestore...", policy.ProposalNumber)
+	log.Printf("saving proposal n. %d to firestore...", policy.ProposalNumber)
 
 	firePolicy := lib.GetDatasetByEnv(origin.String, lib.PolicyCollection)
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
@@ -82,7 +82,7 @@ func sendProposalMail(state bpmn.StorageData) error {
 	}
 
 	log.Printf(
-		"[sendProposalMail] from '%s', to '%s', cc '%s'",
+		"from '%s', to '%s', cc '%s'",
 		addresses.FromAddress.String(),
 		addresses.ToAddress.String(),
 		addresses.CcAddress.String(),

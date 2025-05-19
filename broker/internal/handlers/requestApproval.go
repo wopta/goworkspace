@@ -37,7 +37,7 @@ func setRequestApprova(state bpmn.StorageData) error {
 
 	utility.SetRequestApprovalData(policy.Policy, networkNode.NetworkNode, mgaProduct.Product, origin.String)
 
-	log.Printf("[setRequestApproval] saving policy with uid %s to Firestore....", policy.Uid)
+	log.Printf("saving policy with uid %s to Firestore....", policy.Uid)
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
