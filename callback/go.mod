@@ -7,16 +7,16 @@ replace github.com/wopta/goworkspace/callback => ./
 require (
 	cloud.google.com/go/firestore v1.15.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
-	github.com/wopta/goworkspace/bpmn v1.0.29
-	github.com/wopta/goworkspace/callback_out v1.0.60
-	github.com/wopta/goworkspace/lib v1.0.153
-	github.com/wopta/goworkspace/mail v1.0.164
-	github.com/wopta/goworkspace/models v1.2.49
-	github.com/wopta/goworkspace/network v1.0.114
-	github.com/wopta/goworkspace/payment v1.0.335
-	github.com/wopta/goworkspace/policy v1.0.198
-	github.com/wopta/goworkspace/product v1.1.46
-	github.com/wopta/goworkspace/transaction v1.0.191
+	github.com/wopta/goworkspace/bpmn v1.0.30
+	github.com/wopta/goworkspace/callback_out v1.0.61
+	github.com/wopta/goworkspace/lib v1.0.154
+	github.com/wopta/goworkspace/mail v1.0.165
+	github.com/wopta/goworkspace/models v1.2.50
+	github.com/wopta/goworkspace/network v1.0.115
+	github.com/wopta/goworkspace/payment v1.0.336
+	github.com/wopta/goworkspace/policy v1.0.199
+	github.com/wopta/goworkspace/product v1.1.47
+	github.com/wopta/goworkspace/transaction v1.0.192
 	google.golang.org/api v0.181.0
 )
 
@@ -82,8 +82,8 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	github.com/wopta/goworkspace/accounting v1.0.18 // indirect
-	github.com/wopta/goworkspace/document v1.1.158 // indirect
+	github.com/wopta/goworkspace/accounting v1.0.19 // indirect
+	github.com/wopta/goworkspace/document v1.1.159 // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
