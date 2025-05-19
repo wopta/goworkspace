@@ -9,12 +9,12 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/dustin/go-humanize v1.0.1
 	github.com/go-gota/gota v0.12.0
-	github.com/wopta/goworkspace/lib v1.0.153
-	github.com/wopta/goworkspace/models v1.2.49
-	github.com/wopta/goworkspace/network v1.0.114
-	github.com/wopta/goworkspace/policy v1.0.198
-	github.com/wopta/goworkspace/product v1.1.46
-	github.com/wopta/goworkspace/sellable v1.0.147
+	github.com/wopta/goworkspace/lib v1.0.154
+	github.com/wopta/goworkspace/models v1.2.50
+	github.com/wopta/goworkspace/network v1.0.115
+	github.com/wopta/goworkspace/policy v1.0.199
+	github.com/wopta/goworkspace/product v1.1.47
+	github.com/wopta/goworkspace/sellable v1.0.148
 	github.com/xuri/excelize/v2 v2.8.1
 	google.golang.org/api v0.209.0
 	modernc.org/mathutil v1.5.0
@@ -79,7 +79,7 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	github.com/wopta/goworkspace/document v1.1.158 // indirect
+	github.com/wopta/goworkspace/document v1.1.159 // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20231025114914-d1ff6096ae53 // indirect
