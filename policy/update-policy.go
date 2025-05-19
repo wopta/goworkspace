@@ -49,7 +49,7 @@ func UpdatePolicy(policy *models.Policy) (map[string]any, error) {
 		input["startDate"] = policy.StartDate
 		input["endDate"] = policy.EndDate
 		input["quoteQuestions"] = policy.QuoteQuestions
-		input["paymentComponents"] = policy.PaymentComponents
+		input["offersPrices"] = policy.OffersPrices
 	}
 
 	input["updated"] = time.Now().UTC()
