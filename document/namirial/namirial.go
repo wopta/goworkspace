@@ -53,7 +53,11 @@ func uploadFiles(files ...string) (fileIds []string, err error) {
 	var idsFile []string
 	for i := range files {
 		if env.IsLocal() {
-			file, err = os.ReadFile("document/contract.pdf")
+			if i%2 == 0 {
+				file, err = os.ReadFile("document/net.pdf")
+			} else {
+				file, err = os.ReadFile("document/contract.pdf")
+			}
 		} else {
 			file, err = lib.GetFromStorageErr(os.Getenv("GOOGLE_STORAGE_BUCKET"), files[i], "")
 		}
@@ -106,8 +110,11 @@ func prepareDocuments(idsDocument ...string) (resp document.PrepareResponse, err
 			EndPattern:           "string",
 			ClearSigString:       true,
 			SearchEntireWordOnly: true,
-		},
-		}}
+		}, {
+			StartPattern:         "Rappresentante_Legale",
+			ClearSigString:       true,
+			SearchEntireWordOnly: true,
+		}}}
 
 	req, err := doNamirialRequest(http.MethodPost, url, request)
 	if err != nil {
@@ -118,12 +125,7 @@ func prepareDocuments(idsDocument ...string) (resp document.PrepareResponse, err
 	if err != nil {
 		return resp, err
 	}
-	if env.IsLocal() || env.IsDevelopment() {
-		for i := range resp.Activities {
-			resp.Activities[i].Action.Sign.RecipientConfiguration.AuthenticationConfiguration.AccessCode.Code = "test"
-		}
-	}
-
+	log.PrintStruct("prepare namirial", resp)
 	log.Println("End preparing files")
 	return resp, nil
 }
@@ -134,6 +136,15 @@ func sendDocuments(preSendBody document.PrepareResponse, idFiles []string, polic
 	log.Println("Sending documents")
 
 	body.Activities = preSendBody.Activities
+	//in this way both documents will have save RecipientConfiguration
+	//TODO: create two activities?
+	body.Activities[0].Action.Sign.Elements.Signatures = append(body.Activities[0].Action.Sign.Elements.Signatures, preSendBody.UnassignedElements.Signatures...)
+
+	if env.IsLocal() || env.IsDevelopment() {
+		for i := range body.Activities {
+			body.Activities[i].Action.Sign.RecipientConfiguration.AuthenticationConfiguration.AccessCode.Code = "test"
+		}
+	}
 	body.Documents = make([]documentDescription, len(idFiles))
 	for i := range idFiles {
 		body.Documents[i] = documentDescription{FileId: idFiles[i], DocumentNumber: i + 1} //the document number has to start from 1
@@ -144,10 +155,12 @@ func sendDocuments(preSendBody document.PrepareResponse, idFiles []string, polic
 		Url: callbackUrl,
 	}
 	setContractorDataInSendBody(&body, policy)
+	log.PrintStruct("request send envelope", body)
 	req, err := doNamirialRequest("POST", url, body)
 	if err != nil {
 		return idEnvelope, err
 	}
+
 	resp, err := handleResponse[responseSendDocuments](lib.RetryDo(req, 5, 30))
 	if err != nil {
 		return idEnvelope, err

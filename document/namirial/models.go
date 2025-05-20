@@ -47,6 +47,7 @@ type sendNamirialRequest struct {
 	Documents             []documentDescription `json:"Documents"`
 	Name                  string                `json:"Name"`
 	Activities            []document.Activity   `json:"Activities"`
+	UnassignedElements    document.Elements     `json:"UnassignedElements"`
 	CallbackConfiguration callbackConfiguration `json:"CallbackConfiguration"`
 }
 

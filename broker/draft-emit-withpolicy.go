@@ -79,7 +79,9 @@ func DraftEmitWithPolicyFx(w http.ResponseWriter, r *http.Request) (string, any,
 	}
 
 	b, err := json.Marshal(responseEmit)
-
+	if err != nil {
+		return string(b), responseEmit, err
+	}
 	log.Println("Handler end -------------------------------------------------")
 
 	return string(b), responseEmit, err
