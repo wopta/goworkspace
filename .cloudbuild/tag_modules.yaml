@@ -4,6 +4,8 @@ steps:
   dir: '.cloudbuild/go_scripts'
   env:
     - 'GIT_REMOTE=$_GIT_REMOTE'
+  secretEnv:
+    - 'GIT_ACCESS_TOKEN'
   args:
     - run
     - main.go
