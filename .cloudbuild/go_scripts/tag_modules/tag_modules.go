@@ -42,6 +42,9 @@ func Exec() {
 		fmt.Printf("==== Working module %s...\n", mod.Name)
 
 		tag := mod.UpdateSelf(repo)
+		if slices.Contains(common.FUNCTIONS, mod.Name) && !slices.Contains(functionsToUpdate, mod.Name) {
+			functionsToUpdate = append(functionsToUpdate, mod.Name)
+		}
 		tagsToPush = append(tagsToPush, tag)
 
 		mod.UpdateDependencies(repo)
@@ -65,7 +68,7 @@ func Exec() {
 		panic(err)
 	}
 	common.PushTags(repo, tagsToPush)
-	fmt.Printf("Functions to release: %+v\n", functionsToUpdate)
+	fmt.Printf("Functions to release: %+v\n", strings.Join(functionsToUpdate, ","))
 }
 
 func parseModules(path string, tagMap map[string][]common.GitTag) []GoModule {
