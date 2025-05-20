@@ -70,7 +70,6 @@ func init() {
 }
 
 func Payment(w http.ResponseWriter, r *http.Request) {
-
 	router := lib.GetRouter("payment", paymentRoutes)
 	router.ServeHTTP(w, r)
 }
