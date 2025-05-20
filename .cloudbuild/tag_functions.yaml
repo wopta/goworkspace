@@ -1,0 +1,21 @@
+steps:
+- name: 'golang:1.23'
+  entrypoint: go
+  dir: '.cloudbuild/go_scripts'
+  env:
+    - 'GIT_REMOTE=$_GIT_REMOTE'
+  args:
+    - run
+    - main.go
+    - '--script=tag_functions'
+    - '--functions=$_FUNCTIONS'
+    - '--from=$_FROM_ENV'
+    - '--target=$_TARGET_ENV'
+
+availableSecrets:
+  secretManager:
+    - versionName: projects/$_PROJECT_NUMBER_DEPLOY/secrets/GITLAB_GOWORKSPACE_ACCESS_TOKEN/versions/1
+      env: 'GIT_ACCESS_TOKEN'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
