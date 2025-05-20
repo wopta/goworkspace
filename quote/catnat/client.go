@@ -82,6 +82,7 @@ func (c *NetClient) Emit(dto QuoteRequest) (response QuoteResponse, err error) {
 	dto.Emission = "si"
 	url := os.Getenv("NET_BASEURL") + "/PolizzeGateway24/emettiPolizza/441-029-007"
 	rBuff := new(bytes.Buffer)
+	log.PrintStruct("request interagration api netensurance", dto)
 	err = json.NewEncoder(rBuff).Encode(dto)
 
 	if err != nil {
