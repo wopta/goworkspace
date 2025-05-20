@@ -213,6 +213,9 @@ func (d *QuoteRequest) FromPolicy(p *models.Policy, isEmission bool) error {
 	if isEmission {
 		d.Emission = yes
 		var dt string
+		if p.Contractor.CompanyAddress == nil {
+			return errors.New("You need to populate CompanyAddress")
+		}
 		if p.Contractor.Type == "legalEntity" && p.Contractor.FiscalCode == "" {
 			dt = catNatLegalPerson
 		} else {
@@ -222,7 +225,7 @@ func (d *QuoteRequest) FromPolicy(p *models.Policy, isEmission bool) error {
 			PersonalDataType:          dt,
 			Name:                      p.Contractor.Name,
 			Surname:                   p.Contractor.Surname,
-			PostalCode:                p.Contractor.Residence.PostalCode,
+			PostalCode:                p.Contractor.CompanyAddress.PostalCode,
 			CompanyName:               p.Contractor.Name,
 			VatNumber:                 p.Contractor.VatCode,
 			FiscalCode:                p.Contractor.FiscalCode,
