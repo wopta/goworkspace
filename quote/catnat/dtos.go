@@ -212,10 +212,10 @@ func (d *QuoteRequest) FromPolicy(p *models.Policy, isEmission bool) error {
 
 	if isEmission {
 		d.Emission = yes
-		var dt string
 		if p.Contractor.CompanyAddress == nil {
 			return errors.New("You need to populate CompanyAddress")
 		}
+		var dt string
 		if p.Contractor.Type == "legalEntity" && p.Contractor.FiscalCode == "" {
 			dt = catNatLegalPerson
 		} else {
@@ -225,11 +225,10 @@ func (d *QuoteRequest) FromPolicy(p *models.Policy, isEmission bool) error {
 			PersonalDataType:          dt,
 			Name:                      p.Contractor.Name,
 			Surname:                   p.Contractor.Surname,
-			PostalCode:                p.Contractor.CompanyAddress.PostalCode,
-			CompanyName:               p.Contractor.Name,
+			CompanyName:               p.Contractor.CompanyName,
 			VatNumber:                 p.Contractor.VatCode,
 			FiscalCode:                p.Contractor.FiscalCode,
-			AtecoCode:                 baseAsset.Building.Ateco,
+			AtecoCode:                 p.Contractor.Ateco,
 			Phone:                     p.Contractor.Phone,
 			Email:                     p.Contractor.Mail,
 			PrivacyConsentDate:        p.StartDate.Format("2006-01-02"),
@@ -240,10 +239,11 @@ func (d *QuoteRequest) FromPolicy(p *models.Policy, isEmission bool) error {
 			DocumentationFormat:       1,
 			ConsensoTrattamento:       "si",
 		}
-		if p.Contractor.Residence != nil {
-			contr.Address = formatAddress(p.Contractor.Residence)
-			contr.Locality = p.Contractor.Residence.Locality
-			contr.CityCode = p.Contractor.Residence.CityCode
+		if p.Contractor.CompanyAddress != nil {
+			contr.Address = formatAddress(p.Contractor.CompanyAddress)
+			contr.Locality = p.Contractor.CompanyAddress.Locality
+			contr.CityCode = p.Contractor.CompanyAddress.CityCode
+			contr.PostalCode = p.Contractor.CompanyAddress.PostalCode
 		}
 
 		d.Contractor = contr
@@ -414,7 +414,7 @@ func (d *QuoteResponse) ToPolicy(p *models.Policy) {
 	p.OffersPrices["default"]["yearly"].Gross = p.PriceGross
 	p.OffersPrices["default"]["yearly"].Net = p.PriceNett
 	p.OffersPrices["default"]["yearly"].Tax = p.TaxAmount
-
+	p.OfferlName = "default"
 }
 
 func formatAddress(addr *models.Address) string {
