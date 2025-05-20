@@ -51,7 +51,6 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		policy       models.Policy
 		responseEmit EmitResponse
 	)
-
 	log.AddPrefix("EmitFx")
 	defer log.PopPrefix()
 
@@ -94,7 +93,6 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	policy, err = plc.GetPolicy(uid, origin)
 	lib.CheckError(err)
-
 	if policy.Channel == models.NetworkChannel && policy.ProducerUid != authToken.UserID {
 		log.Printf("user %s cannot emit policy %s because producer not equal to request user", authToken.UserID, policy.Uid)
 		return "", nil, errors.New("operation not allowed")
@@ -119,8 +117,21 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		return "", "", err
 	}
 
-	emitUpdatePolicy(&policy, request)
+	//!!!!!TODO must be eliminated, should use either this or the new one
+	//Only for test!!!!!
+	if policy.Name == models.CatNatProduct {
+		responseEmit, err = emitDraftWithPolicy(&policy, origin)
+		if err != nil {
+			return "", nil, err
+		}
 
+		b, err := json.Marshal(responseEmit)
+
+		log.Println("Handler end -------------------------------------------------")
+
+		return string(b), responseEmit, err
+	}
+	emitUpdatePolicy(&policy, request)
 	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
 	if networkNode != nil {
 		warrant = networkNode.GetWarrant()
@@ -133,10 +144,9 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	responseEmit = emit(&policy, request, origin)
 
 	b, e := json.Marshal(responseEmit)
-
 	log.Println("Handler end -------------------------------------------------")
-
 	return string(b), responseEmit, e
+
 }
 
 func emit(policy *models.Policy, request EmitRequest, origin string) EmitResponse {
