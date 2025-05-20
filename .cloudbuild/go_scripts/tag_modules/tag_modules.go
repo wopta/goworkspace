@@ -36,6 +36,7 @@ func Exec() {
 	modulesToUpdate := getDependentModules(allModules, startingModules)
 
 	tagsToPush := make([]string, 0)
+	functionsToUpdate := make([]string, 0)
 	for _, mod := range modulesToUpdate {
 		fmt.Println("=========================================================")
 		fmt.Printf("==== Working module %s...\n", mod.Name)
@@ -44,6 +45,11 @@ func Exec() {
 		tagsToPush = append(tagsToPush, tag)
 
 		mod.UpdateDependencies(repo)
+		for _, m := range mod.DependedBy {
+			if slices.Contains(common.FUNCTIONS, m) && !slices.Contains(functionsToUpdate, m) {
+				functionsToUpdate = append(functionsToUpdate, m)
+			}
+		}
 
 		fmt.Printf("==== Module %s completed!\n", mod.Name)
 		fmt.Println("=========================================================")
@@ -59,6 +65,7 @@ func Exec() {
 		panic(err)
 	}
 	common.PushTags(repo, tagsToPush)
+	fmt.Printf("Functions to release: %+v\n", functionsToUpdate)
 }
 
 func parseModules(path string, tagMap map[string][]common.GitTag) []GoModule {
