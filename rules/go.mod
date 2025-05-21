@@ -10,7 +10,7 @@ require (
 	github.com/go-gota/gota v0.12.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/wopta/goworkspace/lib v1.0.156
-	github.com/wopta/goworkspace/quote v1.0.158
+	github.com/wopta/goworkspace/quote v1.0.159
 )
 
 require (
@@ -72,10 +72,10 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	github.com/wopta/goworkspace/document v1.1.161 // indirect
+	github.com/wopta/goworkspace/document v1.1.162 // indirect
 	github.com/wopta/goworkspace/models v1.2.52 // indirect
 	github.com/wopta/goworkspace/network v1.0.117 // indirect
-	github.com/wopta/goworkspace/policy v1.0.201 // indirect
+	github.com/wopta/goworkspace/policy v1.0.202 // indirect
 	github.com/wopta/goworkspace/product v1.1.49 // indirect
 	github.com/wopta/goworkspace/sellable v1.0.150 // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
