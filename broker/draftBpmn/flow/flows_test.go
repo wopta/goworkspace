@@ -555,6 +555,7 @@ func TestEmitForEcommerceWithNodeFlowConfFalse(t *testing.T) {
 	storeNode := bpmn.NewStorageBpnm()
 	storeNode.AddLocal("config", &CallbackConfig{Emit: false})
 
+	storeProduct := bpmn.NewStorageBpnm()
 	exps := []string{
 		"setProposalData",
 		"emitWithSequence",
@@ -572,7 +573,14 @@ func TestEmitForEcommerceWithNodeFlowConfFalse(t *testing.T) {
 		if e != nil {
 			return nil, e
 		}
+		productBuild, e := getBuilderFlowProduct(log, storeProduct)
+		if e != nil {
+			return nil, e
+		}
 		if e := build.Inject(nodeBuild); e != nil {
+			return nil, e
+		}
+		if e := build.Inject(productBuild); e != nil {
 			return nil, e
 		}
 
@@ -589,7 +597,10 @@ func TestEmitForEcommerceCatnat(t *testing.T) {
 	storeNode := bpmn.NewStorageBpnm()
 	storeNode.AddLocal("config", &CallbackConfig{Emit: false})
 
+	storeProduct := bpmn.NewStorageBpnm()
 	exps := []string{
+		"catnatIntegration",
+		"catnatdownloadPolicy",
 		"setProposalData",
 		"emitNoSequence",
 		"sign",
@@ -606,7 +617,14 @@ func TestEmitForEcommerceCatnat(t *testing.T) {
 		if e != nil {
 			return nil, e
 		}
+		productBuild, e := getBuilderFlowProduct(log, storeProduct)
+		if e != nil {
+			return nil, e
+		}
 		if e := build.Inject(nodeBuild); e != nil {
+			return nil, e
+		}
+		if e := build.Inject(productBuild); e != nil {
 			return nil, e
 		}
 
