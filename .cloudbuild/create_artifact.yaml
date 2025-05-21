@@ -1,23 +1,27 @@
 steps:
+# - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+#   args:
+#   - '-c'
+#   - |
+#     chmod +x ./extract_tag_info.sh
+#     ./extract_tag_info.sh ${TAG_NAME}
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   args:
   - '-c'
   - |
-    chmod +x ./extract_tag_info.sh
-    ./extract_tag_info.sh ${TAG_NAME}
-- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-  args:
-  - '-c'
-  - |
-    TAG_MODULE=$(cat /workspace/tag_module)
-    TAG_VERSION=$(cat /workspace/tag_version)
+    # TAG_MODULE=$(cat /workspace/tag_module)
+    # TAG_VERSION=$(cat /workspace/tag_version)
+    # === EXTRACT MODULE NAME AND VERSION FROM TAG =================================
+    # Read TAG_NAME splitting by the IFS separator into the needed variables
+    IFS='/'
+    read -a TAG_ARRAY <<< $TAG_NAME
 
-    gcloud artifacts go upload --project=${$PROJECT_ID} \
+    gcloud artifacts go upload --project=${PROJECT_ID} \
       --repository=${_REPOSITORY} \
       --location=${_REGION} \
-      --module-path=${_MODULE_PREFIX}/${TAG_MODULE} \
-      --version=${TAG_VERSION} \
-      --source=/workspace/${TAG_MODULE}
+      --module-path=${_MODULE_PREFIX}/${TAG_ARRAY[0]} \
+      --version=${TAG_ARRAY[1]} \
+      --source=/workspace/${TAG_ARRAY[0]}
 
 options:
   logging: CLOUD_LOGGING_ONLY
