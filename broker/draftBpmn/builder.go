@@ -30,7 +30,10 @@ func NewBpnmBuilderRawPath(path string) (*BpnmBuilder, error) {
 }
 func NewBpnmBuilder(path string) (*BpnmBuilder, error) {
 	var Bpnm BpnmBuilder
-	jsonProva := lib.GetFilesByEnv(path)
+	jsonProva, err := lib.GetFilesByEnvV2(path)
+	if err != nil {
+		return nil, err
+	}
 	if len(jsonProva) == 0 {
 		return nil, errors.New("Json not found: " + path)
 	}
