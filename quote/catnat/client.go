@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -73,7 +72,8 @@ func (c *NetClient) Quote(dto QuoteRequest) (response QuoteResponse, err error) 
 		return response, err
 	}
 	if response.Result != "OK" {
-		return response, fmt.Errorf("%+v", response.Errors)
+		log.ErrorF("Errore quotazione %+v", response.Errors)
+		return response, errors.New("Errore quotazione")
 	}
 	return response, nil
 }
@@ -108,7 +108,8 @@ func (c *NetClient) Emit(dto QuoteRequest) (response QuoteResponse, err error) {
 		return response, err
 	}
 	if response.Result != "OK" {
-		return response, fmt.Errorf("%+v", response.Errors)
+		log.ErrorF("Errore emissione %+v", response.Errors)
+		return response, errors.New("Errore emissione")
 	}
 	return response, nil
 }
