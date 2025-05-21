@@ -6,6 +6,7 @@ steps:
 #     chmod +x ./extract_tag_info.sh
 #     ./extract_tag_info.sh ${TAG_NAME}
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: 'bash'
   args:
   - '-c'
   - |
