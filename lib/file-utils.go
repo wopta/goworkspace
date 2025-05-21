@@ -273,6 +273,8 @@ func PutToFireStorage(bucketname string, path string, file []byte) string {
 
 }
 
+// DEPRECATED
+// use GetFilesByEnvV2
 func GetFilesByEnv(file string) []byte {
 	var res []byte
 
@@ -309,6 +311,8 @@ func GetFilesByEnvV2(file string) ([]byte, error) {
 		res, err = GetFromStorageErr("core-452909-function-data", file, "")
 	case env.Production:
 		res, err = GetFromStorageErr("core-350507-function-data", file, "")
+	default:
+		err = fmt.Errorf("No env '%v' not found", os.Getenv("env"))
 	}
 
 	return res, err

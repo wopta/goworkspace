@@ -486,12 +486,7 @@ type Elements struct {
 	ListBoxes    []interface{} `json:"ListBoxes"`
 	Attachments  []interface{} `json:"Attachments"`
 
-	Signatures        []Signature       `json:"Signatures"`
-	LinkConfiguration LinkConfiguration `json:"LinkConfiguration"`
-}
-
-type LinkConfiguration struct {
-	HyperLinks []interface{} `json:"HyperLinks"`
+	Signatures []Signature `json:"Signatures"`
 }
 
 type Signature struct {
