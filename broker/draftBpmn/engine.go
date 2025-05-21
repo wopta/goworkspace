@@ -29,7 +29,7 @@ func (f *FlowBpnm) RunAt(processName, startingActivity string) error {
 	if e := process.loop(startingActivity); e != nil { //TODO: how to check if there is an infinite loop
 		return e
 	}
-	log.InfoF("Stop %v", processName)
+	log.InfoF("Finished %v", processName)
 	return nil
 }
 
@@ -157,6 +157,7 @@ func (act *activity) evaluateDecisions(processName string, storage StorageData, 
 			log.InfoF("Process '%v' has not activities", processName)
 			return []*activity{}, nil
 		}
+		log.InfoF("Decision evaluation: %v", ga.decision)
 		resultEvaluation, err = eval.Evaluate(ga.decision, date, nil)
 		if err != nil {
 			return nil, fmt.Errorf("Process '%v' with activity '%v' has an eval error: %v", processName, act.name, err.Error())
