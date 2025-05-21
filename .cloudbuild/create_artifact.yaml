@@ -1,0 +1,23 @@
+steps:
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  args:
+  - '-c'
+  - |
+    chmod +x ./extract_tag_info.sh
+    ./extract_tag_info.sh ${TAG_NAME}
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  args:
+  - '-c'
+  - |
+    TAG_MODULE=$(cat /workspace/tag_module)
+    TAG_VERSION=$(cat /workspace/tag_version)
+
+    gcloud artifacts go upload --project=${$PROJECT_ID} \
+      --repository=${_REPOSITORY} \
+      --location=${_REGION} \
+      --module-path=${_MODULE_PREFIX}/${TAG_MODULE} \
+      --version=${TAG_VERSION} \
+      --source=/workspace/${TAG_MODULE}
+
+options:
+  logging: CLOUD_LOGGING_ONLY
