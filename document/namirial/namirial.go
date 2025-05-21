@@ -128,11 +128,10 @@ func prepareDocuments(idsDocument ...string) (resp document.PrepareResponse, err
 	if err != nil {
 		return resp, err
 	}
-	//in this way both documents will have save RecipientConfiguration
-	//TODO: create two activities?
 	if len(resp.Activities) == 0 {
 		resp.Activities = append(resp.Activities, document.Activity{})
 	}
+	//The signatures that dont use the default place holder are put inside Unassigned,so you need to iterate them and fix their size and position
 	for i := range resp.UnassignedElements.Signatures {
 		sign := &resp.UnassignedElements.Signatures[i]
 		if sign.FieldDefinition.Size.Height < sign.FieldDefinition.Size.Width {
@@ -210,7 +209,7 @@ func setContractorDataInSendBody(bodySend *sendNamirialRequest, policy models.Po
 	}
 
 	if signer == nil {
-		return errors.New("You need to populate contractors|contractor to sign")
+		return errors.New("You need to populate contractors to sign")
 	}
 	for i := range bodySend.Activities {
 		contactInfo := &bodySend.Activities[i].Action.Sign.RecipientConfiguration.ContactInformation
@@ -220,7 +219,6 @@ func setContractorDataInSendBody(bodySend *sendNamirialRequest, policy models.Po
 		contactInfo.Email = signer.Mail
 		contactInfo.PhoneNumber = signer.Phone
 		contactInfo.PhoneNumber = signer.Phone
-		log.PrintStruct("contacter Info -------", *contactInfo)
 	}
 	bodySend.Name = policy.Name
 	return nil
