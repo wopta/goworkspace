@@ -217,9 +217,9 @@ func (d *QuoteRequest) FromPolicy(p *models.Policy, isEmission bool) error {
 			return errors.New("You need to populate CompanyAddress")
 		}
 		var dt string
-		if p.Contractor.Type == "legalEntity" && p.Contractor.FiscalCode == "" {
+		if p.Contractor.Type == "legalEntity" { //persona giuridica
 			dt = catNatLegalPerson
-		} else {
+		} else { //ditta individuale i need all date
 			dt = catNatSoleProp
 		}
 		contr := Contractor{
