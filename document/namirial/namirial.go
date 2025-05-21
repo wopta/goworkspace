@@ -48,6 +48,7 @@ func Sign(input NamirialInput) (response NamirialOutput, err error) {
 func uploadFiles(files ...string) (fileIds []string, err error) {
 	var url = os.Getenv("ESIGN_BASEURL") + "v6/file/upload"
 
+	log.Println("Start uploading files")
 	var file []byte
 	var buffer bytes.Buffer
 	var idsFile []string
@@ -92,8 +93,9 @@ func uploadFiles(files ...string) (fileIds []string, err error) {
 			return fileIds, fmt.Errorf("Error: no fileId found")
 		}
 		idsFile = append(idsFile, res.FileId)
-		log.Printf("End uploading files, idFiles %v", res)
+		log.Printf("files uploaded, idFiles %v", res)
 	}
+	log.Println("End uploading files")
 	return idsFile, nil
 }
 
@@ -125,7 +127,26 @@ func prepareDocuments(idsDocument ...string) (resp document.PrepareResponse, err
 	if err != nil {
 		return resp, err
 	}
-	log.PrintStruct("prepare namirial", resp)
+	//in this way both documents will have save RecipientConfiguration
+	//TODO: create two activities?
+	if len(resp.Activities) == 0 {
+		resp.Activities = append(resp.Activities, document.Activity{})
+	}
+	for i := range resp.UnassignedElements.Signatures {
+		sign := &resp.UnassignedElements.Signatures[i]
+		if sign.FieldDefinition.Size.Height < sign.FieldDefinition.Size.Width {
+			continue
+		}
+		sign.FieldDefinition.Size.Height = 50
+		sign.FieldDefinition.Position.X -= 25
+		sign.FieldDefinition.Position.Y -= 10
+		sign.FieldDefinition.Size.Width = 150
+	}
+	resp.Activities[0].Action.Sign.Elements.Signatures = append(resp.Activities[0].Action.Sign.Elements.Signatures, resp.UnassignedElements.Signatures...)
+	for i := range resp.Activities[0].Action.Sign.Elements.Signatures {
+		sign := &resp.Activities[0].Action.Sign.Elements.Signatures[i]
+		sign.DisplayName = "firma qui"
+	}
 	log.Println("End preparing files")
 	return resp, nil
 }
@@ -136,9 +157,6 @@ func sendDocuments(preSendBody document.PrepareResponse, idFiles []string, polic
 	log.Println("Sending documents")
 
 	body.Activities = preSendBody.Activities
-	//in this way both documents will have save RecipientConfiguration
-	//TODO: create two activities?
-	body.Activities[0].Action.Sign.Elements.Signatures = append(body.Activities[0].Action.Sign.Elements.Signatures, preSendBody.UnassignedElements.Signatures...)
 
 	if env.IsLocal() || env.IsDevelopment() {
 		for i := range body.Activities {
@@ -155,7 +173,7 @@ func sendDocuments(preSendBody document.PrepareResponse, idFiles []string, polic
 		Url: callbackUrl,
 	}
 	setContractorDataInSendBody(&body, policy)
-	log.PrintStruct("request send envelope", body)
+	log.PrintStruct("request send", body)
 	req, err := doNamirialRequest("POST", url, body)
 	if err != nil {
 		return idEnvelope, err

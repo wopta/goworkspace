@@ -3,6 +3,7 @@ package namirial
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -46,7 +47,7 @@ func handleResponse[T any](r *http.Response, err error) (T, error) {
 	if r.StatusCode != http.StatusOK {
 		var body []byte
 		r.Body.Read(body)
-		return req, err
+		return req, fmt.Errorf("Error: %v", string(body))
 	}
 
 	body, err := io.ReadAll(r.Body)
