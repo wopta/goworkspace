@@ -173,7 +173,10 @@ func sendDocuments(preSendBody document.PrepareResponse, idFiles []string, polic
 	body.CallbackConfiguration.ActivityActionCallbackConfig = activityActionCallbackConfiguration{
 		Url: callbackUrl,
 	}
-	setContractorDataInSendBody(&body, policy)
+	err = setContractorDataInSendBody(&body, policy)
+	if err != nil {
+		return idEnvelope, err
+	}
 	log.PrintStruct("request send", body)
 	req, err := doNamirialRequest("POST", url, body)
 	if err != nil {
@@ -217,7 +220,7 @@ func setContractorDataInSendBody(bodySend *sendNamirialRequest, policy models.Po
 			contactInfo.PhoneNumber = signer.Phone
 		}
 	}
-	bodySend.Name = policy.CodeCompany
+	bodySend.Name = policy.Name
 	return nil
 }
 
