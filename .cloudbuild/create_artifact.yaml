@@ -1,17 +1,9 @@
 steps:
-# - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-#   args:
-#   - '-c'
-#   - |
-#     chmod +x ./extract_tag_info.sh
-#     ./extract_tag_info.sh ${TAG_NAME}
-- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+- name: 'gcr.io/cloud-builders/gcloud:latest'
   entrypoint: 'bash'
   args:
   - '-c'
   - |
-    # TAG_MODULE=$(cat /workspace/tag_module)
-    # TAG_VERSION=$(cat /workspace/tag_version)
     # === EXTRACT MODULE NAME AND VERSION FROM TAG =================================
     # Read TAG_NAME splitting by the IFS separator into the needed variables
     IFS='/'
