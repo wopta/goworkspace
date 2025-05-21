@@ -92,21 +92,30 @@ func (p *processBpnm) loop(nameActivity string) error {
 	}
 }
 
-func (act *activity) runActivity(nameProcess string, storage StorageData) error {
+func (act *activity) runActivity(nameProcess string, storage StorageData) (err error) {
 	log.InfoF("Run process '%v',start activity '%v'", nameProcess, act.name)
-	defer log.InfoF("Run process '%v',stop activity '%v'", nameProcess, act.name)
+	defer func() {
+		status := ""
+		if err == nil {
+			status = "OK"
+		} else {
+			status = "Fail: " + err.Error()
+		}
+		log.InfoF("Run process '%v',stop activity '%v' with status: %v", nameProcess, act.name, status)
+	}()
+
 	if pre := act.preActivity; pre != nil {
 		if err := pre.loop(pre.defaultStart); err != nil {
 			return err
 		}
 	}
 	if e := checkLocalResources(storage, act.requiredInputData); e != nil {
-		return fmt.Errorf("Process '%v' with activity '%v' has an input error: %v", nameProcess, act.name, e.Error())
+		return fmt.Errorf("has an input error: %v", e.Error())
 	}
 
 	if act.handler != nil {
-		if err := callWithRecover(nameProcess, storage, act); err != nil && *err != nil {
-			return *err
+		if err := callWithRecover(nameProcess, storage, act); err != nil {
+			return err
 		}
 	}
 
@@ -118,20 +127,17 @@ func (act *activity) runActivity(nameProcess string, storage StorageData) error 
 	return nil
 }
 
-func callWithRecover(nameProcess string, storage StorageData, act *activity) *error {
-	var err *error = new(error) //i use a pointer since defer is called after the return, so normally i cant change the value
+func callWithRecover(nameProcess string, storage StorageData, act *activity) (err error) {
 	defer func() {
 		if act.recover == nil {
 			return
 		}
-		if r := recover(); r != nil || (err != nil && *err != nil) {
+		if r := recover(); r != nil || (err != nil) {
 			log.InfoF("Run recorver process '%v', activity '%v'", nameProcess, act.name)
-			*err = act.recover(storage)
+			err = act.recover(storage)
 		}
-		*err = nil
 	}()
-	*err = act.handler(storage)
-	return err
+	return act.handler(storage)
 }
 
 func (act *activity) evaluateDecisions(processName string, storage StorageData, date map[string]any) ([]*activity, error) {
