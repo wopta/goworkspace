@@ -2,7 +2,7 @@ package broker
 
 import (
 	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
-	"github.com/wopta/goworkspace/broker/internal/handlers"
+	"github.com/wopta/goworkspace/broker/internal/handlers/productFlow"
 )
 
 func getProductFlow() (*bpmn.BpnmBuilder, error) {
@@ -13,8 +13,8 @@ func getProductFlow() (*bpmn.BpnmBuilder, error) {
 	}
 	builder.SetStorage(store)
 	err := bpmn.IsError(
-		builder.AddHandler("catnatIntegration", handlers.CatnatIntegration),
-		builder.AddHandler("catnatdownloadPolicy", handlers.CatnatDownloadCertification),
+		builder.AddHandler("catnatIntegration", productFlow.CatnatIntegration),
+		builder.AddHandler("catnatdownloadPolicy", productFlow.CatnatDownloadCertification),
 	)
 	if err != nil {
 		return nil, err

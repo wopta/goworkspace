@@ -1,4 +1,4 @@
-package handlers
+package productFlow
 
 import (
 	"encoding/base64"
