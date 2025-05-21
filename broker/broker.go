@@ -65,6 +65,12 @@ var brokerRoutes []lib.Route = []lib.Route{
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
+		Route:   "/draft/policy/body/emit/",
+		Handler: lib.ResponseLoggerWrapper(DraftEmitWithPolicyFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
 		Route:   "/draft/policy/lead",
 		Handler: lib.ResponseLoggerWrapper(DraftLeadFx),
 		Method:  http.MethodPost,

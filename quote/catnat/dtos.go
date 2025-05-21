@@ -68,7 +68,8 @@ type Contractor struct {
 	MarketingProfilingConsent string `json:"consensoProfilazioneMarketing,omitempty"`
 	MarketingActivityConsent  string `json:"consensoAttivitaMarketing,omitempty"`
 	DocumentationFormat       int    `json:"formatoDocumentazione"`
-	ConsensoTrattamento       string `json:"ConsensoTrattamento,omitempty"`
+	//leave it with "C" otherwise dosnt work
+	ConsensoTrattamento string `json:"ConsensoTrattamento,omitempty"`
 }
 
 type LegalRepresentative struct {
