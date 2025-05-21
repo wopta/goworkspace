@@ -3,7 +3,7 @@ package broker
 import (
 	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
 	"github.com/wopta/goworkspace/broker/draftBpmn/flow"
-	"github.com/wopta/goworkspace/broker/internal/handlers/callbackFlow"
+	"github.com/wopta/goworkspace/broker/internal/handlers/channelFlow"
 )
 
 func getNodeFlow() (*bpmn.BpnmBuilder, error) {
@@ -27,15 +27,15 @@ func getNodeFlow() (*bpmn.BpnmBuilder, error) {
 	}
 	builder.SetStorage(store)
 	err := bpmn.IsError(
-		builder.AddHandler("baseCallback", callbackFlow.BaseRequest),
-		builder.AddHandler("winEmit", callbackFlow.CallBackEmit),
-		builder.AddHandler("winSign", callbackFlow.CallBackSigned),
-		builder.AddHandler("saveAudit", callbackFlow.SaveAudit),
-		builder.AddHandler("winPay", callbackFlow.CallBackPaid),
-		builder.AddHandler("winProposal", callbackFlow.CallBackProposal),
-		builder.AddHandler("winRequestApproval", callbackFlow.CallBackRequestApproval),
-		builder.AddHandler("winApproved", callbackFlow.CallBackApproved),
-		builder.AddHandler("winRejected", callbackFlow.CallBackRejected),
+		builder.AddHandler("baseCallback", channelFlow.BaseRequest),
+		builder.AddHandler("winEmit", channelFlow.CallBackEmit),
+		builder.AddHandler("winSign", channelFlow.CallBackSigned),
+		builder.AddHandler("saveAudit", channelFlow.SaveAudit),
+		builder.AddHandler("winPay", channelFlow.CallBackPaid),
+		builder.AddHandler("winProposal", channelFlow.CallBackProposal),
+		builder.AddHandler("winRequestApproval", channelFlow.CallBackRequestApproval),
+		builder.AddHandler("winApproved", channelFlow.CallBackApproved),
+		builder.AddHandler("winRejected", channelFlow.CallBackRejected),
 	)
 	if err != nil {
 		return nil, err
