@@ -46,7 +46,7 @@ func getFlow(policy *models.Policy, originStr string, storage bpmn.StorageData) 
 	builder.SetStorage(storage)
 
 	if networkNode != nil && networkNode.CallbackConfig != nil {
-		injected, err := getNodeFlow()
+		injected, err := getNodeFlow(networkNode.CallbackConfig.Name)
 		if err != nil {
 			return nil, err
 		}

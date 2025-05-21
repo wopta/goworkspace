@@ -197,28 +197,30 @@ func sendDocuments(preSendBody document.PrepareResponse, idFiles []string, polic
 
 // adjust the request to insert information regard the contractor
 func setContractorDataInSendBody(bodySend *sendNamirialRequest, policy models.Policy) error {
-	var signer models.User
-	if policy.Contractors == nil || len(*policy.Contractors) == 0 {
-		return errors.New("You need to populate contractors to sign")
-	}
-
-	for _, contractor := range *policy.Contractors {
-		if contractor.IsSignatory {
-			signer = contractor
-			break
+	var signer *models.User
+	if policy.Contractor.Type == "legalEntity" { //for legalentity who pay is between contractors
+		for _, contractor := range *policy.Contractors {
+			if contractor.IsSignatory {
+				signer = &contractor
+				break
+			}
 		}
+	} else { //otherwise i use contractor
+		signer = policy.Contractor.ToUser()
 	}
 
+	if signer == nil {
+		return errors.New("You need to populate contractors|contractor to sign")
+	}
 	for i := range bodySend.Activities {
-		for range bodySend.Activities[i].Action.Sign.Elements.Signatures {
-			contactInfo := &bodySend.Activities[i].Action.Sign.RecipientConfiguration.ContactInformation
-			contactInfo.LanguageCode = "IT"
-			contactInfo.Surname = signer.Surname
-			contactInfo.GivenName = signer.Name
-			contactInfo.Email = signer.Mail
-			contactInfo.PhoneNumber = signer.Phone
-			contactInfo.PhoneNumber = signer.Phone
-		}
+		contactInfo := &bodySend.Activities[i].Action.Sign.RecipientConfiguration.ContactInformation
+		contactInfo.LanguageCode = "IT"
+		contactInfo.Surname = signer.Surname
+		contactInfo.GivenName = signer.Name
+		contactInfo.Email = signer.Mail
+		contactInfo.PhoneNumber = signer.Phone
+		contactInfo.PhoneNumber = signer.Phone
+		log.PrintStruct("contacter Info -------", *contactInfo)
 	}
 	bodySend.Name = policy.Name
 	return nil

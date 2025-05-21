@@ -1,32 +1,40 @@
 package broker
 
 import (
+	"encoding/json"
+	"fmt"
+
 	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
 	"github.com/wopta/goworkspace/broker/draftBpmn/flow"
 	"github.com/wopta/goworkspace/broker/internal/handlers/channelFlow"
+	"github.com/wopta/goworkspace/lib"
 )
 
-func getNodeFlow() (*bpmn.BpnmBuilder, error) {
+func getNodeFlow(callbackConfigName string) (*bpmn.BpnmBuilder, error) {
 	store := bpmn.NewStorageBpnm()
-	builder, e := bpmn.NewBpnmBuilder("flows/draft/node_flows.json")
-	if e != nil {
-		return nil, e
+	builder, err := bpmn.NewBpnmBuilder("flows/draft/node_flows.json")
+	if err != nil {
+		return nil, err
 	}
-	//hard coded, need to be on json
-	callbackConf := flow.CallbackConfig{
-		Proposal:        true,
-		RequestApproval: true,
-		Emit:            true,
-		Pay:             true,
-		Sign:            true,
-		Approved:        true,
-		Rejected:        true,
+	var callbackConfigFile []byte
+	switch callbackConfigName {
+	case "winClient":
+		callbackConfigFile, err = lib.GetFilesByEnvV2("flows/draft/callback/win.json")
+	case "facileBrokerClient":
+		callbackConfigFile, err = lib.GetFilesByEnvV2("flows/draft/callback/base.json")
+	default:
+		return nil, fmt.Errorf("CallbackCConfigName not valid '%v'", callbackConfigName)
 	}
-	if e := store.AddLocal("config", &callbackConf); e != nil {
-		return nil, e
+	var callbackConf flow.CallbackConfig
+	err = json.Unmarshal(callbackConfigFile, &callbackConf)
+	if err != nil {
+		return nil, err
+	}
+	if err = store.AddLocal("config", &callbackConf); err != nil {
+		return nil, err
 	}
 	builder.SetStorage(store)
-	err := bpmn.IsError(
+	err = bpmn.IsError(
 		builder.AddHandler("baseCallback", channelFlow.BaseRequest),
 		builder.AddHandler("winEmit", channelFlow.CallBackEmit),
 		builder.AddHandler("winSign", channelFlow.CallBackSigned),
