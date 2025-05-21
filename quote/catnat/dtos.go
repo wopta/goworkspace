@@ -216,11 +216,30 @@ func (d *QuoteRequest) FromPolicy(p *models.Policy, isEmission bool) error {
 		if p.Contractor.CompanyAddress == nil {
 			return errors.New("You need to populate CompanyAddress")
 		}
+		if p.Contractors == nil || len(*p.Contractors) == 0 {
+			return errors.New("You need to compile Contractors")
+		}
 		var dt string
+
+		if p.Contractor.VatCode == "" {
+			return errors.New("You need to compile Contractor.VatCode")
+		}
 		if p.Contractor.Type == "legalEntity" { //persona giuridica
 			dt = catNatLegalPerson
+			if p.Contractor.CompanyName == "" {
+				return errors.New("You need to compile Contractor.CompanyName")
+			}
 		} else { //ditta individuale i need all date
 			dt = catNatSoleProp
+			if p.Contractor.Name == "" {
+				return errors.New("You need to compile Contractor.Name")
+			}
+			if p.Contractor.Surname == "" {
+				return errors.New("You need to compile Contractor.Surname")
+			}
+			if p.Contractor.FiscalCode == "" {
+				return errors.New("You need to compile Contractor.FiscalCode")
+			}
 		}
 		contr := Contractor{
 			PersonalDataType:          dt,
