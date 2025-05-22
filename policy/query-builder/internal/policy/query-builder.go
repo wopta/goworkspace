@@ -3,8 +3,8 @@ package policy
 import (
 	"strings"
 
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/policy/query-builder/internal/base"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/policy/query-builder/internal/base"
 )
 
 type QueryBuilder struct {
@@ -22,7 +22,7 @@ func (qb *QueryBuilder) Build(params map[string]string) (string, map[string]inte
 	qb.WhereClauses = []string{"(**tableAlias**.companyEmit = true)"}
 
 	for key, value := range params {
-		if key == "status" && !strings.Contains(value, "deleted"){
+		if key == "status" && !strings.Contains(value, "deleted") {
 			qb.WhereClauses = append(qb.WhereClauses, "(**tableAlias**.isDeleted = false OR **tableAlias**.isDeleted IS NULL)")
 		}
 	}

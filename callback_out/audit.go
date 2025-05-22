@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"cloud.google.com/go/bigquery"
-	"github.com/wopta/goworkspace/callback_out/internal"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/callback_out/internal"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 const CallbackOutTableId string = "callback-out"

@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"net/http"
 	"os"
@@ -12,10 +11,12 @@ import (
 	"strings"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/dustin/go-humanize"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/mail"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/mail"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 const (

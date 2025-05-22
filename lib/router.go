@@ -16,8 +16,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
-	env "github.com/wopta/goworkspace/lib/environment"
-	"github.com/wopta/goworkspace/lib/log"
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 )
 
 type Route struct {

@@ -2,13 +2,14 @@ package companydata
 
 import (
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 	"time"
 
-	lib "github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	lib "gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 const collection = "transactions"

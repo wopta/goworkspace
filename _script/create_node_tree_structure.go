@@ -1,11 +1,12 @@
 package _script
 
 import (
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
 	"log"
 	"time"
+
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
 func CreateNodeTreeStructure() {

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/wopta/goworkspace/lib/log"
 	"io/fs"
 	"net/http"
 	"os"
@@ -13,10 +12,12 @@ import (
 	"sort"
 	"time"
 
-	"github.com/wopta/goworkspace/lib"
-	env "github.com/wopta/goworkspace/lib/environment"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
 func GetUndeclaredConsensFx(w http.ResponseWriter, r *http.Request) (string, any, error) {

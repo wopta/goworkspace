@@ -2,21 +2,22 @@ package fabrick
 
 import (
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/wopta/goworkspace/callback/internal"
-	"github.com/wopta/goworkspace/callback_out"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/mail"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
-	plc "github.com/wopta/goworkspace/policy"
-	prd "github.com/wopta/goworkspace/product"
-	tr "github.com/wopta/goworkspace/transaction"
-	"github.com/wopta/goworkspace/payment/consultancy"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	"gitlab.dev.wopta.it/goworkspace/callback/internal"
+	"gitlab.dev.wopta.it/goworkspace/callback_out"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/mail"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
+	"gitlab.dev.wopta.it/goworkspace/payment/consultancy"
+	plc "gitlab.dev.wopta.it/goworkspace/policy"
+	prd "gitlab.dev.wopta.it/goworkspace/product"
+	tr "gitlab.dev.wopta.it/goworkspace/transaction"
 )
 
 /*

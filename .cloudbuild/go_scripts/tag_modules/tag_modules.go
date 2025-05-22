@@ -17,7 +17,7 @@ import (
 
 var (
 	modules    = flag.String("modules", "", "Comma separated list of modules to apply new tags")
-	modulePath = flag.String("modulePath", "github.com/wopta/goworkspace/", "The path prefix for the go module")
+	modulePath = flag.String("modulePath", "gitlab.dev.wopta.it/goworkspace/", "The path prefix for the go module")
 )
 
 func Exec() {

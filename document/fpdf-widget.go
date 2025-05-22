@@ -7,8 +7,8 @@ import (
 
 	"github.com/dustin/go-humanize"
 	"github.com/go-pdf/fpdf"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy, isProposal bool) {

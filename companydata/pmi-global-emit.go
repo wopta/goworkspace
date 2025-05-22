@@ -2,14 +2,15 @@ package companydata
 
 import (
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
 
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

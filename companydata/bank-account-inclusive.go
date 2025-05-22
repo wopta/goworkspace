@@ -4,17 +4,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"cloud.google.com/go/bigquery"
-	"github.com/wopta/goworkspace/inclusive"
-	lib "github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/inclusive"
+	lib "gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 	"google.golang.org/api/iterator"
 )
 

@@ -3,7 +3,7 @@ package win
 import (
 	"encoding/json"
 
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 type emissioneReq struct {

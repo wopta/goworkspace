@@ -12,9 +12,9 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func UploadDocumentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

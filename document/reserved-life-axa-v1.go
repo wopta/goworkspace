@@ -2,12 +2,13 @@ package document
 
 import (
 	"fmt"
-	"github.com/go-pdf/fpdf"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/models"
 	"strings"
 	"time"
+
+	"github.com/go-pdf/fpdf"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func lifeReserved(policy *models.Policy, product *models.Product) (string, []byte) {

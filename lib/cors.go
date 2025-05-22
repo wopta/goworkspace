@@ -1,10 +1,11 @@
 package lib
 
 import (
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
-	env "github.com/wopta/goworkspace/lib/environment"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
 )
 
 func EnableCors(w *http.ResponseWriter, r *http.Request) {

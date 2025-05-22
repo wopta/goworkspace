@@ -1,11 +1,12 @@
 package rules
 
 import (
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	"github.com/wopta/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 var rulesRoutes []lib.Route = []lib.Route{

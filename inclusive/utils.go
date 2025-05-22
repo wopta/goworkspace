@@ -3,11 +3,12 @@ package inclusive
 import (
 	"context"
 
-	"github.com/wopta/goworkspace/lib/log"
 	"os"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"cloud.google.com/go/bigquery"
-	lib "github.com/wopta/goworkspace/lib"
+	lib "gitlab.dev.wopta.it/goworkspace/lib"
 	"google.golang.org/api/iterator"
 )
 

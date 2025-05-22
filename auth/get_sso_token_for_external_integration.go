@@ -3,16 +3,17 @@ package auth
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/network"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
 func GetTokenForExternalIntegrationFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

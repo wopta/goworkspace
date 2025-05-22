@@ -5,14 +5,14 @@ import (
 	"io"
 	"net/http"
 
-	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
-	"github.com/wopta/goworkspace/broker/draftBpmn/flow"
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/mail"
+	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
+	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/mail"
 
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
 func DraftLeadFx(w http.ResponseWriter, r *http.Request) (string, any, error) {

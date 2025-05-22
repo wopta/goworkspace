@@ -1,13 +1,14 @@
 package _script
 
 import (
-	"cloud.google.com/go/firestore"
 	"context"
-	"github.com/wopta/goworkspace/models"
-	"google.golang.org/api/iterator"
 	"log"
 	"os"
 	"time"
+
+	"cloud.google.com/go/firestore"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"google.golang.org/api/iterator"
 )
 
 func UpdateNetworkNodesCodes() {

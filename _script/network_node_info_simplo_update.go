@@ -1,11 +1,12 @@
 package _script
 
 import (
-	"cloud.google.com/go/firestore"
 	"context"
-	"github.com/wopta/goworkspace/models"
 	"log"
 	"os"
+
+	"cloud.google.com/go/firestore"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func UpdateNetworkNodeInfoSimplo() {

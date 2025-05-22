@@ -2,16 +2,17 @@ package renew
 
 import (
 	"errors"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/go-chi/chi/v5"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/payment/fabrick"
-	plcRenew "github.com/wopta/goworkspace/policy/renew"
-	trxRenew "github.com/wopta/goworkspace/transaction/renew"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/payment/fabrick"
+	plcRenew "gitlab.dev.wopta.it/goworkspace/policy/renew"
+	trxRenew "gitlab.dev.wopta.it/goworkspace/transaction/renew"
 )
 
 func DeleteRenewPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

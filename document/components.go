@@ -5,8 +5,8 @@ import (
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
-	lib "github.com/wopta/goworkspace/lib"
-	//model "github.com/wopta/goworkspace/models"
+	lib "gitlab.dev.wopta.it/goworkspace/lib"
+	//model "gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func (s Skin) CustomerRow(m pdf.Maroto, k string, v string) pdf.Maroto {

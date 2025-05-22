@@ -4,21 +4,22 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"strconv"
 	"time"
 
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/mail"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
-	"github.com/wopta/goworkspace/payment/common"
-	plc "github.com/wopta/goworkspace/policy"
-	plcRenew "github.com/wopta/goworkspace/policy/renew"
-	prd "github.com/wopta/goworkspace/product"
-	"github.com/wopta/goworkspace/transaction"
-	trRenew "github.com/wopta/goworkspace/transaction/renew"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/mail"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
+	"gitlab.dev.wopta.it/goworkspace/payment/common"
+	plc "gitlab.dev.wopta.it/goworkspace/policy"
+	plcRenew "gitlab.dev.wopta.it/goworkspace/policy/renew"
+	prd "gitlab.dev.wopta.it/goworkspace/product"
+	"gitlab.dev.wopta.it/goworkspace/transaction"
+	trRenew "gitlab.dev.wopta.it/goworkspace/transaction/renew"
 )
 
 type RefreshPayByLinkRequest struct {

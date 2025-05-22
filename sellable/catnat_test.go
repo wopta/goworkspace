@@ -7,10 +7,10 @@ import (
 	"testing"
 	"time"
 
-	env "github.com/wopta/goworkspace/lib/environment"
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/product"
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/product"
 )
 
 func assertEqual[t comparable](got, exp t, test *testing.T, namefield string) {

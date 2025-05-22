@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wopta/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 type QueryBuilder struct {

@@ -2,13 +2,14 @@ package sellable
 
 import (
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"strings"
 	"time"
 
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	prd "github.com/wopta/goworkspace/product"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	prd "gitlab.dev.wopta.it/goworkspace/product"
 )
 
 const (

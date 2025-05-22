@@ -3,18 +3,19 @@ package payment
 import (
 	"encoding/json"
 	"errors"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/payment/common"
-	plcRenew "github.com/wopta/goworkspace/policy/renew"
-	prd "github.com/wopta/goworkspace/product"
-	"github.com/wopta/goworkspace/transaction"
-	trsRenew "github.com/wopta/goworkspace/transaction/renew"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/payment/common"
+	plcRenew "gitlab.dev.wopta.it/goworkspace/policy/renew"
+	prd "gitlab.dev.wopta.it/goworkspace/product"
+	"gitlab.dev.wopta.it/goworkspace/transaction"
+	trsRenew "gitlab.dev.wopta.it/goworkspace/transaction/renew"
 )
 
 /*

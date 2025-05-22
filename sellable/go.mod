@@ -1,15 +1,15 @@
-module github.com/wopta/goworkspace/sellable
+module gitlab.dev.wopta.it/goworkspace/sellable
 
 go 1.21
 
-replace github.com/wopta/goworkspace/sellable => ./
+replace gitlab.dev.wopta.it/goworkspace/sellable => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
-	github.com/wopta/goworkspace/lib v1.0.161
-	github.com/wopta/goworkspace/models v1.2.55
-	github.com/wopta/goworkspace/network v1.0.120
-	github.com/wopta/goworkspace/product v1.1.52
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.161
+	gitlab.dev.wopta.it/goworkspace/models v1.2.55
+	gitlab.dev.wopta.it/goworkspace/network v1.0.120
+	gitlab.dev.wopta.it/goworkspace/product v1.1.52
 )
 
 require (

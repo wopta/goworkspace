@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"github.com/wopta/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 type ReservedInfo struct {

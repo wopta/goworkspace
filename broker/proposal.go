@@ -7,14 +7,14 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/wopta/goworkspace/broker/internal/utility"
-	"github.com/wopta/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/broker/internal/utility"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
-	"github.com/wopta/goworkspace/callback_out"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
-	plc "github.com/wopta/goworkspace/policy"
+	"gitlab.dev.wopta.it/goworkspace/callback_out"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
+	plc "gitlab.dev.wopta.it/goworkspace/policy"
 )
 
 type ProposalReq struct {

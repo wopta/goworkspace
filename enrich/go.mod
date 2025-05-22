@@ -1,14 +1,14 @@
-module github.com/wopta/goworkspace/enrich
+module gitlab.dev.wopta.it/goworkspace/enrich
 
 go 1.21
 
-replace github.com/wopta/goworkspace/enrich => ./
+replace gitlab.dev.wopta.it/goworkspace/enrich => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/go-gota/gota v0.12.0
-	github.com/wopta/goworkspace/lib v1.0.161
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.161
 )
 
 require (

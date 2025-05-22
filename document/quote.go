@@ -3,10 +3,10 @@ package document
 import (
 	"errors"
 
-	"github.com/wopta/goworkspace/document/internal/domain"
-	"github.com/wopta/goworkspace/document/internal/engine"
-	"github.com/wopta/goworkspace/document/pkg/quote"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/document/internal/domain"
+	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
+	"gitlab.dev.wopta.it/goworkspace/document/pkg/quote"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 var errProductNotImplemented = errors.New("not implemented")

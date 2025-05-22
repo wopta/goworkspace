@@ -4,9 +4,9 @@ import (
 	"log"
 	"time"
 
-	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
-	"github.com/wopta/goworkspace/broker/draftBpmn/flow"
-	"github.com/wopta/goworkspace/lib"
+	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
+	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 func savePolicy(state bpmn.StorageData) error {

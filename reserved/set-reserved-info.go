@@ -1,7 +1,7 @@
 package reserved
 
 import (
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func SetReservedInfo(policy *models.Policy) {

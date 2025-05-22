@@ -3,17 +3,18 @@ package document
 import (
 	"encoding/base64"
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"net/http"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/go-pdf/fpdf"
-	"github.com/wopta/goworkspace/document/internal/engine"
-	"github.com/wopta/goworkspace/document/pkg/contract"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
-	prd "github.com/wopta/goworkspace/product"
+	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
+	"gitlab.dev.wopta.it/goworkspace/document/pkg/contract"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
+	prd "gitlab.dev.wopta.it/goworkspace/product"
 )
 
 func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

@@ -1,9 +1,9 @@
 package pkg
 
 import (
-	"github.com/wopta/goworkspace/policy/query-builder/internal/policy"
-	"github.com/wopta/goworkspace/policy/query-builder/internal/proposal"
-	"github.com/wopta/goworkspace/policy/query-builder/internal/renew"
+	"gitlab.dev.wopta.it/goworkspace/policy/query-builder/internal/policy"
+	"gitlab.dev.wopta.it/goworkspace/policy/query-builder/internal/proposal"
+	"gitlab.dev.wopta.it/goworkspace/policy/query-builder/internal/renew"
 )
 
 func NewQueryBuilder(tmp string) QueryBuilder {

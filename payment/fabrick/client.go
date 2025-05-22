@@ -3,12 +3,13 @@ package fabrick
 import (
 	"errors"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/google/uuid"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/payment/common"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/payment/common"
 )
 
 type Client struct {

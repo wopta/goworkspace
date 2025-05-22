@@ -2,7 +2,7 @@ package models
 
 import (
 	"cloud.google.com/go/bigquery"
-	"github.com/wopta/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 // Check if it's worth updating the Address model used by User

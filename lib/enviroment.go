@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/wopta/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 )
 
 func GetDatasetByContractorName(name string, dataset string) string {

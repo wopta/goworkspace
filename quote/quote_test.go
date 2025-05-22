@@ -7,13 +7,13 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/wopta/goworkspace/lib"
-	env "github.com/wopta/goworkspace/lib/environment"
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/product"
-	"github.com/wopta/goworkspace/quote/catnat"
-	"github.com/wopta/goworkspace/sellable"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/product"
+	"gitlab.dev.wopta.it/goworkspace/quote/catnat"
+	"gitlab.dev.wopta.it/goworkspace/sellable"
 )
 
 func mock_sellable(policy *models.Policy, product *models.Product, _ bool) (*sellable.SellableOutput, error) {

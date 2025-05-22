@@ -2,7 +2,6 @@ package companydata
 
 import (
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"net/http"
 	"os"
@@ -11,11 +10,13 @@ import (
 	"strings"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"cloud.google.com/go/firestore"
 	"github.com/go-gota/gota/dataframe"
 	"github.com/go-gota/gota/series"
-	lib "github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	lib "gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 	"google.golang.org/api/iterator"
 )
 

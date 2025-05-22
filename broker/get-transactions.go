@@ -3,15 +3,16 @@ package broker
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/go-chi/chi/v5"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	plc "github.com/wopta/goworkspace/policy"
-	plcUtils "github.com/wopta/goworkspace/policy/utils"
-	"github.com/wopta/goworkspace/transaction"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	plc "gitlab.dev.wopta.it/goworkspace/policy"
+	plcUtils "gitlab.dev.wopta.it/goworkspace/policy/utils"
+	"gitlab.dev.wopta.it/goworkspace/transaction"
 )
 
 type GetPolicyTransactionsResp struct {

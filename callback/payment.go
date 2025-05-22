@@ -4,16 +4,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"net/http"
 	"strings"
 
-	"github.com/wopta/goworkspace/callback_out"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	plc "github.com/wopta/goworkspace/policy"
-	tr "github.com/wopta/goworkspace/transaction"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	"gitlab.dev.wopta.it/goworkspace/callback_out"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	plc "gitlab.dev.wopta.it/goworkspace/policy"
+	tr "gitlab.dev.wopta.it/goworkspace/transaction"
 )
 
 const fabrickBillPaid string = "PAID"

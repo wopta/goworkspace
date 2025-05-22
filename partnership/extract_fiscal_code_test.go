@@ -1,9 +1,10 @@
 package partnership
 
 import (
-	"github.com/wopta/goworkspace/lib"
 	"testing"
 	"time"
+
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 func TestExtractBirthdate(t *testing.T) {

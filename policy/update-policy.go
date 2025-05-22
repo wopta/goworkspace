@@ -3,8 +3,8 @@ package policy
 import (
 	"time"
 
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func UpdatePolicy(policy *models.Policy) (map[string]any, error) {

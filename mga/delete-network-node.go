@@ -1,12 +1,13 @@
 package mga
 
 import (
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
+
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"github.com/go-chi/chi/v5"
 
-	"github.com/wopta/goworkspace/network"
+	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
 func DeleteNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

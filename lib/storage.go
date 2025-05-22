@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
-	"google.golang.org/api/iterator"
 	"io/ioutil"
 	"os"
 	"strings"
 	"time"
+
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"google.golang.org/api/iterator"
 
 	"cloud.google.com/go/storage"
 )

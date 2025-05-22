@@ -3,12 +3,13 @@ package document
 import (
 	"encoding/base64"
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/models"
-	prd "github.com/wopta/goworkspace/product"
 	"io"
 	"net/http"
+
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	prd "gitlab.dev.wopta.it/goworkspace/product"
 )
 
 func ReservedFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

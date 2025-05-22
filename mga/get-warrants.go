@@ -2,11 +2,12 @@ package mga
 
 import (
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
 type warrantProduct struct {

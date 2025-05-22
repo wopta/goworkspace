@@ -2,10 +2,11 @@ package dto
 
 import (
 	"fmt"
-	"github.com/wopta/goworkspace/document/internal/constants"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 	"time"
+
+	"gitlab.dev.wopta.it/goworkspace/document/internal/constants"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 var splitPayment map[string]string = map[string]string{
@@ -38,14 +39,13 @@ func NewLifeDto() LifeDTO {
 	}
 }
 
-
 func (n *LifeDTO) FromPolicy(policy *models.Policy, network *models.NetworkNode) {
 	n.Channel = policy.Channel
 	n.ProposalNumber = fmt.Sprint(policy.ProposalNumber)
 
 	n.Contractor.fromPolicy(policy.Contractor)
 
-	n.Prizes.Split=getSplit(policy.PaymentSplit)
+	n.Prizes.Split = getSplit(policy.PaymentSplit)
 	n.Prizes.Gross.ValueFloat = policy.PriceGross
 	n.Prizes.Gross.Text = lib.HumanaizePriceEuro(policy.PriceGross)
 

@@ -1,11 +1,12 @@
 package test
 
 import (
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"time"
 
-	"github.com/wopta/goworkspace/accounting"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	"gitlab.dev.wopta.it/goworkspace/accounting"
 )
 
 func createInvoice(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

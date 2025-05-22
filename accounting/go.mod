@@ -1,19 +1,19 @@
-module github.com/wopta/goworkspace/accounting
+module gitlab.dev.wopta.it/goworkspace/accounting
 
 go 1.21
 
-replace github.com/wopta/goworkspace/accounting => ./
+replace gitlab.dev.wopta.it/goworkspace/accounting => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/fattureincloud/fattureincloud-go-sdk/v2 v2.1.1
 	github.com/go-chi/chi/v5 v5.0.12
-	github.com/wopta/goworkspace/lib v1.0.161
-	github.com/wopta/goworkspace/models v1.2.55
-	github.com/wopta/goworkspace/network v1.0.120
-	github.com/wopta/goworkspace/policy v1.0.205
-	github.com/wopta/goworkspace/product v1.1.52
-	github.com/wopta/goworkspace/transaction v1.0.198
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.161
+	gitlab.dev.wopta.it/goworkspace/models v1.2.55
+	gitlab.dev.wopta.it/goworkspace/network v1.0.120
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.205
+	gitlab.dev.wopta.it/goworkspace/product v1.1.52
+	gitlab.dev.wopta.it/goworkspace/transaction v1.0.198
 )
 
 require (
@@ -76,8 +76,8 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	github.com/wopta/goworkspace/document v1.1.165 // indirect
-	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
+	gitlab.dev.wopta.it/goworkspace/document v1.1.165 // indirect
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect

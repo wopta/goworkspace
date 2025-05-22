@@ -3,13 +3,14 @@ package auth
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	jwt "github.com/golang-jwt/jwt/v5"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func JwtAuaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

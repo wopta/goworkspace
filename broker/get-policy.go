@@ -3,13 +3,14 @@ package broker
 import (
 	"encoding/json"
 	"errors"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/go-chi/chi/v5"
-	"github.com/wopta/goworkspace/lib"
-	plc "github.com/wopta/goworkspace/policy"
-	"github.com/wopta/goworkspace/policy/utils"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	plc "gitlab.dev.wopta.it/goworkspace/policy"
+	"gitlab.dev.wopta.it/goworkspace/policy/utils"
 )
 
 func GetPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

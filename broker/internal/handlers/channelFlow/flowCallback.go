@@ -11,10 +11,10 @@ import (
 	"time"
 
 	"cloud.google.com/go/bigquery"
-	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
-	"github.com/wopta/goworkspace/broker/draftBpmn/flow"
-	"github.com/wopta/goworkspace/callback_out/win"
-	"github.com/wopta/goworkspace/lib"
+	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
+	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
+	"gitlab.dev.wopta.it/goworkspace/callback_out/win"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 func CallBackEmit(st bpmn.StorageData) error {

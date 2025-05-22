@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/maja42/goval"
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func (state *State) AddTaskHandler(name string, handler func(state *State) error) map[string]func(state *State) error {

@@ -3,20 +3,21 @@ package partnership
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"strings"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/go-chi/chi/v5"
 
 	"github.com/mohae/deepcopy"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
-	"github.com/wopta/goworkspace/product"
-	"github.com/wopta/goworkspace/quote"
-	"github.com/wopta/goworkspace/user"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
+	"gitlab.dev.wopta.it/goworkspace/product"
+	"gitlab.dev.wopta.it/goworkspace/quote"
+	"gitlab.dev.wopta.it/goworkspace/user"
 )
 
 func LifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, error) {

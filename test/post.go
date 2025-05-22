@@ -8,8 +8,8 @@ import (
 	"os"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 )
 
 func TestPostFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

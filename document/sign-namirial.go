@@ -4,19 +4,20 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"strings"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"os"
 	"path/filepath"
 	"time"
 
-	lib "github.com/wopta/goworkspace/lib"
-	env "github.com/wopta/goworkspace/lib/environment"
-	model "github.com/wopta/goworkspace/models"
+	lib "gitlab.dev.wopta.it/goworkspace/lib"
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
+	model "gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func SignNamirial(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

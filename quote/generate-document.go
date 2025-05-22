@@ -3,13 +3,14 @@ package quote
 import (
 	"encoding/base64"
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
-	"github.com/wopta/goworkspace/document"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
-	"github.com/wopta/goworkspace/product"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	"gitlab.dev.wopta.it/goworkspace/document"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
+	"gitlab.dev.wopta.it/goworkspace/product"
 )
 
 type DraftResponse struct {

@@ -4,10 +4,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/models"
-	plc "github.com/wopta/goworkspace/policy"
-	"github.com/wopta/goworkspace/reserved"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	plc "gitlab.dev.wopta.it/goworkspace/policy"
+	"gitlab.dev.wopta.it/goworkspace/reserved"
 )
 
 func SetRequestApprovalData(policy *models.Policy, networkNode *models.NetworkNode, mgaProduct *models.Product, origin string) {

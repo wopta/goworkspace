@@ -7,8 +7,9 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/binary"
-	"github.com/wopta/goworkspace/lib/log"
 	"math/big"
+
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"golang.org/x/crypto/ripemd160"
 )

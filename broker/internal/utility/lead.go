@@ -5,8 +5,8 @@ import (
 	"slices"
 	"time"
 
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func SetLeadData(policy *models.Policy, product models.Product, networkNode *models.NetworkNode) {

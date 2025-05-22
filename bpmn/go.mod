@@ -1,12 +1,12 @@
-module github.com/wopta/goworkspace/bpmn
+module gitlab.dev.wopta.it/goworkspace/bpmn
 
 go 1.21
 
-replace github.com/wopta/goworkspace/bpmn => ./
+replace gitlab.dev.wopta.it/goworkspace/bpmn => ./
 
 require (
 	github.com/maja42/goval v1.4.0
-	github.com/wopta/goworkspace/models v1.2.55
+	gitlab.dev.wopta.it/goworkspace/models v1.2.55
 )
 
 require (
@@ -58,7 +58,7 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/lib v1.0.161 // indirect
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.161 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect

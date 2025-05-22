@@ -9,18 +9,18 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wopta/goworkspace/broker/internal/utility"
-	"github.com/wopta/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/broker/internal/utility"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
-	prd "github.com/wopta/goworkspace/product"
+	prd "gitlab.dev.wopta.it/goworkspace/product"
 
 	"cloud.google.com/go/civil"
-	"github.com/wopta/goworkspace/callback_out"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
-	plc "github.com/wopta/goworkspace/policy"
-	"github.com/wopta/goworkspace/question"
+	"gitlab.dev.wopta.it/goworkspace/callback_out"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
+	plc "gitlab.dev.wopta.it/goworkspace/policy"
+	"gitlab.dev.wopta.it/goworkspace/question"
 )
 
 const (

@@ -1,12 +1,13 @@
 package companydata
 
 import (
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 var companydataRoutes []lib.Route = []lib.Route{

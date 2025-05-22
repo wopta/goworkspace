@@ -3,13 +3,13 @@ package handlers
 import (
 	"os"
 
-	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
-	"github.com/wopta/goworkspace/broker/draftBpmn/flow"
-	"github.com/wopta/goworkspace/broker/internal/utility"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/mail"
-	"github.com/wopta/goworkspace/models"
+	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
+	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
+	"gitlab.dev.wopta.it/goworkspace/broker/internal/utility"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/mail"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func AddRequestApprovaHandlers(builder *bpmn.BpnmBuilder) error {

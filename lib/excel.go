@@ -3,9 +3,10 @@ package lib
 import (
 	"bytes"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"strconv"
+
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"github.com/xuri/excelize/v2"
 )

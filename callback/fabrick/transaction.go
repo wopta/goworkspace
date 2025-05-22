@@ -3,8 +3,8 @@ package fabrick
 import (
 	"time"
 
-	"github.com/wopta/goworkspace/models"
-	tr "github.com/wopta/goworkspace/transaction"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	tr "gitlab.dev.wopta.it/goworkspace/transaction"
 )
 
 func payTransaction(policy models.Policy, providerId, trSchedule, paymentMethod, collection string, networkNode *models.NetworkNode) (models.Transaction, error) {

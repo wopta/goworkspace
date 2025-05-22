@@ -33,6 +33,7 @@ const (
 	PARTNERSHIP  = "partnership"
 	RULES        = "rules"
 	RENEW        = "renew"
+	WISEPROXY    = "wiseproxy"
 )
 
 var MODULES []string = []string{
@@ -53,6 +54,7 @@ var MODULES []string = []string{
 	SELLABLE,
 	TRANSACTION,
 	USER,
+	WISEPROXY,
 }
 
 var FUNCTIONS []string = []string{

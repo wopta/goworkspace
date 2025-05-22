@@ -2,11 +2,12 @@ package manual
 
 import (
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"time"
 
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/payment/common"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/payment/common"
 )
 
 type Client struct {

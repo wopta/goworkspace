@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
-	"github.com/wopta/goworkspace/broker/draftBpmn/flow"
-	"github.com/wopta/goworkspace/broker/internal/handlers/channelFlow"
-	"github.com/wopta/goworkspace/lib"
+	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
+	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
+	"gitlab.dev.wopta.it/goworkspace/broker/internal/handlers/channelFlow"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 func getNodeFlow(callbackConfigName string) (*bpmn.BpnmBuilder, error) {

@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"time"
 
-	lib "github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	lib "gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func LifeAxaDelete(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

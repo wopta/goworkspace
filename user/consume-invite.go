@@ -3,14 +3,15 @@ package user
 import (
 	"encoding/json"
 	"errors"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"net/http"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"firebase.google.com/go/v4/auth"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 type ConsumeInviteReq struct {

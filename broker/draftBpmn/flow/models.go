@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"net/mail"
 
-	"github.com/wopta/goworkspace/callback"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/callback"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 type CallbackInfo struct {

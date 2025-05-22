@@ -11,11 +11,11 @@ import (
 	"time"
 
 	"cloud.google.com/go/firestore"
-	"github.com/wopta/goworkspace/lib"
-	env "github.com/wopta/goworkspace/lib/environment"
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/mail"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/mail"
+	"gitlab.dev.wopta.it/goworkspace/models"
 	"google.golang.org/api/iterator"
 )
 

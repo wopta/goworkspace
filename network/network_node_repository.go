@@ -4,14 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"os"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/firestore"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 	"google.golang.org/api/iterator"
 )
 

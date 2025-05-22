@@ -1,10 +1,10 @@
 package product
 
 import (
-	"github.com/wopta/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func calculateCommissionV2(commissions *models.Commissions, isRenew, isActive bool, amount float64) float64 {

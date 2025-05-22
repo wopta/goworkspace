@@ -2,8 +2,9 @@ package consens
 
 import (
 	"context"
-	"github.com/wopta/goworkspace/lib/log"
 	"time"
+
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 )
 
 type key string

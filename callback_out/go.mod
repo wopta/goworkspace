@@ -1,13 +1,13 @@
-module github.com/wopta/goworkspace/callback_out
+module gitlab.dev.wopta.it/goworkspace/callback_out
 
 go 1.21
 
-replace github.com/wopta/goworkspace/callback_out => ./
+replace gitlab.dev.wopta.it/goworkspace/callback_out => ./
 
 require (
 	cloud.google.com/go v0.113.0
-	github.com/wopta/goworkspace/lib v1.0.161
-	github.com/wopta/goworkspace/models v1.2.55
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.161
+	gitlab.dev.wopta.it/goworkspace/models v1.2.55
 )
 
 require (

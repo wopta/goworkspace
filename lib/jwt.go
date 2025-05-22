@@ -3,8 +3,9 @@ package lib
 import (
 	b64 "encoding/base64"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"os"
+
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"github.com/go-jose/go-jose/v4"
 )

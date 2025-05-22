@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/bigquery"
-	"github.com/wopta/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 var (

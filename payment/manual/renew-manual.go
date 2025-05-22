@@ -4,20 +4,21 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/go-chi/chi/v5"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
-	"github.com/wopta/goworkspace/payment/common"
-	plcRenew "github.com/wopta/goworkspace/policy/renew"
-	prd "github.com/wopta/goworkspace/product"
-	tr "github.com/wopta/goworkspace/transaction"
-	"github.com/wopta/goworkspace/payment/consultancy"
-	trxRenew "github.com/wopta/goworkspace/transaction/renew"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
+	"gitlab.dev.wopta.it/goworkspace/payment/common"
+	"gitlab.dev.wopta.it/goworkspace/payment/consultancy"
+	plcRenew "gitlab.dev.wopta.it/goworkspace/policy/renew"
+	prd "gitlab.dev.wopta.it/goworkspace/product"
+	tr "gitlab.dev.wopta.it/goworkspace/transaction"
+	trxRenew "gitlab.dev.wopta.it/goworkspace/transaction/renew"
 )
 
 func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

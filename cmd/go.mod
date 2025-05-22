@@ -1,55 +1,55 @@
-module github.com/wopta/goworkspace/cmd
+module gitlab.dev.wopta.it/goworkspace/cmd
 
 go 1.21
 
 toolchain go1.21.7
 
 replace (
-	github.com/wopta/goworkspace/auth => ../auth
-	github.com/wopta/goworkspace/broker => ../broker
-	github.com/wopta/goworkspace/callback => ../callback
-	github.com/wopta/goworkspace/claim => ../claim
-	github.com/wopta/goworkspace/companydata => ../companydata
-	github.com/wopta/goworkspace/document => ../document
-	github.com/wopta/goworkspace/enrich => ../enrich
-	github.com/wopta/goworkspace/form => ../form
-	github.com/wopta/goworkspace/mail => ../mail
-	github.com/wopta/goworkspace/mga => ../mga
-	github.com/wopta/goworkspace/partnership => ../partnership
-	github.com/wopta/goworkspace/policy => ../policy
-	github.com/wopta/goworkspace/question => ../question
-	github.com/wopta/goworkspace/quote => ../quote
-	github.com/wopta/goworkspace/renew => ../renew
-	github.com/wopta/goworkspace/reserved => ../reserved
-	github.com/wopta/goworkspace/rules => ../rules
-	github.com/wopta/goworkspace/sellable => ../sellable
-	github.com/wopta/goworkspace/test => ../test
-	github.com/wopta/goworkspace/user => ../user
+	gitlab.dev.wopta.it/goworkspace/auth => ../auth
+	gitlab.dev.wopta.it/goworkspace/broker => ../broker
+	gitlab.dev.wopta.it/goworkspace/callback => ../callback
+	gitlab.dev.wopta.it/goworkspace/claim => ../claim
+	gitlab.dev.wopta.it/goworkspace/companydata => ../companydata
+	gitlab.dev.wopta.it/goworkspace/document => ../document
+	gitlab.dev.wopta.it/goworkspace/enrich => ../enrich
+	gitlab.dev.wopta.it/goworkspace/form => ../form
+	gitlab.dev.wopta.it/goworkspace/mail => ../mail
+	gitlab.dev.wopta.it/goworkspace/mga => ../mga
+	gitlab.dev.wopta.it/goworkspace/partnership => ../partnership
+	gitlab.dev.wopta.it/goworkspace/policy => ../policy
+	gitlab.dev.wopta.it/goworkspace/question => ../question
+	gitlab.dev.wopta.it/goworkspace/quote => ../quote
+	gitlab.dev.wopta.it/goworkspace/renew => ../renew
+	gitlab.dev.wopta.it/goworkspace/reserved => ../reserved
+	gitlab.dev.wopta.it/goworkspace/rules => ../rules
+	gitlab.dev.wopta.it/goworkspace/sellable => ../sellable
+	gitlab.dev.wopta.it/goworkspace/test => ../test
+	gitlab.dev.wopta.it/goworkspace/user => ../user
 )
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/joho/godotenv v1.5.1
-	github.com/wopta/goworkspace/auth v0.0.0-00010101000000-000000000000
-	github.com/wopta/goworkspace/broker v0.0.0-00010101000000-000000000000
-	github.com/wopta/goworkspace/callback v0.0.0-00010101000000-000000000000
-	github.com/wopta/goworkspace/claim v0.0.0-00010101000000-000000000000
-	github.com/wopta/goworkspace/companydata v0.0.0-00010101000000-000000000000
-	github.com/wopta/goworkspace/document v1.1.85
-	github.com/wopta/goworkspace/enrich v0.0.0-00010101000000-000000000000
-	github.com/wopta/goworkspace/form v0.0.0-00010101000000-000000000000
-	github.com/wopta/goworkspace/mail v1.0.118
-	github.com/wopta/goworkspace/mga v0.0.0-00010101000000-000000000000
-	github.com/wopta/goworkspace/partnership v0.0.0-00010101000000-000000000000
-	github.com/wopta/goworkspace/policy v1.0.109
-	github.com/wopta/goworkspace/question v1.0.61
-	github.com/wopta/goworkspace/quote v1.0.77
-	github.com/wopta/goworkspace/renew v0.0.0-00010101000000-000000000000
-	github.com/wopta/goworkspace/reserved v1.0.112
-	github.com/wopta/goworkspace/rules v0.0.0-00010101000000-000000000000
-	github.com/wopta/goworkspace/sellable v1.0.96
-	github.com/wopta/goworkspace/test v0.0.0-00010101000000-000000000000
-	github.com/wopta/goworkspace/user v1.0.103
+	gitlab.dev.wopta.it/goworkspace/auth v0.0.0-00010101000000-000000000000
+	gitlab.dev.wopta.it/goworkspace/broker v0.0.0-00010101000000-000000000000
+	gitlab.dev.wopta.it/goworkspace/callback v0.0.0-00010101000000-000000000000
+	gitlab.dev.wopta.it/goworkspace/claim v0.0.0-00010101000000-000000000000
+	gitlab.dev.wopta.it/goworkspace/companydata v0.0.0-00010101000000-000000000000
+	gitlab.dev.wopta.it/goworkspace/document v1.1.85
+	gitlab.dev.wopta.it/goworkspace/enrich v0.0.0-00010101000000-000000000000
+	gitlab.dev.wopta.it/goworkspace/form v0.0.0-00010101000000-000000000000
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.118
+	gitlab.dev.wopta.it/goworkspace/mga v0.0.0-00010101000000-000000000000
+	gitlab.dev.wopta.it/goworkspace/partnership v0.0.0-00010101000000-000000000000
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.109
+	gitlab.dev.wopta.it/goworkspace/question v1.0.61
+	gitlab.dev.wopta.it/goworkspace/quote v1.0.77
+	gitlab.dev.wopta.it/goworkspace/renew v0.0.0-00010101000000-000000000000
+	gitlab.dev.wopta.it/goworkspace/reserved v1.0.112
+	gitlab.dev.wopta.it/goworkspace/rules v0.0.0-00010101000000-000000000000
+	gitlab.dev.wopta.it/goworkspace/sellable v1.0.96
+	gitlab.dev.wopta.it/goworkspace/test v0.0.0-00010101000000-000000000000
+	gitlab.dev.wopta.it/goworkspace/user v1.0.103
 )
 
 require (
@@ -117,16 +117,16 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	github.com/wopta/goworkspace/bpmn v1.0.18 // indirect
-	github.com/wopta/goworkspace/callback_out v1.0.12 // indirect
-	github.com/wopta/goworkspace/inclusive v0.0.4 // indirect
-	github.com/wopta/goworkspace/lib v1.0.127 // indirect
-	github.com/wopta/goworkspace/models v1.1.124 // indirect
-	github.com/wopta/goworkspace/network v1.0.70 // indirect
-	github.com/wopta/goworkspace/payment v1.0.219 // indirect
-	github.com/wopta/goworkspace/product v1.0.115 // indirect
-	github.com/wopta/goworkspace/transaction v1.0.89 // indirect
-	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
+	gitlab.dev.wopta.it/goworkspace/bpmn v1.0.18 // indirect
+	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.12 // indirect
+	gitlab.dev.wopta.it/goworkspace/inclusive v0.0.4 // indirect
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.127 // indirect
+	gitlab.dev.wopta.it/goworkspace/models v1.1.124 // indirect
+	gitlab.dev.wopta.it/goworkspace/network v1.0.70 // indirect
+	gitlab.dev.wopta.it/goworkspace/payment v1.0.219 // indirect
+	gitlab.dev.wopta.it/goworkspace/product v1.0.115 // indirect
+	gitlab.dev.wopta.it/goworkspace/transaction v1.0.89 // indirect
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20231025114914-d1ff6096ae53 // indirect
 	github.com/xuri/excelize/v2 v2.8.1 // indirect

@@ -2,18 +2,19 @@ package broker
 
 import (
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"net/http"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/go-chi/chi/v5"
-	"github.com/wopta/goworkspace/callback_out"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/mail"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
-	plc "github.com/wopta/goworkspace/policy"
+	"gitlab.dev.wopta.it/goworkspace/callback_out"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/mail"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
+	plc "gitlab.dev.wopta.it/goworkspace/policy"
 )
 
 type AcceptancePayload struct {

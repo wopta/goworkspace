@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/wopta/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 type PartnershipNode struct {

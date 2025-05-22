@@ -1,9 +1,10 @@
 package models_test
 
 import (
-	"github.com/wopta/goworkspace/models"
 	"testing"
 	"time"
+
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 type dateInput struct {

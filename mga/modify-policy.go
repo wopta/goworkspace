@@ -4,19 +4,20 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"reflect"
 	"strings"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/mohae/deepcopy"
-	"github.com/wopta/goworkspace/document"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/lib/compare"
-	"github.com/wopta/goworkspace/models"
-	plc "github.com/wopta/goworkspace/policy"
-	usr "github.com/wopta/goworkspace/user"
+	"gitlab.dev.wopta.it/goworkspace/document"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/compare"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	plc "gitlab.dev.wopta.it/goworkspace/policy"
+	usr "gitlab.dev.wopta.it/goworkspace/user"
 )
 
 func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

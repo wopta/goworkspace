@@ -1,12 +1,13 @@
 package broker
 
 import (
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	"github.com/wopta/goworkspace/broker/renew"
-	"github.com/wopta/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/broker/renew"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 type BrokerBaseRequest struct {

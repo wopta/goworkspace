@@ -3,14 +3,15 @@ package companydata
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"reflect"
 	"strconv"
 	"time"
 
-	lib "github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/xuri/excelize/v2"
+	lib "gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func CheckStructNil[T interface{}](s interface{}) T {

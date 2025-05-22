@@ -8,16 +8,16 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/wopta/goworkspace/callback"
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/mail"
-	tr "github.com/wopta/goworkspace/transaction"
+	"gitlab.dev.wopta.it/goworkspace/callback"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/mail"
+	tr "gitlab.dev.wopta.it/goworkspace/transaction"
 
-	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
-	"github.com/wopta/goworkspace/broker/draftBpmn/flow"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	plc "github.com/wopta/goworkspace/policy"
+	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
+	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	plc "gitlab.dev.wopta.it/goworkspace/policy"
 )
 
 const fabrickBillPaid string = "PAID"

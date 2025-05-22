@@ -1,6 +1,6 @@
 package constants
 
-import "github.com/wopta/goworkspace/document/internal/domain"
+import "gitlab.dev.wopta.it/goworkspace/document/internal/domain"
 
 const (
 	RegularFontStyle domain.FontStyle = ""

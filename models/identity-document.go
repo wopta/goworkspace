@@ -1,8 +1,9 @@
 package models
 
 import (
-	"github.com/wopta/goworkspace/lib"
 	"time"
+
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 type IdentityDocument struct {

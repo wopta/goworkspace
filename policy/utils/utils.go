@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
 func CanBeAccessedBy(role, producerUid, nodeUid string) bool {

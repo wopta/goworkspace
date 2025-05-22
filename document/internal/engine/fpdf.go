@@ -8,9 +8,9 @@ import (
 
 	"github.com/go-pdf/fpdf"
 	"github.com/mohae/deepcopy"
-	"github.com/wopta/goworkspace/document/internal/constants"
-	"github.com/wopta/goworkspace/document/internal/domain"
-	"github.com/wopta/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/document/internal/constants"
+	"gitlab.dev.wopta.it/goworkspace/document/internal/domain"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 var (

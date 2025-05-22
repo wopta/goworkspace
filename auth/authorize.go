@@ -3,15 +3,16 @@ package auth
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	jwt "github.com/golang-jwt/jwt/v5"
-	"github.com/wopta/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 func AuthorizeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

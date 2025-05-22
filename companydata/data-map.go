@@ -2,15 +2,16 @@ package companydata
 
 import (
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/go-gota/gota/dataframe"
 	"github.com/go-gota/gota/series"
-	lib "github.com/wopta/goworkspace/lib"
+	lib "gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 type fn func([]interface{}) interface{}

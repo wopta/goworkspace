@@ -3,8 +3,9 @@ package lib
 import (
 	"encoding/json"
 	"errors"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
+
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 )
 
 func CheckError(e error) {

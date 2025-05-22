@@ -3,12 +3,12 @@ package handlers
 import (
 	"time"
 
-	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
-	draftbpmn "github.com/wopta/goworkspace/broker/draftBpmn"
-	"github.com/wopta/goworkspace/broker/draftBpmn/flow"
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/mail"
-	"github.com/wopta/goworkspace/models"
+	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
+	draftbpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
+	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/mail"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func AddAcceptanceHandlers(builder *bpmn.BpnmBuilder) error {

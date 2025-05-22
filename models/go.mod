@@ -1,15 +1,15 @@
-module github.com/wopta/goworkspace/models
+module gitlab.dev.wopta.it/goworkspace/models
 
 go 1.21
 
-replace github.com/wopta/goworkspace/models => ./
+replace gitlab.dev.wopta.it/goworkspace/models => ./
 
 require (
 	cloud.google.com/go v0.113.0
 	cloud.google.com/go/bigquery v1.61.0
 	cloud.google.com/go/firestore v1.15.0
 	github.com/golang-jwt/jwt/v4 v4.5.0
-	github.com/wopta/goworkspace/lib v1.0.161
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.161
 	google.golang.org/api v0.181.0
 	google.golang.org/genproto v0.0.0-20240515191416-fc5f0ca64291
 )

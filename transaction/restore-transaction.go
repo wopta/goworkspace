@@ -8,12 +8,12 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/models"
-	plc "github.com/wopta/goworkspace/policy"
-	plcRenew "github.com/wopta/goworkspace/policy/renew"
-	trxRenew "github.com/wopta/goworkspace/transaction/renew"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	plc "gitlab.dev.wopta.it/goworkspace/policy"
+	plcRenew "gitlab.dev.wopta.it/goworkspace/policy/renew"
+	trxRenew "gitlab.dev.wopta.it/goworkspace/transaction/renew"
 )
 
 func RestoreTransactionFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

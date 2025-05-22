@@ -4,9 +4,9 @@ import (
 	// "log"
 
 	"github.com/go-jose/go-jose/v4"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
 var nameDesc string = "Wopta per te Vita"

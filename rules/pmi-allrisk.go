@@ -2,7 +2,6 @@ package rules
 
 import (
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -11,12 +10,14 @@ import (
 	"strings"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"cloud.google.com/go/civil"
 	"github.com/go-gota/gota/dataframe"
 	"github.com/go-gota/gota/series"
 	"github.com/mohae/deepcopy"
-	"github.com/wopta/goworkspace/lib"
-	q "github.com/wopta/goworkspace/quote"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	q "gitlab.dev.wopta.it/goworkspace/quote"
 )
 
 type PmiAllriskRequest struct {

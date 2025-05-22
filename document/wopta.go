@@ -3,8 +3,8 @@ package document
 import (
 	"github.com/dustin/go-humanize"
 	"github.com/johnfercher/maroto/pkg/pdf"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func (skin Skin) PriceTable(m pdf.Maroto, data models.Policy) {

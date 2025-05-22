@@ -11,7 +11,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/wopta/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"golang.org/x/oauth2/clientcredentials"
 )
 

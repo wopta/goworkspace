@@ -5,16 +5,16 @@ import (
 	"os"
 	"strings"
 
-	"github.com/wopta/goworkspace/broker/internal/utility"
-	"github.com/wopta/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/broker/internal/utility"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
-	"github.com/wopta/goworkspace/bpmn"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/mail"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
-	plc "github.com/wopta/goworkspace/policy"
-	prd "github.com/wopta/goworkspace/product"
+	"gitlab.dev.wopta.it/goworkspace/bpmn"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/mail"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
+	plc "gitlab.dev.wopta.it/goworkspace/policy"
+	prd "gitlab.dev.wopta.it/goworkspace/product"
 )
 
 var (

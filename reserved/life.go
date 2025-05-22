@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/models"
-	prd "github.com/wopta/goworkspace/product"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	prd "gitlab.dev.wopta.it/goworkspace/product"
 )
 
 type ByAssetPerson struct{}

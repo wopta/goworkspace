@@ -3,9 +3,9 @@ package dto
 import (
 	"strconv"
 
-	"github.com/wopta/goworkspace/document/internal/constants"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/document/internal/constants"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 type contractDTO struct {

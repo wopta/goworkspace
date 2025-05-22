@@ -3,10 +3,10 @@ package quote
 import (
 	"net/http"
 
-	"github.com/wopta/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	"github.com/wopta/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 var quoteRoutes []lib.Route = []lib.Route{

@@ -5,7 +5,6 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"io/fs"
 	"io/ioutil"
@@ -15,9 +14,11 @@ import (
 	"strings"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"cloud.google.com/go/storage"
 	firebase "firebase.google.com/go"
-	env "github.com/wopta/goworkspace/lib/environment"
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
 	"google.golang.org/api/iterator"
 )
 

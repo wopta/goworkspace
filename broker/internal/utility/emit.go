@@ -4,14 +4,14 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/wopta/goworkspace/document"
-	"github.com/wopta/goworkspace/document/namirial"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/payment"
-	"github.com/wopta/goworkspace/payment/consultancy"
-	"github.com/wopta/goworkspace/transaction"
+	"gitlab.dev.wopta.it/goworkspace/document"
+	"gitlab.dev.wopta.it/goworkspace/document/namirial"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/payment"
+	"gitlab.dev.wopta.it/goworkspace/payment/consultancy"
+	"gitlab.dev.wopta.it/goworkspace/transaction"
 )
 
 func EmitSign(policy *models.Policy, product *models.Product, networkNode *models.NetworkNode, sendEmail bool, origin string) {

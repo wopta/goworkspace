@@ -1,6 +1,6 @@
 package renew
 
-import "github.com/wopta/goworkspace/models"
+import "gitlab.dev.wopta.it/goworkspace/models"
 
 var collectionPrefix string
 

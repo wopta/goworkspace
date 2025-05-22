@@ -3,13 +3,14 @@ package lib
 import (
 	"bufio"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"net"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"

@@ -2,7 +2,7 @@ package document
 
 import (
 	"github.com/go-pdf/fpdf"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func lifeAxaProposalV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (string, []byte) {

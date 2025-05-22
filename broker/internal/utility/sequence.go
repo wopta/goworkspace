@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"cloud.google.com/go/firestore"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func GetSequenceByCompany(name string, firePolicy string) (string, int, int) {

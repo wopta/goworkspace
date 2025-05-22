@@ -1,9 +1,10 @@
 package models
 
 import (
-	"cloud.google.com/go/bigquery"
-	"github.com/wopta/goworkspace/lib"
 	"time"
+
+	"cloud.google.com/go/bigquery"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 type AgentNode struct {

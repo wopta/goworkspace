@@ -3,7 +3,6 @@ package companydata
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"net/http"
 	"os"
@@ -12,15 +11,17 @@ import (
 	"strings"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/civil"
 	"github.com/go-gota/gota/dataframe"
 	"github.com/google/uuid"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
-	"github.com/wopta/goworkspace/product"
-	"github.com/wopta/goworkspace/user"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
+	"gitlab.dev.wopta.it/goworkspace/product"
+	"gitlab.dev.wopta.it/goworkspace/user"
 )
 
 type ResultStruct struct {

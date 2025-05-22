@@ -2,14 +2,15 @@ package form
 
 import (
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"net/http"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"cloud.google.com/go/bigquery"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/mail"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/mail"
 )
 
 type FleetAssistenceInclusiveMovements struct {

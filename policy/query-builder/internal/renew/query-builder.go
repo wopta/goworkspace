@@ -1,8 +1,8 @@
 package renew
 
 import (
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/policy/query-builder/internal/base"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/policy/query-builder/internal/base"
 )
 
 type QueryBuilder struct {

@@ -5,9 +5,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/wopta/goworkspace/document/internal/constants"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/document/internal/constants"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 type numeric struct {
@@ -121,5 +121,5 @@ func (g *quoteGuaranteeDTO) fromData(guarantee models.Guarante, startDate time.T
 		g.PremiumGrossYearly.Text = lib.HumanaizePriceEuro(g.PremiumGrossYearly.ValueFloat)
 	}
 
-	g.ExpiryDate = startDate.AddDate(int(g.Duration.ValueInt), 0,0).Format(constants.DayMonthYearFormat)
+	g.ExpiryDate = startDate.AddDate(int(g.Duration.ValueInt), 0, 0).Format(constants.DayMonthYearFormat)
 }

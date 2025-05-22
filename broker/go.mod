@@ -1,28 +1,28 @@
-module github.com/wopta/goworkspace/broker
+module gitlab.dev.wopta.it/goworkspace/broker
 
 go 1.21
 
-replace github.com/wopta/goworkspace/broker => ./
+replace gitlab.dev.wopta.it/goworkspace/broker => ./
 
 require (
 	cloud.google.com/go v0.113.0
 	cloud.google.com/go/firestore v1.15.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
-	github.com/wopta/goworkspace/bpmn v1.0.35
-	github.com/wopta/goworkspace/callback_out v1.0.66
-	github.com/wopta/goworkspace/document v1.1.165
-	github.com/wopta/goworkspace/lib v1.0.161
-	github.com/wopta/goworkspace/mail v1.0.170
-	github.com/wopta/goworkspace/models v1.2.55
-	github.com/wopta/goworkspace/network v1.0.120
-	github.com/wopta/goworkspace/payment v1.0.343
-	github.com/wopta/goworkspace/policy v1.0.205
-	github.com/wopta/goworkspace/product v1.1.52
-	github.com/wopta/goworkspace/question v1.0.107
-	github.com/wopta/goworkspace/reserved v1.0.212
-	github.com/wopta/goworkspace/transaction v1.0.198
-	github.com/wopta/goworkspace/wiseproxy v1.0.3
+	gitlab.dev.wopta.it/goworkspace/bpmn v1.0.35
+	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.66
+	gitlab.dev.wopta.it/goworkspace/document v1.1.165
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.161
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.170
+	gitlab.dev.wopta.it/goworkspace/models v1.2.55
+	gitlab.dev.wopta.it/goworkspace/network v1.0.120
+	gitlab.dev.wopta.it/goworkspace/payment v1.0.343
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.205
+	gitlab.dev.wopta.it/goworkspace/product v1.1.52
+	gitlab.dev.wopta.it/goworkspace/question v1.0.107
+	gitlab.dev.wopta.it/goworkspace/reserved v1.0.212
+	gitlab.dev.wopta.it/goworkspace/transaction v1.0.198
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.3
 )
 
 require (

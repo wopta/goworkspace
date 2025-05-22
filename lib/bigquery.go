@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"os"
 	"reflect"
 	"strconv"
 	"time"
+
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/civil"

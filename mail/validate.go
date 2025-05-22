@@ -3,13 +3,14 @@ package mail
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"net/http"
 	"os"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"cloud.google.com/go/firestore"
-	lib "github.com/wopta/goworkspace/lib"
+	lib "gitlab.dev.wopta.it/goworkspace/lib"
 	"google.golang.org/api/iterator"
 )
 

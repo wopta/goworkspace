@@ -3,8 +3,8 @@ package models
 import (
 	"strconv"
 
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 )
 
 // {"responses":{"TIPO MOVIMENTO":"Inserimento","Targa Inserimento":"test","MODELLO VEICOLO":"test mod","DATA IMMATRICOLAZIONE":"1212-12-02","DATA INIZIO VALIDITA' COPERTURA":"1212-12-12"}}

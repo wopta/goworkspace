@@ -3,16 +3,17 @@ package payment
 import (
 	"encoding/json"
 	"errors"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"net/http"
 
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/payment/common"
-	plc "github.com/wopta/goworkspace/policy"
-	prd "github.com/wopta/goworkspace/product"
-	"github.com/wopta/goworkspace/transaction"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/payment/common"
+	plc "gitlab.dev.wopta.it/goworkspace/policy"
+	prd "gitlab.dev.wopta.it/goworkspace/product"
+	"gitlab.dev.wopta.it/goworkspace/transaction"
 )
 
 type ChangePaymentProviderReq struct {

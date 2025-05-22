@@ -10,7 +10,6 @@ use(
     ./wiseproxy
     ./accounting
     ./document
-    ./appcheck-proxy
     ./mail
     ./wise-broker
     ./claim

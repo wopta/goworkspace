@@ -1,20 +1,21 @@
 package document
 
 import (
-	"github.com/wopta/goworkspace/lib/log"
 	"math"
 	"os"
 	"strconv"
 	"time"
+
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"github.com/dustin/go-humanize"
 	"github.com/johnfercher/maroto/pkg/color"
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
-	lib "github.com/wopta/goworkspace/lib"
-	env "github.com/wopta/goworkspace/lib/environment"
-	"github.com/wopta/goworkspace/models"
+	lib "gitlab.dev.wopta.it/goworkspace/lib"
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func (s Skin) lenToHeight(w string) float64 {

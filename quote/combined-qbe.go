@@ -8,15 +8,15 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/quote/internal"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/quote/internal"
 
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
-	plc "github.com/wopta/goworkspace/policy"
-	"github.com/wopta/goworkspace/product"
-	"github.com/wopta/goworkspace/sellable"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
+	plc "gitlab.dev.wopta.it/goworkspace/policy"
+	"gitlab.dev.wopta.it/goworkspace/product"
+	"gitlab.dev.wopta.it/goworkspace/sellable"
 )
 
 func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

@@ -8,13 +8,13 @@ import (
 	"time"
 
 	"github.com/mohae/deepcopy"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
-	plc "github.com/wopta/goworkspace/policy"
-	"github.com/wopta/goworkspace/product"
-	tr "github.com/wopta/goworkspace/transaction"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
+	plc "gitlab.dev.wopta.it/goworkspace/policy"
+	"gitlab.dev.wopta.it/goworkspace/product"
+	tr "gitlab.dev.wopta.it/goworkspace/transaction"
 )
 
 func UpdateCompanyNetworkTransactions() {

@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/network"
-	prd "github.com/wopta/goworkspace/product"
-	"github.com/wopta/goworkspace/quote/catnat"
-	"github.com/wopta/goworkspace/sellable"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/network"
+	prd "gitlab.dev.wopta.it/goworkspace/product"
+	"gitlab.dev.wopta.it/goworkspace/quote/catnat"
+	"gitlab.dev.wopta.it/goworkspace/sellable"
 
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

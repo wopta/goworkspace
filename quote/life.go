@@ -11,14 +11,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/quote/internal"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/quote/internal"
 
 	"github.com/dustin/go-humanize"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
-	"github.com/wopta/goworkspace/sellable"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
+	"gitlab.dev.wopta.it/goworkspace/sellable"
 	"modernc.org/mathutil"
 )
 

@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/wopta/goworkspace/document/internal/constants"
-	"github.com/wopta/goworkspace/document/internal/domain"
-	"github.com/wopta/goworkspace/document/internal/dto"
-	"github.com/wopta/goworkspace/document/internal/engine"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/document/internal/constants"
+	"gitlab.dev.wopta.it/goworkspace/document/internal/domain"
+	"gitlab.dev.wopta.it/goworkspace/document/internal/dto"
+	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 const (
@@ -34,7 +34,7 @@ func NewLifeGenerator(engine *engine.Fpdf, policy *models.Policy,
 			now:     time.Now(),
 			policy:  policy,
 			product: product,
-			dto: quoteDTO.QuoteBaseDTO,
+			dto:     quoteDTO.QuoteBaseDTO,
 		},
 		dto: quoteDTO,
 	}
@@ -97,10 +97,10 @@ func (lg *LifeGenerator) mainFooter() {
 			FontSize:  constants.SmallFontSize,
 		})
 		lg.engine.WriteText(domain.TableCell{
-			Text:      fmt.Sprintf("%d", lg.engine.PageNumber()),
-			Height:    constants.CellHeight,
-			Width:     0,
-			Align:     constants.RightAlign,
+			Text:   fmt.Sprintf("%d", lg.engine.PageNumber()),
+			Height: constants.CellHeight,
+			Width:  0,
+			Align:  constants.RightAlign,
 		})
 		lg.engine.InsertImage(logoPath, constants.FullPageWidth, 279, 13, 9)
 	})
@@ -189,9 +189,9 @@ func (lg *LifeGenerator) insuredDataTable() {
 
 func (lg *LifeGenerator) guaranteeTable() {
 	const (
-		firstColWidth = float64(90)
-		otherColWidth = float64(25)
-		headingRowHeight = 5
+		firstColWidth       = float64(90)
+		otherColWidth       = float64(25)
+		headingRowHeight    = 5
 		guaranteesRowHeight = 8
 	)
 
@@ -235,30 +235,30 @@ func (lg *LifeGenerator) guaranteeTable() {
 				Border:    constants.BorderTopBottom,
 			},
 			domain.TableCell{
-				Text:      lg.dto.Guarantees[slug].SumInsuredLimitOfIndemnity.Text,
-				Height:    guaranteesRowHeight,
-				Width:     otherColWidth,
-				Border:    constants.BorderTopBottom,
+				Text:   lg.dto.Guarantees[slug].SumInsuredLimitOfIndemnity.Text,
+				Height: guaranteesRowHeight,
+				Width:  otherColWidth,
+				Border: constants.BorderTopBottom,
 			},
 			domain.TableCell{
-				Text:      lg.dto.Guarantees[slug].Duration.Text,
-				Height:    guaranteesRowHeight,
-				Width:     otherColWidth,
-				Align:     constants.CenterAlign,
-				Border:    constants.BorderTopBottom,
+				Text:   lg.dto.Guarantees[slug].Duration.Text,
+				Height: guaranteesRowHeight,
+				Width:  otherColWidth,
+				Align:  constants.CenterAlign,
+				Border: constants.BorderTopBottom,
 			},
 			domain.TableCell{
-				Text:      lg.dto.Guarantees[slug].ExpiryDate,
-				Height:    guaranteesRowHeight,
-				Width:     otherColWidth,
-				Align:     constants.CenterAlign,
-				Border:    constants.BorderTopBottom,
+				Text:   lg.dto.Guarantees[slug].ExpiryDate,
+				Height: guaranteesRowHeight,
+				Width:  otherColWidth,
+				Align:  constants.CenterAlign,
+				Border: constants.BorderTopBottom,
 			},
 			domain.TableCell{
-				Text:      lg.dto.Guarantees[slug].PremiumGrossYearly.Text,
-				Height:    guaranteesRowHeight,
-				Width:     otherColWidth,
-				Border:    constants.BorderTopBottom,
+				Text:   lg.dto.Guarantees[slug].PremiumGrossYearly.Text,
+				Height: guaranteesRowHeight,
+				Width:  otherColWidth,
+				Border: constants.BorderTopBottom,
 			},
 		)
 		table = append(table, row)

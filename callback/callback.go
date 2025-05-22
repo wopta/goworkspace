@@ -1,12 +1,13 @@
 package callback
 
 import (
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	"github.com/wopta/goworkspace/callback/fabrick"
-	"github.com/wopta/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/callback/fabrick"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 var callbackRoutes []lib.Route = []lib.Route{

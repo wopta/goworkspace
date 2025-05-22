@@ -1,8 +1,9 @@
 package _script
 
 import (
-	"github.com/wopta/goworkspace/network"
 	"log"
+
+	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
 func UpdateAgentRuiCode(nodeUid, ruiCode string) {

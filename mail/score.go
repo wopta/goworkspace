@@ -2,15 +2,16 @@ package mail
 
 import (
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"net/http"
 	"os"
 	"strings"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/google/uuid"
-	"github.com/wopta/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 func ScoreFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {

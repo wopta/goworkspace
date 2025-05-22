@@ -1,13 +1,13 @@
-module github.com/wopta/goworkspace/_script
+module gitlab.dev.wopta.it/goworkspace/_script
 
 go 1.21
 
-replace github.com/wopta/goworkspace/_script => ./
+replace gitlab.dev.wopta.it/goworkspace/_script => ./
 
 require (
-	github.com/wopta/goworkspace/lib v1.0.89
-	github.com/wopta/goworkspace/models v1.1.65
-	github.com/wopta/goworkspace/transaction v1.0.22
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.89
+	gitlab.dev.wopta.it/goworkspace/models v1.1.65
+	gitlab.dev.wopta.it/goworkspace/transaction v1.0.22
 )
 
 require (
@@ -64,8 +64,8 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/network v1.0.5 // indirect
-	github.com/wopta/goworkspace/product v1.0.54 // indirect
+	gitlab.dev.wopta.it/goworkspace/network v1.0.5 // indirect
+	gitlab.dev.wopta.it/goworkspace/product v1.0.54 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect

@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/wopta/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 )
 
 type refreshTokenReq struct {

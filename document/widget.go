@@ -5,13 +5,13 @@ import (
 	"strings"
 
 	"github.com/dustin/go-humanize"
-	"github.com/wopta/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
-	"github.com/wopta/goworkspace/models"
-	//model "github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	//model "gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func (s Skin) Customer(m pdf.Maroto, customer []Kv) pdf.Maroto {

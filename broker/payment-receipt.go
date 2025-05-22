@@ -5,22 +5,23 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/go-chi/chi/v5"
-	"github.com/wopta/goworkspace/document"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
-	plc "github.com/wopta/goworkspace/policy"
-	plcRenew "github.com/wopta/goworkspace/policy/renew"
-	plcUtils "github.com/wopta/goworkspace/policy/utils"
-	trx "github.com/wopta/goworkspace/transaction"
-	trxRenew "github.com/wopta/goworkspace/transaction/renew"
+	"gitlab.dev.wopta.it/goworkspace/document"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
+	plc "gitlab.dev.wopta.it/goworkspace/policy"
+	plcRenew "gitlab.dev.wopta.it/goworkspace/policy/renew"
+	plcUtils "gitlab.dev.wopta.it/goworkspace/policy/utils"
+	trx "gitlab.dev.wopta.it/goworkspace/transaction"
+	trxRenew "gitlab.dev.wopta.it/goworkspace/transaction/renew"
 )
 
 const (

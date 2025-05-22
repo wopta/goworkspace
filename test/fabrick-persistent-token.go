@@ -3,12 +3,13 @@ package test
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"net/http"
 	"os"
 
-	"github.com/wopta/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 type fabrickPersistentTokenReq struct {

@@ -3,12 +3,13 @@ package quote
 import (
 	"bytes"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 
-	"github.com/wopta/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/xuri/excelize/v2"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 func ExcelFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

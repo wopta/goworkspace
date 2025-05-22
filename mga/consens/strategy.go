@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 const (

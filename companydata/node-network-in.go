@@ -2,12 +2,13 @@ package companydata
 
 import (
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 
-	lib "github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	lib "gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func NodeNetworkIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

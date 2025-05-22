@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/wopta/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 func getKeyInjectedProcess(targetPro, targetAct string, order orderActivity) keyInjected {

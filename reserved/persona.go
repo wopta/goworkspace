@@ -1,9 +1,10 @@
 package reserved
 
 import (
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/models"
 	"math"
+
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func personaReserved(policy *models.Policy) (bool, *models.ReservedInfo) {

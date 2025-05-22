@@ -1,12 +1,12 @@
-module github.com/wopta/goworkspace/product
+module gitlab.dev.wopta.it/goworkspace/product
 
 go 1.21
 
-replace github.com/wopta/goworkspace/product => ./
+replace gitlab.dev.wopta.it/goworkspace/product => ./
 
 require (
-	github.com/wopta/goworkspace/lib v1.0.161
-	github.com/wopta/goworkspace/models v1.2.55
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.161
+	gitlab.dev.wopta.it/goworkspace/models v1.2.55
 )
 
 require (

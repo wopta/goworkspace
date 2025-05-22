@@ -3,15 +3,16 @@ package question
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"net/http"
+
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/go-chi/chi/v5"
 
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 const (

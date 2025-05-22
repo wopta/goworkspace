@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/wopta/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 type WiseCompletePolicy struct {

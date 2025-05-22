@@ -2,16 +2,17 @@ package document
 
 import (
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"strconv"
 	"time"
+
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"github.com/dustin/go-humanize"
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func (skin Skin) GlobalContract(m pdf.Maroto, data models.Policy) {

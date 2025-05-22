@@ -1,9 +1,9 @@
 package payment
 
 import (
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/payment/fabrick"
-	"github.com/wopta/goworkspace/payment/manual"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/payment/fabrick"
+	"gitlab.dev.wopta.it/goworkspace/payment/manual"
 )
 
 type Client interface {

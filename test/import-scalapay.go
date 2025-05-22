@@ -1,15 +1,16 @@
 package test
 
 import (
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"cloud.google.com/go/civil"
 	"github.com/google/uuid"
-	"github.com/wopta/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 func ImportScalapay(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

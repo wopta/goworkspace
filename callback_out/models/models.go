@@ -1,6 +1,6 @@
 package models
 
-import "github.com/wopta/goworkspace/callback_out/internal"
+import "gitlab.dev.wopta.it/goworkspace/callback_out/internal"
 
 var (
 	Proposal        internal.CallbackoutAction = "Proposal"

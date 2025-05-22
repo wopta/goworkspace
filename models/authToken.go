@@ -1,6 +1,6 @@
 package models
 
-import "github.com/wopta/goworkspace/lib"
+import "gitlab.dev.wopta.it/goworkspace/lib"
 
 // TODO: delete me when all modules read directly form lib
 

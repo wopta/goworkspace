@@ -58,6 +58,15 @@ if [[ "${TAG}" == *"prod"* ]]; then
     VPC=functions-connector
 fi
 
+GCPTOKEN=$(gcloud auth print-access-token)
+
+VGOPROXY="https://oauth2accesstoken:${GCPTOKEN}@europe-west1-go.pkg.dev/positive-apex-350507/goworkspace"
+VGOPROXY+=,https://proxy.golang.org,direct
+VGONOSUMDB="gitlab.dev.wopta.it/goworkspace/*"
+
+BUILD_ENV_VARS="^#^GOPROXY=${VGOPROXY}"
+BUILD_ENV_VARS+="#GONOSUMDB=${VGONOSUMDB}"
+
 # === COPY ASSETS FROM BUCKET ==================================================
 echo "Copying assets..."
 mkdir -p /workspace/${FX_NAME}/tmp/assets
@@ -95,7 +104,9 @@ gcloud functions deploy ${FX_NAME} \
     --egress-settings=all \
     --memory=${MEMORY} \
     --vpc-connector=${VPC} \
+    --verbosity=debug \
     --clear-build-env-vars \
+    --update-build-env-vars "${BUILD_ENV_VARS}" \
     ${GEN_FX} 
 
 # === APPLY TAG VERSION LABEL ==================================================

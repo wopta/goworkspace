@@ -1,15 +1,15 @@
-module github.com/wopta/goworkspace/inclusive
+module gitlab.dev.wopta.it/goworkspace/inclusive
 
 go 1.21
 
-replace github.com/wopta/goworkspace/inclusive => ./
+replace gitlab.dev.wopta.it/goworkspace/inclusive => ./
 
 require (
 	cloud.google.com/go v0.110.2
 	cloud.google.com/go/bigquery v1.51.1
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/google/uuid v1.6.0
-	github.com/wopta/goworkspace/lib v1.0.122
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.122
 	google.golang.org/api v0.128.0
 )
 

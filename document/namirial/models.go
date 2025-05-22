@@ -1,8 +1,8 @@
 package namirial
 
 import (
-	"github.com/wopta/goworkspace/document"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/document"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 type NamirialInput struct {

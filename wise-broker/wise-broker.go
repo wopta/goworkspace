@@ -4,14 +4,15 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib/log"
 	"html/template"
 	"io/ioutil"
 	"net/http"
 	"strings"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	lib "github.com/wopta/goworkspace/lib"
+	lib "gitlab.dev.wopta.it/goworkspace/lib"
 	//"google.golang.org/api/firebaseappcheck/v1"
 )
 

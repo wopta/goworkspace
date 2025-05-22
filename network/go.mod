@@ -1,8 +1,8 @@
-module github.com/wopta/goworkspace/network
+module gitlab.dev.wopta.it/goworkspace/network
 
 go 1.21
 
-replace github.com/wopta/goworkspace/network => ./
+replace gitlab.dev.wopta.it/goworkspace/network => ./
 
 require (
 	cloud.google.com/go/bigquery v1.61.0
@@ -10,8 +10,8 @@ require (
 	cloud.google.com/go/pubsub v1.38.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
-	github.com/wopta/goworkspace/lib v1.0.161
-	github.com/wopta/goworkspace/models v1.2.55
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.161
+	gitlab.dev.wopta.it/goworkspace/models v1.2.55
 	google.golang.org/api v0.181.0
 )
 

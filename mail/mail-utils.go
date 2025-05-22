@@ -4,15 +4,16 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"os"
 	"strings"
 	"text/template"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/dustin/go-humanize"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
 func getBodyData(policy models.Policy) BodyData {

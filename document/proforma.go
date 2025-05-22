@@ -2,12 +2,13 @@ package document
 
 import (
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"strings"
 
-	"github.com/wopta/goworkspace/document/internal/engine"
-	"github.com/wopta/goworkspace/document/pkg/proforma"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
+	"gitlab.dev.wopta.it/goworkspace/document/pkg/proforma"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 const (

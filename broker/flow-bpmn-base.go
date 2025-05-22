@@ -1,13 +1,13 @@
 package broker
 
 import (
-	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
-	"github.com/wopta/goworkspace/broker/draftBpmn/flow"
-	"github.com/wopta/goworkspace/broker/internal/handlers"
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
-	prd "github.com/wopta/goworkspace/product"
+	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
+	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
+	"gitlab.dev.wopta.it/goworkspace/broker/internal/handlers"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
+	prd "gitlab.dev.wopta.it/goworkspace/product"
 )
 
 func getFlow(policy *models.Policy, originStr string, storage bpmn.StorageData) (*bpmn.FlowBpnm, error) {

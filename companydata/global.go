@@ -2,16 +2,17 @@ package companydata
 
 import (
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"io/ioutil"
 	"os"
 	"strconv"
 	"time"
 
-	lib "github.com/wopta/goworkspace/lib"
-	env "github.com/wopta/goworkspace/lib/environment"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	lib "gitlab.dev.wopta.it/goworkspace/lib"
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 var (

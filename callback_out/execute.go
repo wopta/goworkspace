@@ -1,10 +1,10 @@
 package callback_out
 
 import (
-	"github.com/wopta/goworkspace/callback_out/internal"
-	md "github.com/wopta/goworkspace/callback_out/models"
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/callback_out/internal"
+	md "gitlab.dev.wopta.it/goworkspace/callback_out/models"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 var (

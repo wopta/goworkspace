@@ -5,12 +5,12 @@ import (
 	"time"
 
 	"cloud.google.com/go/firestore"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/models"
-	plc "github.com/wopta/goworkspace/policy"
-	"github.com/wopta/goworkspace/question"
-	"github.com/wopta/goworkspace/reserved"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	plc "gitlab.dev.wopta.it/goworkspace/policy"
+	"gitlab.dev.wopta.it/goworkspace/question"
+	"gitlab.dev.wopta.it/goworkspace/reserved"
 )
 
 func SetProposalData(policy *models.Policy, origin string, networkNode *models.NetworkNode, mgaProduct *models.Product) {

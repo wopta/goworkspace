@@ -3,13 +3,14 @@ package quote
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"net/http"
 	"os"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"cloud.google.com/go/civil"
-	"github.com/wopta/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 func PmiMunichFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

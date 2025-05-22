@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"log/slog"
 	"net/http"
 	"os"
 	"runtime"
 	"strings"
+
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"cloud.google.com/go/logging"
 )

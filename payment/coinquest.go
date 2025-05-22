@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	lib "github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/lib/log"
+	lib "gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 )
 
 func CriptoPayObj(id string) <-chan string {

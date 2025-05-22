@@ -1,6 +1,6 @@
 package models
 
-import "github.com/wopta/goworkspace/lib"
+import "gitlab.dev.wopta.it/goworkspace/lib"
 
 type Attachment struct {
 	Name        string `firestore:"name,omitempty"        json:"name,omitempty"`

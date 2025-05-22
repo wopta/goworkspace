@@ -3,14 +3,15 @@ package lib
 import (
 	"context"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 	"strings"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/auth"
-	env "github.com/wopta/goworkspace/lib/environment"
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
 )
 
 func getClient() (*auth.Client, context.Context) {

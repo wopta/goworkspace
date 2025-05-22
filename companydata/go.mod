@@ -1,4 +1,4 @@
-module github.com/wopta/goworkspace/companydata
+module gitlab.dev.wopta.it/goworkspace/companydata
 
 go 1.21
 
@@ -11,13 +11,13 @@ require (
 	github.com/go-gota/gota v0.12.0
 	github.com/google/uuid v1.6.0
 	github.com/oliveagle/jsonpath v0.0.0-20180606110733-2e52cf6e6852
-	github.com/wopta/goworkspace/inclusive v0.0.5
-	github.com/wopta/goworkspace/lib v1.0.161
-	github.com/wopta/goworkspace/mail v1.0.170
-	github.com/wopta/goworkspace/models v1.2.55
-	github.com/wopta/goworkspace/network v1.0.120
-	github.com/wopta/goworkspace/product v1.1.52
-	github.com/wopta/goworkspace/user v1.0.155
+	gitlab.dev.wopta.it/goworkspace/inclusive v0.0.5
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.161
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.170
+	gitlab.dev.wopta.it/goworkspace/models v1.2.55
+	gitlab.dev.wopta.it/goworkspace/network v1.0.120
+	gitlab.dev.wopta.it/goworkspace/product v1.1.52
+	gitlab.dev.wopta.it/goworkspace/user v1.0.155
 	github.com/xuri/excelize/v2 v2.9.0
 	google.golang.org/api v0.206.0
 )
@@ -70,7 +70,7 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20240408161823-9ad904a10d6d // indirect
 	github.com/xuri/nfp v0.0.0-20240318013403-ab9948c2c4a7 // indirect

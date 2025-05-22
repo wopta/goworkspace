@@ -2,10 +2,11 @@ package enrich
 
 import (
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 
-	"github.com/wopta/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 func NaicsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

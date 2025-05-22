@@ -3,9 +3,9 @@ package win_test
 import (
 	"testing"
 
-	"github.com/wopta/goworkspace/callback_out/internal"
-	md "github.com/wopta/goworkspace/callback_out/models"
-	"github.com/wopta/goworkspace/callback_out/win"
+	"gitlab.dev.wopta.it/goworkspace/callback_out/internal"
+	md "gitlab.dev.wopta.it/goworkspace/callback_out/models"
+	"gitlab.dev.wopta.it/goworkspace/callback_out/win"
 )
 
 func TestWinDecodeAction(t *testing.T) {

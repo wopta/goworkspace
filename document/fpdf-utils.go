@@ -12,8 +12,8 @@ import (
 	"github.com/go-pdf/fpdf"
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/ttacon/libphonenumber"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 const (

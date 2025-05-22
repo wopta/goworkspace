@@ -1,8 +1,8 @@
-module github.com/wopta/goworkspace/lib
+module gitlab.dev.wopta.it/goworkspace/lib
 
 go 1.21
 
-replace github.com/wopta/goworkspace/lib => ./
+replace gitlab.dev.wopta.it/goworkspace/lib => ./
 
 require (
 	cloud.google.com/go v0.110.0

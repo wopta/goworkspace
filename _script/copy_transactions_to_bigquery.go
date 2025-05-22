@@ -5,9 +5,9 @@ import (
 	"log"
 
 	"github.com/mohae/deepcopy"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/transaction"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/transaction"
 	"google.golang.org/api/iterator"
 
 	"time"

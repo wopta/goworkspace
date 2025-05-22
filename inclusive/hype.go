@@ -6,15 +6,16 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/civil"
 	"github.com/google/uuid"
-	lib "github.com/wopta/goworkspace/lib"
+	lib "gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 const (

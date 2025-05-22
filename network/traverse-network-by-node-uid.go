@@ -1,10 +1,11 @@
 package network
 
 import (
-	"github.com/wopta/goworkspace/lib/log"
 	"strings"
 
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func TraverseWithCallbackNetworkByNodeUid(

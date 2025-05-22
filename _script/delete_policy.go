@@ -1,12 +1,13 @@
 package _script
 
 import (
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	plc "github.com/wopta/goworkspace/policy"
-	tr "github.com/wopta/goworkspace/transaction"
 	"log"
 	"time"
+
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	plc "gitlab.dev.wopta.it/goworkspace/policy"
+	tr "gitlab.dev.wopta.it/goworkspace/transaction"
 )
 
 func DeletePolicy(policyUid string) {

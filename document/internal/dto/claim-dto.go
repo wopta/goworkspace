@@ -3,8 +3,8 @@ package dto
 import (
 	"fmt"
 
-	"github.com/wopta/goworkspace/document/internal/constants"
-	"github.com/wopta/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/document/internal/constants"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 type claimDTO struct {

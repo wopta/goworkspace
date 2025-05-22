@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/maja42/goval"
-	"github.com/wopta/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 )
 
 // Run a process, it starts from defaultActivity defined in json

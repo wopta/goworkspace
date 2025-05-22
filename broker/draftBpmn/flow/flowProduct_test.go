@@ -1,9 +1,10 @@
 package flow
 
 import (
-	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
-	env "github.com/wopta/goworkspace/lib/environment"
 	"os"
+
+	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
 )
 
 func mock_catnatIntegration(log *mockLog) func(bpmn.StorageData) error {

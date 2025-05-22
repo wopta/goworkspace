@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/wopta/goworkspace/accounting"
-	"github.com/wopta/goworkspace/document"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/accounting"
+	"gitlab.dev.wopta.it/goworkspace/document"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 const (
@@ -33,7 +33,7 @@ func GenerateInvoice(p models.Policy, t models.Transaction) error {
 	// create proforma document
 	if proformaResp, err := document.Proforma(p); err == nil {
 		proformatAtt := models.Attachment{
-			Name:      fmt.Sprintf("Nota informativa %d", p.StartDate.AddDate(p.Annuity, 0,0).Year()),
+			Name:      fmt.Sprintf("Nota informativa %d", p.StartDate.AddDate(p.Annuity, 0, 0).Year()),
 			FileName:  proformaResp.Filename,
 			MimeType:  "application/pdf",
 			IsPrivate: false,

@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"cloud.google.com/go/firestore"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"google.golang.org/api/iterator"
 )
 

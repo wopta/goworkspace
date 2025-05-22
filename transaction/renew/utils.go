@@ -3,8 +3,8 @@ package renew
 import (
 	"slices"
 
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 	"google.golang.org/api/iterator"
 )
 

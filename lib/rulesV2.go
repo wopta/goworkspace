@@ -3,7 +3,8 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
+
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"github.com/hyperjumptech/grule-rule-engine/ast"
 	"github.com/hyperjumptech/grule-rule-engine/builder"

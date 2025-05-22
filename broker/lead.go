@@ -3,13 +3,14 @@ package broker
 import (
 	"encoding/json"
 	"errors"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
 	"io"
 	"net/http"
 	"slices"
+
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
 func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

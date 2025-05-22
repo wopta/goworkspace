@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	env "github.com/wopta/goworkspace/lib/environment"
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
 )
 
 func TriggerRenewDraft(dryRun bool, appCheckToken string) {

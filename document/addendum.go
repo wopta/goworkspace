@@ -3,13 +3,14 @@ package document
 import (
 	"errors"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"strings"
 	"time"
 
-	"github.com/wopta/goworkspace/document/internal/engine"
-	"github.com/wopta/goworkspace/document/pkg/addendum"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
+	"gitlab.dev.wopta.it/goworkspace/document/pkg/addendum"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 const (

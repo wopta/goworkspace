@@ -1,10 +1,11 @@
 package lib
 
 import (
-	"github.com/wopta/goworkspace/lib/log"
 	"strconv"
 	"strings"
 	"time"
+
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 )
 
 func Dateformat(t time.Time) string {

@@ -1,10 +1,10 @@
 package catnat
 
 import (
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/quote/internal"
-	"github.com/wopta/goworkspace/sellable"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/quote/internal"
+	"gitlab.dev.wopta.it/goworkspace/sellable"
 )
 
 type sellableCatnat func(policy *models.Policy, product *models.Product, isValidationForQuote bool) (*sellable.SellableOutput, error)

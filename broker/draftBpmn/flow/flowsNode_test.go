@@ -5,9 +5,9 @@ import (
 	"os"
 	"testing"
 
-	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
-	env "github.com/wopta/goworkspace/lib/environment"
-	"github.com/wopta/goworkspace/models"
+	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func funcTestWithInfo(message string, log *mockLog) func(bpmn.StorageData) error {

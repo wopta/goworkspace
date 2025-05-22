@@ -3,8 +3,9 @@ package lib
 import (
 	"context"
 	"errors"
-	"github.com/wopta/goworkspace/lib/log"
 	"os"
+
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"cloud.google.com/go/firestore"
 	"google.golang.org/api/iterator"

@@ -1,6 +1,6 @@
 package constants
 
-import "github.com/wopta/goworkspace/models"
+import "gitlab.dev.wopta.it/goworkspace/models"
 
 var (
 	CompanyMap map[string]string = map[string]string{

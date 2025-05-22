@@ -3,15 +3,16 @@ package quote
 import (
 	"context"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
 
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 	"google.golang.org/api/drive/v2"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"

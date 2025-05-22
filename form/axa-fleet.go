@@ -3,16 +3,17 @@ package form
 import (
 	"context"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/mail"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/xuri/excelize/v2"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/mail"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
 )

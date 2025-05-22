@@ -2,14 +2,15 @@ package product
 
 import (
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib/log"
 	"os"
 	"sort"
 	"strings"
 
-	"github.com/wopta/goworkspace/lib"
-	env "github.com/wopta/goworkspace/lib/environment"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func GetAllProductsByChannel(channel string) []models.ProductInfo {

@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/wopta/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 )
 
 func Httpclient(req *http.Request) *http.Response {

@@ -1,15 +1,16 @@
 package enrich
 
 import (
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"strings"
+
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"github.com/go-chi/chi/v5"
 
 	"github.com/go-gota/gota/dataframe"
 	"github.com/go-gota/gota/series"
-	"github.com/wopta/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 func AtecoFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

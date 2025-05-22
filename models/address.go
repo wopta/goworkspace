@@ -1,6 +1,6 @@
 package models
 
-import "github.com/wopta/goworkspace/lib"
+import "gitlab.dev.wopta.it/goworkspace/lib"
 
 type Address struct {
 	StreetName    string `json:"streetName" firestore:"streetName" bigquery:"-"`

@@ -15,8 +15,8 @@ import (
 
 	// Blank-import the function package so the init() runs
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	lib "github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/lib/log"
+	lib "gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 )
 
 func init() {

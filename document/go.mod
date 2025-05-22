@@ -1,8 +1,8 @@
-module github.com/wopta/goworkspace/document
+module gitlab.dev.wopta.it/goworkspace/document
 
 go 1.21
 
-replace github.com/wopta/goworkspace/document => ./
+replace gitlab.dev.wopta.it/goworkspace/document => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
@@ -10,10 +10,10 @@ require (
 	github.com/go-pdf/fpdf v0.6.0
 	github.com/johnfercher/maroto v1.0.0
 	github.com/ttacon/libphonenumber v1.2.1
-	github.com/wopta/goworkspace/lib v1.0.161
-	github.com/wopta/goworkspace/models v1.2.55
-	github.com/wopta/goworkspace/network v1.0.120
-	github.com/wopta/goworkspace/product v1.1.52
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.161
+	gitlab.dev.wopta.it/goworkspace/models v1.2.55
+	gitlab.dev.wopta.it/goworkspace/network v1.0.120
+	gitlab.dev.wopta.it/goworkspace/product v1.1.52
 )
 
 require (

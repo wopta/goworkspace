@@ -3,22 +3,23 @@ package manual
 import (
 	"errors"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"io"
 	"net/http"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
 	"github.com/go-chi/chi/v5"
-	"github.com/wopta/goworkspace/callback_out"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/mail"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
-	"github.com/wopta/goworkspace/payment/common"
-	"github.com/wopta/goworkspace/payment/consultancy"
-	plc "github.com/wopta/goworkspace/policy"
-	prd "github.com/wopta/goworkspace/product"
-	trn "github.com/wopta/goworkspace/transaction"
+	"gitlab.dev.wopta.it/goworkspace/callback_out"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/mail"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
+	"gitlab.dev.wopta.it/goworkspace/payment/common"
+	"gitlab.dev.wopta.it/goworkspace/payment/consultancy"
+	plc "gitlab.dev.wopta.it/goworkspace/policy"
+	prd "gitlab.dev.wopta.it/goworkspace/product"
+	trn "gitlab.dev.wopta.it/goworkspace/transaction"
 )
 
 type ManualPaymentPayload struct {

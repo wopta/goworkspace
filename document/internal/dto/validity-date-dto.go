@@ -1,8 +1,8 @@
 package dto
 
 import (
-	"github.com/wopta/goworkspace/document/internal/constants"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/document/internal/constants"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 type validityDateDTO struct {

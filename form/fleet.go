@@ -3,15 +3,16 @@ package form
 import (
 	"context"
 	"fmt"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
-	lib "github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/mail"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	lib "gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/mail"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
 	//"google.golang.org/api/firebaseappcheck/v1"

@@ -4,11 +4,11 @@ import (
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/lib/log"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/payment/fabrick"
-	"github.com/wopta/goworkspace/payment/manual"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/payment/fabrick"
+	"gitlab.dev.wopta.it/goworkspace/payment/manual"
 )
 
 var paymentRoutes []lib.Route = []lib.Route{

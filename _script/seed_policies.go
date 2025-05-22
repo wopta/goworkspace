@@ -7,11 +7,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/product"
-	"github.com/wopta/goworkspace/transaction"
-	"github.com/wopta/goworkspace/user"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/product"
+	"gitlab.dev.wopta.it/goworkspace/transaction"
+	"gitlab.dev.wopta.it/goworkspace/user"
 )
 
 func getFakeAddress() *models.Address {

@@ -3,10 +3,10 @@ package callback_out
 import (
 	"errors"
 
-	"github.com/wopta/goworkspace/callback_out/base"
-	"github.com/wopta/goworkspace/callback_out/internal"
-	"github.com/wopta/goworkspace/callback_out/win"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
+	"gitlab.dev.wopta.it/goworkspace/callback_out/internal"
+	"gitlab.dev.wopta.it/goworkspace/callback_out/win"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 type CallbackClient interface {

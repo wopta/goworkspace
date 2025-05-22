@@ -3,12 +3,12 @@ package quote
 import (
 	"time"
 
-	"github.com/wopta/goworkspace/document/internal/constants"
-	"github.com/wopta/goworkspace/document/internal/domain"
-	"github.com/wopta/goworkspace/document/internal/dto"
-	"github.com/wopta/goworkspace/document/internal/engine"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/document/internal/constants"
+	"gitlab.dev.wopta.it/goworkspace/document/internal/domain"
+	"gitlab.dev.wopta.it/goworkspace/document/internal/dto"
+	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 type baseGenerator struct {

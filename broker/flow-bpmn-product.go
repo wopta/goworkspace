@@ -1,8 +1,8 @@
 package broker
 
 import (
-	bpmn "github.com/wopta/goworkspace/broker/draftBpmn"
-	"github.com/wopta/goworkspace/broker/internal/handlers/productFlow"
+	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
+	"gitlab.dev.wopta.it/goworkspace/broker/internal/handlers/productFlow"
 )
 
 func getProductFlow() (*bpmn.BpnmBuilder, error) {

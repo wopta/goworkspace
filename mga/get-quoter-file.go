@@ -3,11 +3,12 @@ package mga
 import (
 	"encoding/base64"
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib/log"
 	"net/http"
 	"os"
 
-	"github.com/wopta/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+
+	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
 func GetQuoterFileFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

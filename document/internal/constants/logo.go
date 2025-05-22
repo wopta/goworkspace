@@ -1,6 +1,6 @@
 package constants
 
-import "github.com/wopta/goworkspace/models"
+import "gitlab.dev.wopta.it/goworkspace/models"
 
 const WoptaLogo string = "logo_wopta.png"
 
