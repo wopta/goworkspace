@@ -40,13 +40,15 @@ func EmitSignWithNewNamirial(policy *models.Policy, product *models.Product, net
 	policy.Status = models.PolicyStatusToSign
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusContact, models.PolicyStatusToSign)
 
-	p := <-document.ContractObj(origin, *policy, networkNode, product)
-	policy.DocumentName = p.LinkGcs
 	namirialInput := namirial.NamirialInput{
 		Policy:    *policy,
 		FilesName: make([]string, 0),
 	}
-	namirialInput.FilesName = append(namirialInput.FilesName, p.LinkGcs)
+	if policy.Name != models.CatNatProduct {
+		p := <-document.ContractObj(origin, *policy, networkNode, product)
+		policy.DocumentName = p.LinkGcs
+		namirialInput.FilesName = append(namirialInput.FilesName, p.LinkGcs)
+	}
 	for _, document := range *policy.Attachments {
 		if strings.HasPrefix(document.Name, models.ContractAttachmentName) {
 			namirialInput.FilesName = append(namirialInput.FilesName, document.FileName)
