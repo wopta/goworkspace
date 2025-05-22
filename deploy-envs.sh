@@ -114,6 +114,5 @@ if [[ "${GEN_FX}" == "--gen2" ]]; then
     gcloud run services update ${FX_NAME} \
         --update-labels tagversion=${TAG_VERSION} \
         --service-account=${SERVICE_ACCOUNT} \
-        --clear-build-env-vars \
         --region=${REGION}
 fi
