@@ -190,10 +190,10 @@ var buildingMaterialMap = map[string]int{
 	"unknown":  4,
 }
 
-var splittingMap = map[models.PaySplit]string{
-	models.PaySplitYearly:     "01",
-	models.PaySplitSemestral:  "02",
-	models.PaySplitTrimestral: "04",
+var splittingMap = map[string]string{
+	string(models.PaySplitYearly):     "01",
+	string(models.PaySplitSemestral):  "02",
+	string(models.PaySplitTrimestral): "04",
 }
 var quoteQuestionMap = map[bool]string{
 	true:  "si",
@@ -205,7 +205,7 @@ func (d *QuoteRequest) FromPolicy(p *models.Policy, isEmission bool) error {
 	d.Date = p.StartDate.Format("2006-01-02")
 	d.ExternalReference = p.Uid
 	d.DistributorCode = catNatDistributorCode
-	split, ok := splittingMap[p.PaymentComponents.Split]
+	split, ok := splittingMap[p.PaymentSplit]
 	if !ok {
 		return fmt.Errorf("No valid split selected for NetInsurance")
 	}
@@ -437,14 +437,23 @@ func (d *QuoteResponse) ToPolicy(p *models.Policy) {
 	p.PriceGross = d.AnnualGross
 	p.PriceNett = d.AnnualNet
 	p.TaxAmount = d.AnnualTax
+	//	p.OffersPrices = map[string]map[string]*models.Price{
+	//		"default": {
+	//			"yearly": &models.Price{},
+	//		},
+	//	}
+	//	p.OffersPrices["default"]["yearly"].Gross = p.PriceGross
+	//	p.OffersPrices["default"]["yearly"].Net = p.PriceNett
+	//	p.OffersPrices["default"]["yearly"].Tax = p.TaxAmount
+	split := string(p.PaymentSplit)
 	p.OffersPrices = map[string]map[string]*models.Price{
 		"default": {
-			"yearly": &models.Price{},
+			split: &models.Price{},
 		},
 	}
-	p.OffersPrices["default"]["yearly"].Gross = p.PriceGross
-	p.OffersPrices["default"]["yearly"].Net = p.PriceNett
-	p.OffersPrices["default"]["yearly"].Tax = p.TaxAmount
+	p.OffersPrices["default"][split].Gross = p.PriceGross
+	p.OffersPrices["default"][split].Net = p.PriceNett
+	p.OffersPrices["default"][split].Tax = p.TaxAmount
 	p.OfferlName = "default"
 }
 
