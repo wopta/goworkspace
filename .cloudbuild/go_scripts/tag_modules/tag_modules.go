@@ -42,14 +42,14 @@ func Exec() {
 		fmt.Printf("==== Working module %s...\n", mod.Name)
 
 		tag := mod.UpdateSelf(repo)
-		if slices.Contains(common.FUNCTIONS, mod.Name) && !slices.Contains(functionsToUpdate, mod.Name) {
+		if slices.Contains(common.ALL_FUNCTIONS, mod.Name) && !slices.Contains(functionsToUpdate, mod.Name) {
 			functionsToUpdate = append(functionsToUpdate, mod.Name)
 		}
 		tagsToPush = append(tagsToPush, tag)
 
 		mod.UpdateDependencies(repo)
 		for _, m := range mod.DependedBy {
-			if slices.Contains(common.FUNCTIONS, m) && !slices.Contains(functionsToUpdate, m) {
+			if slices.Contains(common.ALL_FUNCTIONS, m) && !slices.Contains(functionsToUpdate, m) {
 				functionsToUpdate = append(functionsToUpdate, m)
 			}
 		}
