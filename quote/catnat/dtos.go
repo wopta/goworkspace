@@ -229,6 +229,7 @@ func (d *QuoteRequest) FromPolicy(p *models.Policy, isEmission bool) error {
 			if p.Contractor.CompanyName == "" {
 				return errors.New("You need to compile Contractor.CompanyName")
 			}
+			p.Contractor.FiscalCode = p.Contractor.VatCode
 		} else { //ditta individuale i need all date
 			dt = catNatSoleProp
 			if p.Contractor.Name == "" {
