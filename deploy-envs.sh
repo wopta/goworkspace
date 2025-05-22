@@ -95,6 +95,7 @@ gcloud functions deploy ${FX_NAME} \
     --egress-settings=all \
     --memory=${MEMORY} \
     --vpc-connector=${VPC} \
+    --clear-build-env-vars \
     ${GEN_FX} 
 
 # === APPLY TAG VERSION LABEL ==================================================
