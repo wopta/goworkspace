@@ -117,6 +117,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		return "", "", err
 	}
 
+	emitUpdatePolicy(&policy, request)
 	//!!!!!TODO must be eliminated, should use either this or the new one
 	//Only for test!!!!!
 	if policy.Name == models.CatNatProduct {
@@ -131,7 +132,6 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 		return string(b), responseEmit, err
 	}
-	emitUpdatePolicy(&policy, request)
 	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
 	if networkNode != nil {
 		warrant = networkNode.GetWarrant()
@@ -202,6 +202,7 @@ func emit(policy *models.Policy, request EmitRequest, origin string) EmitRespons
 
 func emitUpdatePolicy(policy *models.Policy, request EmitRequest) {
 	log.AddPrefix("emitUpdatePolicy")
+	log.ErrorF("fsdklfjsadklfjsdaklfjsdklfjsdklfjlsdakfjsadl;fjsdal;kfjsdalkfasd")
 	defer log.PopPrefix()
 	log.Println("start ------------------------------------")
 	if policy.Statements == nil || len(*policy.Statements) == 0 {
