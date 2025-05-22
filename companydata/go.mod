@@ -13,7 +13,7 @@ require (
 	github.com/oliveagle/jsonpath v0.0.0-20180606110733-2e52cf6e6852
 	gitlab.dev.wopta.it/goworkspace/inclusive v0.0.5
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.162
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.170
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.171
 	gitlab.dev.wopta.it/goworkspace/models v1.2.56
 	gitlab.dev.wopta.it/goworkspace/network v1.0.121
 	gitlab.dev.wopta.it/goworkspace/product v1.1.53
