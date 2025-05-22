@@ -8,7 +8,7 @@ require (
 	firebase.google.com/go/v4 v4.10.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.161
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.162
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.170
 	gitlab.dev.wopta.it/goworkspace/models v1.2.55
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.3
