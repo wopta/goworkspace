@@ -105,7 +105,6 @@ gcloud functions deploy ${FX_NAME} \
     --memory=${MEMORY} \
     --vpc-connector=${VPC} \
     --verbosity=debug \
-    --clear-build-env-vars \
     --update-build-env-vars "${BUILD_ENV_VARS}" \
     ${GEN_FX} 
 
@@ -115,5 +114,6 @@ if [[ "${GEN_FX}" == "--gen2" ]]; then
     gcloud run services update ${FX_NAME} \
         --update-labels tagversion=${TAG_VERSION} \
         --service-account=${SERVICE_ACCOUNT} \
+        --clear-build-env-vars \
         --region=${REGION}
 fi
