@@ -51,6 +51,9 @@ func UpdatePolicy(policy *models.Policy) (map[string]any, error) {
 		input["quoteQuestions"] = policy.QuoteQuestions
 		input["offersPrices"] = policy.OffersPrices
 		input["contractors"] = policy.Contractors
+		input["taxAmount"] = policy.TaxAmount
+		input["priceNett"] = policy.PriceNett
+		input["priceGross"] = policy.PriceGross
 	}
 
 	input["updated"] = time.Now().UTC()
