@@ -2,7 +2,6 @@ package broker
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -93,18 +92,18 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	policy, err = plc.GetPolicy(uid, origin)
 	lib.CheckError(err)
-	if policy.Channel == models.NetworkChannel && policy.ProducerUid != authToken.UserID {
-		log.Printf("user %s cannot emit policy %s because producer not equal to request user", authToken.UserID, policy.Uid)
-		return "", nil, errors.New("operation not allowed")
-	}
+	//	if policy.Channel == models.NetworkChannel && policy.ProducerUid != authToken.UserID {
+	//		log.Printf("user %s cannot emit policy %s because producer not equal to request user", authToken.UserID, policy.Uid)
+	//		return "", nil, errors.New("operation not allowed")
+	//	}
 
 	policyJsonLog, _ := policy.Marshal()
 	log.Printf("Policy %s JSON: %s", uid, string(policyJsonLog))
 
-	if policy.IsPay || policy.IsSign || policy.CompanyEmit || policy.CompanyEmitted || policy.IsDeleted {
-		log.Printf("cannot emit policy %s because state is not correct", policy.Uid)
-		return "", nil, errors.New("operation not allowed")
-	}
+	//	if policy.IsPay || policy.IsSign || policy.CompanyEmit || policy.CompanyEmitted || policy.IsDeleted {
+	//		log.Printf("cannot emit policy %s because state is not correct", policy.Uid)
+	//		return "", nil, errors.New("operation not allowed")
+	//	}
 
 	if request.SendEmail == nil {
 		sendEmail = true
@@ -117,6 +116,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		return "", "", err
 	}
 
+	emitUpdatePolicy(&policy, request)
 	//!!!!!TODO must be eliminated, should use either this or the new one
 	//Only for test!!!!!
 	if policy.Name == models.CatNatProduct {
@@ -131,7 +131,6 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 		return string(b), responseEmit, err
 	}
-	emitUpdatePolicy(&policy, request)
 	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
 	if networkNode != nil {
 		warrant = networkNode.GetWarrant()
@@ -202,6 +201,7 @@ func emit(policy *models.Policy, request EmitRequest, origin string) EmitRespons
 
 func emitUpdatePolicy(policy *models.Policy, request EmitRequest) {
 	log.AddPrefix("emitUpdatePolicy")
+	log.ErrorF("fsdklfjsadklfjsdaklfjsdklfjsdklfjlsdakfjsadl;fjsdal;kfjsdalkfasd")
 	defer log.PopPrefix()
 	log.Println("start ------------------------------------")
 	if policy.Statements == nil || len(*policy.Statements) == 0 {
