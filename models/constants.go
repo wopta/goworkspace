@@ -55,6 +55,7 @@ const (
 	PaySplitYearly            PaySplit = "yearly"
 	PaySplitSemestral         PaySplit = "semestral"
 	PaySplitSingleInstallment PaySplit = "singleInstallment"
+	PaySplitTrimestral        PaySplit = "trimestral"
 )
 
 var PaySplitRateMap = map[PaySplit]int{

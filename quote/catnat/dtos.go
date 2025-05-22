@@ -2,6 +2,7 @@ package catnat
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
@@ -155,7 +156,6 @@ const landslideSlug = "landslides"
 
 const catNatProductCode = "007"
 const catNatDistributorCode = "0168"
-const catNatSplitting = "01"
 const catNatLegalPerson = "2"
 const catNatSalesChannel = "3"
 const catNatSoleProp = "3"
@@ -189,6 +189,12 @@ var buildingMaterialMap = map[string]int{
 	"steel":    3,
 	"unknown":  4,
 }
+
+var splittingMap = map[models.PaySplit]string{
+	models.PaySplitYearly:     "01",
+	models.PaySplitSemestral:  "02",
+	models.PaySplitTrimestral: "04",
+}
 var quoteQuestionMap = map[bool]string{
 	true:  "si",
 	false: "no",
@@ -199,7 +205,11 @@ func (d *QuoteRequest) FromPolicy(p *models.Policy, isEmission bool) error {
 	d.Date = p.StartDate.Format("2006-01-02")
 	d.ExternalReference = p.Uid
 	d.DistributorCode = catNatDistributorCode
-	d.Splitting = catNatSplitting
+	split, ok := splittingMap[p.PaymentComponents.Split]
+	if !ok {
+		return fmt.Errorf("No valid split selected for NetInsurance")
+	}
+	d.Splitting = split
 	d.Emission = no
 	d.SalesChannel = catNatSalesChannel
 

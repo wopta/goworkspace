@@ -24,6 +24,7 @@ func CatnatQuote(policy *models.Policy, product *models.Product, sellable sellab
 	}
 
 	resp, err = catnatClient.Quote(cnReq)
+	log.PrintStruct("response quote", resp)
 	if err != nil {
 		return resp, err
 	}
