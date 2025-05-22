@@ -10,7 +10,7 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
 	gitlab.dev.wopta.it/goworkspace/bpmn v1.0.36
-	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.66
+	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.67
 	gitlab.dev.wopta.it/goworkspace/document v1.1.165
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.162
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.170
