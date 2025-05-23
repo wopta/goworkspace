@@ -11,7 +11,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.163
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.171
 	gitlab.dev.wopta.it/goworkspace/models v1.2.57
-	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.4
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.5
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
 
 )
