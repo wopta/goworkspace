@@ -11,7 +11,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.163
 	gitlab.dev.wopta.it/goworkspace/models v1.2.57
 	gitlab.dev.wopta.it/goworkspace/network v1.0.121
-	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.4
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.5
 	google.golang.org/grpc v1.63.2
 )
 
