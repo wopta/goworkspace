@@ -11,7 +11,7 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.163
 	gitlab.dev.wopta.it/goworkspace/models v1.2.57
-	gitlab.dev.wopta.it/goworkspace/network v1.0.122
+	gitlab.dev.wopta.it/goworkspace/network v1.0.123
 	gitlab.dev.wopta.it/goworkspace/product v1.1.54
 	gitlab.dev.wopta.it/goworkspace/quote v1.0.168
 	gitlab.dev.wopta.it/goworkspace/user v1.0.157
