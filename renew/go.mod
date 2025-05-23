@@ -7,7 +7,7 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.163
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.171
-	gitlab.dev.wopta.it/goworkspace/models v1.2.56
+	gitlab.dev.wopta.it/goworkspace/models v1.2.57
 	gitlab.dev.wopta.it/goworkspace/payment v1.0.344
 	gitlab.dev.wopta.it/goworkspace/transaction v1.0.199
 	google.golang.org/api v0.181.0
