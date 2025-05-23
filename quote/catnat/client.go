@@ -107,6 +107,7 @@ func (c *NetClient) Emit(dto QuoteRequest) (response QuoteResponse, err error) {
 		log.ErrorF("error decoding catnat response")
 		return response, err
 	}
+	log.PrintStruct("response api catnat", response)
 	if response.Result != "OK" {
 		log.ErrorF("Errore emissione %+v", response.Errors)
 		return response, errors.New("Errore emissione")

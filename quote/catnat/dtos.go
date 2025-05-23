@@ -3,6 +3,7 @@ package catnat
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
@@ -16,7 +17,7 @@ type QuoteResponse struct {
 	AnnualGross    float64         `json:"imp_Lordo_Annuo,omitempty"`
 	AnnualNet      float64         `json:"imp_Netto_Annuo,omitempty"`
 	AnnualTax      float64         `json:"imp_Tasse_Annuo,omitempty"`
-	AssetDetail    []AssetResponse `json:"dettaglioBeni,omitempty"`
+	AssetsDetail   []AssetResponse `json:"dettaglioBeni,omitempty"`
 	Errors         []Detail        `json:"errori,omitempty"`
 	Reports        []Detail        `json:"segnalazioni,omitempty"`
 }
@@ -113,7 +114,7 @@ type AssetResponse struct {
 	GrossAmount       float64           `json:"imp_Lordo_Bene,omitempty"`
 	NetAmount         float64           `json:"imp_Netto_Bene,omitempty"`
 	TaxAmount         float64           `json:"imp_Tasse_Bene,omitempty"`
-	GuaranteeDetail   []GuaranteeDetail `json:"dettaglioGaranzie,omitempty"`
+	GuaranteesDetail  []GuaranteeDetail `json:"dettaglioGaranzie,omitempty"`
 }
 
 type GuaranteeDetail struct {
@@ -133,22 +134,9 @@ type Documento struct {
 	DatiDocumento        string `json:"datiDocumento"`
 }
 
-const earthquakeCode = "211"
-const floodCode = "212"
-const landslideCode = "209"
 const buildingCode = "/00"
 const contentCode = "/01"
 const stockCode = "/02"
-
-const earthquakeBuildingCode = earthquakeCode + buildingCode
-const earthquakeContentCode = earthquakeCode + contentCode
-const earthquakeStockCode = earthquakeCode + stockCode
-const floodBuildingCode = floodCode + buildingCode
-const floodContentCode = floodCode + contentCode
-const floodStockCode = floodCode + stockCode
-const landslideBuildingCode = landslideCode + buildingCode
-const landslideContentCode = landslideCode + contentCode
-const landslideStockCode = landslideCode + stockCode
 
 const earthquakeSlug = "earthquake"
 const floodSlug = "flood"
@@ -163,6 +151,16 @@ const catNatSoleProp = "3"
 const yes = "si"
 const no = "no"
 
+var guaranteeSlugToCode = map[string]string{
+	earthquakeSlug: "211",
+	floodSlug:      "212",
+	landslideSlug:  "209",
+}
+var guaranteeCodeToSlug = map[string]string{
+	"211": earthquakeSlug,
+	"212": floodSlug,
+	"209": landslideSlug,
+}
 var useTypeMap = map[string]string{
 	"owner-tenant": "si",
 	"tenant":       "no",
@@ -200,17 +198,23 @@ var quoteQuestionMap = map[bool]string{
 	false: "no",
 }
 
-func (d *QuoteRequest) FromPolicy(p *models.Policy, isEmission bool) error {
+func (d *QuoteRequest) FromPolicy(policy *models.Policy, isEmission bool) error {
 	d.ProductCode = catNatProductCode
-	d.Date = p.StartDate.Format("2006-01-02")
-	d.ExternalReference = p.Uid
+	d.Date = policy.StartDate.Format("2006-01-02")
+	d.ExternalReference = policy.Uid
 	d.DistributorCode = catNatDistributorCode
-	d.Splitting = splittingMap[string(models.PaySplitYearly)]
+	split, ok := splittingMap[string(policy.PaymentSplit)]
+	if ok {
+		d.Splitting = split
+	} else {
+		log.Printf("Use split 'yearly' since 'PaymentSplit' is wrong '%v'", policy.PaymentSplit)
+		d.Splitting = splittingMap[string(models.PaySplitYearly)]
+	}
 	d.Emission = no
 	d.SalesChannel = catNatSalesChannel
 
 	var baseAsset models.Asset
-	for _, a := range p.Assets {
+	for _, a := range policy.Assets {
 		if a.Building != nil {
 			baseAsset = a
 			break
@@ -218,52 +222,50 @@ func (d *QuoteRequest) FromPolicy(p *models.Policy, isEmission bool) error {
 	}
 
 	if isEmission {
-		split, ok := splittingMap[p.PaymentSplit]
-		if !ok {
+		if policy.PaymentSplit == "" {
 			return fmt.Errorf("No valid split selected for NetInsurance")
 		}
-		d.Splitting = split
 		d.Emission = yes
-		if p.Contractor.CompanyAddress == nil {
+		if policy.Contractor.CompanyAddress == nil {
 			return errors.New("You need to populate CompanyAddress")
 		}
-		if p.Contractors == nil || len(*p.Contractors) == 0 {
+		if policy.Contractors == nil || len(*policy.Contractors) == 0 {
 			return errors.New("You need to compile Contractors")
 		}
 		var dt string
 
-		if p.Contractor.VatCode == "" {
+		if policy.Contractor.VatCode == "" {
 			return errors.New("You need to compile Contractor.VatCode")
 		}
-		if p.Contractor.Type == "legalEntity" { //persona giuridica
+		if policy.Contractor.Type == "legalEntity" { //persona giuridica
 			dt = catNatLegalPerson
-			if p.Contractor.CompanyName == "" {
+			if policy.Contractor.CompanyName == "" {
 				return errors.New("You need to compile Contractor.CompanyName")
 			}
-			p.Contractor.FiscalCode = p.Contractor.VatCode
+			policy.Contractor.FiscalCode = policy.Contractor.VatCode
 		} else { //ditta individuale i need all date
 			dt = catNatSoleProp
-			if p.Contractor.Name == "" {
+			if policy.Contractor.Name == "" {
 				return errors.New("You need to compile Contractor.Name")
 			}
-			if p.Contractor.Surname == "" {
+			if policy.Contractor.Surname == "" {
 				return errors.New("You need to compile Contractor.Surname")
 			}
-			if p.Contractor.FiscalCode == "" {
+			if policy.Contractor.FiscalCode == "" {
 				return errors.New("You need to compile Contractor.FiscalCode")
 			}
 		}
 		contr := Contractor{
 			PersonalDataType:          dt,
-			Name:                      p.Contractor.Name,
-			Surname:                   p.Contractor.Surname,
-			CompanyName:               p.Contractor.CompanyName,
-			VatNumber:                 p.Contractor.VatCode,
-			FiscalCode:                p.Contractor.FiscalCode,
-			AtecoCode:                 p.Contractor.Ateco,
-			Phone:                     p.Contractor.Phone,
-			Email:                     p.Contractor.Mail,
-			PrivacyConsentDate:        p.StartDate.Format("2006-01-02"),
+			Name:                      policy.Contractor.Name,
+			Surname:                   policy.Contractor.Surname,
+			CompanyName:               policy.Contractor.CompanyName,
+			VatNumber:                 policy.Contractor.VatCode,
+			FiscalCode:                policy.Contractor.FiscalCode,
+			AtecoCode:                 policy.Contractor.Ateco,
+			Phone:                     policy.Contractor.Phone,
+			Email:                     policy.Contractor.Mail,
+			PrivacyConsentDate:        policy.StartDate.Format("2006-01-02"),
 			ProcessingConsent:         no,
 			GenericMarketingConsent:   no,
 			MarketingProfilingConsent: no,
@@ -271,18 +273,18 @@ func (d *QuoteRequest) FromPolicy(p *models.Policy, isEmission bool) error {
 			DocumentationFormat:       1,
 			ConsensoTrattamento:       "si",
 		}
-		if p.Contractor.CompanyAddress != nil {
-			contr.Address = formatAddress(p.Contractor.CompanyAddress)
-			contr.Locality = p.Contractor.CompanyAddress.Locality
-			contr.CityCode = p.Contractor.CompanyAddress.CityCode
-			contr.PostalCode = p.Contractor.CompanyAddress.PostalCode
+		if policy.Contractor.CompanyAddress != nil {
+			contr.Address = formatAddress(policy.Contractor.CompanyAddress)
+			contr.Locality = policy.Contractor.CompanyAddress.Locality
+			contr.CityCode = policy.Contractor.CompanyAddress.CityCode
+			contr.PostalCode = policy.Contractor.CompanyAddress.PostalCode
 		}
 
 		d.Contractor = contr
 
 		var legalRep LegalRepresentative
-		if p.Contractors != nil {
-			for _, v := range *p.Contractors {
+		if policy.Contractors != nil {
+			for _, v := range *policy.Contractors {
 				if v.IsSignatory {
 					legalRep.Name = v.Name
 					legalRep.Surname = v.Surname
@@ -303,19 +305,19 @@ func (d *QuoteRequest) FromPolicy(p *models.Policy, isEmission bool) error {
 		d.LegalRepresentative = legalRep
 	}
 
-	alreadyEarthquake := p.QuoteQuestions["alreadyEarthquake"]
+	alreadyEarthquake := policy.QuoteQuestions["alreadyEarthquake"]
 	if alreadyEarthquake == nil {
 		return errors.New("missing field alreadyEarthquake")
 	}
-	wantEarthquake := p.QuoteQuestions["wantEarthquake"]
+	wantEarthquake := policy.QuoteQuestions["wantEarthquake"]
 	if wantEarthquake == nil {
 		wantEarthquake = false
 	}
-	alreadyFlood := p.QuoteQuestions["alreadyFlood"]
+	alreadyFlood := policy.QuoteQuestions["alreadyFlood"]
 	if alreadyFlood == nil {
 		return errors.New("missing field alreadyFlood")
 	}
-	wantFlood := p.QuoteQuestions["wantFlood"]
+	wantFlood := policy.QuoteQuestions["wantFlood"]
 	if wantFlood == nil {
 		wantFlood = false
 	}
@@ -341,26 +343,11 @@ func (d *QuoteRequest) FromPolicy(p *models.Policy, isEmission bool) error {
 	log.Println("Managing slug guarantees")
 	for _, g := range baseAsset.Guarantees {
 		if g.IsSelected {
-			setGuaranteeValue(&asset, g, mapCodeFromSlug(g.Slug))
+			setGuaranteeValue(&asset, g, guaranteeSlugToCode[g.Slug])
 		}
 	}
 	d.Asset = asset
 	return nil
-}
-
-func mapCodeFromSlug(slug string) string {
-	switch slug {
-	case earthquakeSlug:
-		log.Println("adding earthquake ")
-		return earthquakeCode
-	case floodSlug:
-		log.Println("adding flood")
-		return floodCode
-	case landslideSlug:
-		log.Println("adding landslides")
-		return landslideCode
-	}
-	return ""
 }
 
 func setGuaranteeValue(asset *AssetRequest, guarantee models.Guarante, code string) {
@@ -382,8 +369,37 @@ func setGuaranteeValue(asset *AssetRequest, guarantee models.Guarante, code stri
 	}
 }
 
-// TODO: to change
-func (d *QuoteResponse) ToPolicy(p *models.Policy) {
+func getGuarantee(policy *models.Policy, codeGuarantees string) *models.Guarante {
+	slug := guaranteeCodeToSlug[codeGuarantees]
+	for i := range policy.Assets[0].Guarantees {
+		if policy.Assets[0].Guarantees[i].Slug == slug {
+			return &policy.Assets[0].Guarantees[i]
+		}
+	}
+	log.Println("No guarantees found")
+	return nil
+}
+func MappingQuoteResponseToPolicy(quoteResponse QuoteResponse, policy *models.Policy) {
+	var currentGuaranteeCode string
+	var currentGuaranteeValueCode string
+
+	for _, assetDetailCatnat := range quoteResponse.AssetsDetail {
+		for _, guaranteeDetailCatnat := range assetDetailCatnat.GuaranteesDetail {
+			guaranteeCodes := strings.Split(guaranteeDetailCatnat.GuaranteeCode, "/")
+			currentGuaranteeCode, currentGuaranteeValueCode = guaranteeCodes[0], "/"+guaranteeCodes[1]
+			guarantee := getGuarantee(policy, currentGuaranteeCode)
+			switch currentGuaranteeValueCode {
+			case buildingCode:
+				guarantee.Value.SumInsuredLimitOfIndemnity = guaranteeDetailCatnat.GuaranteeGross
+			case contentCode:
+				guarantee.Value.SumInsured = guaranteeDetailCatnat.GuaranteeGross
+			case stockCode:
+				guarantee.Value.LimitOfIndemnity = guaranteeDetailCatnat.GuaranteeGross
+
+			}
+		}
+	}
+
 	eOffer := make(map[string]*models.GuaranteValue)
 	fOffer := make(map[string]*models.GuaranteValue)
 	lOffer := make(map[string]*models.GuaranteValue)
@@ -391,73 +407,36 @@ func (d *QuoteResponse) ToPolicy(p *models.Policy) {
 	eOffer["default"] = new(models.GuaranteValue)
 	fOffer["default"] = new(models.GuaranteValue)
 	lOffer["default"] = new(models.GuaranteValue)
-	for _, a := range d.AssetDetail {
-		for _, g := range a.GuaranteeDetail {
-			if g.GuaranteeCode == earthquakeBuildingCode {
-				eOffer["default"].SumInsuredLimitOfIndemnity = g.GuaranteeGross
+	for _, asset := range policy.Assets {
+		for _, guarantee := range asset.Guarantees {
+			if guarantee.Slug == earthquakeSlug {
+				guarantee.Offer = eOffer
 			}
-			if g.GuaranteeCode == earthquakeContentCode {
-				eOffer["default"].SumInsured = g.GuaranteeGross
+			if guarantee.Slug == floodSlug {
+				guarantee.Offer = fOffer
 			}
-			if g.GuaranteeCode == earthquakeStockCode {
-				eOffer["default"].LimitOfIndemnity = g.GuaranteeGross
-			}
-			if g.GuaranteeCode == floodBuildingCode {
-				fOffer["default"].SumInsuredLimitOfIndemnity = g.GuaranteeGross
-			}
-			if g.GuaranteeCode == floodContentCode {
-				fOffer["default"].SumInsured = g.GuaranteeGross
-			}
-			if g.GuaranteeCode == floodStockCode {
-				fOffer["default"].LimitOfIndemnity = g.GuaranteeGross
-			}
-			if g.GuaranteeCode == landslideBuildingCode {
-				lOffer["default"].SumInsuredLimitOfIndemnity = g.GuaranteeGross
-			}
-			if g.GuaranteeCode == landslideContentCode {
-				lOffer["default"].SumInsured = g.GuaranteeGross
-			}
-			if g.GuaranteeCode == landslideStockCode {
-				lOffer["default"].LimitOfIndemnity = g.GuaranteeGross
+			if guarantee.Slug == landslideSlug {
+				guarantee.Offer = lOffer
 			}
 		}
 	}
-
-	for _, a := range p.Assets {
-		for _, g := range a.Guarantees {
-			if g.Slug == earthquakeSlug {
-				g.Offer = eOffer
-			}
-			if g.Slug == floodSlug {
-				g.Offer = fOffer
-			}
-			if g.Slug == landslideSlug {
-				g.Offer = lOffer
-			}
-		}
-	}
-	p.PriceGross = d.AnnualGross
-	p.PriceNett = d.AnnualNet
-	p.TaxAmount = d.AnnualTax
-	split := string(p.PaymentSplit)
-	if split == "" {
-		log.Println("Use split yearly since 'PaymentSplit' is empty")
-		split = string(models.PaySplitYearly)
-	}
-	p.OffersPrices = map[string]map[string]*models.Price{
+	policy.PriceGross = quoteResponse.AnnualGross
+	policy.PriceNett = quoteResponse.AnnualNet
+	policy.TaxAmount = quoteResponse.AnnualTax
+	split := string(models.PaySplitYearly)
+	policy.OffersPrices = map[string]map[string]*models.Price{
 		"default": {
 			split: &models.Price{},
 		},
 	}
-	p.OffersPrices["default"][split].Gross = p.PriceGross
-	p.OffersPrices["default"][split].Net = p.PriceNett
-	p.OffersPrices["default"][split].Tax = p.TaxAmount
+	policy.OffersPrices["default"][split].Gross = policy.PriceGross
+	policy.OffersPrices["default"][split].Net = policy.PriceNett
+	policy.OffersPrices["default"][split].Tax = policy.TaxAmount
 	//TODO: populate in policy->guaranteesMap:>sumInsured sunInsuredLimitOfIndemnity ecc with the different value of response,ex:{"codiceGaranzia":"212/02","imp_Lordo_Garanzia":48.9,"imp_Netto_Garanzia":40,"imp_Tasse_Garanzia":8.9}
-	p.OfferlName = "default"
+	policy.OfferlName = "default"
 }
 
 func formatAddress(addr *models.Address) string {
 	res := addr.StreetName + "," + addr.StreetNumber
-
 	return res
 }

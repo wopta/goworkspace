@@ -28,7 +28,7 @@ func CatnatQuote(policy *models.Policy, product *models.Product, sellable sellab
 	if err != nil {
 		return resp, err
 	}
-	resp.ToPolicy(policy)
+	MappingQuoteResponseToPolicy(resp, policy)
 	internal.AddConsultacyPrice(policy, product)
 	return
 }
