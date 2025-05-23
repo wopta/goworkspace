@@ -276,19 +276,6 @@ func emitBase(policy *models.Policy, origin string) {
 	policy.BigRenewDate = civil.DateTimeOf(policy.RenewDate)
 }
 
-func emitPay(policy *models.Policy, origin string) {
-	log.AddPrefix("emitPay")
-	defer log.PopPrefix()
-	log.Printf("Policy Uid %s", policy.Uid)
-
-	policy.IsPay = false
-	payUrl, err := utility.CreatePolicyTransactions(policy, product, mgaProduct, networkNode)
-	if err != nil {
-		return
-	}
-	policy.PayUrl = payUrl
-}
-
 func calculatePaymentComponents(policy *models.Policy) {
 	policy.PaymentComponents = models.PaymentComponents{
 		Split:    models.PaySplit(policy.PaymentSplit),
@@ -310,7 +297,7 @@ func calculatePaymentComponents(policy *models.Policy) {
 		priceSplit = policy.PaymentComponents.PriceAnnuity
 		priceFirstSplit = priceSplit
 	case models.PaySplitSemestral:
-	// TODO: unimplemented
+		// TODO: unimplemented
 	case models.PaySplitMonthly:
 		priceSplit = models.PriceComponents{
 			Gross:       policy.PriceGrossMonthly,

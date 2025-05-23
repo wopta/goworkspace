@@ -293,7 +293,7 @@ func sign(state *bpmn.State) error {
 
 func pay(state *bpmn.State) error {
 	policy := state.Data
-	emitPay(policy, origin)
+	utility.EmitPay(policy, origin, product, mgaProduct, networkNode)
 	if policy.PayUrl == "" {
 		return fmt.Errorf("missing payment url")
 	}
