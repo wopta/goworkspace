@@ -205,11 +205,7 @@ func (d *QuoteRequest) FromPolicy(p *models.Policy, isEmission bool) error {
 	d.Date = p.StartDate.Format("2006-01-02")
 	d.ExternalReference = p.Uid
 	d.DistributorCode = catNatDistributorCode
-	split, ok := splittingMap[p.PaymentSplit]
-	if !ok {
-		return fmt.Errorf("No valid split selected for NetInsurance")
-	}
-	d.Splitting = split
+	d.Splitting = splittingMap[string(models.PaySplitYearly)]
 	d.Emission = no
 	d.SalesChannel = catNatSalesChannel
 
@@ -222,6 +218,11 @@ func (d *QuoteRequest) FromPolicy(p *models.Policy, isEmission bool) error {
 	}
 
 	if isEmission {
+		split, ok := splittingMap[p.PaymentSplit]
+		if !ok {
+			return fmt.Errorf("No valid split selected for NetInsurance")
+		}
+		d.Splitting = split
 		d.Emission = yes
 		if p.Contractor.CompanyAddress == nil {
 			return errors.New("You need to populate CompanyAddress")
