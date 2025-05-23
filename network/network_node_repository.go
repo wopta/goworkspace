@@ -125,8 +125,31 @@ func UpdateNode(node models.NetworkNode) error {
 	}
 	originalNode.ExternalNetworkCode = node.ExternalNetworkCode
 	originalNode.Mail = node.Mail
-	originalNode.Warrant = node.Warrant
-	originalNode.Products = node.Products
+	if originalNode.Warrant != node.Warrant {
+		originalNode.Warrant = node.Warrant
+		// Update node products - this will clear all existing overrides
+		warrant := originalNode.GetWarrant()
+		if warrant == nil {
+			return fmt.Errorf("could not find warrant for node with value '%s'", node.Warrant)
+		}
+		originalNode.Products = make([]models.Product, 0)
+		for _, product := range warrant.Products {
+			companies := make([]models.Company, 0)
+			for _, company := range product.Companies {
+				companies = append(companies, models.Company{
+					Name:         company.Name,
+					ProducerCode: node.Code,
+				})
+			}
+			originalNode.Products = append(originalNode.Products, models.Product{
+				Name:      product.Name,
+				Companies: companies,
+			})
+		}
+	} else {
+		originalNode.Products = node.Products
+	}
+
 	if originalNode.AuthId != "" && originalNode.IsActive != node.IsActive {
 		err = lib.HandleUserAuthenticationStatus(originalNode.Uid, !node.IsActive)
 		if err != nil {
@@ -330,11 +353,6 @@ func GetNodeByUidBigQuery(uid string) (models.NetworkNode, error) {
 		return models.NetworkNode{}, fmt.Errorf("could not find node with uid %s", uid)
 	}
 	return nodes[0], err
-}
-
-func CreateNodeBigQuery(node models.NetworkNode) error {
-	initNode(&node)
-	return lib.InsertRowsBigQuery(models.WoptaDataset, lib.NetworkNodesCollection, node)
 }
 
 func GetAllSubNodesFromNodeBigQuery(uid string) ([]models.NetworkNode, error) {
