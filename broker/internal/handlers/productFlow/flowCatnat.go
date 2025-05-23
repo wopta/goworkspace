@@ -29,6 +29,7 @@ func CatnatIntegration(store bpmn.StorageData) error {
 		return e
 	}
 	catnat.MappingQuoteResponseToPolicy(res, policy.Policy)
+	catnat.MappingQuoteResponseToGuarantee(res, policy.Policy)
 	store.AddLocal("numeroPolizza", &flow.StringBpmn{String: res.PolicyNumber})
 	return nil
 }

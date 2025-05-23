@@ -379,7 +379,7 @@ func getGuarantee(policy *models.Policy, codeGuarantees string) *models.Guarante
 	log.Println("No guarantees found")
 	return nil
 }
-func MappingQuoteResponseToPolicy(quoteResponse QuoteResponse, policy *models.Policy) {
+func MappingQuoteResponseToGuarantee(quoteResponse QuoteResponse, policy *models.Policy) {
 	var currentGuaranteeCode string
 	var currentGuaranteeValueCode string
 
@@ -399,7 +399,9 @@ func MappingQuoteResponseToPolicy(quoteResponse QuoteResponse, policy *models.Po
 			}
 		}
 	}
+}
 
+func MappingQuoteResponseToPolicy(quoteResponse QuoteResponse, policy *models.Policy) {
 	eOffer := make(map[string]*models.GuaranteValue)
 	fOffer := make(map[string]*models.GuaranteValue)
 	lOffer := make(map[string]*models.GuaranteValue)
