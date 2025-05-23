@@ -50,20 +50,36 @@ func CreateTag(repo *git.Repository, newTag, message string, hash plumbing.Hash)
 
 func PushTags(repo *git.Repository, tagsToPush []string) {
 	fmt.Printf("Pushing tags %+v...\n", tagsToPush)
-	refSpecs := make([]config.RefSpec, 0)
+
+	// Push tags in batches of BATCH_MAX_CAP, since pushing all together caused 
+	// cloudbuild to not catch the push tag event for any of the new tags
+	batches := make([][]config.RefSpec, 0)
+	batch := make([]config.RefSpec, 0)
+	batches = append(batches, batch)
 	for _, tag := range tagsToPush {
-		refSpecs = append(refSpecs, config.RefSpec(fmt.Sprintf("refs/tags/%s:refs/tags/%s", tag, tag)))
+		if len(batches[len(batches)-1]) == BATCH_MAX_CAP {
+			batch := make([]config.RefSpec, 0)
+			batches = append(batches, batch)
+		}
+		batches[len(batches)-1] = append(batches[len(batches)-1],
+			config.RefSpec(fmt.Sprintf("refs/tags/%s:refs/tags/%s", tag, tag)))
 	}
-	if err := repo.Push(&git.PushOptions{
-		RemoteName: "origin",
-		Progress:   os.Stdout,
-		RefSpecs:   refSpecs,
-		Auth: &http.BasicAuth{
-			Username: "ci-bot",
-			Password: os.Getenv("GIT_ACCESS_TOKEN"),
-		},
-	}); err != nil {
-		panic(err)
+
+	for idx, batch := range batches {
+		if idx > 0 {
+			time.Sleep(time.Second * 2)
+		}
+		if err := repo.Push(&git.PushOptions{
+			RemoteName: "origin",
+			Progress:   os.Stdout,
+			RefSpecs:   batch,
+			Auth: &http.BasicAuth{
+				Username: "ci-bot",
+				Password: os.Getenv("GIT_ACCESS_TOKEN"),
+			},
+		}); err != nil {
+			panic(err)
+		}
 	}
 	fmt.Println("Release of tags completed!")
 }

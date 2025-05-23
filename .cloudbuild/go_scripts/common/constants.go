@@ -97,3 +97,5 @@ var ALL_FUNCTIONS []string = []string{
 	USER,
 	INCLUSIVE,
 }
+
+const BATCH_MAX_CAP = 2
