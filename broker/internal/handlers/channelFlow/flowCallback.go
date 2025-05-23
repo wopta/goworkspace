@@ -26,7 +26,7 @@ func CallBackEmit(st bpmn.StorageData) error {
 	if err != nil {
 		return err
 	}
-	win := win.NewClient(node.ExternalNetworkCode)
+	win := win.NewClient(node.NetworkNode.ExternalNetworkCode)
 	_info := win.Emit(*policy.Policy)
 
 	info := flow.CallbackInfo{

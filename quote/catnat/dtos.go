@@ -381,6 +381,7 @@ func setGuaranteeValue(asset *AssetRequest, guarantee models.Guarante, code stri
 	}
 }
 
+// TODO: to change
 func (d *QuoteResponse) ToPolicy(p *models.Policy) {
 	eOffer := make(map[string]*models.GuaranteValue)
 	fOffer := make(map[string]*models.GuaranteValue)
@@ -437,14 +438,6 @@ func (d *QuoteResponse) ToPolicy(p *models.Policy) {
 	p.PriceGross = d.AnnualGross
 	p.PriceNett = d.AnnualNet
 	p.TaxAmount = d.AnnualTax
-	//	p.OffersPrices = map[string]map[string]*models.Price{
-	//		"default": {
-	//			"yearly": &models.Price{},
-	//		},
-	//	}
-	//	p.OffersPrices["default"]["yearly"].Gross = p.PriceGross
-	//	p.OffersPrices["default"]["yearly"].Net = p.PriceNett
-	//	p.OffersPrices["default"]["yearly"].Tax = p.TaxAmount
 	split := string(p.PaymentSplit)
 	p.OffersPrices = map[string]map[string]*models.Price{
 		"default": {
@@ -454,6 +447,7 @@ func (d *QuoteResponse) ToPolicy(p *models.Policy) {
 	p.OffersPrices["default"][split].Gross = p.PriceGross
 	p.OffersPrices["default"][split].Net = p.PriceNett
 	p.OffersPrices["default"][split].Tax = p.TaxAmount
+	//TODO: populate in policy->guaranteesMap:>sumInsured sunInsuredLimitOfIndemnity ecc with the different value of response,ex:{"codiceGaranzia":"212/02","imp_Lordo_Garanzia":48.9,"imp_Netto_Garanzia":40,"imp_Tasse_Garanzia":8.9}
 	p.OfferlName = "default"
 }
 

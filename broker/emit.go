@@ -202,7 +202,6 @@ func emit(policy *models.Policy, request EmitRequest, origin string) EmitRespons
 
 func emitUpdatePolicy(policy *models.Policy, request EmitRequest) {
 	log.AddPrefix("emitUpdatePolicy")
-	log.ErrorF("fsdklfjsadklfjsdaklfjsdklfjsdklfjlsdakfjsadl;fjsdal;kfjsdalkfasd")
 	defer log.PopPrefix()
 	log.Println("start ------------------------------------")
 	if policy.Statements == nil || len(*policy.Statements) == 0 {

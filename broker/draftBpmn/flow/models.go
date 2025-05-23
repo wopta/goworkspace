@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"net/mail"
 
-	"gitlab.dev.wopta.it/goworkspace/callback"
 	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/payment/fabrick"
 )
 
 type CallbackInfo struct {
@@ -23,7 +23,7 @@ func (c *CallbackInfo) GetType() string {
 type PaymentInfoBpmn struct {
 	Schedule      string
 	PaymentMethod string
-	callback.FabrickCallback
+	fabrick.FabrickCallback
 }
 
 func (*PaymentInfoBpmn) GetType() string {

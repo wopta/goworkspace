@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"strings"
 
-	"gitlab.dev.wopta.it/goworkspace/callback"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/mail"
+	"gitlab.dev.wopta.it/goworkspace/payment/fabrick"
 	tr "gitlab.dev.wopta.it/goworkspace/transaction"
 
 	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
@@ -26,7 +26,7 @@ func DraftPaymentFx(w http.ResponseWriter, r *http.Request) (string, any, error)
 	var (
 		responseFormat  string = `{"result":%t,"requestPayload":%s,"locale": "it"}`
 		err             error
-		fabrickCallback callback.FabrickCallback
+		fabrickCallback fabrick.FabrickCallback
 	)
 
 	log.AddPrefix("PaymentFx")
