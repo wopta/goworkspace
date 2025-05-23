@@ -440,6 +440,10 @@ func (d *QuoteResponse) ToPolicy(p *models.Policy) {
 	p.PriceNett = d.AnnualNet
 	p.TaxAmount = d.AnnualTax
 	split := string(p.PaymentSplit)
+	if split == "" {
+		log.Println("Use split yearly since 'PaymentSplit' is empty")
+		split = string(models.PaySplitYearly)
+	}
 	p.OffersPrices = map[string]map[string]*models.Price{
 		"default": {
 			split: &models.Price{},
