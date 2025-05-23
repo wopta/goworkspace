@@ -9,6 +9,7 @@ const (
 	BPMN         = "bpmn"
 	CALLBACK_OUT = "callback_out"
 	DOCUMENT     = "document"
+	INCLUSIVE    = "inclusive"
 	LIB          = "lib"
 	MAIL         = "mail"
 	MODELS       = "models"
@@ -55,6 +56,7 @@ var MODULES []string = []string{
 	TRANSACTION,
 	USER,
 	WISEPROXY,
+	INCLUSIVE,
 }
 
 var FUNCTIONS []string = []string{
@@ -93,4 +95,5 @@ var ALL_FUNCTIONS []string = []string{
 	SELLABLE,
 	TRANSACTION,
 	USER,
+	INCLUSIVE,
 }
