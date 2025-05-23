@@ -121,6 +121,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	//!!!!!TODO must be eliminated, should use either this or the new one
 	//Only for test!!!!!
 	if policy.Name == models.CatNatProduct {
+		log.Println("Using emitCatnat")
 		responseEmit, err = emitDraftWithPolicy(&policy, origin)
 		if err != nil {
 			return "", nil, err
