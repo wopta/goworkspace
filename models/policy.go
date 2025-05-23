@@ -325,7 +325,6 @@ func PolicyToListData(query *firestore.DocumentIterator) []Policy {
 	for {
 		d, err := query.Next()
 		if err != nil {
-			log.ErrorF("error")
 			if err == iterator.Done {
 				log.Println("iterator.Done")
 				break
@@ -334,7 +333,6 @@ func PolicyToListData(query *firestore.DocumentIterator) []Policy {
 		} else {
 			var value Policy
 			e := d.DataTo(&value)
-			log.Println("todata")
 			lib.CheckError(e)
 			result = append(result, value)
 			log.Println(fmt.Sprint(len(result)))
