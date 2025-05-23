@@ -7,7 +7,7 @@ replace gitlab.dev.wopta.it/goworkspace/callback_out => ./
 require (
 	cloud.google.com/go v0.113.0
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.163
-	gitlab.dev.wopta.it/goworkspace/models v1.2.56
+	gitlab.dev.wopta.it/goworkspace/models v1.2.57
 )
 
 require (
