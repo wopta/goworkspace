@@ -445,8 +445,16 @@ type Action struct {
 }
 
 type Sign struct {
-	Elements               Elements `json:"Elements"`
-	RecipientConfiguration RecipientConfiguration
+	Elements                  Elements                  `json:"Elements"`
+	RecipientConfiguration    RecipientConfiguration    `json:"RecipientConfiguration"`
+	FinishActionConfiguration FinishActionConfiguration `json:"FinishActionConfiguration"`
+}
+type FinishActionConfiguration struct {
+	SignAnyWhereViewer SignAnyWhereViewer `json:"SignAnyWhereViewer"`
+}
+
+type SignAnyWhereViewer struct {
+	RedirectUri string `json:"RedirectUri"`
 }
 
 type RecipientConfiguration struct {

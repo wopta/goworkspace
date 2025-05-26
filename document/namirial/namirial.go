@@ -188,6 +188,12 @@ func buildBodyToSend(prepareteResponse document.PrepareResponse, idFiles []strin
 	body.CallbackConfiguration.StatusUpdateCallbackUrl = callbackUrl
 	body.CallbackConfiguration.ActivityActionCallbackConfig = activityActionCallbackConfiguration{
 		Url: callbackUrl,
+		ActionCallbackSelection: actionCallbackSelection{
+			WorkstepFinished:               true,
+			WorkstepRejected:               true,
+			DisablePolicyAndValidityChecks: true,
+			EnablePolicyAndValidityChecks:  true,
+		},
 	}
 	body.AgentRedirectConfiguration = agentRedirectConfiguration{
 		Policy:             "None",
@@ -203,6 +209,16 @@ func buildBodyToSend(prepareteResponse document.PrepareResponse, idFiles []strin
 	body.AddDocumentTimestamp = true
 	body.ShareWithTeam = true
 	body.LockFormFieldsOnFinish = true
+	var baseUrl string = "https://www.wopta.it"
+	if os.Getenv("env") != "prod" {
+		baseUrl = "https://dev.wopta.it"
+	}
+	body.Activities[0].Action.Sign.FinishActionConfiguration = document.FinishActionConfiguration{
+		SignAnyWhereViewer: document.SignAnyWhereViewer{
+			RedirectUri: baseUrl + `/it/quote/` + policy.Name + "/thank-you",
+		},
+	}
+
 	setContractorDataInSendBody(&body, policy)
 	return body
 }
@@ -217,7 +233,7 @@ func setContractorDataInSendBody(bodySend *sendNamirialRequest, policy models.Po
 				break
 			}
 		}
-	} else { //otherwise i use contractor
+	} else {
 		signer = policy.Contractor.ToUser()
 	}
 
