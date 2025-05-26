@@ -114,7 +114,7 @@ type responseSendDocuments struct {
 	EnvelopeId string `json:"EnvelopeId"`
 }
 
-type ResponseGetEvelop struct {
+type responseGetEvelop struct {
 	ViewerLinks []viewerLink `json:"ViewerLinks"`
 }
 
@@ -135,10 +135,4 @@ type documentDesc struct {
 type auditTrail struct {
 	FileId    string `json:"FileId"`
 	XmlFileId string `json:"XmlFileId"`
-}
-
-type FilesIdsResponse struct {
-	Documents   []documentDesc `json:"Documents"`
-	AuditTrail  auditTrail     `json:"AuditTrail"`
-	Disclaimers []string       `json:"Disclaimers"`
 }

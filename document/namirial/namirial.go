@@ -44,8 +44,6 @@ func Sign(input NamirialInput) (response NamirialOutput, err error) {
 	}, err
 }
 
-// upload the files thought namirial
-// TODO: could be done in parallel ?
 func uploadFiles(files ...string) (fileIds []string, err error) {
 	var url = os.Getenv("ESIGN_BASEURL") + "v6/file/upload"
 
@@ -256,8 +254,8 @@ func setContractorDataInSendBody(bodySend *sendNamirialRequest, policy models.Po
 }
 
 // return an object that contains a link to open and sign the documents
-func getEnvelope(idEvenelope string) (ResponseGetEvelop, error) {
-	var resp ResponseGetEvelop
+func getEnvelope(idEvenelope string) (responseGetEvelop, error) {
+	var resp responseGetEvelop
 	var url = os.Getenv("ESIGN_BASEURL") + "v6/envelope/" + idEvenelope + "/viewerlinks"
 	log.Println("Start Getting envelop")
 
@@ -270,7 +268,7 @@ func getEnvelope(idEvenelope string) (ResponseGetEvelop, error) {
 		return resp, err
 	}
 
-	resp, err = handleResponse[ResponseGetEvelop](lib.RetryDo(req, 5, 30))
+	resp, err = handleResponse[responseGetEvelop](lib.RetryDo(req, 5, 30))
 
 	if err != nil {
 		return resp, err
