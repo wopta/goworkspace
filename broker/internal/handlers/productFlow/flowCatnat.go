@@ -24,12 +24,15 @@ func CatnatIntegration(store bpmn.StorageData) error {
 	if err != nil {
 		return err
 	}
-	res, e := client.Emit(requestDto)
-	if e != nil {
-		return e
+	res, err := client.Emit(requestDto)
+	if err != nil {
+		return err
 	}
 	catnat.MappingQuoteResponseToPolicy(res, policy.Policy)
-	catnat.MappingQuoteResponseToGuarantee(res, policy.Policy)
+	err = catnat.MappingQuoteResponseToGuarantee(res, policy.Policy)
+	if err != nil {
+		return err
+	}
 	store.AddLocal("numeroPolizza", &flow.StringBpmn{String: res.PolicyNumber})
 	return nil
 }

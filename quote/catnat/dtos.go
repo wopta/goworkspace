@@ -369,25 +369,26 @@ func setGuaranteeValue(asset *AssetRequest, guarantee models.Guarante, code stri
 	}
 }
 
-func getGuarantee(policy *models.Policy, codeGuarantees string) *models.Guarante {
+func getGuarantee(policy *models.Policy, codeGuarantees string) (*models.Guarante, error) {
 	slug := guaranteeCodeToSlug[codeGuarantees]
 	for i := range policy.Assets[0].Guarantees {
 		if policy.Assets[0].Guarantees[i].Slug == slug {
-			return &policy.Assets[0].Guarantees[i]
+			return &policy.Assets[0].Guarantees[i], nil
 		}
 	}
-	log.Println("No guarantees found")
-	return nil
+	return nil, errors.New("No guarantees found")
 }
-func MappingQuoteResponseToGuarantee(quoteResponse QuoteResponse, policy *models.Policy) {
+func MappingQuoteResponseToGuarantee(quoteResponse QuoteResponse, policy *models.Policy) error {
 	var currentGuaranteeCode string
 	var currentGuaranteeValueCode string
-
 	for _, assetDetailCatnat := range quoteResponse.AssetsDetail {
 		for _, guaranteeDetailCatnat := range assetDetailCatnat.GuaranteesDetail {
 			guaranteeCodes := strings.Split(guaranteeDetailCatnat.GuaranteeCode, "/")
 			currentGuaranteeCode, currentGuaranteeValueCode = guaranteeCodes[0], "/"+guaranteeCodes[1]
-			guarantee := getGuarantee(policy, currentGuaranteeCode)
+			guarantee, err := getGuarantee(policy, currentGuaranteeCode)
+			if err != nil {
+				return err
+			}
 			value := guaranteeDetailCatnat.GuaranteeGross
 			switch currentGuaranteeValueCode {
 			case buildingCode:
@@ -400,6 +401,7 @@ func MappingQuoteResponseToGuarantee(quoteResponse QuoteResponse, policy *models
 			}
 		}
 	}
+	return nil
 }
 
 func MappingQuoteResponseToPolicy(quoteResponse QuoteResponse, policy *models.Policy) {
