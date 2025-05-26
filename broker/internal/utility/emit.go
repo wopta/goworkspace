@@ -43,6 +43,8 @@ func EmitSignWithNewNamirial(policy *models.Policy, product *models.Product, net
 	namirialInput := namirial.NamirialInput{
 		Policy:    *policy,
 		FilesName: make([]string, 0),
+		SendEmail: sendEmail,
+		Origin:    origin,
 	}
 	if policy.Name != models.CatNatProduct {
 		p := <-document.ContractObj(origin, *policy, networkNode, product)
