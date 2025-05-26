@@ -46,6 +46,7 @@ func EmitSignWithNewNamirial(policy *models.Policy, product *models.Product, net
 		SendEmail: sendEmail,
 		Origin:    origin,
 	}
+	//TODO: to remove after catnat document is done
 	if policy.Name != models.CatNatProduct {
 		p := <-document.ContractObj(origin, *policy, networkNode, product)
 		policy.DocumentName = p.LinkGcs
