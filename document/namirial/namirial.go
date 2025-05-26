@@ -28,7 +28,7 @@ func Sign(input NamirialInput) (response NamirialOutput, err error) {
 	if err != nil {
 		return response, err
 	}
-	callbackurl := `"https://europe-west1-` + os.Getenv("GOOGLE_PROJECT_ID") + `.cloudfunctions.net/callback/v1/sign?envelope=##EnvelopeId##&action=##Action##&uid=` + input.Policy.Uid + `&token=` + os.Getenv("WOPTA_TOKEN_API") + `&origin=` + input.Origin + `&sendEmail=` + strconv.FormatBool(input.SendEmail) + `"`
+	callbackurl := `https://europe-west1-` + os.Getenv("GOOGLE_PROJECT_ID") + `.cloudfunctions.net/callback/v1/sign?envelope=##EnvelopeId##&action=##Action##&uid=` + input.Policy.Uid + `&token=` + os.Getenv("WOPTA_TOKEN_API") + `&origin=` + input.Origin + `&sendEmail=` + strconv.FormatBool(input.SendEmail)
 	idEnvelope, err := sendDocuments(resp, fileIds, input.Policy, callbackurl)
 	if err != nil {
 		return response, err
@@ -174,6 +174,11 @@ func sendDocuments(preSendBody document.PrepareResponse, idFiles []string, polic
 }
 
 func buildBodyToSend(prepareteResponse document.PrepareResponse, idFiles []string, callbackUrl string, policy models.Policy) (body sendNamirialRequest) {
+	body.Name = policy.CodeCompany
+	body.AddDocumentTimestamp = true
+	body.ShareWithTeam = true
+	body.LockFormFieldsOnFinish = true
+
 	body.Activities = prepareteResponse.Activities
 	if env.IsLocal() || env.IsDevelopment() {
 		for i := range body.Activities {
@@ -206,9 +211,6 @@ func buildBodyToSend(prepareteResponse document.PrepareResponse, idFiles []strin
 		ReminderResendIntervalInDays: 1,
 		BeforeExpirationInDays:       1,
 	}
-	body.AddDocumentTimestamp = true
-	body.ShareWithTeam = true
-	body.LockFormFieldsOnFinish = true
 	var baseUrl string = "https://www.wopta.it"
 	if os.Getenv("env") != "prod" {
 		baseUrl = "https://dev.wopta.it"
