@@ -50,7 +50,7 @@ func CatnatFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		warrant = networkNode.GetWarrant()
 	}
 
-	product := product.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode, warrant)
+	product := product.GetLatestActiveProduct(policy.Name, policy.Channel, networkNode, warrant)
 	if product == nil {
 		return "", nil, errors.New("Error getting catnat product")
 	}
