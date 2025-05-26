@@ -17,7 +17,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/network v1.0.123
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.210
 	gitlab.dev.wopta.it/goworkspace/product v1.1.54
-	gitlab.dev.wopta.it/goworkspace/transaction v1.0.202
+	gitlab.dev.wopta.it/goworkspace/transaction v1.0.203
 )
 
 require (
