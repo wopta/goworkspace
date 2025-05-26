@@ -153,29 +153,8 @@ func prepareDocuments(idsDocument ...string) (resp document.PrepareResponse, err
 
 func sendDocuments(preSendBody document.PrepareResponse, idFiles []string, policy models.Policy, callbackUrl string) (idEnvelope string, err error) {
 	var url = os.Getenv("ESIGN_BASEURL") + "v6/envelope/send"
-	var body sendNamirialRequest
 	log.Println("Sending documents")
-
-	body.Activities = preSendBody.Activities
-
-	if env.IsLocal() || env.IsDevelopment() {
-		for i := range body.Activities {
-			body.Activities[i].Action.Sign.RecipientConfiguration.AuthenticationConfiguration.AccessCode.Code = "test"
-		}
-	}
-	body.Documents = make([]documentDescription, len(idFiles))
-	for i := range idFiles {
-		body.Documents[i] = documentDescription{FileId: idFiles[i], DocumentNumber: i + 1} //the document number has to start from 1
-	}
-	body.CallbackConfiguration.CallbackUrl = callbackUrl
-	body.CallbackConfiguration.StatusUpdateCallbackUrl = callbackUrl
-	body.CallbackConfiguration.ActivityActionCallbackConfig = activityActionCallbackConfiguration{
-		Url: callbackUrl,
-	}
-	err = setContractorDataInSendBody(&body, policy)
-	if err != nil {
-		return idEnvelope, err
-	}
+	body := buildBodyToSend(preSendBody, idFiles, callbackUrl, policy)
 	log.PrintStruct("request send", body)
 	req, err := doNamirialRequest("POST", url, body)
 	if err != nil {
@@ -192,6 +171,40 @@ func sendDocuments(preSendBody document.PrepareResponse, idFiles []string, polic
 	idEnvelope = resp.EnvelopeId
 	log.Println("End sending documents")
 	return idEnvelope, err
+}
+
+func buildBodyToSend(prepareteResponse document.PrepareResponse, idFiles []string, callbackUrl string, policy models.Policy) (body sendNamirialRequest) {
+	body.Activities = prepareteResponse.Activities
+	if env.IsLocal() || env.IsDevelopment() {
+		for i := range body.Activities {
+			body.Activities[i].Action.Sign.RecipientConfiguration.AuthenticationConfiguration.AccessCode.Code = "test"
+		}
+	}
+	body.Documents = make([]documentDescription, len(idFiles))
+	for i := range idFiles {
+		body.Documents[i] = documentDescription{FileId: idFiles[i], DocumentNumber: i + 1} //the document number has to start from 1
+	}
+	body.CallbackConfiguration.CallbackUrl = callbackUrl
+	body.CallbackConfiguration.StatusUpdateCallbackUrl = callbackUrl
+	body.CallbackConfiguration.ActivityActionCallbackConfig = activityActionCallbackConfiguration{
+		Url: callbackUrl,
+	}
+	body.AgentRedirectConfiguration = agentRedirectConfiguration{
+		Policy:             "None",
+		Allow:              true,
+		IframeWhitelisting: []string{"dev.wopta.it", "wopta.it"},
+	}
+	body.ReminderConfiguration = reminderConfiguration{
+		Enabled:                      true,
+		FirstReminderInDays:          2,
+		ReminderResendIntervalInDays: 1,
+		BeforeExpirationInDays:       1,
+	}
+	body.AddDocumentTimestamp = true
+	body.ShareWithTeam = true
+	body.LockFormFieldsOnFinish = true
+	setContractorDataInSendBody(&body, policy)
+	return body
 }
 
 // adjust the request to insert information regard the contractor

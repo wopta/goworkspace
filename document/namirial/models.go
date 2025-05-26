@@ -44,11 +44,27 @@ type documentDescription struct {
 }
 
 type sendNamirialRequest struct {
-	Documents             []documentDescription `json:"Documents"`
-	Name                  string                `json:"Name"`
-	Activities            []document.Activity   `json:"Activities"`
-	UnassignedElements    document.Elements     `json:"UnassignedElements"`
-	CallbackConfiguration callbackConfiguration `json:"CallbackConfiguration"`
+	Documents                  []documentDescription      `json:"Documents"`
+	Name                       string                     `json:"Name"`
+	AddDocumentTimestamp       bool                       `json:"AddDocumentTimestamp"`
+	ShareWithTeam              bool                       `json:"ShareWithTeam"`
+	LockFormFieldsOnFinish     bool                       `json:"LockFormFieldsOnFinish"`
+	Activities                 []document.Activity        `json:"Activities"`
+	UnassignedElements         document.Elements          `json:"UnassignedElements"`
+	CallbackConfiguration      callbackConfiguration      `json:"CallbackConfiguration"`
+	AgentRedirectConfiguration agentRedirectConfiguration `json:"AgentRedirectConfiguration"`
+	ReminderConfiguration      reminderConfiguration      `json:"ReminderConfiguration"`
+}
+type reminderConfiguration struct {
+	Enabled                      bool `json:"Enabled"`
+	FirstReminderInDays          int  `json:"FirstReminderInDays"`
+	ReminderResendIntervalInDays int  `json:"ReminderResendIntervalInDays"`
+	BeforeExpirationInDays       int  `json:"BeforeExpirationInDays"`
+}
+type agentRedirectConfiguration struct {
+	Policy             string   `json:"Policy"`
+	Allow              bool     `json:"Allow"`
+	IframeWhitelisting []string `json:"IframeWhitelisting"`
 }
 
 type callbackConfiguration struct {
