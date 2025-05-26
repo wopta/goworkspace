@@ -3,7 +3,6 @@ package catnat
 import (
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -389,11 +388,7 @@ func MappingQuoteResponseToGuarantee(quoteResponse QuoteResponse, policy *models
 			guaranteeCodes := strings.Split(guaranteeDetailCatnat.GuaranteeCode, "/")
 			currentGuaranteeCode, currentGuaranteeValueCode = guaranteeCodes[0], "/"+guaranteeCodes[1]
 			guarantee := getGuarantee(policy, currentGuaranteeCode)
-			value, e := strconv.ParseFloat(fmt.Sprintf("%.2f", guaranteeDetailCatnat.GuaranteeGross/100*quoteResponse.AnnualGross), 2)
-			if e != nil {
-				//should never happened
-				panic(e)
-			}
+			value := guaranteeDetailCatnat.GuaranteeGross
 			switch currentGuaranteeValueCode {
 			case buildingCode:
 				guarantee.Value.SumInsuredLimitOfIndemnity = value
