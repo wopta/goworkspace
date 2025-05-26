@@ -1,8 +1,0 @@
-go 1.23.9
-
-use (
-	.
-	./tag_functions
-	./tag_modules
-	./common
-)
