@@ -45,6 +45,13 @@ func GetUndeclaredConsensFx(w http.ResponseWriter, r *http.Request) (string, any
 		log.ErrorF("error extracting authToken")
 		return "", nil, err
 	}
+	log.Printf(
+		"authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
+		authToken.Type,
+		authToken.Role,
+		authToken.UserID,
+		authToken.Email,
+	)
 
 	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
 	if networkNode == nil {
