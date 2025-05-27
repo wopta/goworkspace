@@ -232,7 +232,7 @@ func (nn *NetworkNode) HasAccessToProduct(productName string, warrant *Warrant) 
 		return false
 	}
 
-	log.ErrorF("checking if network node %s has access product %s", nn.Uid, productName)
+	log.Printf("checking if network node %s has access product %s", nn.Uid, productName)
 
 	for _, product := range warrant.Products {
 		if product.Name == productName {
