@@ -9,7 +9,7 @@ require (
 	github.com/fattureincloud/fattureincloud-go-sdk/v2 v2.1.1
 	github.com/go-chi/chi/v5 v5.0.12
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.163
-	gitlab.dev.wopta.it/goworkspace/models v1.2.57
+	gitlab.dev.wopta.it/goworkspace/models v1.2.58
 	gitlab.dev.wopta.it/goworkspace/network v1.0.123
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.212
 	gitlab.dev.wopta.it/goworkspace/product v1.1.54
