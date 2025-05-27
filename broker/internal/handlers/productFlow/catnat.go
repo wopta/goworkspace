@@ -20,7 +20,7 @@ func CatnatIntegration(store bpmn.StorageData) error {
 	}
 	client := catnat.NewNetClient()
 	requestDto := catnat.QuoteRequest{}
-	err = requestDto.FromPolicy(policy.Policy, true)
+	err = requestDto.FromPolicyForEmit(policy.Policy)
 	if err != nil {
 		return err
 	}

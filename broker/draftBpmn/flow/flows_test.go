@@ -600,9 +600,9 @@ func TestEmitForEcommerceCatnat(t *testing.T) {
 
 	storeProduct := bpmn.NewStorageBpnm()
 	exps := []string{
+		"setProposalData",
 		"catnatIntegration",
 		"catnatdownloadPolicy",
-		"setProposalData",
 		"emitNoSequence",
 		"sign",
 		"pay",

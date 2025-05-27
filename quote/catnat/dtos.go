@@ -198,10 +198,99 @@ var quoteQuestionMap = map[bool]string{
 	false: "no",
 }
 
-func (d *QuoteRequest) FromPolicy(policy *models.Policy, isEmission bool) error {
+func (d *QuoteRequest) FromPolicyForEmit(policy *models.Policy) error {
+	if err := d.FromPolicyForQuote(policy); err != nil {
+		return err
+	}
+	d.ExternalReference = fmt.Sprint(policy.ProposalNumber)
+	if policy.PaymentSplit == "" {
+		return fmt.Errorf("No valid split selected for NetInsurance")
+	}
+	d.Emission = yes
+	if policy.Contractor.CompanyAddress == nil {
+		return errors.New("You need to populate CompanyAddress")
+	}
+	if policy.Contractors == nil || len(*policy.Contractors) == 0 {
+		return errors.New("You need to compile Contractors")
+	}
+	var dt string
+
+	if policy.Contractor.VatCode == "" {
+		return errors.New("You need to compile Contractor.VatCode")
+	}
+	if policy.Contractor.Type == "legalEntity" { //persona giuridica
+		dt = catNatLegalPerson
+		if policy.Contractor.CompanyName == "" {
+			return errors.New("You need to compile Contractor.CompanyName")
+		}
+		policy.Contractor.FiscalCode = policy.Contractor.VatCode
+	} else { //ditta individuale i need all date
+		dt = catNatSoleProp
+		if policy.Contractor.Name == "" {
+			return errors.New("You need to compile Contractor.Name")
+		}
+		if policy.Contractor.Surname == "" {
+			return errors.New("You need to compile Contractor.Surname")
+		}
+		if policy.Contractor.FiscalCode == "" {
+			return errors.New("You need to compile Contractor.FiscalCode")
+		}
+	}
+	contr := Contractor{
+		PersonalDataType:          dt,
+		Name:                      policy.Contractor.Name,
+		Surname:                   policy.Contractor.Surname,
+		CompanyName:               policy.Contractor.CompanyName,
+		VatNumber:                 policy.Contractor.VatCode,
+		FiscalCode:                policy.Contractor.FiscalCode,
+		AtecoCode:                 policy.Contractor.Ateco,
+		Phone:                     policy.Contractor.Phone,
+		Email:                     policy.Contractor.Mail,
+		PrivacyConsentDate:        policy.StartDate.Format("2006-01-02"),
+		ProcessingConsent:         no,
+		GenericMarketingConsent:   no,
+		MarketingProfilingConsent: no,
+		MarketingActivityConsent:  no,
+		DocumentationFormat:       1,
+		ConsensoTrattamento:       "si",
+	}
+	if policy.Contractor.CompanyAddress != nil {
+		contr.Address = formatAddress(policy.Contractor.CompanyAddress)
+		contr.Locality = policy.Contractor.CompanyAddress.Locality
+		contr.CityCode = policy.Contractor.CompanyAddress.CityCode
+		contr.PostalCode = policy.Contractor.CompanyAddress.PostalCode
+	}
+
+	d.Contractor = contr
+
+	var legalRep LegalRepresentative
+	if policy.Contractors != nil {
+		for _, v := range *policy.Contractors {
+			if v.IsSignatory {
+				legalRep.Name = v.Name
+				legalRep.Surname = v.Surname
+				legalRep.FiscalCode = v.FiscalCode
+				legalRep.Phone = v.Phone
+				legalRep.Email = v.Mail
+				if v.Residence != nil {
+					legalRep.Address = formatAddress(v.Residence)
+					legalRep.PostalCode = v.Residence.PostalCode
+					legalRep.Locality = v.Residence.Locality
+					legalRep.CityCode = v.Residence.CityCode
+				}
+				break
+			}
+		}
+	}
+
+	d.LegalRepresentative = legalRep
+	return nil
+}
+
+func (d *QuoteRequest) FromPolicyForQuote(policy *models.Policy) error {
 	d.ProductCode = catNatProductCode
-	d.Date = policy.StartDate.Format("2006-01-02")
 	d.ExternalReference = policy.Uid
+	d.Date = policy.StartDate.Format("2006-01-02")
 	d.DistributorCode = catNatDistributorCode
 	split, ok := splittingMap[string(policy.PaymentSplit)]
 	if ok {
@@ -219,90 +308,6 @@ func (d *QuoteRequest) FromPolicy(policy *models.Policy, isEmission bool) error 
 			baseAsset = a
 			break
 		}
-	}
-
-	if isEmission {
-		if policy.PaymentSplit == "" {
-			return fmt.Errorf("No valid split selected for NetInsurance")
-		}
-		d.Emission = yes
-		if policy.Contractor.CompanyAddress == nil {
-			return errors.New("You need to populate CompanyAddress")
-		}
-		if policy.Contractors == nil || len(*policy.Contractors) == 0 {
-			return errors.New("You need to compile Contractors")
-		}
-		var dt string
-
-		if policy.Contractor.VatCode == "" {
-			return errors.New("You need to compile Contractor.VatCode")
-		}
-		if policy.Contractor.Type == "legalEntity" { //persona giuridica
-			dt = catNatLegalPerson
-			if policy.Contractor.CompanyName == "" {
-				return errors.New("You need to compile Contractor.CompanyName")
-			}
-			policy.Contractor.FiscalCode = policy.Contractor.VatCode
-		} else { //ditta individuale i need all date
-			dt = catNatSoleProp
-			if policy.Contractor.Name == "" {
-				return errors.New("You need to compile Contractor.Name")
-			}
-			if policy.Contractor.Surname == "" {
-				return errors.New("You need to compile Contractor.Surname")
-			}
-			if policy.Contractor.FiscalCode == "" {
-				return errors.New("You need to compile Contractor.FiscalCode")
-			}
-		}
-		contr := Contractor{
-			PersonalDataType:          dt,
-			Name:                      policy.Contractor.Name,
-			Surname:                   policy.Contractor.Surname,
-			CompanyName:               policy.Contractor.CompanyName,
-			VatNumber:                 policy.Contractor.VatCode,
-			FiscalCode:                policy.Contractor.FiscalCode,
-			AtecoCode:                 policy.Contractor.Ateco,
-			Phone:                     policy.Contractor.Phone,
-			Email:                     policy.Contractor.Mail,
-			PrivacyConsentDate:        policy.StartDate.Format("2006-01-02"),
-			ProcessingConsent:         no,
-			GenericMarketingConsent:   no,
-			MarketingProfilingConsent: no,
-			MarketingActivityConsent:  no,
-			DocumentationFormat:       1,
-			ConsensoTrattamento:       "si",
-		}
-		if policy.Contractor.CompanyAddress != nil {
-			contr.Address = formatAddress(policy.Contractor.CompanyAddress)
-			contr.Locality = policy.Contractor.CompanyAddress.Locality
-			contr.CityCode = policy.Contractor.CompanyAddress.CityCode
-			contr.PostalCode = policy.Contractor.CompanyAddress.PostalCode
-		}
-
-		d.Contractor = contr
-
-		var legalRep LegalRepresentative
-		if policy.Contractors != nil {
-			for _, v := range *policy.Contractors {
-				if v.IsSignatory {
-					legalRep.Name = v.Name
-					legalRep.Surname = v.Surname
-					legalRep.FiscalCode = v.FiscalCode
-					legalRep.Phone = v.Phone
-					legalRep.Email = v.Mail
-					if v.Residence != nil {
-						legalRep.Address = formatAddress(v.Residence)
-						legalRep.PostalCode = v.Residence.PostalCode
-						legalRep.Locality = v.Residence.Locality
-						legalRep.CityCode = v.Residence.CityCode
-					}
-					break
-				}
-			}
-		}
-
-		d.LegalRepresentative = legalRep
 	}
 
 	alreadyEarthquake := policy.QuoteQuestions["alreadyEarthquake"]

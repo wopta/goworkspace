@@ -17,7 +17,7 @@ func CatnatQuote(policy *models.Policy, product *models.Product, sellable sellab
 	internal.AddGuaranteesSettingsFromProduct(policy, outSellable.Product)
 
 	var cnReq QuoteRequest
-	err = cnReq.FromPolicy(policy, false)
+	err = cnReq.FromPolicyForQuote(policy)
 	if err != nil {
 		log.ErrorF("error building NetInsurance DTO: %s", err.Error())
 		return resp, err
