@@ -160,7 +160,7 @@ func CreateNetworkTransactions(
 				return baseName
 			}
 			prod := warrant.GetProduct(policy.Name)
-			if warrant == nil {
+			if prod == nil {
 				log.ErrorF("error getting product for warrant: %s", warrant.Name)
 				return baseName
 			}

@@ -2,8 +2,10 @@ package namirial
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -276,4 +278,29 @@ func getEnvelope(idEvenelope string) (responseGetEvelop, error) {
 	log.Println("End getting evenlop")
 
 	return resp, err
+}
+
+func GetFilesV6(envelopeId string) (document.NamirialFiles, error) {
+
+	var resp document.NamirialFiles
+	var urlstring = os.Getenv("ESIGN_BASEURL") + "v6/envelope/" + envelopeId + "/files"
+
+	req, _ := http.NewRequest(http.MethodGet, urlstring, nil)
+	req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
+
+	res, err := lib.RetryDo(req, 5, 30)
+	lib.CheckError(err)
+
+	if res != nil {
+		body, _ := io.ReadAll(res.Body)
+
+		err := json.Unmarshal(body, &resp)
+		if err != nil {
+			return resp, err
+		}
+		res.Body.Close()
+
+		log.Println("body:", string(body))
+	}
+	return resp, nil
 }

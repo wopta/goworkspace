@@ -152,6 +152,30 @@ func AddContract(policy *models.Policy, origin string) error {
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
+// // Not sure if this is the right place
+// // because it creates a dependency with document
+//
+//	func AddContractDraft(policy *models.Policy, origin string) error {
+//		if slices.Contains(policy.StatusHistory, models.PolicyStatusManualSigned) {
+//			return nil
+//		}
+//		documents, err := namirial.GetFiles(policy.SignUrl)
+//		if err != nil {
+//			return err
+//		}
+//		filename := strings.ReplaceAll(fmt.Sprintf(models.ContractDocumentFormat, policy.NameDesc, policy.CodeCompany), " ", "_")
+//		*policy.Attachments = append(*policy.Attachments, models.Attachment{
+//			Name:     models.ContractAttachmentName,
+//			Link:     gsLink,
+//			FileName: filename,
+//			Section:  models.DocumentSectionContracts,
+//		})
+//		policy.Updated = time.Now().UTC()
+//
+//		firePolicy := lib.PolicyCollection
+//
+//		return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
+//	}
 func Pay(policy *models.Policy, origin string) error {
 	firePolicy := lib.PolicyCollection
 

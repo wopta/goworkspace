@@ -208,7 +208,7 @@ func postDataV6(data []byte, productNameDesc string) <-chan string {
 	return r
 }
 
-func GetFileV6(policy models.Policy, uid string) chan string {
+func GetFileV6(policy models.Policy, uid string) chan Documents {
 	r := make(chan string)
 	log.Println("Get file: ", policy.IdSign)
 	contractPath := "assets/users/%s/" + models.ContractDocumentFormat
