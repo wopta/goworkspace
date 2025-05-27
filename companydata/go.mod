@@ -15,7 +15,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.163
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.173
 	gitlab.dev.wopta.it/goworkspace/models v1.2.58
-	gitlab.dev.wopta.it/goworkspace/network v1.0.123
+	gitlab.dev.wopta.it/goworkspace/network v1.0.124
 	gitlab.dev.wopta.it/goworkspace/product v1.1.54
 	gitlab.dev.wopta.it/goworkspace/user v1.0.158
 	github.com/xuri/excelize/v2 v2.9.0
