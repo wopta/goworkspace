@@ -20,7 +20,7 @@ const (
 )
 
 func DraftSignFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
-	log.AddPrefix("SignFx")
+	log.AddPrefix("DraftSignFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")

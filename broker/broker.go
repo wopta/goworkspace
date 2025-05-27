@@ -78,7 +78,7 @@ var brokerRoutes []lib.Route = []lib.Route{
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
-		Route:   "/draft/policy/pay",
+		Route:   "/draft/policy/payment",
 		Handler: lib.ResponseLoggerWrapper(DraftPaymentFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
@@ -86,7 +86,7 @@ var brokerRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/draft/policy/sign",
 		Handler: lib.ResponseLoggerWrapper(DraftSignFx),
-		Method:  http.MethodPost,
+		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
