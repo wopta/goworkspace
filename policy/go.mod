@@ -10,7 +10,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/document v1.1.172
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.163
 	gitlab.dev.wopta.it/goworkspace/models v1.2.58
-	gitlab.dev.wopta.it/goworkspace/network v1.0.123
+	gitlab.dev.wopta.it/goworkspace/network v1.0.124
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.5
 	google.golang.org/grpc v1.63.2
 )
