@@ -14,7 +14,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/document v1.1.172
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.163
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.173
-	gitlab.dev.wopta.it/goworkspace/models v1.2.57
+	gitlab.dev.wopta.it/goworkspace/models v1.2.58
 	gitlab.dev.wopta.it/goworkspace/network v1.0.123
 	gitlab.dev.wopta.it/goworkspace/payment v1.0.350
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.212
