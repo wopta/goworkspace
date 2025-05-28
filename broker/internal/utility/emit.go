@@ -2,6 +2,7 @@ package utility
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"gitlab.dev.wopta.it/goworkspace/document"
@@ -52,11 +53,21 @@ func EmitSignWithNewNamirial(policy *models.Policy, product *models.Product, net
 		policy.DocumentName = p.LinkGcs
 		namirialInput.FilesName = append(namirialInput.FilesName, p.LinkGcs)
 	}
-	for _, document := range *policy.Attachments {
-		if strings.HasPrefix(document.Name, models.ContractAttachmentName) {
-			namirialInput.FilesName = append(namirialInput.FilesName, document.FileName)
-		}
+
+	filePath := strings.ReplaceAll(fmt.Sprintf("%s/%s/namirial/", "temp", policy.Uid), " ", "_")
+	paths, err := lib.ListGoogleStorageFolderContent(filePath)
+	if err != nil {
+		return err
 	}
+	for _, name := range paths {
+		namirialInput.FilesName = append(namirialInput.FilesName, name)
+	}
+
+	if len(namirialInput.FilesName) == 0 {
+		log.ErrorF("nothing to send to namirial")
+		return nil
+	}
+
 	envelope, err := namirial.Sign(namirialInput)
 	if err != nil {
 		return err

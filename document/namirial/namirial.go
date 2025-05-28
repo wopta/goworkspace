@@ -280,11 +280,9 @@ func getEnvelope(idEvenelope string) (responseGetEvelop, error) {
 	return resp, err
 }
 
-func GetFilesV6(envelopeId string) (document.NamirialFiles, error) {
-
+func GetFiles(envelopeId string) (document.NamirialFiles, error) {
 	var resp document.NamirialFiles
 	var urlstring = os.Getenv("ESIGN_BASEURL") + "v6/envelope/" + envelopeId + "/files"
-
 	req, _ := http.NewRequest(http.MethodGet, urlstring, nil)
 	req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
 
@@ -301,6 +299,26 @@ func GetFilesV6(envelopeId string) (document.NamirialFiles, error) {
 		res.Body.Close()
 
 		log.Println("body:", string(body))
+	}
+	return resp, nil
+}
+
+func GetFile(fileId string) ([]byte, error) {
+	var urlstring = os.Getenv("ESIGN_BASEURL") + "v6/file/" + fileId
+	req, err := http.NewRequest(http.MethodGet, urlstring, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
+
+	res, err := lib.RetryDo(req, 5, 30)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
 	}
 	return resp, nil
 }

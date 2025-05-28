@@ -57,19 +57,11 @@ func CatnatDownloadCertification(store bpmn.StorageData) error {
 	if err != nil {
 		return err
 	}
-	filePath := strings.ReplaceAll(fmt.Sprintf("%s/%s/%s", "temp", policy.Uid, fmt.Sprintf(models.NetInsuranceDocument, policy.NameDesc)), " ", "_")
-	link, err := lib.PutToStorageErr(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, bytes)
+	filePath := strings.ReplaceAll(fmt.Sprintf("%s/%s/namirial/%v", "temp", policy.Uid, fmt.Sprintf(models.NetInsuranceDocument, policy.NameDesc)), " ", "_")
+	_, err = lib.PutToStorageErr(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, bytes)
 	if err != nil {
 		return err
 	}
-	if policy.Attachments == nil {
-		policy.Attachments = new([]models.Attachment)
-	}
-	*policy.Attachments = append(*policy.Attachments, models.Attachment{
-		Name:     models.ContractAttachmentName + " NetInsurance",
-		FileName: filePath,
-		Link:     link,
-		MimeType: "application/pdf",
-	})
+
 	return err
 }
