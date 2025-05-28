@@ -173,7 +173,9 @@ func AddContractForFiles(policy *models.Policy, origin string) error {
 		}
 		fileName := documents.Documents[i].FileName
 		fileName, _, _ = strings.Cut(fileName, ".")
-		filePath := strings.ReplaceAll(fmt.Sprintf("%s/%s_signed", policy.Uid, fileName), " ", "_")
+		filePath := "assets/users/" + policy.Contractor.Uid + "/" + documents.Documents[i].FileName
+		log.Println("path file path:", filePath)
+
 		gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, body)
 		*policy.Attachments = append(*policy.Attachments, models.Attachment{
 			Name:     fileName,
