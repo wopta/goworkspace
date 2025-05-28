@@ -135,6 +135,7 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) error {
 
 // Not sure if this is the right place
 // because it creates a dependency with document
+// DEPRECATED
 func AddContract(policy *models.Policy, origin string) error {
 	if slices.Contains(policy.StatusHistory, models.PolicyStatusManualSigned) {
 		return nil
