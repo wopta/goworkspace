@@ -19,8 +19,9 @@ func CheckPaymentModes(policy models.Policy) error {
 		allowedModes = models.GetAllowedYearlyModes()
 	case string(models.PaySplitSingleInstallment):
 		allowedModes = models.GetAllowedSingleInstallmentModes()
+	case string(models.PaySplitSemestral):
+		//TODO: what is allowed?
 	}
-
 	if !lib.SliceContains(allowedModes, policy.PaymentMode) {
 		return fmt.Errorf("mode '%s' is incompatible with split '%s'", policy.PaymentMode, policy.PaymentSplit)
 	}
