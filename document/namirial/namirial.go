@@ -30,7 +30,7 @@ func Sign(input NamirialInput) (response NamirialOutput, err error) {
 	if err != nil {
 		return response, err
 	}
-	callbackurl := `https://europe-west1-` + os.Getenv("GOOGLE_PROJECT_ID") + `.cloudfunctions.net/broker/draft/policy/sign?envelope=##EnvelopeId##&action=##Action##&uid=` + input.Policy.Uid + `&token=` + os.Getenv("WOPTA_TOKEN_API") + `&origin=` + input.Origin + `&sendEmail=` + strconv.FormatBool(input.SendEmail)
+	callbackurl := `https://europe-west1-` + os.Getenv("GOOGLE_PROJECT_ID") + `.cloudfunctions.net/callback/v1/sign?envelope=##EnvelopeId##&action=##Action##&uid=` + input.Policy.Uid + `&token=` + os.Getenv("WOPTA_TOKEN_API") + `&origin=` + input.Origin + `&sendEmail=` + strconv.FormatBool(input.SendEmail)
 	idEnvelope, err := sendDocuments(resp, fileIds, input.Policy, callbackurl)
 	if err != nil {
 		return response, err
