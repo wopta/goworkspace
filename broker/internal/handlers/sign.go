@@ -50,7 +50,7 @@ func addContract(state bpmn.StorageData) error {
 		return err
 	}
 
-	plc.AddContractDraft(policy.Policy, origin.String)
+	plc.AddContractForFiles(policy.Policy, origin.String)
 
 	return nil
 }
