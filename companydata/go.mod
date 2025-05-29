@@ -12,7 +12,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/oliveagle/jsonpath v0.0.0-20180606110733-2e52cf6e6852
 	gitlab.dev.wopta.it/goworkspace/inclusive v0.0.6
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.163
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.164
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.174
 	gitlab.dev.wopta.it/goworkspace/models v1.2.58
 	gitlab.dev.wopta.it/goworkspace/network v1.0.124
