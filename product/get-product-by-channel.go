@@ -210,6 +210,8 @@ func replaceDatesInProduct(product *models.Product, channel string) error {
 		err = replaceLifeDates(product, channel)
 	case models.GapProduct:
 		err = replaceGapDates(product, channel)
+	case models.CatNatProduct:
+		err = replaceCatnatDates(product, channel)
 	default:
 		log.Printf("product %s does not have dates to be replaced", product.Name)
 	}
@@ -254,6 +256,30 @@ func replaceLifeDates(product *models.Product, channel string) error {
 	return json.Unmarshal([]byte(productJson), &product)
 }
 
+func replaceCatnatDates(product *models.Product, channel string) error {
+	log.AddPrefix("replaceCatnatDates")
+	defer log.PopPrefix()
+	jsonOut, err := product.Marshal()
+	if err != nil {
+		return err
+	}
+
+	productJson := string(jsonOut)
+
+	initialDate := time.Now().Format(models.TimeDateOnly)
+	minDate := time.Now().Format(models.TimeDateOnly)
+	maxDate := time.Now().AddDate(0, 0, 30).Format(models.TimeDateOnly)
+
+	regexInitialDate := regexp.MustCompile("{{INITIAL_DATE}}")
+	regexMinDate := regexp.MustCompile("{{MIN_DATE}}")
+	regexMaxDate := regexp.MustCompile("{{MAX_DATE}}")
+
+	productJson = regexInitialDate.ReplaceAllString(productJson, initialDate)
+	productJson = regexMinDate.ReplaceAllString(productJson, minDate)
+	productJson = regexMaxDate.ReplaceAllString(productJson, maxDate)
+
+	return json.Unmarshal([]byte(productJson), &product)
+}
 func replaceGapDates(product *models.Product, channel string) error {
 	log.AddPrefix("replaceGapDates")
 	defer log.PopPrefix()
