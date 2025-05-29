@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
+	"gitlab.dev.wopta.it/goworkspace/document/pkg/contract"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"github.com/go-pdf/fpdf"
@@ -99,19 +101,8 @@ func ContractObj(origin string, data models.Policy, networkNode *models.NetworkN
 			pdf := initFpdf()
 			document, err = gapSogessurContractV1(pdf, origin, &data, networkNode)
 		case models.CommercialCombinedProduct:
-			//TODO: should be eliminated?
-			//			var filename string
-			//			var out []byte
-			//			generator := contract.NewCommercialCombinedGenerator(engine.NewFpdf(), &data, networkNode, *product, false)
-			//			filename, out, err = generator.Contract()
-			//			document = DocumentGenerated{
-			//				FullPath: filename,
-			//				Bytes:    out,
-			//			}
-			//			if err != nil {
-			//				log.ErrorF("error generating contract: %v", err)
-			//				return
-			//			}
+			generator := contract.NewCommercialCombinedGenerator(engine.NewFpdf(), &data, networkNode, *product, false)
+			document, err = NewDocumentGenerated(generator.Contract())
 		}
 		if err != nil {
 			log.ErrorF("error generating contract: %v", err)

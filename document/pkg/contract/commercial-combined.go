@@ -61,7 +61,7 @@ func NewCommercialCombinedGenerator(engine *engine.Fpdf, policy *models.Policy, 
 	}
 }
 
-func (ccg *CommercialCombinedGenerator) Contract() (string, []byte, error) {
+func (ccg *CommercialCombinedGenerator) Contract() (directoryParent string, filename string, out []byte, err error) {
 	ccg.mainHeader()
 
 	ccg.engine.NewPage()
@@ -146,14 +146,14 @@ func (ccg *CommercialCombinedGenerator) Contract() (string, []byte, error) {
 
 	ccg.woptaPrivacySection()
 
-	filename := strings.ReplaceAll(fmt.Sprintf("%s/%s/"+models.ProposalDocumentFormat, "temp", ccg.policy.Uid,
-		ccg.policy.NameDesc, ccg.policy.ProposalNumber), " ", "_")
+	directoryParent = fmt.Sprintf("temp/%s", ccg.policy.Uid)
+	filename = fmt.Sprintf(models.ProposalDocumentFormat, ccg.policy.NameDesc, ccg.policy.ProposalNumber)
 	if !ccg.isProposal {
-		filename = strings.ReplaceAll(fmt.Sprintf("%s/%s/"+models.ContractDocumentFormat, "temp", ccg.policy.Uid,
-			ccg.policy.NameDesc, ccg.policy.CodeCompany), " ", "_")
+		directoryParent = fmt.Sprintf("temp/%s", ccg.policy.Uid)
+		filename = fmt.Sprintf(models.ContractDocumentFormat, ccg.policy.NameDesc, ccg.policy.ProposalNumber)
 	}
-	bytes, err := ccg.engine.RawDoc()
-	return filename, bytes, err
+	out, err = ccg.engine.RawDoc()
+	return directoryParent, filename, out, err
 }
 
 func (ccg *CommercialCombinedGenerator) mainHeader() {
