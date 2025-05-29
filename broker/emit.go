@@ -328,6 +328,8 @@ func calculatePaymentComponents(policy *models.Policy) {
 	policy.PaymentComponents.PriceSplit = priceSplit
 	policy.PaymentComponents.PriceFirstSplit = priceFirstSplit
 }
+
+// TODO: to remove eventually, use SignFiles instead
 func EmitSign(policy *models.Policy, product *models.Product, networkNode *models.NetworkNode, sendEmail bool, origin string) error {
 	log.AddPrefix("emitSign")
 	defer log.PopPrefix()
