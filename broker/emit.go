@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"gitlab.dev.wopta.it/goworkspace/broker/internal/utility"
-	"gitlab.dev.wopta.it/goworkspace/document"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	prd "gitlab.dev.wopta.it/goworkspace/product"
@@ -327,28 +326,4 @@ func calculatePaymentComponents(policy *models.Policy) {
 
 	policy.PaymentComponents.PriceSplit = priceSplit
 	policy.PaymentComponents.PriceFirstSplit = priceFirstSplit
-}
-
-// TODO: to remove eventually, use SignFiles instead
-func EmitSign(policy *models.Policy, product *models.Product, networkNode *models.NetworkNode, sendEmail bool, origin string) error {
-	log.AddPrefix("emitSign")
-	defer log.PopPrefix()
-	log.Printf("Policy Uid %s", policy.Uid)
-
-	policy.IsSign = false
-	policy.Status = models.PolicyStatusToSign
-	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusContact, models.PolicyStatusToSign)
-
-	p := <-document.ContractObj(origin, *policy, networkNode, product)
-	doc, err := p.Save()
-	if err != nil {
-		return err
-	}
-
-	policy.DocumentName = doc.LinkGcs
-	_, signResponse, _ := document.NamirialOtpV6(*policy, origin, sendEmail)
-	policy.ContractFileId = signResponse.FileId
-	policy.IdSign = signResponse.EnvelopeId
-	policy.SignUrl = signResponse.Url
-	return nil
 }
