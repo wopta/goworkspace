@@ -177,7 +177,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		}
 
 		// Add contract to policy
-		err = plc.AddDocumentsInPolicy(&policy, "")
+		err = plc.AddNamirialDocumentsInPolicy(&policy, "")
 		if err != nil {
 			log.ErrorF("error add contract to policy: %s", err.Error())
 			return "", nil, err

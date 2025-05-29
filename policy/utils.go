@@ -155,9 +155,9 @@ func AddContract(policy *models.Policy, origin string) error {
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
-// Download the file from the envelope and add them inside the policy's attachments, and save the policy.
+// Download the signed file from the envelope and add them inside the policy's attachments, and save the policy.
 // The name of the attachment is given by file's name sended to namirial(with the extension removed)
-func AddDocumentsInPolicy(policy *models.Policy, origin string) error {
+func AddSignedDocumentsInPolicy(policy *models.Policy, origin string) error {
 	log.AddPrefix("AddDocumentsInPolicy")
 	defer log.PopPrefix()
 	if slices.Contains(policy.StatusHistory, models.PolicyStatusManualSigned) {
