@@ -1,6 +1,7 @@
 package document
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -72,6 +73,7 @@ func ContractObj(origin string, data models.Policy, networkNode *models.NetworkN
 
 		switch data.Name {
 		case models.PmiProduct:
+			var buffer bytes.Buffer
 			skin := getVar()
 			m := skin.initDefault()
 			skin.GlobalContract(m, data)
@@ -81,7 +83,8 @@ func ContractObj(origin string, data models.Policy, networkNode *models.NetworkN
 
 			now := time.Now()
 			timestamp := strconv.FormatInt(now.Unix(), 10)
-			buffer, _ := m.Output()
+
+			buffer, err = m.Output()
 			out := buffer.Bytes()
 			document = DocumentGenerated{
 				ParentPath: "temp/" + data.Uid,

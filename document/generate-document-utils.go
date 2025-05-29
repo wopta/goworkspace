@@ -13,9 +13,11 @@ import (
 )
 
 type DocumentGenerated struct {
+	//Default target directory, do not insert '/' at the end
 	ParentPath string
-	FileName   string
-	Bytes      []byte
+	//Default name of the file
+	FileName string
+	Bytes    []byte
 }
 
 func NewDocumentGenerated(parentPath string, filename string, out []byte, err error) (doc DocumentGenerated, errOut error) {
@@ -34,14 +36,7 @@ func NewDocumentGenerated(parentPath string, filename string, out []byte, err er
 // save document in fullpath and return a documentResponse
 func (d DocumentGenerated) Save() (result DocumentResponse, err error) {
 	log.Printf("Saving document '%v/%v'", d.ParentPath, d.FileName)
-	linkGcs, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), d.ParentPath+"/"+d.FileName, d.Bytes)
-	if err != nil {
-		return result, err
-	}
-	return DocumentResponse{
-		LinkGcs: linkGcs,
-		Bytes:   base64.StdEncoding.EncodeToString(d.Bytes),
-	}, nil
+	return d.SaveWithName(d.FileName)
 }
 
 func (d DocumentGenerated) SaveWithName(name string) (result DocumentResponse, err error) {
