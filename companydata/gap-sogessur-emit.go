@@ -94,7 +94,7 @@ func GapSogessurEmit(w http.ResponseWriter, r *http.Request) (string, interface{
 
 		mail.SendMail(mail.MailRequest{
 			FromAddress: mail.Address{Name: "Wopta", Address: os.Getenv("EMAIL_USERNAME")},
-			Attachments: &[]mail.Attachment{
+			Attachments: &[]models.Attachment{
 				{
 					Name:        filename,
 					Byte:        base64.StdEncoding.EncodeToString(source),

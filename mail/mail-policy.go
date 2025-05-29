@@ -103,7 +103,7 @@ func SendMailSign(policy models.Policy, from, to, cc Address, flowName string) {
 	})
 }
 
-func SendMailContract(policy models.Policy, at *[]Attachment, from, to, cc Address, flowName string) {
+func SendMailContract(policy models.Policy, at *[]models.Attachment, from, to, cc Address, flowName string) error {
 	var (
 		bodyData BodyData
 		bcc      string
@@ -121,11 +121,14 @@ func SendMailContract(policy models.Policy, at *[]Attachment, from, to, cc Addre
 
 		filepath := fmt.Sprintf("assets/users/%s/"+models.ContractDocumentFormat, policy.Contractor.Uid, policy.NameDesc, policy.CodeCompany)
 		contractbyte, err := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filepath)
-		lib.CheckError(err)
+		if err != nil {
+			log.Error(err)
+			return err
+		}
 
 		filename := fmt.Sprintf(models.ContractDocumentFormat, policy.NameDesc,
 			policy.CodeCompany)
-		at = &[]Attachment{{
+		at = &[]models.Attachment{{
 			Byte:        base64.StdEncoding.EncodeToString(contractbyte),
 			ContentType: lib.GetContentType("pdf"),
 			FileName:    filename,
@@ -155,11 +158,12 @@ func SendMailContract(policy models.Policy, at *[]Attachment, from, to, cc Addre
 		IsAttachment: true,
 		Attachments:  at,
 	})
+	return nil
 }
 
 func SendMailReserved(policy models.Policy, from, to, cc Address, flowName string, attachmentNames []string) {
 	var (
-		at       []Attachment
+		at       []models.Attachment
 		bodyData BodyData
 		rawDoc   []byte
 		err      error
@@ -187,7 +191,7 @@ func SendMailReserved(policy models.Policy, from, to, cc Address, flowName strin
 			attachment.Byte = base64.StdEncoding.EncodeToString(rawDoc)
 		}
 
-		at = append(at, Attachment{
+		at = append(at, models.Attachment{
 			Name:        strings.ReplaceAll(fmt.Sprintf("%s", attachment.FileName), "_", " "),
 			Link:        attachment.Link,
 			Byte:        attachment.Byte,
@@ -260,7 +264,7 @@ func SendMailReservedResult(policy models.Policy, from, to, cc Address, flowName
 
 func SendMailProposal(policy models.Policy, from, to, cc Address, flowName string, attachmentNames []string) {
 	var (
-		at       []Attachment
+		at       []models.Attachment
 		bodyData BodyData
 	)
 

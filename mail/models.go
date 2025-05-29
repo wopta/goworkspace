@@ -4,6 +4,7 @@ import (
 	m "net/mail"
 
 	"cloud.google.com/go/bigquery"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 type Data struct {
@@ -36,37 +37,27 @@ type BodyData struct {
 	PolicyUid            string
 }
 
-type Attachment struct {
-	Name        string `firestore:"name,omitempty" json:"name,omitempty"`
-	Link        string `firestore:"link,omitempty" json:"link,omitempty"`
-	Byte        string `firestore:"byte,omitempty" json:"byte,omitempty"`
-	FileName    string `firestore:"fileName,omitempty" json:"fileName,omitempty"`
-	MimeType    string `firestore:"mimeType,omitempty" json:"mimeType,omitempty"`
-	Url         string `firestore:"url,omitempty" json:"url,omitempty"`
-	ContentType string `firestore:"contentType,omitempty" json:"contentType,omitempty"`
-}
-
 type MailRequest struct {
-	From         string        `json:"from"`
-	FromName     string        `json:"fromName"`
-	FromAddress  Address       `json:"fromAddress"`
-	To           []string      `json:"to"`
-	Message      string        `json:"message"`
-	Subject      string        `json:"subject"`
-	IsHtml       bool          `json:"isHtml,omitempty"`
-	IsAttachment bool          `json:"isAttachment,omitempty"`
-	Attachments  *[]Attachment `json:"attachments,omitempty"`
-	Cc           string        `json:"cc,omitempty"`
-	Bcc          string        `json:"bcc,omitempty"`
-	TemplateName string        `json:"templateName,omitempty"`
-	Title        string        `json:"title,omitempty"`
-	SubTitle     string        `json:"subTitle,omitempty"`
-	Content      string        `json:"content,omitempty"`
-	Link         string        `json:"link,omitempty"`
-	LinkLabel    string        `json:"linkLabel,omitempty"`
-	IsLink       bool          `json:"isLink,omitempty"`
-	IsApp        bool          `json:"isApp,omitempty"`
-	Policy       string        `json:"policy,omitempty"`
+	From         string               `json:"from"`
+	FromName     string               `json:"fromName"`
+	FromAddress  Address              `json:"fromAddress"`
+	To           []string             `json:"to"`
+	Message      string               `json:"message"`
+	Subject      string               `json:"subject"`
+	IsHtml       bool                 `json:"isHtml,omitempty"`
+	IsAttachment bool                 `json:"isAttachment,omitempty"`
+	Attachments  *[]models.Attachment `json:"attachments,omitempty"`
+	Cc           string               `json:"cc,omitempty"`
+	Bcc          string               `json:"bcc,omitempty"`
+	TemplateName string               `json:"templateName,omitempty"`
+	Title        string               `json:"title,omitempty"`
+	SubTitle     string               `json:"subTitle,omitempty"`
+	Content      string               `json:"content,omitempty"`
+	Link         string               `json:"link,omitempty"`
+	LinkLabel    string               `json:"linkLabel,omitempty"`
+	IsLink       bool                 `json:"isLink,omitempty"`
+	IsApp        bool                 `json:"isApp,omitempty"`
+	Policy       string               `json:"policy,omitempty"`
 }
 
 type MailValidate struct {

@@ -169,17 +169,18 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	// Update policy if needed
 	if !policy.IsPay && policy.Annuity == 0 {
 		policy.SanitizePaymentData()
-		// Create/Update document on user collection based on contractor fiscalCode
-		err = plc.SetUserIntoPolicyContractor(&policy, "")
-		if err != nil {
-			log.ErrorF("error set user into policy contractor: %s", err.Error())
-			return "", nil, err
-		}
 
 		// Add contract to policy
 		err = plc.AddSignedDocumentsInPolicy(&policy, "")
 		if err != nil {
 			log.ErrorF("error add contract to policy: %s", err.Error())
+			return "", nil, err
+		}
+
+		// Create/Update document on user collection based on contractor fiscalCode
+		err = plc.SetUserIntoPolicyContractor(&policy, "")
+		if err != nil {
+			log.ErrorF("error set user into policy contractor: %s", err.Error())
 			return "", nil, err
 		}
 
@@ -222,7 +223,8 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 			toAddress.String(),
 			ccAddress.String(),
 		)
-		mail.SendMailContract(policy, nil, fromAddress, toAddress, ccAddress, flowName)
+		err = mail.SendMailContract(policy, policy.Attachments, fromAddress, toAddress, ccAddress, flowName)
+		return "", nil, err
 	} else if !policy.IsPay && policy.Annuity > 0 && isFirstTransactionAnnuity {
 		policy.SanitizePaymentData()
 		// Update Policy as paid and renewed

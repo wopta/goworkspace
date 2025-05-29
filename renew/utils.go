@@ -313,7 +313,7 @@ func sendReportMail(date time.Time, report RenewResp, isDraft bool) {
 		Subject:      subject,
 		IsHtml:       true,
 		IsAttachment: true,
-		Attachments: &[]mail.Attachment{{
+		Attachments: &[]models.Attachment{{
 			Name:        fmt.Sprintf("report-%s-%d.json", date.Format(time.DateOnly), time.Now().Unix()),
 			Byte:        base64.StdEncoding.EncodeToString(responseJson),
 			FileName:    fmt.Sprintf("report-%s-%d.json", date.Format(time.DateOnly), time.Now().Unix()),

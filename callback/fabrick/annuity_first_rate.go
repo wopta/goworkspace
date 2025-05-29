@@ -135,12 +135,13 @@ func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod string) e
 	transaction.BigQueryParse()
 
 	if policy.Annuity == 0 {
-		// TODO: all methods save the data, they shouldn't to avoid data corruption
-		if err = plc.SetUserIntoPolicyContractor(&policy, ""); err != nil {
+
+		if err = plc.AddSignedDocumentsInPolicy(&policy, ""); err != nil {
 			return err
 		}
 
-		if err = plc.AddSignedDocumentsInPolicy(&policy, ""); err != nil {
+		// TODO: all methods save the data, they shouldn't to avoid data corruption
+		if err = plc.SetUserIntoPolicyContractor(&policy, ""); err != nil {
 			return err
 		}
 
@@ -163,7 +164,10 @@ func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod string) e
 			toAddress = mail.GetContractorEmail(&policy)
 		}
 
-		mail.SendMailContract(policy, nil, fromAddress, toAddress, ccAddress, flowName)
+		err = mail.SendMailContract(policy, policy.Attachments, fromAddress, toAddress, ccAddress, flowName)
+		if err != nil {
+			return err
+		}
 
 		defer callback_out.Execute(networkNode, policy, callback_out.Paid)
 	}

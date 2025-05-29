@@ -200,9 +200,9 @@ func GetNetworkNodeEmail(networkNode *models.NetworkNode) Address {
 	return address
 }
 
-func getMailAttachments(policy models.Policy, attachmentNames []string) []Attachment {
+func getMailAttachments(policy models.Policy, attachmentNames []string) []models.Attachment {
 	var (
-		at     []Attachment
+		at     []models.Attachment
 		rawDoc []byte
 		err    error
 	)
@@ -213,7 +213,7 @@ func getMailAttachments(policy models.Policy, attachmentNames []string) []Attach
 		return at
 	}
 
-	at = make([]Attachment, 0)
+	at = make([]models.Attachment, 0)
 	for _, attachment := range *policy.Attachments {
 		if lib.SliceContains(attachmentNames, attachment.Name) {
 			if strings.HasPrefix(attachment.Link, "gs://") {
@@ -227,7 +227,7 @@ func getMailAttachments(policy models.Policy, attachmentNames []string) []Attach
 			}
 			attachment.Byte = base64.StdEncoding.EncodeToString(rawDoc)
 
-			at = append(at, Attachment{
+			at = append(at, models.Attachment{
 				Name:        strings.ReplaceAll(attachment.FileName, "_", " "),
 				Link:        attachment.Link,
 				Byte:        attachment.Byte,

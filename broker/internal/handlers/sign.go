@@ -91,9 +91,7 @@ func sendMailContract(state bpmn.StorageData) error {
 		addresses.ToAddress.String(),
 		addresses.CcAddress.String(),
 	)
-	mail.SendMailContract(*policy.Policy, nil, addresses.FromAddress, addresses.ToAddress, addresses.CcAddress, flowName.String)
-
-	return nil
+	return mail.SendMailContract(*policy.Policy, policy.Attachments, addresses.FromAddress, addresses.ToAddress, addresses.CcAddress, flowName.String)
 }
 
 func fillAttachments(state bpmn.StorageData) error {

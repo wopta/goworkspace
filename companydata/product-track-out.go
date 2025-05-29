@@ -441,7 +441,7 @@ func (track *Track) sendMail(filename string, byteArray []byte) {
 		contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 	}
 
-	at := &[]mail.Attachment{{
+	at := &[]models.Attachment{{
 		Byte:        base64.StdEncoding.EncodeToString(source),
 		ContentType: contentType,
 		FileName:    filename,

@@ -46,8 +46,9 @@ func (d DocumentGenerated) SaveWithName(name string) (result DocumentResponse, e
 		return result, err
 	}
 	return DocumentResponse{
-		LinkGcs: linkGcs,
-		Bytes:   base64.StdEncoding.EncodeToString(d.Bytes),
+		LinkGcs:  linkGcs,
+		FullPath: d.ParentPath + "/" + name,
+		Bytes:    base64.StdEncoding.EncodeToString(d.Bytes),
 	}, nil
 }
 

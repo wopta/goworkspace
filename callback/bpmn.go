@@ -141,9 +141,7 @@ func sendMailContract(state *bpmn.State) error {
 		toAddress.String(),
 		ccAddress.String(),
 	)
-	mail.SendMailContract(*policy, nil, fromAddress, toAddress, ccAddress, flowName)
-
-	return nil
+	return mail.SendMailContract(*policy, policy.Attachments, fromAddress, toAddress, ccAddress, flowName)
 }
 
 func fillAttachments(state *bpmn.State) error {
@@ -209,17 +207,17 @@ func updatePolicy(state *bpmn.State) error {
 		return nil
 	}
 
-	// promote documents from temp bucket to user and connect it to policy
-	err = plc.SetUserIntoPolicyContractor(policy, origin)
-	if err != nil {
-		log.ErrorF("error SetUserIntoPolicyContractor %s", err.Error())
-		return err
-	}
-
 	// Add Policy contract
 	err = plc.AddSignedDocumentsInPolicy(policy, origin)
 	if err != nil {
 		log.ErrorF("error AddContract %s", err.Error())
+		return err
+	}
+
+	// promote documents from temp bucket to user and connect it to policy
+	err = plc.SetUserIntoPolicyContractor(policy, origin)
+	if err != nil {
+		log.ErrorF("error SetUserIntoPolicyContractor %s", err.Error())
 		return err
 	}
 
@@ -255,9 +253,8 @@ func updatePolicy(state *bpmn.State) error {
 		toAddress.String(),
 		ccAddress.String(),
 	)
-	mail.SendMailContract(*policy, nil, fromAddress, toAddress, ccAddress, flowName)
+	return mail.SendMailContract(*policy, policy.Attachments, fromAddress, toAddress, ccAddress, flowName)
 
-	return nil
 }
 
 func payTransaction(state *bpmn.State) error {

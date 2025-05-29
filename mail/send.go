@@ -172,7 +172,7 @@ func sendmail(obj MailRequest) error {
 
 			if obj.IsAttachment {
 				for _, v := range *obj.Attachments {
-					message = addAttachment(message, v.Name, v.ContentType, v.Byte)
+					message = addAttachment(message, v.FileName, v.ContentType, v.Byte)
 				}
 				message += fmt.Sprintf("\r\n--%s--\r\n", outerBoundary)
 			}

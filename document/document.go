@@ -74,6 +74,7 @@ type DocumentResponse struct {
 	EnvelopSignId string `json:"envelopSignId"`
 	LinkGcs       string `json:"linkGcs"`
 	Bytes         string `json:"bytes"`
+	FullPath      string
 }
 
 type DodumentData struct {

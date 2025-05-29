@@ -42,17 +42,17 @@ func updatePolicy(state bpmn.StorageData) error {
 		return nil
 	}
 
-	// promote documents from temp bucket to user and connect it to policy
-	err = plc.SetUserIntoPolicyContractor(policy.Policy, origin.String)
-	if err != nil {
-		log.ErrorF("ERROR SetUserIntoPolicyContractor %s", err.Error())
-		return err
-	}
-
 	// Add Policy contract
 	err = plc.AddSignedDocumentsInPolicy(policy.Policy, origin.String)
 	if err != nil {
 		log.ErrorF("ERROR AddContract %s", err.Error())
+		return err
+	}
+
+	// promote documents from temp bucket to user and connect it to policy
+	err = plc.SetUserIntoPolicyContractor(policy.Policy, origin.String)
+	if err != nil {
+		log.ErrorF("ERROR SetUserIntoPolicyContractor %s", err.Error())
 		return err
 	}
 
@@ -88,9 +88,7 @@ func updatePolicy(state bpmn.StorageData) error {
 		addresses.ToAddress.String(),
 		addresses.CcAddress.String(),
 	)
-	mail.SendMailContract(*policy.Policy, nil, addresses.FromAddress, addresses.ToAddress, addresses.CcAddress, flowName.String)
-
-	return nil
+	return mail.SendMailContract(*policy.Policy, policy.Attachments, addresses.FromAddress, addresses.ToAddress, addresses.CcAddress, flowName.String)
 }
 
 func payTransaction(state bpmn.StorageData) error {
