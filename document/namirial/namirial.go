@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"gitlab.dev.wopta.it/goworkspace/document"
 	"gitlab.dev.wopta.it/goworkspace/lib"
@@ -54,23 +55,24 @@ func uploadFiles(files ...string) (fileIds []string, err error) {
 	var buffer bytes.Buffer
 	var idsFile []string
 	for i := range files {
+		split := strings.Split(files[i], "/")
+		name := split[len(split)-1]
 		if env.IsLocal() {
-			if i%2 == 0 {
-				file, err = os.ReadFile("document/net.pdf")
-			} else {
-				file, err = os.ReadFile("document/contract.pdf")
-			}
+			file, err = os.ReadFile("document/contract.pdf")
 		} else {
 			file, err = lib.GetFromStorageErr(os.Getenv("GOOGLE_STORAGE_BUCKET"), files[i], "")
 		}
 		if err != nil {
 			return fileIds, err
 		}
+		if len(file) == 0 {
+			return fileIds, fmt.Errorf("No file found at %v", files[i])
+		}
 		if file == nil || len(file) == 0 {
 			return fileIds, fmt.Errorf("Error getting the file %v", files[i])
 		}
 		w := multipart.NewWriter(&buffer)
-		fw, err := w.CreateFormFile("file", files[i]+".pdf")
+		fw, err := w.CreateFormFile("file", name+".pdf")
 		if err != nil {
 			return fileIds, err
 		}
@@ -79,7 +81,7 @@ func uploadFiles(files ...string) (fileIds []string, err error) {
 			return fileIds, err
 		}
 		w.Close()
-
+		log.ErrorF("request ", buffer.String())
 		req, err := http.NewRequest(http.MethodPost, url, &buffer)
 		if err != nil {
 			return fileIds, err

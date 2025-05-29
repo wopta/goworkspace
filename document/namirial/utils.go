@@ -47,7 +47,7 @@ func handleResponse[T any](r *http.Response, err error) (T, error) {
 	if r.StatusCode != http.StatusOK {
 		var body []byte
 		r.Body.Read(body)
-		return req, fmt.Errorf("ErrorNamirial: %v", string(body))
+		return req, fmt.Errorf("ErrorNamirial: %s", string(body))
 	}
 
 	body, err := io.ReadAll(r.Body)

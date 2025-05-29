@@ -30,6 +30,12 @@ func SignFiles(policy *models.Policy, product *models.Product, networkNode *mode
 		SendEmail:         sendEmail,
 		Origin:            origin,
 	}
+	//Preparing dto for namirial
+	basePathForDocument := strings.ReplaceAll(fmt.Sprintf("temp/%s/namirial/", policy.Uid), " ", "_")
+	fullPathDocumentToSign, err := lib.ListGoogleStorageFolderContent(basePathForDocument)
+	if err != nil {
+		return err
+	}
 	//TODO: remove this 'if' after catnat document is done
 	if policy.Name != models.CatNatProduct {
 		p := <-document.ContractObj(origin, *policy, networkNode, product)
@@ -39,12 +45,6 @@ func SignFiles(policy *models.Policy, product *models.Product, networkNode *mode
 		}
 		policy.DocumentName = document.LinkGcs
 		namirialInput.DocumentsFullPath = append(namirialInput.DocumentsFullPath, document.LinkGcs)
-	}
-	//Preparing dto for namirial
-	basePathForDocument := strings.ReplaceAll(fmt.Sprintf("temp/%s/namirial/", policy.Uid), " ", "_")
-	fullPathDocumentToSign, err := lib.ListGoogleStorageFolderContent(basePathForDocument)
-	if err != nil {
-		return err
 	}
 	for _, path := range fullPathDocumentToSign {
 		namirialInput.DocumentsFullPath = append(namirialInput.DocumentsFullPath, path)
