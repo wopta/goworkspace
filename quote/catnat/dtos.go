@@ -434,6 +434,11 @@ func MappingQuoteResponseToPolicy(quoteResponse QuoteResponse, policy *models.Po
 	policy.PriceNett = quoteResponse.AnnualNet
 	policy.TaxAmount = quoteResponse.AnnualTax
 	split := policy.PaymentSplit
+	if split == "" {
+		log.Printf("split isnt inserted, use default '%s'", models.PaySplitYearly)
+		split = string(models.PaySplitYearly)
+
+	}
 	policy.OffersPrices = map[string]map[string]*models.Price{
 		"default": {
 			split: &models.Price{},
