@@ -65,7 +65,7 @@ func SignFiles(policy *models.Policy, product *models.Product, networkNode *mode
 		namirialInput.FilesFullPath = append(namirialInput.FilesFullPath, document.LinkGcs)
 	}
 	//Preparing dto for namirial
-	filePath := strings.ReplaceAll(fmt.Sprintf("%s/%s/namirial/", "temp", policy.Uid), " ", "_")
+	filePath := strings.ReplaceAll(fmt.Sprintf("temp/%s/namirial/", policy.Uid), " ", "_")
 	paths, err := lib.ListGoogleStorageFolderContent(filePath)
 	if err != nil {
 		return err
