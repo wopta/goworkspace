@@ -385,25 +385,16 @@ func getGuarantee(policy *models.Policy, codeGuarantees string) (*models.Guarant
 }
 func MappingQuoteResponseToGuarantee(quoteResponse QuoteResponse, policy *models.Policy) error {
 	var currentGuaranteeCode string
-	var currentGuaranteeValueCode string
 	for _, assetDetailCatnat := range quoteResponse.AssetsDetail {
 		for _, guaranteeDetailCatnat := range assetDetailCatnat.GuaranteesDetail {
 			guaranteeCodes := strings.Split(guaranteeDetailCatnat.GuaranteeCode, "/")
-			currentGuaranteeCode, currentGuaranteeValueCode = guaranteeCodes[0], "/"+guaranteeCodes[1]
+			currentGuaranteeCode = guaranteeCodes[0]
 			guarantee, err := getGuarantee(policy, currentGuaranteeCode)
 			if err != nil {
 				return err
 			}
 			value := guaranteeDetailCatnat.GuaranteeGross
-			switch currentGuaranteeValueCode {
-			case buildingCode:
-				guarantee.Value.SumInsuredLimitOfIndemnity = value
-			case contentCode:
-				guarantee.Value.SumInsured = value
-			case stockCode:
-				guarantee.Value.LimitOfIndemnity = value
-
-			}
+			guarantee.Value.PremiumGrossYearly += value
 		}
 	}
 	return nil
