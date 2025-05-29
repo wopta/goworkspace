@@ -9,7 +9,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.12
 	gitlab.dev.wopta.it/goworkspace/document v1.1.180
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.165
-	gitlab.dev.wopta.it/goworkspace/models v1.2.59
+	gitlab.dev.wopta.it/goworkspace/models v1.2.60
 	gitlab.dev.wopta.it/goworkspace/network v1.0.125
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.7
 	google.golang.org/grpc v1.63.2
