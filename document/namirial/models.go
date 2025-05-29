@@ -6,10 +6,10 @@ import (
 )
 
 type NamirialInput struct {
-	FilesFullPath []string
-	Policy        models.Policy
-	SendEmail     bool
-	Origin        string
+	DocumentsFullPath []string
+	Policy            models.Policy
+	SendEmail         bool
+	Origin            string
 }
 
 type NamirialOutput struct {

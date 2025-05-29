@@ -49,10 +49,10 @@ func SignFiles(policy *models.Policy, product *models.Product, networkNode *mode
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusContact, models.PolicyStatusToSign)
 
 	namirialInput := namirial.NamirialInput{
-		Policy:        *policy,
-		FilesFullPath: make([]string, 0),
-		SendEmail:     sendEmail,
-		Origin:        origin,
+		Policy:            *policy,
+		DocumentsFullPath: make([]string, 0),
+		SendEmail:         sendEmail,
+		Origin:            origin,
 	}
 	//TODO: remove this 'if' after catnat document is done
 	if policy.Name != models.CatNatProduct {
@@ -62,20 +62,20 @@ func SignFiles(policy *models.Policy, product *models.Product, networkNode *mode
 			return err
 		}
 		policy.DocumentName = document.LinkGcs
-		namirialInput.FilesFullPath = append(namirialInput.FilesFullPath, document.LinkGcs)
+		namirialInput.DocumentsFullPath = append(namirialInput.DocumentsFullPath, document.LinkGcs)
 	}
 	//Preparing dto for namirial
-	filePath := strings.ReplaceAll(fmt.Sprintf("temp/%s/namirial/", policy.Uid), " ", "_")
-	paths, err := lib.ListGoogleStorageFolderContent(filePath)
+	basePathForDocument := strings.ReplaceAll(fmt.Sprintf("temp/%s/namirial/", policy.Uid), " ", "_")
+	fullPathDocumentToSign, err := lib.ListGoogleStorageFolderContent(basePathForDocument)
 	if err != nil {
 		return err
 	}
-	for _, path := range paths {
-		namirialInput.FilesFullPath = append(namirialInput.FilesFullPath, path)
+	for _, path := range fullPathDocumentToSign {
+		namirialInput.DocumentsFullPath = append(namirialInput.DocumentsFullPath, path)
 	}
 
-	if len(namirialInput.FilesFullPath) == 0 {
-		log.ErrorF("nothing to send to namirial")
+	if len(namirialInput.DocumentsFullPath) == 0 {
+		log.ErrorF("nothing to sign")
 		return nil
 	}
 
@@ -86,7 +86,7 @@ func SignFiles(policy *models.Policy, product *models.Product, networkNode *mode
 	policy.IdSign = envelope.IdEnvelope
 	policy.SignUrl = envelope.Url
 	policy.ContractFileId = envelope.FileIds[0] //this field is deprecated
-	policy.DocumentName = filePath
+	policy.DocumentName = basePathForDocument   //this field is deprecated
 	return nil
 }
 
