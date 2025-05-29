@@ -384,8 +384,13 @@ func getGuarantee(policy *models.Policy, codeGuarantees string) (*models.Guarant
 	}
 	return nil, errors.New("No guarantees found")
 }
+
+// Given a quoteResponse of catnat sum and assign the assentDailt to each guarantees
 func MappingQuoteResponseToGuarantee(quoteResponse QuoteResponse, policy *models.Policy) error {
 	var currentGuaranteeCode string
+	for i := range policy.Assets[0].Guarantees {
+		policy.Assets[0].Guarantees[i].Value.PremiumGrossYearly = 0
+	}
 	for _, assetDetailCatnat := range quoteResponse.AssetsDetail {
 		for _, guaranteeDetailCatnat := range assetDetailCatnat.GuaranteesDetail {
 			guaranteeCodes := strings.Split(guaranteeDetailCatnat.GuaranteeCode, "/")
@@ -439,9 +444,14 @@ func MappingQuoteResponseToPolicy(quoteResponse QuoteResponse, policy *models.Po
 			split: &models.Price{},
 		},
 	}
-	policy.OffersPrices["default"][split].Gross = policy.PriceGross
-	policy.OffersPrices["default"][split].Net = policy.PriceNett
-	policy.OffersPrices["default"][split].Tax = policy.TaxAmount
+	rates := float64(models.PaySplitRateMap[models.PaySplit(policy.PaymentSplit)])
+	if rates == 0 {
+		log.ErrorF("Rates is 0")
+		rates = 1
+	}
+	policy.OffersPrices["default"][split].Gross = policy.PriceGross / rates
+	policy.OffersPrices["default"][split].Net = policy.PriceNett / rates
+	policy.OffersPrices["default"][split].Tax = policy.TaxAmount / rates
 	policy.OfferlName = "default"
 }
 
