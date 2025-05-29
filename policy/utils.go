@@ -189,9 +189,9 @@ func AddDocumentsInPolicy(policy *models.Policy, origin string) error {
 		gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, body)
 		//TODO: to remove eventually
 		//With the new implementation of namirial we use the file's name to extract the label that will be showed in FE
-		//But in the old one, the file's name was hardcode independently of 'NameDesc' (that happened to be the filename that we used to send to namirial)
+		//Instead in the old one, the label was hardcode independently of 'NameDesc' (that happened to be the filename that we used for namirial)
 		//olfImplementation of namirial: fw, err := w.CreateFormFile("file", NameDesc+" Polizza.pdf")'
-		//So to allow retrocompatibility we use this,
+		//So to allow retrocompatibility we use this, old file sended with old implementation
 		if strings.Contains(fileName, policy.NameDesc) {
 			fileName = models.ContractAttachmentName
 		}
