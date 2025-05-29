@@ -232,7 +232,7 @@ func getMailAttachments(policy models.Policy, attachmentNames []string) []Attach
 				Link:        attachment.Link,
 				Byte:        attachment.Byte,
 				FileName:    attachment.FileName,
-				ContentType: "application/pdf",
+				ContentType: lib.GetContentType("pdf"),
 			})
 		}
 	}

@@ -54,10 +54,10 @@ func SignFiles(policy *models.Policy, product *models.Product, networkNode *mode
 		SendEmail:     sendEmail,
 		Origin:        origin,
 	}
-	//TODO: to remove after catnat document is done
+	//TODO: remove this 'if' after catnat document is done
 	if policy.Name != models.CatNatProduct {
 		p := <-document.ContractObj(origin, *policy, networkNode, product)
-		document, err := p.SaveWithName("Contratto")
+		document, err := p.SaveWithName(models.ContractAttachmentName)
 		if err != nil {
 			return err
 		}
@@ -86,6 +86,7 @@ func SignFiles(policy *models.Policy, product *models.Product, networkNode *mode
 	policy.IdSign = envelope.IdEnvelope
 	policy.SignUrl = envelope.Url
 	policy.ContractFileId = envelope.FileIds[0] //this field is deprecated
+	policy.DocumentName = filePath
 	return nil
 }
 

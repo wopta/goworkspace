@@ -75,7 +75,7 @@ func addAttachment(message, filename, contentType, data string) string {
 	var ct string
 	if contentType == "" {
 		sct := strings.Split(filename, ".")
-		ct = getContentType(sct[1])
+		ct = lib.GetContentType(sct[1])
 	} else {
 		ct = contentType
 	}
@@ -88,29 +88,6 @@ func addAttachment(message, filename, contentType, data string) string {
 	message += fmt.Sprintf("\r\n%s\r\n", string(data))
 
 	return message
-}
-
-func getContentType(ext string) string {
-	m := make(map[string]string)
-	m["doc"] = "application/msword"
-	m["docx"] = "application/msword"
-	m["pdf"] = "application/pdf"
-	m["GIF"] = "image/gif"
-	m["jpeg"] = "image/jpeg"
-	m["jpg"] = "image/jpeg"
-	m["jpe"] = "image/jpeg"
-	m["PNG"] = "image/png"
-	m["png"] = "image/png"
-	m["tiff"] = "image/tiff"
-	m["tif"] = "image/tiff"
-	m["xls"] = "application/vnd.ms-excel"
-	m["xlsx"] = "application/vnd.ms-excel"
-	m["pptx"] = "application/vnd.ms-powerpoint"
-	m["ppt"] = "application/vnd.ms-powerpoint"
-	m["txt"] = "text/plain"
-	m["zip"] = "application/zip"
-	m["gzip"] = "application/x-gzip"
-	return m[ext]
 }
 
 func sendmail(obj MailRequest) error {

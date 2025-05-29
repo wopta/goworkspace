@@ -127,7 +127,7 @@ func SendMailContract(policy models.Policy, at *[]Attachment, from, to, cc Addre
 			policy.CodeCompany)
 		at = &[]Attachment{{
 			Byte:        base64.StdEncoding.EncodeToString(contractbyte),
-			ContentType: "application/pdf",
+			ContentType: lib.GetContentType("pdf"),
 			FileName:    filename,
 			Name:        strings.ReplaceAll(filename, "_", " "),
 		}}

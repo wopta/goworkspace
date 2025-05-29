@@ -155,9 +155,14 @@ func AddContract(policy *models.Policy, origin string) error {
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
-func AddFilesInPolicy(policy *models.Policy, origin string) error {
+func AddDocumentsInPolicy(policy *models.Policy, origin string) error {
+	log.AddPrefix("Adding document in policy")
+	defer log.PopPrefix()
 	if slices.Contains(policy.StatusHistory, models.PolicyStatusManualSigned) {
 		return nil
+	}
+	if policy.IdSign == "" {
+		return fmt.Errorf("No IdSign for policy with uid '%v'", policy.Uid)
 	}
 	documents, err := namirial.GetFiles(policy.IdSign)
 	if err != nil {
@@ -166,23 +171,38 @@ func AddFilesInPolicy(policy *models.Policy, origin string) error {
 	if policy.Attachments == nil {
 		policy.Attachments = &[]models.Attachment{}
 	}
+	if len(documents.Documents) == 0 {
+		return fmt.Errorf("No document in envelope '%s'", policy.IdSign)
+	}
 	for i := range documents.Documents {
 		body, err := namirial.GetFile(documents.Documents[i].FileID)
 		if err != nil {
 			return err
 		}
+		var typeFile string
 		fileName := documents.Documents[i].FileName
-		fileName, _, _ = strings.Cut(fileName, ".")
+		fileName, typeFile, _ = strings.Cut(fileName, ".")
 
 		filePath := strings.ReplaceAll(fmt.Sprintf("temp/%s/%v", policy.Uid, documents.Documents[i].FileName), " ", "_")
 		log.Println("path file path:", filePath)
 
 		gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, body)
+		//TODO: to remove eventually
+		//With the new implementation of namirial we use the file's name to extract the label that will be showed in FE
+		//But in the old one, the file's name was hardcode independently of 'NameDesc' (that happened to be the filename that we used to send to namirial)
+		//olfImplementation of namirial: fw, err := w.CreateFormFile("file", NameDesc+" Polizza.pdf")'
+		//So to allow retrocompatibility we use this,
+		if strings.Contains(fileName, policy.NameDesc) {
+			fileName = models.ContractAttachmentName
+		}
+
 		*policy.Attachments = append(*policy.Attachments, models.Attachment{
-			Name:     fileName,
-			Link:     gsLink,
-			FileName: fileName,
-			Section:  models.DocumentSectionContracts,
+			Name:        fileName,
+			Link:        gsLink,
+			FileName:    fileName,
+			Section:     models.DocumentSectionContracts,
+			ContentType: lib.GetContentType(typeFile),
+			MimeType:    lib.GetContentType(typeFile),
 		})
 
 	}

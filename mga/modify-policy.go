@@ -84,13 +84,13 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		log.Println("generating addendum document for chages...")
 		if addendumResp, err := document.Addendum(&diffPolicy); err == nil {
 			addendumAtt := models.Attachment{
-				Name:      "Appendice - Modifica dati di polizza",
-				FileName:  addendumResp.Filename,
-				MimeType:  "application/pdf",
-				Link:      addendumResp.LinkGcs,
-				IsPrivate: false,
-				Section:   models.DocumentSectionContracts,
-				Note:      "",
+				Name:        "Appendice - Modifica dati di polizza",
+				FileName:    addendumResp.Filename,
+				ContentType: lib.GetContentType("pdf"),
+				Link:        addendumResp.LinkGcs,
+				IsPrivate:   false,
+				Section:     models.DocumentSectionContracts,
+				Note:        "",
 			}
 			if modifiedPolicy.Attachments == nil {
 				modifiedPolicy.Attachments = new([]models.Attachment)

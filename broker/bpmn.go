@@ -287,7 +287,7 @@ func sendMailSign(state *bpmn.State) error {
 
 func sign(state *bpmn.State) error {
 	policy := state.Data
-	err := utility.EmitSign(policy, product, networkNode, sendEmail, origin)
+	err := EmitSign(policy, product, networkNode, sendEmail, origin)
 	return err
 }
 
