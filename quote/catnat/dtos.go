@@ -433,7 +433,7 @@ func MappingQuoteResponseToPolicy(quoteResponse QuoteResponse, policy *models.Po
 	policy.PriceGross = quoteResponse.AnnualGross
 	policy.PriceNett = quoteResponse.AnnualNet
 	policy.TaxAmount = quoteResponse.AnnualTax
-	split := string(models.PaySplitYearly)
+	split := policy.PaymentSplit
 	policy.OffersPrices = map[string]map[string]*models.Price{
 		"default": {
 			split: &models.Price{},
@@ -442,7 +442,6 @@ func MappingQuoteResponseToPolicy(quoteResponse QuoteResponse, policy *models.Po
 	policy.OffersPrices["default"][split].Gross = policy.PriceGross
 	policy.OffersPrices["default"][split].Net = policy.PriceNett
 	policy.OffersPrices["default"][split].Tax = policy.TaxAmount
-	//TODO: populate in policy->guaranteesMap:>sumInsured sunInsuredLimitOfIndemnity ecc with the different value of response,ex:{"codiceGaranzia":"212/02","imp_Lordo_Garanzia":48.9,"imp_Netto_Garanzia":40,"imp_Tasse_Garanzia":8.9}
 	policy.OfferlName = "default"
 }
 

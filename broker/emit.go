@@ -296,8 +296,21 @@ func calculatePaymentComponents(policy *models.Policy) {
 	case models.PaySplitSingleInstallment, models.PaySplitYearly, models.PaySplitYear:
 		priceSplit = policy.PaymentComponents.PriceAnnuity
 		priceFirstSplit = priceSplit
-	case models.PaySplitSemestral:
-		// TODO: unimplemented
+	case models.PaySplitSemestral, models.PaySplitTrimestral:
+		if policy.PaymentComponents.Rates == 0 {
+			log.ErrorF("Rates should not be 0")
+			return
+		}
+		priceSplit = models.PriceComponents{
+			Gross:       policy.PriceGross / float64(policy.PaymentComponents.Rates),
+			Nett:        policy.PriceGross / float64(policy.PaymentComponents.Rates),
+			Tax:         policy.TaxAmount / float64(policy.PaymentComponents.Rates),
+			Consultancy: 0,
+			Total:       policy.PriceGross / float64(policy.PaymentComponents.Rates),
+		}
+		priceFirstSplit = priceSplit
+		priceFirstSplit.Consultancy = policy.ConsultancyValue.Price
+		priceFirstSplit.Total = lib.RoundFloat(priceFirstSplit.Gross+priceFirstSplit.Consultancy, 2)
 	case models.PaySplitMonthly:
 		priceSplit = models.PriceComponents{
 			Gross:       policy.PriceGrossMonthly,

@@ -63,6 +63,7 @@ var PaySplitRateMap = map[PaySplit]int{
 	PaySplitYear:              1,
 	PaySplitYearly:            1,
 	PaySplitSemestral:         2,
+	PaySplitTrimestral:        4,
 	PaySplitSingleInstallment: 1,
 }
 
