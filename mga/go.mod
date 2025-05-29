@@ -10,7 +10,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/gomarkdown/markdown v0.0.0-20241205020045-f7e15b2f3e62
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.165
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.175
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.176
 	gitlab.dev.wopta.it/goworkspace/models v1.2.60
 	gitlab.dev.wopta.it/goworkspace/network v1.0.126
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.223
