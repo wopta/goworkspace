@@ -71,7 +71,7 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.175 // indirect
 	gitlab.dev.wopta.it/goworkspace/sellable v1.0.160 // indirect
-	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.6 // indirect
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.7 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20230802181842-ad255f2331ca // indirect
 	github.com/xuri/excelize/v2 v2.8.0 // indirect
