@@ -57,6 +57,8 @@ func uploadFiles(files ...string) (fileIds []string, err error) {
 	for i := range files {
 		split := strings.Split(files[i], "/")
 		name := split[len(split)-1]
+		files[i], _ = strings.CutPrefix(files[i], "gs://function-data/")
+
 		if env.IsLocal() {
 			file, err = os.ReadFile("document/contract.pdf")
 		} else {
@@ -81,7 +83,6 @@ func uploadFiles(files ...string) (fileIds []string, err error) {
 			return fileIds, err
 		}
 		w.Close()
-		log.ErrorF("request ", buffer.String())
 		req, err := http.NewRequest(http.MethodPost, url, &buffer)
 		if err != nil {
 			return fileIds, err

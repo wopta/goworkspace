@@ -57,6 +57,7 @@ func SignFiles(policy *models.Policy, product *models.Product, networkNode *mode
 
 	envelope, err := namirial.Sign(namirialInput)
 	if err != nil {
+		log.Error(err)
 		return err
 	}
 	policy.IdSign = envelope.IdEnvelope
