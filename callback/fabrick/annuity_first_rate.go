@@ -140,7 +140,7 @@ func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod string) e
 			return err
 		}
 
-		if err = plc.AddContractForFiles(&policy, ""); err != nil {
+		if err = plc.AddFilesInPolicy(&policy, ""); err != nil {
 			return err
 		}
 

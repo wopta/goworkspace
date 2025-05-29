@@ -155,7 +155,7 @@ func AddContract(policy *models.Policy, origin string) error {
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
-func AddContractForFiles(policy *models.Policy, origin string) error {
+func AddFilesInPolicy(policy *models.Policy, origin string) error {
 	if slices.Contains(policy.StatusHistory, models.PolicyStatusManualSigned) {
 		return nil
 	}
@@ -173,7 +173,8 @@ func AddContractForFiles(policy *models.Policy, origin string) error {
 		}
 		fileName := documents.Documents[i].FileName
 		fileName, _, _ = strings.Cut(fileName, ".")
-		filePath := "assets/users/" + policy.Contractor.Uid + "/" + documents.Documents[i].FileName
+
+		filePath := strings.ReplaceAll(fmt.Sprintf("temp/%s/%v", policy.Uid, documents.Documents[i].FileName), " ", "_")
 		log.Println("path file path:", filePath)
 
 		gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, body)

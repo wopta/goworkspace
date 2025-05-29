@@ -113,7 +113,7 @@ func setSign(state *bpmn.State) error {
 
 func addContract(state *bpmn.State) error {
 	policy := state.Data
-	plc.AddContractForFiles(policy, origin)
+	plc.AddFilesInPolicy(policy, origin)
 
 	return nil
 }
@@ -217,7 +217,7 @@ func updatePolicy(state *bpmn.State) error {
 	}
 
 	// Add Policy contract
-	err = plc.AddContractForFiles(policy, origin)
+	err = plc.AddFilesInPolicy(policy, origin)
 	if err != nil {
 		log.ErrorF("error AddContract %s", err.Error())
 		return err
