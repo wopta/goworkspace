@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
@@ -396,6 +397,9 @@ func MappingQuoteResponseToGuarantee(quoteResponse QuoteResponse, policy *models
 			value := guaranteeDetailCatnat.GuaranteeGross
 			guarantee.Value.PremiumGrossYearly += value
 		}
+	}
+	for i := range policy.Assets[0].Guarantees {
+		policy.Assets[0].Guarantees[i].Value.PremiumGrossYearly = lib.RoundFloat(policy.Assets[0].Guarantees[i].Value.PremiumGrossYearly, 2)
 	}
 	return nil
 }
