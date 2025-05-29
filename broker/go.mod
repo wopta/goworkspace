@@ -21,7 +21,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/product v1.1.57
 	gitlab.dev.wopta.it/goworkspace/question v1.0.111
 	gitlab.dev.wopta.it/goworkspace/reserved v1.0.228
-	gitlab.dev.wopta.it/goworkspace/transaction v1.0.214
+	gitlab.dev.wopta.it/goworkspace/transaction v1.0.215
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.6
 )
 
