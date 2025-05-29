@@ -1,7 +1,9 @@
 package document
 
 import (
+	"encoding/base64"
 	"net/http"
+	"os"
 
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
@@ -74,6 +76,37 @@ type DocumentResponse struct {
 	EnvelopSignId string `json:"envelopSignId"`
 	LinkGcs       string `json:"linkGcs"`
 	Bytes         string `json:"bytes"`
+}
+
+type DocumentGenerated struct {
+	ParentPath string
+	FileName   string
+	Bytes      []byte
+}
+
+// save document in fullpath and return a documentResponse
+func (d DocumentGenerated) Save() (result DocumentResponse, err error) {
+	log.Printf("Saving document '%v/%v'", d.ParentPath, d.FileName)
+	linkGcs, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), d.ParentPath+"/"+d.FileName, d.Bytes)
+	if err != nil {
+		return result, err
+	}
+	return DocumentResponse{
+		LinkGcs: linkGcs,
+		Bytes:   base64.StdEncoding.EncodeToString(d.Bytes),
+	}, nil
+}
+
+func (d DocumentGenerated) SaveWithName(name string) (result DocumentResponse, err error) {
+	log.Printf("Saving document '%v' with name %v", d.ParentPath, name)
+	linkGcs, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), d.ParentPath+"/"+name, d.Bytes)
+	if err != nil {
+		return result, err
+	}
+	return DocumentResponse{
+		LinkGcs: linkGcs,
+		Bytes:   base64.StdEncoding.EncodeToString(d.Bytes),
+	}, nil
 }
 
 type DodumentData struct {

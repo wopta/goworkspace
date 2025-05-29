@@ -15,7 +15,7 @@ type keyValue struct {
 	value string
 }
 
-func personaGlobalContractV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (string, []byte) {
+func personaGlobalContractV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (DocumentGenerated, error) {
 	signatureID = 0
 
 	personaMainHeaderV1(pdf, policy, networkNode, false)
@@ -68,8 +68,7 @@ func personaGlobalContractV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode 
 
 	globalPrivacySection(pdf, (*policy.Surveys)[len(*policy.Surveys)-1])
 
-	filename, out := saveContract(pdf, policy)
-	return filename, out
+	return generateContractDocument(pdf, policy)
 }
 
 func personaMainHeaderV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode, isProposal bool) {

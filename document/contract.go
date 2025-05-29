@@ -1,16 +1,15 @@
 package document
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"io"
 	"net/http"
+	"strconv"
+	"time"
 
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"github.com/go-pdf/fpdf"
-	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
-	"gitlab.dev.wopta.it/goworkspace/document/pkg/contract"
 	"gitlab.dev.wopta.it/goworkspace/network"
 	prd "gitlab.dev.wopta.it/goworkspace/product"
 
@@ -43,14 +42,18 @@ func ContractFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	product := prd.GetProductV2(data.Name, data.ProductVersion, models.MgaChannel, networkNode, warrant)
 
 	respObj := <-ContractObj(origin, data, networkNode, product) // TODO review product nil
-	resp, err := json.Marshal(respObj)
+	response, err := respObj.Save()
+	if err != nil {
+		return "", nil, err
+	}
+	resp, err := json.Marshal(response)
 
 	lib.CheckError(err)
 	return string(resp), respObj, nil
 }
 
-func ContractObj(origin string, data models.Policy, networkNode *models.NetworkNode, product *models.Product) <-chan DocumentResponse {
-	r := make(chan DocumentResponse)
+func ContractObj(origin string, data models.Policy, networkNode *models.NetworkNode, product *models.Product) <-chan DocumentGenerated {
+	r := make(chan DocumentGenerated)
 	log.AddPrefix("ContractObj")
 	defer log.PopPrefix()
 
@@ -62,8 +65,7 @@ func ContractObj(origin string, data models.Policy, networkNode *models.NetworkN
 	go func() {
 		var (
 			err      error
-			filename string
-			out      []byte
+			document DocumentGenerated
 		)
 
 		switch data.Name {
@@ -72,39 +74,52 @@ func ContractObj(origin string, data models.Policy, networkNode *models.NetworkN
 			m := skin.initDefault()
 			skin.GlobalContract(m, data)
 			//-----------Save file
-			filename, out = Save(m, data)
+			//TODO: why is this different?
+			//filename, out = Save(m, data)
+
+			now := time.Now()
+			timestamp := strconv.FormatInt(now.Unix(), 10)
+			buffer, _ := m.Output()
+			out := buffer.Bytes()
+			document = DocumentGenerated{
+				ParentPath: "temp/" + data.Uid,
+				FileName:   data.Contractor.Name + "_" + data.Contractor.Surname + "_" + timestamp + "_contract.pdf",
+				Bytes:      out,
+			}
 		case models.LifeProduct:
 			pdf := initFpdf()
-			filename, out = lifeContract(pdf, origin, &data, networkNode, product)
+			document, err = lifeContract(pdf, origin, &data, networkNode, product)
 		case models.CatNatProduct:
-			//to change
-			filename, out = "prova catnat contratto", []byte{}
+			//TODO: to change
+			//filename, out = "prova catnat contratto", []byte{}
 		case models.PersonaProduct:
 			pdf := initFpdf()
-			filename, out = personaContract(pdf, &data, networkNode, product)
+			document, err = personaGlobalContractV1(pdf, &data, networkNode, product)
 		case models.GapProduct:
 			pdf := initFpdf()
-			filename, out = gapContract(pdf, origin, &data, networkNode)
+			document, err = gapSogessurContractV1(pdf, origin, &data, networkNode)
 		case models.CommercialCombinedProduct:
-			generator := contract.NewCommercialCombinedGenerator(engine.NewFpdf(), &data, networkNode, *product, false)
-			out, err = generator.Contract()
-			if err != nil {
-				log.ErrorF("error generating contract: %v", err)
-				return
-			}
-			filename, err = generator.Save(out)
-			if err != nil {
-				log.ErrorF("error generating contract: %v", err)
-				return
-			}
+			//TODO: should be eliminated?
+			//			var filename string
+			//			var out []byte
+			//			generator := contract.NewCommercialCombinedGenerator(engine.NewFpdf(), &data, networkNode, *product, false)
+			//			filename, out, err = generator.Contract()
+			//			document = DocumentGenerated{
+			//				FullPath: filename,
+			//				Bytes:    out,
+			//			}
+			//			if err != nil {
+			//				log.ErrorF("error generating contract: %v", err)
+			//				return
+			//			}
+		}
+		if err != nil {
+			log.ErrorF("error generating contract: %v", err)
+			return
 		}
 
-		data.DocumentName = filename
 		log.Println(data.Uid + " ContractObj end")
-		r <- DocumentResponse{
-			LinkGcs: filename,
-			Bytes:   base64.StdEncoding.EncodeToString(out),
-		}
+		r <- document
 	}()
 
 	log.Println("function end -------------------------------..")
@@ -112,10 +127,10 @@ func ContractObj(origin string, data models.Policy, networkNode *models.NetworkN
 	return r
 }
 
-func lifeContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (string, []byte) {
+func lifeContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (DocumentGenerated, error) {
 	var (
-		filename string
-		out      []byte
+		document DocumentGenerated
+		err      error
 	)
 	log.AddPrefix("LifeContract")
 	defer log.PopPrefix()
@@ -124,45 +139,13 @@ func lifeContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkN
 	switch policy.ProductVersion {
 	case models.ProductV1:
 		log.Println("life v1")
-		filename, out = lifeAxaContractV1(pdf, origin, policy, networkNode, product)
+		document, err = lifeAxaContractV1(pdf, origin, policy, networkNode, product)
 	case models.ProductV2:
 		log.Println("life v2")
-		filename, out = lifeAxaContractV2(pdf, origin, policy, networkNode, product)
+		document, err = lifeAxaContractV2(pdf, origin, policy, networkNode, product)
 	}
 
 	log.Println("function end --------------------------------")
 
-	return filename, out
-}
-
-func gapContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode) (string, []byte) {
-	var (
-		filename string
-		out      []byte
-	)
-	log.AddPrefix("GapContract")
-	defer log.PopPrefix()
-	log.Println("function start -------------------------------")
-
-	filename, out = gapSogessurContractV1(pdf, origin, policy, networkNode)
-
-	log.Println("function end ---------------------------------")
-
-	return filename, out
-}
-
-func personaContract(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (string, []byte) {
-	var (
-		filename string
-		out      []byte
-	)
-	log.AddPrefix("personaContract")
-	defer log.PopPrefix()
-	log.Println("function start ---------------------------")
-
-	filename, out = personaGlobalContractV1(pdf, policy, networkNode, product)
-
-	log.Println("function end -----------------------------")
-
-	return filename, out
+	return document, err
 }

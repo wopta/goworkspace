@@ -5,7 +5,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func personaGlobalProposalV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (string, []byte) {
+func personaGlobalProposalV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (DocumentGenerated, error) {
 	personaMainHeaderV1(pdf, policy, networkNode, true)
 
 	mainFooter(pdf, policy.Name)
@@ -56,6 +56,5 @@ func personaGlobalProposalV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode 
 
 	globalPrivacySection(pdf, (*policy.Surveys)[len(*policy.Surveys)-1])
 
-	filename, out := saveProposal(pdf, policy)
-	return filename, out
+	return generateProposalDocument(pdf, policy)
 }

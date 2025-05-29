@@ -15,7 +15,8 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/transaction"
 )
 
-func EmitSign(policy *models.Policy, product *models.Product, networkNode *models.NetworkNode, sendEmail bool, origin string) {
+// DEPRECATED use 'SignFiles'
+func EmitSign(policy *models.Policy, product *models.Product, networkNode *models.NetworkNode, sendEmail bool, origin string) error {
 	log.AddPrefix("emitSign")
 	defer log.PopPrefix()
 	log.Printf("Policy Uid %s", policy.Uid)
@@ -25,14 +26,20 @@ func EmitSign(policy *models.Policy, product *models.Product, networkNode *model
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusContact, models.PolicyStatusToSign)
 
 	p := <-document.ContractObj(origin, *policy, networkNode, product)
-	policy.DocumentName = p.LinkGcs
+	doc, err := p.SaveWithName("Contratto")
+	if err != nil {
+		return err
+	}
+
+	policy.DocumentName = doc.LinkGcs
 	_, signResponse, _ := document.NamirialOtpV6(*policy, origin, sendEmail)
 	policy.ContractFileId = signResponse.FileId
 	policy.IdSign = signResponse.EnvelopeId
 	policy.SignUrl = signResponse.Url
+	return nil
 }
 
-func EmitSignWithNewNamirial(policy *models.Policy, product *models.Product, networkNode *models.NetworkNode, sendEmail bool, origin string) error {
+func SignFiles(policy *models.Policy, product *models.Product, networkNode *models.NetworkNode, sendEmail bool, origin string) error {
 	log.AddPrefix("emitSign")
 	defer log.PopPrefix()
 	log.Printf("Policy Uid %s", policy.Uid)
@@ -42,28 +49,32 @@ func EmitSignWithNewNamirial(policy *models.Policy, product *models.Product, net
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusContact, models.PolicyStatusToSign)
 
 	namirialInput := namirial.NamirialInput{
-		Policy:    *policy,
-		FilesName: make([]string, 0),
-		SendEmail: sendEmail,
-		Origin:    origin,
+		Policy:        *policy,
+		FilesFullPath: make([]string, 0),
+		SendEmail:     sendEmail,
+		Origin:        origin,
 	}
 	//TODO: to remove after catnat document is done
 	if policy.Name != models.CatNatProduct {
 		p := <-document.ContractObj(origin, *policy, networkNode, product)
-		policy.DocumentName = p.LinkGcs
-		namirialInput.FilesName = append(namirialInput.FilesName, p.LinkGcs)
+		document, err := p.SaveWithName("Contratto")
+		if err != nil {
+			return err
+		}
+		policy.DocumentName = document.LinkGcs
+		namirialInput.FilesFullPath = append(namirialInput.FilesFullPath, document.LinkGcs)
 	}
-
+	//Preparing dto for namirial
 	filePath := strings.ReplaceAll(fmt.Sprintf("%s/%s/namirial/", "temp", policy.Uid), " ", "_")
 	paths, err := lib.ListGoogleStorageFolderContent(filePath)
 	if err != nil {
 		return err
 	}
-	for _, name := range paths {
-		namirialInput.FilesName = append(namirialInput.FilesName, name)
+	for _, path := range paths {
+		namirialInput.FilesFullPath = append(namirialInput.FilesFullPath, path)
 	}
 
-	if len(namirialInput.FilesName) == 0 {
+	if len(namirialInput.FilesFullPath) == 0 {
 		log.ErrorF("nothing to send to namirial")
 		return nil
 	}

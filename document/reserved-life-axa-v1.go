@@ -11,7 +11,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func lifeReserved(policy *models.Policy, product *models.Product) (string, []byte) {
+func lifeReserved(policy *models.Policy, product *models.Product) (DocumentGenerated, error) {
 	log.AddPrefix("lifeReserved")
 	defer log.PopPrefix()
 	log.Println("function start ------------------------------")
@@ -34,11 +34,9 @@ func lifeReserved(policy *models.Policy, product *models.Product) (string, []byt
 
 	lifeReservedInstructionsSection(pdf, policy)
 
-	gsLink, out := saveReservedDocument(pdf, policy)
-
 	log.Println("function end --------------------------------")
 
-	return gsLink, out
+	return generateReservedDocument(pdf, policy)
 }
 
 func lifeReservedHeader(pdf *fpdf.Fpdf, policy *models.Policy) {

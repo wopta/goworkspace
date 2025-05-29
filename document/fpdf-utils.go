@@ -67,35 +67,6 @@ func loadCustomFonts(pdf *fpdf.Fpdf) {
 	pdf.AddUTF8Font("Montserrat", "I", lib.GetAssetPathByEnvV2()+"montserrat_italic.ttf")
 }
 
-func saveContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
-	var (
-		filename string
-		out      bytes.Buffer
-	)
-	if os.Getenv("env") == "local" {
-		err := pdf.Output(&out)
-		defer pdf.Close()
-
-		pdfFile, err := os.Create("./document/proposal.pdf")
-		lib.CheckError(err)
-		pdfFile.Write(out.Bytes())
-		defer pdfFile.Close()
-
-		pdf.Output(pdfFile)
-		return filename, out.Bytes()
-
-	} else {
-		var out bytes.Buffer
-		err := pdf.Output(&out)
-		lib.CheckError(err)
-		filename = strings.ReplaceAll(fmt.Sprintf("%s/%s/"+models.ContractDocumentFormat, "temp", policy.Uid,
-			policy.NameDesc, policy.CodeCompany), " ", "_")
-		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
-		lib.CheckError(err)
-		return filename, out.Bytes()
-	}
-}
-
 func saveProposal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 	var (
 		filename string
@@ -145,6 +116,35 @@ func saveReservedDocument(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte
 		return filename, out.Bytes()
 	}
 	return filename, nil
+}
+
+func saveContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
+	var (
+		filename string
+		out      bytes.Buffer
+	)
+	if os.Getenv("env") == "local" {
+		err := pdf.Output(&out)
+		defer pdf.Close()
+
+		pdfFile, err := os.Create("./document/proposal.pdf")
+		lib.CheckError(err)
+		pdfFile.Write(out.Bytes())
+		defer pdfFile.Close()
+
+		pdf.Output(pdfFile)
+		return filename, out.Bytes()
+
+	} else {
+		var out bytes.Buffer
+		err := pdf.Output(&out)
+		lib.CheckError(err)
+		filename = strings.ReplaceAll(fmt.Sprintf("%s/%s/"+models.ContractDocumentFormat, "temp", policy.Uid,
+			policy.NameDesc, policy.CodeCompany), " ", "_")
+		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
+		lib.CheckError(err)
+		return filename, out.Bytes()
+	}
 }
 
 func insertWatermark(pdf *fpdf.Fpdf, text string) {

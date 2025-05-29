@@ -22,7 +22,7 @@ func Sign(input NamirialInput) (response NamirialOutput, err error) {
 	log.AddPrefix("Namirial")
 	defer log.PopPrefix()
 
-	fileIds, err := uploadFiles(input.FilesName...)
+	fileIds, err := uploadFiles(input.FilesFullPath...)
 	if err != nil {
 		return response, err
 	}

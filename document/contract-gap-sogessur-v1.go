@@ -12,7 +12,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func gapSogessurContractV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode) (string, []byte) {
+func gapSogessurContractV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode) (DocumentGenerated, error) {
 	signatureID = 0
 
 	gapHeaderV1(pdf, policy, networkNode, false)
@@ -66,8 +66,7 @@ func gapSogessurContractV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy,
 
 	personalDataHandlingSection(pdf, policy, false)
 
-	filename, out := saveContract(pdf, policy)
-	return filename, out
+	return generateContractDocument(pdf, policy)
 }
 
 func gapHeaderV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode, isProposal bool) {

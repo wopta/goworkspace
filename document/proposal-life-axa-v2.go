@@ -5,7 +5,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func lifeAxaProposalV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (string, []byte) {
+func lifeAxaProposalV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (DocumentGenerated, error) {
 	lifeMainHeaderV2(pdf, policy, networkNode, true)
 
 	mainFooter(pdf, policy.Name)
@@ -79,6 +79,5 @@ func lifeAxaProposalV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	personalDataHandlingSection(pdf, policy, true)
 
-	filename, out := saveProposal(pdf, policy)
-	return filename, out
+	return generateProposalDocument(pdf, policy)
 }

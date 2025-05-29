@@ -1,7 +1,6 @@
 package document
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -35,19 +34,25 @@ func ReservedFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	product = prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 
-	resp := Reserved(policy, product)
-
-	respJson, err := json.Marshal(resp)
+	resp, err := Reserved(policy, product)
+	if err != nil {
+		return "", nil, err
+	}
+	response, err := resp.Save()
+	if err != nil {
+		return "", nil, err
+	}
+	respJson, err := json.Marshal(response)
 
 	log.Println("handler end -----------------------------------")
 
 	return string(respJson), resp, err
 }
 
-func Reserved(policy *models.Policy, product *models.Product) *DocumentResponse {
+func Reserved(policy *models.Policy, product *models.Product) (DocumentGenerated, error) {
 	var (
-		rawDoc []byte
-		gsLink string
+		document DocumentGenerated
+		err      error
 	)
 	log.AddPrefix("Reserved")
 	log.Println("function start ----------------------------------")
@@ -55,11 +60,8 @@ func Reserved(policy *models.Policy, product *models.Product) *DocumentResponse 
 	switch policy.Name {
 	case models.LifeProduct:
 		log.Println("call lifeReserved...")
-		gsLink, rawDoc = lifeReserved(policy, product)
+		document, err = lifeReserved(policy, product)
 	}
 
-	return &DocumentResponse{
-		LinkGcs: gsLink,
-		Bytes:   base64.StdEncoding.EncodeToString(rawDoc),
-	}
+	return document, err
 }

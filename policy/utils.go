@@ -230,17 +230,27 @@ func promotePolicyAttachments(policy *models.Policy, origin string) error {
 	return nil
 }
 
-func AddProposalDoc(origin string, policy *models.Policy, networkNode *models.NetworkNode, mgaProduct *models.Product) {
-	result := document.Proposal(origin, policy, networkNode, mgaProduct)
+func AddProposalDoc(origin string, policy *models.Policy, networkNode *models.NetworkNode, mgaProduct *models.Product) error {
+	fileGenerated, err := document.Proposal(origin, policy, networkNode, mgaProduct)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
 	if policy.Attachments == nil {
 		policy.Attachments = new([]models.Attachment)
 	}
 
+	response, err := fileGenerated.Save()
+	if err != nil {
+		log.Error(err)
+		return err
+	}
 	filename := strings.ReplaceAll(fmt.Sprintf(models.ProposalDocumentFormat, policy.NameDesc, policy.ProposalNumber), " ", "_")
 	*policy.Attachments = append(*policy.Attachments, models.Attachment{
 		Name:     models.ProposalAttachmentName,
-		Link:     result.LinkGcs,
+		Link:     response.LinkGcs,
 		FileName: filename,
 		Section:  models.DocumentSectionContracts,
 	})
+	return nil
 }

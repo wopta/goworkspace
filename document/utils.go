@@ -331,6 +331,8 @@ func GetEnterprise(list []models.Asset) *models.Enterprise {
 	}
 	return res
 }
+
+// TODO: could be deleted
 func Save(m pdf.Maroto, data models.Policy) (string, []byte) {
 	//-----------Save file
 	var filename string

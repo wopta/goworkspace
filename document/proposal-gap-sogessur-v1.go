@@ -5,7 +5,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func gapSogessurProposalV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode) (string, []byte) {
+func gapSogessurProposalV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode) (DocumentGenerated, error) {
 	gapHeaderV1(pdf, policy, networkNode, true)
 
 	gapFooterV1(pdf, policy.NameDesc)
@@ -57,6 +57,5 @@ func gapSogessurProposalV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy,
 
 	personalDataHandlingSection(pdf, policy, true)
 
-	filename, out := saveProposal(pdf, policy)
-	return filename, out
+	return generateProposalDocument(pdf, policy)
 }

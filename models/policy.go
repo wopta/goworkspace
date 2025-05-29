@@ -83,7 +83,7 @@ type Policy struct {
 	Agent             *User                        `firestore:"agent,omitempty" json:"agent,omitempty" bigquery:"-"`
 	Contractor        Contractor                   `firestore:"contractor,omitempty" json:"contractor,omitempty" bigquery:"-"`
 	Contractors       *[]User                      `firestore:"contractors,omitempty" json:"contractors,omitempty" bigquery:"-"`
-	DocumentName      string                       `firestore:"documentName,omitempty" json:"documentName,omitempty" bigquery:"-"`
+	DocumentName      string                       `firestore:"documentName,omitempty" json:"documentName,omitempty" bigquery:"-"` //DEPRECATED to remove after new namirial
 	Statements        *[]Statement                 `firestore:"statements,omitempty" json:"statements,omitempty" bigquery:"-"`
 	Surveys           *[]Survey                    `firestore:"surveys,omitempty" json:"surveys,omitempty" bigquery:"-"`
 	Attachments       *[]Attachment                `firestore:"attachments,omitempty" json:"attachments,omitempty" bigquery:"-"`
