@@ -118,8 +118,7 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) error {
 		fireUsers := lib.UserCollection
 		err = lib.SetFirestoreErr(fireUsers, userUid, policy.Contractor)
 		if err != nil {
-			log.ErrorF("error creating/updating user %s: %s", policy.Contractor.Uid,
-				err.Error())
+			log.ErrorF("error creating/updating user %s: %s", policy.Contractor.Uid, err.Error())
 			return err
 		}
 		return policy.Contractor.BigquerySave(origin)
@@ -197,6 +196,7 @@ func AddSignedDocumentsInPolicy(policy *models.Policy, origin string) error {
 		if strings.Contains(fileName, policy.NameDesc) {
 			fileName = models.ContractAttachmentName
 		}
+		fileName = strings.ReplaceAll(fileName, "_", " ")
 
 		*policy.Attachments = append(*policy.Attachments, models.Attachment{
 			Name:        fileName,

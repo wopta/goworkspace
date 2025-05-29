@@ -50,7 +50,7 @@ func updatePolicy(state bpmn.StorageData) error {
 	}
 
 	// Add Policy contract
-	err = plc.AddNamirialDocumentsInPolicy(policy.Policy, origin.String)
+	err = plc.AddSignedDocumentsInPolicy(policy.Policy, origin.String)
 	if err != nil {
 		log.ErrorF("ERROR AddContract %s", err.Error())
 		return err
