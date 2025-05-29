@@ -150,7 +150,7 @@ func (ccg *CommercialCombinedGenerator) Contract() (directoryParent string, file
 	filename = fmt.Sprintf(models.ProposalDocumentFormat, ccg.policy.NameDesc, ccg.policy.ProposalNumber)
 	if !ccg.isProposal {
 		directoryParent = fmt.Sprintf("temp/%s", ccg.policy.Uid)
-		filename = fmt.Sprintf(models.ContractDocumentFormat, ccg.policy.NameDesc, ccg.policy.ProposalNumber)
+		filename = fmt.Sprintf(models.ContractDocumentFormat, ccg.policy.NameDesc, fmt.Sprint((ccg.policy.ProposalNumber)))
 	}
 	out, err = ccg.engine.RawDoc()
 	return directoryParent, filename, out, err
