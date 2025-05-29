@@ -75,7 +75,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/document v1.1.180 // indirect
 	gitlab.dev.wopta.it/goworkspace/models v1.2.59 // indirect
 	gitlab.dev.wopta.it/goworkspace/network v1.0.125 // indirect
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.222 // indirect
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.223 // indirect
 	gitlab.dev.wopta.it/goworkspace/product v1.1.57 // indirect
 	gitlab.dev.wopta.it/goworkspace/sellable v1.0.160 // indirect
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.6 // indirect
