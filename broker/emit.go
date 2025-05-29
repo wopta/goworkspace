@@ -340,7 +340,7 @@ func EmitSign(policy *models.Policy, product *models.Product, networkNode *model
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusContact, models.PolicyStatusToSign)
 
 	p := <-document.ContractObj(origin, *policy, networkNode, product)
-	doc, err := p.SaveWithName("Contratto")
+	doc, err := p.Save()
 	if err != nil {
 		return err
 	}

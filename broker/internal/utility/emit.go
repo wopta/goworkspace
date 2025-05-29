@@ -15,30 +15,6 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/transaction"
 )
 
-// DEPRECATED use 'SignFiles'
-func EmitSign(policy *models.Policy, product *models.Product, networkNode *models.NetworkNode, sendEmail bool, origin string) error {
-	log.AddPrefix("emitSign")
-	defer log.PopPrefix()
-	log.Printf("Policy Uid %s", policy.Uid)
-
-	policy.IsSign = false
-	policy.Status = models.PolicyStatusToSign
-	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusContact, models.PolicyStatusToSign)
-
-	p := <-document.ContractObj(origin, *policy, networkNode, product)
-	doc, err := p.SaveWithName("Contratto")
-	if err != nil {
-		return err
-	}
-
-	policy.DocumentName = doc.LinkGcs
-	_, signResponse, _ := document.NamirialOtpV6(*policy, origin, sendEmail)
-	policy.ContractFileId = signResponse.FileId
-	policy.IdSign = signResponse.EnvelopeId
-	policy.SignUrl = signResponse.Url
-	return nil
-}
-
 func SignFiles(policy *models.Policy, product *models.Product, networkNode *models.NetworkNode, sendEmail bool, origin string) error {
 	log.AddPrefix("emitSign")
 	defer log.PopPrefix()
