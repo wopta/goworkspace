@@ -20,7 +20,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.224
 	gitlab.dev.wopta.it/goworkspace/product v1.1.58
 	gitlab.dev.wopta.it/goworkspace/question v1.0.112
-	gitlab.dev.wopta.it/goworkspace/reserved v1.0.230
+	gitlab.dev.wopta.it/goworkspace/reserved v1.0.231
 	gitlab.dev.wopta.it/goworkspace/transaction v1.0.217
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.7
 )
