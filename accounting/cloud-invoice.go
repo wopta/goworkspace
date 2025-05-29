@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	fattureincloud "github.com/fattureincloud/fattureincloud-go-sdk/v2/model"
 	"gitlab.dev.wopta.it/goworkspace/lib"
@@ -383,7 +384,7 @@ func MapPolicyInvoiceInc(policy models.Policy, tr models.Transaction, desc strin
 		Country:       "Italia",
 		Mail:          policy.Contractor.Mail,
 		Amount:        amount,
-		Date:          tr.CreationDate,
+		Date:          time.Now().UTC(),
 		PayDate:       tr.PayDate,
 		PaymentMethod: paymentMethodMap[tr.PaymentMethod],
 		Items: []Items{{
