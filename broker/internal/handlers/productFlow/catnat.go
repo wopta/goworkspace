@@ -28,7 +28,10 @@ func CatnatIntegration(store bpmn.StorageData) error {
 	if err != nil {
 		return err
 	}
-	catnat.MappingQuoteResponseToPolicy(res, policy.Policy)
+	err = catnat.MappingQuoteResponseToPolicy(res, policy.Policy)
+	if err != nil {
+		return err
+	}
 	err = catnat.MappingQuoteResponseToGuarantee(res, policy.Policy)
 	if err != nil {
 		return err

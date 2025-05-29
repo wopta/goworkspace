@@ -409,7 +409,7 @@ func MappingQuoteResponseToGuarantee(quoteResponse QuoteResponse, policy *models
 	return nil
 }
 
-func MappingQuoteResponseToPolicy(quoteResponse QuoteResponse, policy *models.Policy) {
+func MappingQuoteResponseToPolicy(quoteResponse QuoteResponse, policy *models.Policy) error {
 	eOffer := make(map[string]*models.GuaranteValue)
 	fOffer := make(map[string]*models.GuaranteValue)
 	lOffer := make(map[string]*models.GuaranteValue)
@@ -446,13 +446,13 @@ func MappingQuoteResponseToPolicy(quoteResponse QuoteResponse, policy *models.Po
 	}
 	rates := float64(models.PaySplitRateMap[models.PaySplit(policy.PaymentSplit)])
 	if rates == 0 {
-		log.ErrorF("Rates is 0")
-		rates = 1
+		return errors.New("Rates is 0")
 	}
 	policy.OffersPrices["default"][split].Gross = policy.PriceGross / rates
 	policy.OffersPrices["default"][split].Net = policy.PriceNett / rates
 	policy.OffersPrices["default"][split].Tax = policy.TaxAmount / rates
 	policy.OfferlName = "default"
+	return nil
 }
 
 func formatAddress(addr *models.Address) string {
