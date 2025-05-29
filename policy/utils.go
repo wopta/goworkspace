@@ -183,6 +183,7 @@ func AddSignedDocumentsInPolicy(policy *models.Policy, origin string) error {
 		var typeFile string
 		fileName := documents.Documents[i].FileName
 		fileName, typeFile, _ = strings.Cut(fileName, ".")
+		fileName = strings.ReplaceAll(fileName, "_", " ")
 
 		filePath := strings.ReplaceAll(fmt.Sprintf("temp/%s/%v", policy.Uid, documents.Documents[i].FileName), " ", "_")
 		log.Println("path file path:", filePath)
@@ -196,7 +197,6 @@ func AddSignedDocumentsInPolicy(policy *models.Policy, origin string) error {
 		if strings.Contains(fileName, policy.NameDesc) {
 			fileName = models.ContractAttachmentName
 		}
-		fileName = strings.ReplaceAll(fileName, "_", " ")
 
 		*policy.Attachments = append(*policy.Attachments, models.Attachment{
 			Name:        fileName,
