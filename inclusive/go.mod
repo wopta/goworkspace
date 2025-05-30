@@ -9,7 +9,7 @@ require (
 	cloud.google.com/go/bigquery v1.51.1
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/google/uuid v1.6.0
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.165
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.166
 	google.golang.org/api v0.128.0
 )
 
