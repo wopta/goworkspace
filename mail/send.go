@@ -3,6 +3,7 @@ package mail
 import (
 	"bytes"
 	"crypto/tls"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -172,7 +173,20 @@ func sendmail(obj MailRequest) error {
 
 			if obj.IsAttachment {
 				for _, v := range *obj.Attachments {
-					message = addAttachment(message, v.FileName, v.ContentType, v.Byte)
+					var data string = v.Byte
+					var byte []byte
+					if data == "" {
+						var err error
+						if strings.HasPrefix(v.Link, "gs://") {
+							byte, err = lib.ReadFileFromGoogleStorage(v.Link)
+							if err == nil {
+								data = base64.StdEncoding.EncodeToString(byte)
+							} else {
+								log.Error(err)
+							}
+						}
+					}
+					message = addAttachment(message, v.FileName, v.ContentType, data)
 				}
 				message += fmt.Sprintf("\r\n--%s--\r\n", outerBoundary)
 			}
@@ -182,7 +196,20 @@ func sendmail(obj MailRequest) error {
 
 			if obj.IsAttachment {
 				for _, v := range *obj.Attachments {
-					message = addAttachment(message, v.Name, v.ContentType, v.Byte)
+					var data string = v.Byte
+					var byte []byte
+					if data == "" {
+						var err error
+						if strings.HasPrefix(v.Link, "gs://") {
+							byte, err = lib.ReadFileFromGoogleStorage(v.Link)
+							if err == nil {
+								data = base64.StdEncoding.EncodeToString(byte)
+							} else {
+								log.Error(err)
+							}
+						}
+					}
+					message = addAttachment(message, v.Name, v.ContentType, data)
 				}
 				message += fmt.Sprintf("\r\n\n--%s--\r\n", outerBoundary)
 			}
