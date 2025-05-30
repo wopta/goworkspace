@@ -12,7 +12,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.166
 	gitlab.dev.wopta.it/goworkspace/models v1.2.61
 	gitlab.dev.wopta.it/goworkspace/network v1.0.127
-	gitlab.dev.wopta.it/goworkspace/product v1.1.58
+	gitlab.dev.wopta.it/goworkspace/product v1.1.59
 	gitlab.dev.wopta.it/goworkspace/quote v1.0.197
 	gitlab.dev.wopta.it/goworkspace/user v1.0.162
 )
