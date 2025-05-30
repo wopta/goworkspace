@@ -11,7 +11,7 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.166
-	gitlab.dev.wopta.it/goworkspace/models v1.2.60
+	gitlab.dev.wopta.it/goworkspace/models v1.2.61
 	google.golang.org/api v0.181.0
 )
 
