@@ -9,7 +9,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/google/uuid v1.6.0
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.165
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.176
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.177
 	gitlab.dev.wopta.it/goworkspace/models v1.2.60
 )
 
