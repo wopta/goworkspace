@@ -5,7 +5,7 @@ go 1.21
 require (
 	cloud.google.com/go/firestore v1.15.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.165
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.166
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.177
 	gitlab.dev.wopta.it/goworkspace/models v1.2.60
 	gitlab.dev.wopta.it/goworkspace/payment v1.0.364
