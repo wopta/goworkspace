@@ -162,7 +162,7 @@ func AddContract(policy *models.Policy, origin string) error {
 }
 
 // Download the signed file from the envelope and add them inside the policy's attachments, and save the policy.
-// The name of the attachment is given by file's name sended to namirial(with the extension removed)
+// The name of the attachment is given by file's name sent to namirial(with the extension removed)
 func AddSignedDocumentsInPolicy(policy *models.Policy, origin string) error {
 	log.AddPrefix("AddDocumentsInPolicy")
 	defer log.PopPrefix()
@@ -200,7 +200,7 @@ func AddSignedDocumentsInPolicy(policy *models.Policy, origin string) error {
 		//With the new implementation of namirial we use the file's name to extract the label that will be showed in FE
 		//Instead in the old one, the label was hardcode independently of 'NameDesc' (that happened to be the filename that we used for namirial)
 		//olfImplementation of namirial: fw, err := w.CreateFormFile("file", NameDesc+" Polizza.pdf")'
-		//So to allow retrocompatibility we use this, old file sended with old implementation
+		//So to allow retrocompatibility we use this, old file sent with old implementation
 		if strings.Contains(fileName, policy.NameDesc) {
 			fileName = models.ContractAttachmentName
 		}
