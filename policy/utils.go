@@ -113,6 +113,12 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) error {
 		return err
 	}
 
+	err = promoteNamirialDirectory(policy, origin)
+	if err != nil {
+		log.ErrorF("error promoting namirial document: %s", err.Error())
+		return err
+	}
+
 	if newUser {
 		policy.Contractor.CreationDate = time.Now().UTC()
 		policy.Contractor.UpdatedDate = policy.Contractor.CreationDate
@@ -238,13 +244,15 @@ func promotePolicyAttachments(policy *models.Policy, origin string) error {
 	if policy.Attachments == nil {
 		return nil
 	}
-
 	for index, attachment := range *policy.Attachments {
-		if !strings.HasPrefix(attachment.Link, "temp") {
+		path := attachment.Link
+		path, _ = strings.CutPrefix(path, "gs://"+os.Getenv("GOOGLE_STORAGE_BUCKET")+"/")
+		if !(strings.HasPrefix(path, "temp")) {
 			continue
 		}
+		log.Printf("promoting %s", path)
 		gsLink, err := lib.PromoteFile(
-			fmt.Sprintf(tempPathFormat, policy.Uid, attachment.FileName),
+			path,
 			fmt.Sprintf(userPathFormat, policy.Contractor.Uid, attachment.FileName),
 		)
 		if err != nil {
@@ -254,6 +262,30 @@ func promotePolicyAttachments(policy *models.Policy, origin string) error {
 		(*policy.Attachments)[index].Link = gsLink
 	}
 	return nil
+}
+
+func promoteNamirialDirectory(policy *models.Policy, origin string) error {
+	const (
+		tempPathFormat string = "temp/%s/namirial"
+		userPathFormat string = "assets/users/%s/namirial/%v"
+	)
+	log.AddPrefix("promotoNamirialDirectory")
+
+	defer log.PopPrefix()
+	listFilesPath, err := lib.ListGoogleStorageFolderContent(fmt.Sprintf(tempPathFormat, policy.Uid))
+	if err != nil {
+		return err
+	}
+	for _, path := range listFilesPath {
+		split := strings.Split(path, "/")
+		finalFullPath := fmt.Sprintf(userPathFormat, policy.Contractor.Uid, split[len(split)-1])
+		_, err = lib.PromoteFile(path, finalFullPath)
+		if err != nil {
+			return err
+		}
+		log.Printf("Promoted %v", finalFullPath)
+	}
+	return err
 }
 
 func AddProposalDoc(origin string, policy *models.Policy, networkNode *models.NetworkNode, mgaProduct *models.Product) error {
