@@ -13,7 +13,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/models v1.2.61
 	gitlab.dev.wopta.it/goworkspace/network v1.0.127
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.225
-	gitlab.dev.wopta.it/goworkspace/product v1.1.58
+	gitlab.dev.wopta.it/goworkspace/product v1.1.59
 	gitlab.dev.wopta.it/goworkspace/sellable v1.0.161
 	github.com/xuri/excelize/v2 v2.8.1
 	google.golang.org/api v0.209.0
