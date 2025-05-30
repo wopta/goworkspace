@@ -9,11 +9,11 @@ import (
 )
 
 type mockWriter struct {
-	sended []byte
+	sent []byte
 }
 
 func (m *mockWriter) Write(p []byte) (n int, err error) {
-	m.sended = p
+	m.sent = p
 	return len(p), nil
 }
 
@@ -26,7 +26,7 @@ func TestLocalSendMultipleMessages(t *testing.T) {
 		message := randStringBytes(100)
 		log.Printf(message)
 		if !isLocalMessageCorrect(mockW, message) {
-			t.Fatal("message isnt correct,got:", string(mockW.sended))
+			t.Fatal("message isnt correct,got:", string(mockW.sent))
 		}
 	}
 
@@ -46,7 +46,7 @@ func TestGoogleCloudSendCustomMessage(t *testing.T) {
 			Severity: string(sev[randI]),
 		}
 		if !isGoogleMessageCorrect(mockW, messageS) {
-			t.Fatal("message isnt correct,got:", string(mockW.sended))
+			t.Fatal("message isnt correct,got:", string(mockW.sent))
 		}
 	}
 
@@ -66,7 +66,7 @@ func TestSendGoogleMessage(t *testing.T) {
 			Severity: string(s),
 		}
 		if !isGoogleMessageCorrect(mockW, messagesS) {
-			t.Fatal("message isnt correct,got:", string(mockW.sended))
+			t.Fatal("message isnt correct,got:", string(mockW.sent))
 		}
 	}
 
@@ -79,22 +79,22 @@ func TestAddPopPrefix(t *testing.T) {
 	log.AddPrefix("prefix2")
 
 	log.Println("fjklsd")
-	if ok, _ := regexp.MatchString(fmt.Sprintf("%v", "prefix1|prefix2"), string(mockW.sended)); !ok {
+	if ok, _ := regexp.MatchString(fmt.Sprintf("%v", "prefix1|prefix2"), string(mockW.sent)); !ok {
 		t.Fatal("no prefix found")
 	}
 
 	log.PopPrefix()
 	log.Println("fjklsd")
-	if ok, _ := regexp.MatchString(fmt.Sprintf("%v", `prefix1`), string(mockW.sended)); !ok {
+	if ok, _ := regexp.MatchString(fmt.Sprintf("%v", `prefix1`), string(mockW.sent)); !ok {
 		t.Fatal("no prefix found")
 	}
-	if ok, _ := regexp.MatchString(fmt.Sprintf("%v", `prefix2`), string(mockW.sended)); ok {
+	if ok, _ := regexp.MatchString(fmt.Sprintf("%v", `prefix2`), string(mockW.sent)); ok {
 		t.Fatal("prefix found when it shouldn't")
 	}
 
 	log.PopPrefix()
 	log.Println("fjklsd")
-	if ok, _ := regexp.MatchString(fmt.Sprintf("%v", `prefix1`), string(mockW.sended)); ok {
+	if ok, _ := regexp.MatchString(fmt.Sprintf("%v", `prefix1`), string(mockW.sent)); ok {
 		t.Fatal("prefix found when it shouldn't")
 	}
 
@@ -103,10 +103,10 @@ func TestAddPopPrefix(t *testing.T) {
 	log.PopPrefix()
 	log.PopPrefix()
 	log.Println("fjklsd")
-	if ok, _ := regexp.MatchString(fmt.Sprintf("%v", `prefix1`), string(mockW.sended)); ok {
+	if ok, _ := regexp.MatchString(fmt.Sprintf("%v", `prefix1`), string(mockW.sent)); ok {
 		t.Fatal("prefix found when it shouldn't")
 	}
-	if ok, _ := regexp.MatchString(fmt.Sprintf("%v", `prefix2`), string(mockW.sended)); ok {
+	if ok, _ := regexp.MatchString(fmt.Sprintf("%v", `prefix2`), string(mockW.sent)); ok {
 		t.Fatal("prefix found when it shouldn't")
 	}
 
@@ -125,7 +125,7 @@ func randStringBytes(n int) string {
 
 // Check if the writer's written the right messages with right pattern in local
 func isLocalMessageCorrect(writer mockWriter, message ...string) bool {
-	chunks := strings.Split(string(writer.sended), "\n")
+	chunks := strings.Split(string(writer.sent), "\n")
 	chunks = chunks[:len(chunks)-1] //we have a '\n' at the very end, so we dont considere it
 	if len(message) != len(chunks) {
 		return false
@@ -143,7 +143,7 @@ func isLocalMessageCorrect(writer mockWriter, message ...string) bool {
 
 // Check if the writer's written the right messages with right structure in google cloud
 func isGoogleMessageCorrect(writer mockWriter, message ...MessageInformation) bool {
-	chunks := strings.Split(string(writer.sended), "\n")
+	chunks := strings.Split(string(writer.sent), "\n")
 	chunks = chunks[:len(chunks)-1] //we have a '\n' at the very end, so we dont considere it
 	if len(message) != len(chunks) {
 		return false
