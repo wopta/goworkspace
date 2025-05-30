@@ -696,14 +696,16 @@ func (bg *baseGenerator) signatureForm() {
 	bg.signatureID++
 }
 
-func (bg *baseGenerator) annexSections() {
+func (bg *baseGenerator) AddMup() {
+	bg.mup()
+}
+
+func (bg *baseGenerator) mup() {
 	if bg.networkNode != nil && !bg.networkNode.HasAnnex && bg.networkNode.Type != models.PartnershipNetworkNodeType {
 		return
 	}
 
-	if bg.networkNode == nil || bg.networkNode.Type == models.PartnershipNetworkNodeType || bg.networkNode.
-		IsMgaProponent {
-
+	if bg.networkNode == nil || bg.networkNode.Type == models.PartnershipNetworkNodeType || bg.networkNode.IsMgaProponent {
 		bg.woptaHeader()
 
 		bg.woptaFooter()
@@ -714,25 +716,138 @@ func (bg *baseGenerator) annexSections() {
 	}
 
 	producerInfo := bg.productInfo()
-	proponetInfo := bg.proponentInfo()
+	proponentInfo := bg.proponentInfo()
 	designationInfo := bg.designationInfo()
-	annex4Section1Info, annex4Section3Info := bg.annex4Info()
-
-	log.Println(producerInfo, proponetInfo, designationInfo, annex4Section1Info, annex4Section3Info)
+	mupSection2Info, mupSection5Info := bg.mupInfo()
 
 	bg.engine.NewPage()
 
-	bg.annex3(producerInfo, proponetInfo, designationInfo)
-
+	bg.mupTitle()
+	bg.engine.NewLine(3)
+	bg.mupSectionI(producerInfo, proponentInfo, designationInfo)
+	bg.engine.NewLine(3)
+	bg.mupSectionII(mupSection2Info)
+	bg.engine.NewLine(3)
+	bg.mupSectionIII(proponentInfo["name"])
+	bg.engine.NewLine(3)
+	bg.mupSectionIV()
+	bg.engine.NewLine(3)
+	bg.mupSectionV(mupSection5Info)
+	bg.engine.NewLine(3)
+	bg.mupSectionVI()
 	bg.engine.NewPage()
+	bg.mupSectionVII()
+}
 
-	bg.annex4(producerInfo, proponetInfo, designationInfo, annex4Section1Info, annex4Section3Info)
+func (bg *baseGenerator) mupTitle() {
+	text := "ALLEGATO 3 - MODELLO UNICO PRECONTRATTUALE (MUP) PER I PRODOTTI ASSICURATIVI"
+	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle, constants.CenterAlign))
 
-	bg.engine.NewPage()
+	bg.engine.NewLine(3)
 
-	bg.annex4Ter(producerInfo, proponetInfo, designationInfo)
+	text = "Il distributore ha l’obbligo di consegnare/trasmettere al contraente il presente Modulo, " +
+		"prima della sottoscrizione della proposta o del contratto di assicurazione. Il documento può " +
+		"essere fornito con modalità non cartacea se appropriato rispetto alle modalità di distribuzione " +
+		"del prodotto assicurativo e il contraente lo consente (art. 120-quater del " +
+		"Codice delle Assicurazioni Private)"
+	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
+}
 
-	bg.engine.NewPage()
+func (bg *baseGenerator) mupSectionI(producerInfo, proponentInfo map[string]string, designation string) {
+	text := "SEZIONE I - Informazioni generali sul distributore che entra in contatto con " +
+		"il contraente"
+	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle))
+
+	bg.woptaTable(producerInfo, proponentInfo, designation)
+
+	text = "Gli estremi identificativi e di iscrizione dell’Intermediario e dei soggetti che " +
+		"operano per lo stesso possono essere verificati consultando il Registro Unico degli Intermediari assicurativi " +
+		"e riassicurativi sul sito internet dell’IVASS (www.ivass.it)"
+	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
+}
+
+func (bg *baseGenerator) mupSectionII(body string) {
+	text := "SEZIONE II - Informazioni sul modello di distribuzione"
+	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle))
+
+	bg.engine.WriteText(bg.engine.GetTableCell(body, constants.RegularFontStyle))
+}
+
+func (bg *baseGenerator) mupSectionIII(proponent string) {
+	text := "SEZIONE III - Informazioni relative a potenziali situazioni di conflitto " +
+		"d’interessi"
+	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle))
+
+	text = proponent + " ed i soggetti che operano per la stessa non sono " +
+		"detentori di una partecipazione, diretta o indiretta, pari o superiore al 10% del capitale sociale o dei " +
+		"diritti di voto di alcuna Impresa di assicurazione." + "\n" +
+		"Le Imprese di assicurazione o Imprese controllanti un’Impresa di assicurazione " +
+		"non sono detentrici di una partecipazione, diretta o indiretta, pari o superiore al 10% del capitale sociale " +
+		"o dei diritti di voto dell’Intermediario."
+	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
+}
+
+func (bg *baseGenerator) mupSectionIV() {
+	text := "SEZIONE IV - Informazioni sull’attività di distribuzione e consulenza"
+	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle))
+
+	text = "Nello svolgimento dell’attività di distribuzione, l’intermediario non presta " +
+		"attività di consulenza prima della conclusione del contratto né fornisce al contraente una raccomandazione " +
+		"personalizzata ai sensi dell’art. 119-ter, comma 3, del decreto legislativo n. 209/2005 " +
+		"(Codice delle Assicurazioni Private)." + "\n" +
+		"L'attività di distribuzione assicurativa è svolta in assenza di obblighi " +
+		"contrattuali che impongano di offrire esclusivamente i contratti di una o più imprese di " +
+		"assicurazioni."
+	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
+}
+
+func (bg *baseGenerator) mupSectionV(body string) {
+	text := "SEZIONE V - Informazioni relative alle remunerazioni"
+	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle))
+
+	text = body + "\n" +
+		"L’informazione sopra resa riguarda i compensi complessivamente percepiti da tutti " +
+		"gli intermediari coinvolti nella distribuzione del prodotto."
+	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
+}
+
+func (bg *baseGenerator) mupSectionVI() {
+	text := "SEZIONE VI – Informazioni sul pagamento dei premi"
+	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle))
+
+	text = "Relativamente a questo contratto i premi pagati dal Contraente " +
+		"all’intermediario e le somme destinate ai risarcimenti o ai pagamenti dovuti dalle Imprese di Assicurazione, " +
+		"se regolati per il tramite dell’intermediario costituiscono patrimonio autonomo e separato dal patrimonio " +
+		"dello stesso."
+	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
+
+	text = "Indicare le modalità di pagamento ammesse"
+	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle))
+
+	text = "Sono consentiti, nei confronti dell'intermediario, esclusivamente bonifico e strumenti di " +
+		"pagamento elettronico, quali ad esempio, carte di credito e/o carte di debito, incluse le carte " +
+		"prepagate."
+	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
+}
+
+func (bg *baseGenerator) mupSectionVII() {
+	text := "SEZIONE VII - Informazioni sugli strumenti di tutela del contraente"
+	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle))
+
+	text = "L’attività di distribuzione è garantita da un contratto di assicurazione della " +
+		"responsabilità civile che copre i danni arrecati ai contraenti da negligenze ed errori professionali " +
+		"dell’intermediario o da negligenze, errori professionali ed infedeltà dei dipendenti, dei collaboratori o " +
+		"delle persone del cui operato l’intermediario deve rispondere a norma di legge." + "\n" +
+		"Il contraente ha la facoltà, ferma restando la possibilità di rivolgersi " +
+		"all’Autorità Giudiziaria, di inoltrare reclamo per iscritto all’intermediario, via posta all’indirizzo di " +
+		"sede legale o a mezzo mail alla PEC sopra indicati, oppure all’Impresa secondo le modalità e presso i " +
+		"recapiti indicati nel DIP aggiuntivo nella relativa sezione, nonché la possibilità, qualora non dovesse " +
+		"ritenersi soddisfatto dall’esito del reclamo o in caso di assenza di riscontro da parte dell’intermediario " +
+		"o dell’impresa entro il termine di legge, di rivolgersi all’IVASS secondo quanto indicato nei DIP aggiuntivi." + "\n" +
+		"Il contraente ha la facoltà di avvalersi di altri eventuali sistemi alternativi " +
+		"di risoluzione delle controversie previsti dalla normativa vigente nonché quelli indicati nei" +
+		" DIP aggiuntivi."
+	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
 }
 
 func (bg *baseGenerator) productInfo() map[string]string {
@@ -869,7 +984,7 @@ func (bg *baseGenerator) designationInfo() string {
 	return designation
 }
 
-func (bg *baseGenerator) annex4Info() (section1Info, section3Info string) {
+func (bg *baseGenerator) mupInfo() (section1Info, section3Info string) {
 	const (
 		mgaProponentFormat = "Secondo quanto indicato nel modulo di proposta/polizza e documentazione " +
 			"precontrattuale ricevuta, la distribuzione  relativamente a questa proposta/contratto è svolta per " +

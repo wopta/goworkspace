@@ -15,7 +15,7 @@ type keyValue struct {
 	value string
 }
 
-func personaGlobalContractV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (DocumentGenerated, error) {
+func personaGlobalContractV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) {
 	signatureID = 0
 
 	personaMainHeaderV1(pdf, policy, networkNode, false)
@@ -58,8 +58,6 @@ func personaGlobalContractV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode 
 
 	personalDataHandlingSection(pdf, policy, false)
 
-	generatePolicyAnnex(pdf, "", networkNode, policy, setAnnexHeaderFooter(pdf, networkNode, false))
-
 	globalHeader(pdf, false)
 
 	pdf.AddPage()
@@ -67,8 +65,6 @@ func personaGlobalContractV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode 
 	globalFooter(pdf)
 
 	globalPrivacySection(pdf, (*policy.Surveys)[len(*policy.Surveys)-1])
-
-	return generateContractDocument(pdf, policy)
 }
 
 func personaMainHeaderV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode, isProposal bool) {
