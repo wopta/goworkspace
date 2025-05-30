@@ -13,7 +13,6 @@ import (
 )
 
 type DocumentGenerated struct {
-	//Default target directory, do not insert '/' at the end
 	ParentPath string
 	//Default name of the file
 	FileName string
