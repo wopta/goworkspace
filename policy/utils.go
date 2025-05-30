@@ -273,10 +273,12 @@ func AddProposalDoc(origin string, policy *models.Policy, networkNode *models.Ne
 	}
 	filename := strings.ReplaceAll(fmt.Sprintf(models.ProposalDocumentFormat, policy.NameDesc, policy.ProposalNumber), " ", "_")
 	*policy.Attachments = append(*policy.Attachments, models.Attachment{
-		Name:     models.ProposalAttachmentName,
-		Link:     response.LinkGcs,
-		FileName: filename,
-		Section:  models.DocumentSectionContracts,
+		Name:        models.ProposalAttachmentName,
+		Link:        response.LinkGcs,
+		FileName:    filename,
+		Section:     models.DocumentSectionContracts,
+		MimeType:    lib.GetContentType("pdf"),
+		ContentType: lib.GetContentType("pdf"),
 	})
 	return nil
 }

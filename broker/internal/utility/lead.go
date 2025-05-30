@@ -5,6 +5,7 @@ import (
 	"slices"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
@@ -45,8 +46,10 @@ func SetLeadData(policy *models.Policy, product models.Product, networkNode *mod
 
 	log.Println("add information set")
 	informationSet := models.Attachment{
-		Name:     "Precontrattuale",
-		FileName: "Precontrattuale.pdf",
+		Name:        "Precontrattuale",
+		FileName:    "Precontrattuale.pdf",
+		MimeType:    lib.GetContentType("pdf"),
+		ContentType: lib.GetContentType("pdf"),
 		Link: fmt.Sprintf(
 			"gs://documents-public-dev/information-sets/%s/%s/Precontrattuale.pdf",
 			policy.Name,
