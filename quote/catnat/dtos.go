@@ -414,26 +414,6 @@ func mappingQuoteResponseToGuarantee(quoteResponse QuoteResponse, policy *models
 }
 
 func mappingQuoteResponseToPolicy(quoteResponse QuoteResponse, policy *models.Policy) error {
-	eOffer := make(map[string]*models.GuaranteValue)
-	fOffer := make(map[string]*models.GuaranteValue)
-	lOffer := make(map[string]*models.GuaranteValue)
-
-	eOffer["default"] = new(models.GuaranteValue)
-	fOffer["default"] = new(models.GuaranteValue)
-	lOffer["default"] = new(models.GuaranteValue)
-	for _, asset := range policy.Assets {
-		for _, guarantee := range asset.Guarantees {
-			if guarantee.Slug == earthquakeSlug {
-				guarantee.Offer = eOffer
-			}
-			if guarantee.Slug == floodSlug {
-				guarantee.Offer = fOffer
-			}
-			if guarantee.Slug == landslideSlug {
-				guarantee.Offer = lOffer
-			}
-		}
-	}
 	policy.PriceGross = quoteResponse.AnnualGross
 	policy.PriceNett = quoteResponse.AnnualNet
 	policy.TaxAmount = quoteResponse.AnnualTax
