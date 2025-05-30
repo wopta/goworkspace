@@ -67,7 +67,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
 	gitlab.dev.wopta.it/goworkspace/models v1.2.61 // indirect
-	gitlab.dev.wopta.it/goworkspace/network v1.0.126 // indirect
+	gitlab.dev.wopta.it/goworkspace/network v1.0.127 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
