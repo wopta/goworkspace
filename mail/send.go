@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
 
 	"cloud.google.com/go/bigquery"
 	"gitlab.dev.wopta.it/goworkspace/lib"
@@ -72,24 +73,38 @@ func SendFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, err
 	return `{"message":"Success send "}`, nil, nil
 }
 
-func addAttachment(message, filename, contentType, data string) string {
-	var ct string
-	if contentType == "" {
-		sct := strings.Split(filename, ".")
-		ct = lib.GetContentType(sct[1])
+func addAttachment(message string, attachment models.Attachment) (string, error) {
+	var contentType string
+	var data string
+
+	if attachment.ContentType != "" {
+		contentType = attachment.ContentType
+	} else if attachment.MimeType != "" {
+		contentType = attachment.MimeType
 	} else {
-		ct = contentType
+		_, extension, _ := strings.Cut(attachment.FileName, ".")
+		contentType = lib.GetContentType(extension)
 	}
-	filename = strings.ReplaceAll(filename, "_", " ")
+
+	filename := strings.ReplaceAll(attachment.FileName, "_", " ")
+
+	data = attachment.Byte
+	if data == "" {
+		byte, err := lib.ReadFileFromGoogleStorageEitherGsOrNot(attachment.Link)
+		if err != nil {
+			return message, nil
+		}
+		data = base64.StdEncoding.EncodeToString(byte)
+	}
 
 	message += fmt.Sprintf("\r\n--%s\r\n", outerBoundary)
-	message += fmt.Sprintf("Content-Type: %s; name=\"%s\"\r\n", ct, filename)
+	message += fmt.Sprintf("Content-Type: %s; name=\"%s\"\r\n", contentType, filename)
 	message += fmt.Sprintf("Content-Description: %s\r\n", filename)
 	message += fmt.Sprintf("Content-Disposition: attachment; filename=\"%s\"\r\n", filename)
 	message += fmt.Sprintf("Content-Transfer-Encoding: base64\r\n")
 	message += fmt.Sprintf("\r\n%s\r\n", string(data))
 
-	return message
+	return message, nil
 }
 
 func sendmail(obj MailRequest) error {
@@ -169,25 +184,18 @@ func sendmail(obj MailRequest) error {
 		}
 
 		if obj.IsHtml {
+			log.Println("Adding content to email body")
+
 			message += "Content-Type: text/html; charset=\"UTF-8\"\r\n"
 			message += fmt.Sprintf("\r\n%s", tpl.String())
 
 			if obj.IsAttachment {
 				for _, v := range *obj.Attachments {
-					var data string = v.Byte
-					var byte []byte
-					if data == "" {
-						var err error
-						if strings.HasPrefix(v.Link, "gs://") {
-							byte, err = lib.ReadFileFromGoogleStorage(v.Link)
-							if err == nil {
-								data = base64.StdEncoding.EncodeToString(byte)
-							} else {
-								log.Error(err)
-							}
-						}
+					message, err = addAttachment(message, v)
+					if err != nil {
+						log.Error(err)
+						return err
 					}
-					message = addAttachment(message, v.FileName, v.ContentType, data)
 				}
 				message += fmt.Sprintf("\r\n--%s--\r\n", outerBoundary)
 			}
@@ -197,20 +205,11 @@ func sendmail(obj MailRequest) error {
 
 			if obj.IsAttachment {
 				for _, v := range *obj.Attachments {
-					var data string = v.Byte
-					var byte []byte
-					if data == "" {
-						var err error
-						if strings.HasPrefix(v.Link, "gs://") {
-							byte, err = lib.ReadFileFromGoogleStorage(v.Link)
-							if err == nil {
-								data = base64.StdEncoding.EncodeToString(byte)
-							} else {
-								log.Error(err)
-							}
-						}
+					message, err = addAttachment(message, v)
+					if err != nil {
+						log.Error(err)
+						return err
 					}
-					message = addAttachment(message, v.Name, v.ContentType, data)
 				}
 				message += fmt.Sprintf("\r\n\n--%s--\r\n", outerBoundary)
 			}

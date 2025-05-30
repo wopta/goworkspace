@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"regexp"
 	"strings"
 
@@ -123,13 +122,7 @@ func GetPolicyAttachments(policyUid string, origin string) ([]models.Attachment,
 			log.Printf("empty gsLink")
 			continue
 		}
-		if !strings.Contains(gsLink, "gs://") {
-			gsLink = "gs://" + os.Getenv("GOOGLE_STORAGE_BUCKET") + "/" + gsLink
-		}
-
-		log.Printf("gsLink: %s", gsLink)
-
-		fileData, err := lib.ReadFileFromGoogleStorage(gsLink)
+		fileData, err := lib.ReadFileFromGoogleStorageEitherGsOrNot(gsLink)
 		if err != nil {
 			log.ErrorF("error reading document from Google Storage: %s", err.Error())
 			return nil, err

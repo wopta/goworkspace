@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
-	"os"
 	"strings"
 	"text/template"
 
@@ -216,11 +215,7 @@ func getMailAttachments(policy models.Policy, attachmentNames []string) []models
 	at = make([]models.Attachment, 0)
 	for _, attachment := range *policy.Attachments {
 		if lib.SliceContains(attachmentNames, attachment.Name) {
-			if strings.HasPrefix(attachment.Link, "gs://") {
-				rawDoc, err = lib.ReadFileFromGoogleStorage(attachment.Link)
-			} else {
-				rawDoc, err = lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), attachment.Link)
-			}
+			rawDoc, err = lib.ReadFileFromGoogleStorageEitherGsOrNot(attachment.Link)
 			if err != nil {
 				log.ErrorF("error reading document %s from google storage: %s", attachment.Name, err.Error())
 				return nil

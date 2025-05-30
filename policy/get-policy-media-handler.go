@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"strings"
 
 	"gitlab.dev.wopta.it/goworkspace/lib"
@@ -81,13 +80,10 @@ func downloadAttachment(gsLink string) (string, GetPolicyMediaResp, error) {
 		log.Printf("empty gsLink")
 		return "", GetPolicyMediaResp{}, fmt.Errorf("media not found")
 	}
-	if !strings.Contains(gsLink, "gs://") {
-		gsLink = "gs://" + os.Getenv("GOOGLE_STORAGE_BUCKET") + "/" + gsLink
-	}
 
 	log.Printf("gsLink: %s", gsLink)
+	rawDoc, err := lib.ReadFileFromGoogleStorageEitherGsOrNot(gsLink)
 
-	rawDoc, err := lib.ReadFileFromGoogleStorage(gsLink)
 	if err != nil {
 		log.ErrorF("error reading document from Google Storage: %s", err.Error())
 		return "", GetPolicyMediaResp{}, err

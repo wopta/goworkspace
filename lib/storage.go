@@ -99,6 +99,15 @@ func ReadFileFromGoogleStorage(gsLink string) ([]byte, error) {
 	return nil, errors.New("invalid gsLink")
 }
 
+// Get file from bucket, either with a GSlink or a path
+func ReadFileFromGoogleStorageEitherGsOrNot(pathOrGs string) ([]byte, error) {
+	if strings.HasPrefix(pathOrGs, "gs://") {
+		return ReadFileFromGoogleStorage(pathOrGs)
+	} else {
+		return GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), pathOrGs)
+	}
+}
+
 func ListGoogleStorageFolderContent(folderPath string) ([]string, error) {
 	filesList := make([]string, 0)
 	bucket := os.Getenv("GOOGLE_STORAGE_BUCKET")
