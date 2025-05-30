@@ -386,7 +386,7 @@ func getGuarantee(policy *models.Policy, codeGuarantees string) (*models.Guarant
 }
 
 // Given a quoteResponse of catnat sum and assign the assentDailt to each guarantees
-func MappingQuoteResponseToGuarantee(quoteResponse QuoteResponse, policy *models.Policy) error {
+func mappingQuoteResponseToGuarantee(quoteResponse QuoteResponse, policy *models.Policy) error {
 	var currentGuaranteeCode string
 	for i := range policy.Assets[0].Guarantees {
 		policy.Assets[0].Guarantees[i].Value.PremiumGrossYearly = 0
@@ -413,7 +413,7 @@ func MappingQuoteResponseToGuarantee(quoteResponse QuoteResponse, policy *models
 	return nil
 }
 
-func MappingQuoteResponseToPolicy(quoteResponse QuoteResponse, policy *models.Policy) error {
+func mappingQuoteResponseToPolicy(quoteResponse QuoteResponse, policy *models.Policy) error {
 	eOffer := make(map[string]*models.GuaranteValue)
 	fOffer := make(map[string]*models.GuaranteValue)
 	lOffer := make(map[string]*models.GuaranteValue)

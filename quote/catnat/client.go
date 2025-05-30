@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
 	"golang.org/x/oauth2/clientcredentials"
 )
 
@@ -22,8 +23,8 @@ type NetClient struct {
 }
 
 type INetClient interface {
-	Quote(dto QuoteRequest) (response QuoteResponse, err error)
-	Emit(dto QuoteRequest) (response QuoteResponse, err error)
+	Quote(dto QuoteRequest, policy *models.Policy) (response QuoteResponse, err error)
+	Emit(dto QuoteRequest, policy *models.Policy) (response QuoteResponse, err error)
 	Download(numeroPoliza string) (response DownloadResponse, err error)
 }
 
@@ -43,7 +44,32 @@ func NewNetClient() (client *NetClient) {
 	return client
 }
 
-func (c *NetClient) Quote(dto QuoteRequest) (response QuoteResponse, err error) {
+func (c *NetClient) Quote(dto QuoteRequest, policy *models.Policy) (response QuoteResponse, err error) {
+	response, err = c.quote(dto)
+	if err != nil {
+		return response, err
+	}
+	err = mappingQuoteResponseToPolicy(response, policy)
+	if err != nil {
+		return response, err
+	}
+	err = mappingQuoteResponseToGuarantee(response, policy)
+	return response, err
+}
+
+func (c *NetClient) Emit(dto QuoteRequest, policy *models.Policy) (response QuoteResponse, err error) {
+	response, err = c.emit(dto)
+	if err != nil {
+		return response, err
+	}
+	err = mappingQuoteResponseToPolicy(response, policy)
+	if err != nil {
+		return response, err
+	}
+	err = mappingQuoteResponseToGuarantee(response, policy)
+	return response, err
+}
+func (c *NetClient) quote(dto QuoteRequest) (response QuoteResponse, err error) {
 	url := os.Getenv("NET_BASEURL") + "/PolizzeGateway24/emettiPolizza/441-029-007"
 	rBuff := new(bytes.Buffer)
 	log.PrintStruct("request: ", dto)
@@ -78,7 +104,7 @@ func (c *NetClient) Quote(dto QuoteRequest) (response QuoteResponse, err error) 
 	return response, nil
 }
 
-func (c *NetClient) Emit(dto QuoteRequest) (response QuoteResponse, err error) {
+func (c *NetClient) emit(dto QuoteRequest) (response QuoteResponse, err error) {
 	dto.Emission = "si"
 	url := os.Getenv("NET_BASEURL") + "/PolizzeGateway24/emettiPolizza/441-029-007"
 	rBuff := new(bytes.Buffer)

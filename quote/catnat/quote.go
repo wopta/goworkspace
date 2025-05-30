@@ -23,16 +23,11 @@ func CatnatQuote(policy *models.Policy, product *models.Product, sellable sellab
 		return resp, err
 	}
 
-	resp, err = catnatClient.Quote(cnReq)
+	resp, err = catnatClient.Quote(cnReq, policy)
 	log.PrintStruct("response quote", resp)
 	if err != nil {
 		return resp, err
 	}
-	err = MappingQuoteResponseToPolicy(resp, policy)
-	if err != nil {
-		return resp, err
-	}
-	err = MappingQuoteResponseToGuarantee(resp, policy)
 	internal.AddConsultacyPrice(policy, product)
 	return
 }
