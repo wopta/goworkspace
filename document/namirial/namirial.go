@@ -31,7 +31,7 @@ func Sign(input NamirialInput) (response NamirialOutput, err error) {
 	if err != nil {
 		return response, err
 	}
-	callbackurl := `https://europe-west1-` + os.Getenv("GOOGLE_PROJECT_ID") + `.cloudfunctions.net/callback/v1/sign?envelope=##EnvelopeId##&action=##Action##&uid=` + input.Policy.Uid + `&token=` + os.Getenv("WOPTA_TOKEN_API") + `&origin=` + input.Origin + `&sendEmail=` + strconv.FormatBool(input.SendEmail)
+	callbackurl := getCallbackUrl(input)
 	idEnvelope, err := sendDocuments(resp, fileIds, input.Policy, callbackurl)
 	if err != nil {
 		return response, err
@@ -57,12 +57,11 @@ func uploadFiles(files ...string) (fileIds []string, err error) {
 	for i := range files {
 		split := strings.Split(files[i], "/")
 		name := split[len(split)-1]
-		files[i], _ = strings.CutPrefix(files[i], "gs://function-data/")
 
 		if env.IsLocal() {
 			file, err = os.ReadFile("document/contract.pdf")
 		} else {
-			file, err = lib.GetFromStorageErr(os.Getenv("GOOGLE_STORAGE_BUCKET"), files[i], "")
+			file, err = lib.ReadFileFromGoogleStorageEitherGsOrNot(files[i])
 		}
 		if err != nil {
 			return fileIds, err
@@ -231,7 +230,7 @@ func buildBodyToSend(prepareteResponse document.PrepareResponse, idFiles []strin
 // adjust the request to insert information regard the contractor
 func setContractorDataInSendBody(bodySend *sendNamirialRequest, policy models.Policy) error {
 	var signer *models.User
-	if policy.Contractor.Type == "legalEntity" { //for legalentity who pay is between contractors
+	if policy.Contractor.Type == models.UserLegalEntity { //for legalentity who pay is between contractors
 		for _, contractor := range *policy.Contractors {
 			if contractor.IsSignatory {
 				signer = &contractor
@@ -283,6 +282,15 @@ func getEnvelope(idEvenelope string) (responseGetEvelop, error) {
 	return resp, err
 }
 
+func getCallbackUrl(input NamirialInput) string {
+	var url string = os.Getenv("WOPTA_BASEURL")
+	url += "callback/v1/sign?envelope=##EnvelopeId##&action=##Action##&uid=" + input.Policy.Uid
+	url += "&token=" + os.Getenv("WOPTA_TOKEN_API")
+	url += "&origin=" + input.Origin
+	url += "&sendEmail=" + strconv.FormatBool(input.SendEmail)
+	return url
+}
+
 func GetFiles(envelopeId string) (document.NamirialFiles, error) {
 	var resp document.NamirialFiles
 	var urlstring = os.Getenv("ESIGN_BASEURL") + "v6/envelope/" + envelopeId + "/files"
@@ -293,13 +301,15 @@ func GetFiles(envelopeId string) (document.NamirialFiles, error) {
 	lib.CheckError(err)
 
 	if res != nil {
-		body, _ := io.ReadAll(res.Body)
-
-		err := json.Unmarshal(body, &resp)
+		body, err := io.ReadAll(res.Body)
 		if err != nil {
 			return resp, err
 		}
-		res.Body.Close()
+		defer res.Body.Close()
+		err = json.Unmarshal(body, &resp)
+		if err != nil {
+			return resp, err
+		}
 
 		log.Println("body:", string(body))
 	}
@@ -320,8 +330,5 @@ func GetFile(fileId string) ([]byte, error) {
 	}
 
 	resp, err := io.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-	return resp, nil
+	return resp, err
 }
