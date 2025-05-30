@@ -80,6 +80,7 @@ func addAttachment(message, filename, contentType, data string) string {
 	} else {
 		ct = contentType
 	}
+	filename = strings.ReplaceAll(filename, "_", " ")
 
 	message += fmt.Sprintf("\r\n--%s\r\n", outerBoundary)
 	message += fmt.Sprintf("Content-Type: %s; name=\"%s\"\r\n", ct, filename)
