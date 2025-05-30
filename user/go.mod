@@ -10,7 +10,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.12
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.166
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.177
-	gitlab.dev.wopta.it/goworkspace/models v1.2.60
+	gitlab.dev.wopta.it/goworkspace/models v1.2.61
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.8
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
 
