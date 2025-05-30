@@ -115,7 +115,7 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) error {
 
 	err = promoteNamirialDirectory(policy, origin)
 	if err != nil {
-		log.ErrorF("error promoting namirial document: %s", err.Error())
+		log.ErrorF("error promoting namirial documents: %s", err.Error())
 		return err
 	}
 
