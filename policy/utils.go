@@ -208,7 +208,7 @@ func AddSignedDocumentsInPolicy(policy *models.Policy, origin string) error {
 		*policy.Attachments = append(*policy.Attachments, models.Attachment{
 			Name:        fileName,
 			Link:        gsLink,
-			FileName:    fileName + "." + typeFile,
+			FileName:    documents.Documents[i].FileName,
 			Section:     models.DocumentSectionContracts,
 			ContentType: lib.GetContentType(typeFile),
 			MimeType:    lib.GetContentType(typeFile),
