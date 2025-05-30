@@ -58,16 +58,9 @@ func uploadFiles(files ...string) (fileIds []string, err error) {
 		split := strings.Split(files[i], "/")
 		name := split[len(split)-1]
 
-		if env.IsLocal() {
-			file, err = os.ReadFile("document/contract.pdf")
-		} else {
-			file, err = lib.ReadFileFromGoogleStorageEitherGsOrNot(files[i])
-		}
+		file, err = lib.ReadFileFromGoogleStorageEitherGsOrNot(files[i])
 		if err != nil {
 			return fileIds, err
-		}
-		if len(file) == 0 {
-			return fileIds, fmt.Errorf("No file found at %v", files[i])
 		}
 		if file == nil || len(file) == 0 {
 			return fileIds, fmt.Errorf("Error getting the file %v", files[i])
