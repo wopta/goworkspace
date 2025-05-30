@@ -183,36 +183,27 @@ func sendmail(obj MailRequest) error {
 			message += fmt.Sprintf("\r\n--%s\r\n", outerBoundary)
 		}
 
+		log.Println("Adding content to email body")
 		if obj.IsHtml {
-			log.Println("Adding content to email body")
-
+			log.Println("add html content")
 			message += "Content-Type: text/html; charset=\"UTF-8\"\r\n"
 			message += fmt.Sprintf("\r\n%s", tpl.String())
 
-			if obj.IsAttachment {
-				for _, v := range *obj.Attachments {
-					message, err = addAttachment(message, v)
-					if err != nil {
-						log.Error(err)
-						return err
-					}
-				}
-				message += fmt.Sprintf("\r\n--%s--\r\n", outerBoundary)
-			}
 		} else {
+			log.Println("add no html content")
 			message += "Content-Type:text/plain; charset=\"UTF-8\"\r\n"
 			message += fmt.Sprintf("\r\n%s", body)
+		}
 
-			if obj.IsAttachment {
-				for _, v := range *obj.Attachments {
-					message, err = addAttachment(message, v)
-					if err != nil {
-						log.Error(err)
-						return err
-					}
+		if obj.IsAttachment {
+			for _, v := range *obj.Attachments {
+				message, err = addAttachment(message, v)
+				if err != nil {
+					log.Error(err)
+					return err
 				}
-				message += fmt.Sprintf("\r\n\n--%s--\r\n", outerBoundary)
 			}
+			message += fmt.Sprintf("\r\n--%s--\r\n", outerBoundary)
 		}
 
 		log.Println("sending message...")
