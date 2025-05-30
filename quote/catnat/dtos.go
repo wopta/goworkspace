@@ -391,6 +391,10 @@ func MappingQuoteResponseToGuarantee(quoteResponse QuoteResponse, policy *models
 	for i := range policy.Assets[0].Guarantees {
 		policy.Assets[0].Guarantees[i].Value.PremiumGrossYearly = 0
 	}
+	rates := float64(models.PaySplitRateMap[models.PaySplit(policy.PaymentSplit)])
+	if rates == 0 {
+		return errors.New("Rates is 0")
+	}
 	for _, assetDetailCatnat := range quoteResponse.AssetsDetail {
 		for _, guaranteeDetailCatnat := range assetDetailCatnat.GuaranteesDetail {
 			guaranteeCodes := strings.Split(guaranteeDetailCatnat.GuaranteeCode, "/")
@@ -404,7 +408,7 @@ func MappingQuoteResponseToGuarantee(quoteResponse QuoteResponse, policy *models
 		}
 	}
 	for i := range policy.Assets[0].Guarantees {
-		policy.Assets[0].Guarantees[i].Value.PremiumGrossYearly = lib.RoundFloat(policy.Assets[0].Guarantees[i].Value.PremiumGrossYearly, 2)
+		policy.Assets[0].Guarantees[i].Value.PremiumGrossYearly = lib.RoundFloat(policy.Assets[0].Guarantees[i].Value.PremiumGrossYearly*rates, 2)
 	}
 	return nil
 }
