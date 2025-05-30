@@ -84,7 +84,7 @@ require (
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
 	gitlab.dev.wopta.it/goworkspace/accounting v1.0.46 // indirect
 	gitlab.dev.wopta.it/goworkspace/document v1.1.181 // indirect
-	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.7 // indirect
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.8 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
