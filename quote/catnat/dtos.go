@@ -33,9 +33,9 @@ type QuoteRequest struct {
 	Splitting           string              `json:"frazionamento"`
 	Emission            string              `json:"emissione"`
 	SalesChannel        string              `json:"canaleVendita"`
-	Contractor          Contractor          `json:"contraente"`
-	LegalRepresentative LegalRepresentative `json:"legaleRappresentante"`
-	Asset               AssetRequest        `json:"bene"`
+	Contractor          contractor          `json:"contraente"`
+	LegalRepresentative legalRepresentative `json:"legaleRappresentante"`
+	Asset               assetRequest        `json:"bene"`
 }
 
 type DownloadRequest struct {
@@ -51,7 +51,7 @@ type DownloadResponse struct {
 	Documento     []Documento `json:"documento"`
 	Errors        interface{} `json:"errori"` // or *string if it's always null or a string
 }
-type Contractor struct {
+type contractor struct {
 	Name                      string `json:"nome,omitempty"`
 	Surname                   string `json:"cognome,omitempty"`
 	PersonalDataType          string `json:"tipoAnagrafica,omitempty"`
@@ -75,7 +75,7 @@ type Contractor struct {
 	ConsensoTrattamento string `json:"ConsensoTrattamento,omitempty"`
 }
 
-type LegalRepresentative struct {
+type legalRepresentative struct {
 	Name       string `json:"nome,omitempty"`
 	Surname    string `json:"cognome,omitempty"`
 	FiscalCode string `json:"codiceFiscale,omitempty"`
@@ -87,12 +87,7 @@ type LegalRepresentative struct {
 	Email      string `json:"email,omitempty"`
 }
 
-type GuaranteeList struct {
-	GuaranteeCode string `json:"codGaranzia"`
-	CapitalAmount int    `json:"importoCapitale"`
-}
-
-type AssetRequest struct {
+type assetRequest struct {
 	ContractorAndTenant  string          `json:"contraenteProprietarioEConduttore"`
 	EarthquakeCoverage   string          `json:"presenzaCoperturaTerremoto"`
 	FloodCoverage        string          `json:"presenzaCoperturaAlluvione"`
@@ -107,7 +102,12 @@ type AssetRequest struct {
 	ConstructionYear     int             `json:"annoDiCostruzione"`
 	FloorNumber          int             `json:"numeroPianiEdificio"`
 	LowestFloor          int             `json:"pianoPiuBassoOccupato"`
-	GuaranteeList        []GuaranteeList `json:"elencoGaranzia"`
+	GuaranteeList        []guaranteeList `json:"elencoGaranzia"`
+}
+
+type guaranteeList struct {
+	GuaranteeCode string `json:"codGaranzia"`
+	CapitalAmount int    `json:"importoCapitale"`
 }
 
 type AssetResponse struct {
@@ -237,7 +237,7 @@ func (d *QuoteRequest) FromPolicyForEmit(policy *models.Policy) error {
 			return errors.New("You need to compile Contractor.FiscalCode")
 		}
 	}
-	contr := Contractor{
+	contr := contractor{
 		PersonalDataType:          dt,
 		Name:                      policy.Contractor.Name,
 		Surname:                   policy.Contractor.Surname,
@@ -264,7 +264,7 @@ func (d *QuoteRequest) FromPolicyForEmit(policy *models.Policy) error {
 
 	d.Contractor = contr
 
-	var legalRep LegalRepresentative
+	var legalRep legalRepresentative
 	if policy.Contractors != nil {
 		for _, v := range *policy.Contractors {
 			if v.IsSignatory {
@@ -327,7 +327,7 @@ func (d *QuoteRequest) FromPolicyForQuote(policy *models.Policy) error {
 	if wantFlood == nil {
 		wantFlood = false
 	}
-	asset := AssetRequest{
+	asset := assetRequest{
 		ContractorAndTenant:  useTypeMap[baseAsset.Building.UseType],
 		EarthquakeCoverage:   quoteQuestionMap[alreadyEarthquake.(bool)],
 		FloodCoverage:        quoteQuestionMap[alreadyFlood.(bool)],
@@ -338,7 +338,7 @@ func (d *QuoteRequest) FromPolicyForQuote(policy *models.Policy) error {
 		ConstructionYear:     buildingYearMap[baseAsset.Building.BuildingYear],
 		FloorNumber:          floorMap[baseAsset.Building.Floor],
 		LowestFloor:          lowestFloorMap[baseAsset.Building.LowestFloor],
-		GuaranteeList:        make([]GuaranteeList, 0),
+		GuaranteeList:        make([]guaranteeList, 0),
 	}
 	if baseAsset.Building.BuildingAddress != nil {
 		asset.PostalCode = baseAsset.Building.BuildingAddress.PostalCode
@@ -356,8 +356,8 @@ func (d *QuoteRequest) FromPolicyForQuote(policy *models.Policy) error {
 	return nil
 }
 
-func setGuaranteeValue(asset *AssetRequest, guarantee models.Guarante, code string) {
-	var gL GuaranteeList
+func setGuaranteeValue(asset *assetRequest, guarantee models.Guarante, code string) {
+	var gL guaranteeList
 	if guarantee.Value.SumInsuredLimitOfIndemnity != 0 {
 		gL.GuaranteeCode = code + buildingCode
 		gL.CapitalAmount = int(guarantee.Value.SumInsuredLimitOfIndemnity)
