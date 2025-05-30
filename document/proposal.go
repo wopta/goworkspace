@@ -82,22 +82,18 @@ func Proposal(origin string, policy *models.Policy, networkNode *models.NetworkN
 		document, err = lifeProposal(pdf, origin, policy, networkNode, product)
 	case models.GapProduct:
 		log.Println("call gapProposal...")
-		document, err = gapProposal(pdf, origin, policy, networkNode)
+		document, err = gapSogessurProposalV1(pdf, origin, policy, networkNode)
 	case models.PersonaProduct:
 		log.Println("call personaProposal...")
-		document, err = personaProposal(pdf, policy, networkNode, product)
+		pdf := engine.NewFpdf()
+		generator := contract.NewPersonaGenerator(pdf, policy, networkNode, *product, true)
+		personaGlobalProposalV1(pdf.GetPdf(), policy, networkNode, product)
+		generator.AddMup()
+		document, err = generateProposalDocument(pdf.GetPdf(), policy)
 	case models.CatNatProduct:
 		//to change
 		pdf := initFpdf()
 		document, err = generateProposalDocument(pdf, policy)
-	case models.CommercialCombinedProduct:
-		//TODO: could be this eliminated?
-		//	generator := contract.NewCommercialCombinedGenerator(engine.NewFpdf(), policy, networkNode, *product, true)
-		//	filename, rawDoc, err := generator.Contract()
-		//	if err != nil {
-		//		log.ErrorF("error generating contract: %v", err)
-		//		return nil
-		//	}
 	}
 
 	log.Printf("proposal document generated for proposal n. %d", policy.ProposalNumber)
@@ -125,36 +121,12 @@ func lifeProposal(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkN
 		pdf := engine.NewFpdf()
 		gen := contract.NewLifeGenerator(pdf, policy, networkNode, *product, true)
 		gen.Generate()
-		document, err = lifeAxaProposalV2(pdf.GetPdf(), origin, policy, networkNode, product)
+		lifeAxaProposalV2(pdf.GetPdf(), origin, policy, networkNode, product)
+		gen.AddMup()
+		document, err = generateProposalDocument(pdf.GetPdf(), policy)
 	}
 
 	log.Println("function end --------------------------------")
-
-	return document, err
-}
-
-func gapProposal(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode) (DocumentGenerated, error) {
-	log.AddPrefix("gapProposal")
-	log.Println("function start -------------------------------")
-
-	document, err := gapSogessurProposalV1(pdf, origin, policy, networkNode)
-	log.Println("function end ---------------------------------")
-
-	return document, err
-}
-
-func personaProposal(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (DocumentGenerated, error) {
-	var (
-		document DocumentGenerated
-		err      error
-	)
-	log.AddPrefix("personaProposal")
-	defer log.PopPrefix()
-	log.Println("function start ---------------------------")
-
-	document, err = personaGlobalProposalV1(pdf, policy, networkNode, product)
-
-	log.Println("function end -----------------------------")
 
 	return document, err
 }

@@ -10,14 +10,11 @@ import (
 
 	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
 	"gitlab.dev.wopta.it/goworkspace/document/pkg/contract"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
-
-	"github.com/go-pdf/fpdf"
+	"gitlab.dev.wopta.it/goworkspace/models"
 	"gitlab.dev.wopta.it/goworkspace/network"
 	prd "gitlab.dev.wopta.it/goworkspace/product"
-
-	"gitlab.dev.wopta.it/goworkspace/lib"
-	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 var (
@@ -92,20 +89,20 @@ func ContractObj(origin string, data models.Policy, networkNode *models.NetworkN
 				Bytes:      out,
 			}
 		case models.LifeProduct:
-			pdf := initFpdf()
+			pdf := engine.NewFpdf()
 			document, err = lifeContract(pdf, origin, &data, networkNode, product)
 		case models.CatNatProduct:
 			//TODO: to change
 			//filename, out = "prova catnat contratto", []byte{}
 		case models.PersonaProduct:
-			pdf := initFpdf()
-			document, err = personaGlobalContractV1(pdf, &data, networkNode, product)
+			pdf := engine.NewFpdf()
+			generator := contract.NewPersonaGenerator(pdf, &data, networkNode, *product, false)
+			personaGlobalContractV1(pdf.GetPdf(), &data, networkNode, product)
+			generator.AddMup()
+			document, err = generateContractDocument(pdf.GetPdf(), &data)
 		case models.GapProduct:
 			pdf := initFpdf()
 			document, err = gapSogessurContractV1(pdf, origin, &data, networkNode)
-		case models.CommercialCombinedProduct:
-			generator := contract.NewCommercialCombinedGenerator(engine.NewFpdf(), &data, networkNode, *product, false)
-			document, err = NewDocumentGenerated(generator.Contract())
 		}
 		if err != nil {
 			log.ErrorF("error generating contract: %v", err)
@@ -121,11 +118,12 @@ func ContractObj(origin string, data models.Policy, networkNode *models.NetworkN
 	return r
 }
 
-func lifeContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (DocumentGenerated, error) {
+func lifeContract(enginePdf *engine.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (DocumentGenerated, error) {
 	var (
 		document DocumentGenerated
 		err      error
 	)
+
 	log.AddPrefix("LifeContract")
 	defer log.PopPrefix()
 	log.Println("function start ------------------------------")
@@ -133,10 +131,15 @@ func lifeContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkN
 	switch policy.ProductVersion {
 	case models.ProductV1:
 		log.Println("life v1")
+		pdf := enginePdf.GetPdf()
 		document, err = lifeAxaContractV1(pdf, origin, policy, networkNode, product)
 	case models.ProductV2:
 		log.Println("life v2")
-		document, err = lifeAxaContractV2(pdf, origin, policy, networkNode, product)
+		pdf := enginePdf.GetPdf()
+		generator := contract.NewLifeGenerator(enginePdf, policy, networkNode, *product, false)
+		lifeAxaContractV2(pdf, origin, policy, networkNode, product)
+		generator.AddMup()
+		document, err = generateContractDocument(pdf, policy)
 	}
 
 	log.Println("function end --------------------------------")

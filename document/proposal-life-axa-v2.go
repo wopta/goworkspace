@@ -5,7 +5,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func lifeAxaProposalV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (DocumentGenerated, error) {
+func lifeAxaProposalV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) {
 	lifeMainHeaderV2(pdf, policy, networkNode, true)
 
 	mainFooter(pdf, policy.Name)
@@ -67,8 +67,6 @@ func lifeAxaProposalV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	axaTablePart3Section(pdf)
 
-	generatePolicyAnnex(pdf, origin, networkNode, policy, setAnnexHeaderFooter(pdf, networkNode, true))
-
 	woptaHeader(pdf, true)
 
 	pdf.AddPage()
@@ -78,6 +76,4 @@ func lifeAxaProposalV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 	woptaPrivacySection(pdf)
 
 	personalDataHandlingSection(pdf, policy, true)
-
-	return generateProposalDocument(pdf, policy)
 }

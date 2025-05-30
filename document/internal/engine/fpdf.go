@@ -317,6 +317,8 @@ func (e *Fpdf) GetTableCell(text string, opts ...any) domain.TableCell {
 			tableCell.FontStyle = opt
 		case domain.Color:
 			tableCell.FontColor = opt
+		case domain.TextAlign:
+			tableCell.Align = opt
 		}
 	}
 	return tableCell
