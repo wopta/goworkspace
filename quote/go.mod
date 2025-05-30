@@ -12,7 +12,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.166
 	gitlab.dev.wopta.it/goworkspace/models v1.2.61
 	gitlab.dev.wopta.it/goworkspace/network v1.0.127
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.225
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.226
 	gitlab.dev.wopta.it/goworkspace/product v1.1.59
 	gitlab.dev.wopta.it/goworkspace/sellable v1.0.162
 	github.com/xuri/excelize/v2 v2.8.1
