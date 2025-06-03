@@ -14,7 +14,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/network v1.0.129
 	gitlab.dev.wopta.it/goworkspace/product v1.1.61
 	gitlab.dev.wopta.it/goworkspace/quote v1.0.202
-	gitlab.dev.wopta.it/goworkspace/user v1.0.164
+	gitlab.dev.wopta.it/goworkspace/user v1.0.165
 )
 
 require (
