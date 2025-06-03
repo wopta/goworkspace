@@ -39,7 +39,7 @@ func SignFiles(policy *models.Policy, product *models.Product, networkNode *mode
 	//TODO: remove this 'if' after catnat document is done
 	if policy.Name != models.CatNatProduct {
 		p := <-document.ContractObj(origin, *policy, networkNode, product)
-		document, err := p.SaveWithName(models.ContractAttachmentName)
+		document, err := p.SaveWithName(fmt.Sprint(policy.NameDesc, " Polizza"))
 		if err != nil {
 			return err
 		}
