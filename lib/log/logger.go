@@ -81,12 +81,12 @@ func _newLog(isLocal bool) *LoggerWopta {
 
 // Append the prefix, ex: [prefix1] -> [prefix1|prefix2]
 // Remember to use PopPrefix to remove eventually
-func (l *LoggerWopta) AddPrefix(prefix string) {
+func (l *LoggerWopta) addPrefix(prefix string) {
 	l.prefix = append(l.prefix, prefix)
 }
 
 // Remove the younger prefix, ex: [prefix1|prefix2] -> [prefix1]
-func (l *LoggerWopta) PopPrefix() {
+func (l *LoggerWopta) popPrefix() {
 	if len(l.prefix) == 0 {
 		return
 	}
@@ -94,7 +94,7 @@ func (l *LoggerWopta) PopPrefix() {
 }
 
 // Remove all prefixs, ex: [prefix1|prefix2] -> <None>
-func (l *LoggerWopta) ResetPrefix() {
+func (l *LoggerWopta) resetPrefix() {
 	l.prefix = []string{}
 }
 
@@ -113,27 +113,27 @@ func (l *LoggerWopta) CustomLog(message string, severity SeverityType) {
 }
 
 // Log a formatted message with severity 'DEFAULT'
-func (l *LoggerWopta) Printf(format string, a ...any) {
+func (l *LoggerWopta) printf(format string, a ...any) {
 	l.CustomLog(fmt.Sprintf(format, a...), DEFAULT)
 }
 
 // Log a message with severity equal 'DEFAULT'
-func (l *LoggerWopta) Println(message string) {
+func (l *LoggerWopta) println(message string) {
 	l.CustomLog(message, DEFAULT)
 }
 
 // Log a formatted message with severity 'INFO'
-func (l *LoggerWopta) InfoF(format string, a ...any) {
+func (l *LoggerWopta) infoF(format string, a ...any) {
 	l.CustomLog(fmt.Sprintf(format, a...), INFO)
 }
 
 // Log a formatted message with severity 'WARNING'
-func (l *LoggerWopta) WarningF(format string, a ...any) {
+func (l *LoggerWopta) warningF(format string, a ...any) {
 	l.CustomLog(fmt.Sprintf(format, a...), WARNING)
 }
 
-// Log a error, with struct : 'Error: <err>'
-func (l *LoggerWopta) Error(err error) {
+// Log a error, with struct : 'error: <err>'
+func (l *LoggerWopta) error(err error) {
 	if err == nil {
 		return
 	}
@@ -141,7 +141,7 @@ func (l *LoggerWopta) Error(err error) {
 }
 
 // Log a formatted message with severity 'ERROR'
-func (l *LoggerWopta) ErrorF(format string, a ...any) {
+func (l *LoggerWopta) errorF(format string, a ...any) {
 	l.CustomLog(fmt.Sprintf(format, a...), ERROR)
 }
 
@@ -194,6 +194,6 @@ func Log() *LoggerWopta {
 		return logger
 	}
 	logger = newLog()
-	logger.Println("INIT LOGGER")
+	logger.println("INIT LOGGER")
 	return logger
 }

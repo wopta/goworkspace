@@ -8,47 +8,47 @@ import (
 // Append the prefix, ex: [prefix1] -> [prefix1|prefix2]
 // Remember to use PopPrefix to remove it eventually
 func AddPrefix(prefix string) {
-	Log().AddPrefix(prefix)
+	Log().addPrefix(prefix)
 }
 
 // Remove the younger prefix, ex: [prefix1|prefix2] -> [prefix1]
 func PopPrefix() {
-	Log().PopPrefix()
+	Log().popPrefix()
 }
 
 // Remove all prefixs, ex: [prefix1|prefix2] -> <None>
 func ResetPrefix() {
-	Log().ResetPrefix()
+	Log().resetPrefix()
 }
 
 // Log a formatted message with severity 'DEFAULT'
 func Printf(format string, a ...any) {
-	Log().Printf(format, a...)
+	Log().printf(format, a...)
 }
 
 // Log a message with severity 'DEFAULT'
 func Println(message ...any) {
-	Log().Println(fmt.Sprint(message...))
+	Log().println(fmt.Sprint(message...))
 }
 
 // Log a formatted message with severity 'INFO'
 func InfoF(format string, a ...any) {
-	Log().InfoF(format, a...)
+	Log().infoF(format, a...)
 }
 
 // Log a formatted message with severity 'WARNING'
 func WarningF(format string, a ...any) {
-	Log().WarningF(format, a...)
+	Log().warningF(format, a...)
 }
 
 // Log a error, with struct : 'Error: <err>'
 func Error(err error) {
-	Log().Error(err)
+	Log().error(err)
 }
 
 // Log a formatted message with severity 'ERROR'
 func ErrorF(format string, a ...any) {
-	Log().ErrorF(format, a...)
+	Log().errorF(format, a...)
 }
 
 // Log a struct

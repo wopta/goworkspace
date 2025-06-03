@@ -24,7 +24,7 @@ func TestLocalSendMultipleMessages(t *testing.T) {
 
 	for i := 0; i < 10; i++ {
 		message := randStringBytes(10)
-		log.Printf(message)
+		log.printf(message)
 		if !isLocalMessageCorrect(mockW, message) {
 			t.Fatal("message isnt correct,got:", string(mockW.sent))
 		}
@@ -75,16 +75,16 @@ func TestAddPopPrefix(t *testing.T) {
 	mockW := mockWriter{}
 	log := _newLog(false)
 	log.SetWriter(&mockW)
-	log.AddPrefix("prefix1")
-	log.AddPrefix("prefix2")
+	log.addPrefix("prefix1")
+	log.addPrefix("prefix2")
 
-	log.Println("fjklsd")
+	log.println("fjklsd")
 	if ok, _ := regexp.MatchString(fmt.Sprintf("%v", "prefix1|prefix2"), string(mockW.sent)); !ok {
 		t.Fatal("no prefix found")
 	}
 
-	log.PopPrefix()
-	log.Println("fjklsd")
+	log.popPrefix()
+	log.println("fjklsd")
 	if ok, _ := regexp.MatchString(fmt.Sprintf("%v", `prefix1`), string(mockW.sent)); !ok {
 		t.Fatal("no prefix found")
 	}
@@ -92,17 +92,17 @@ func TestAddPopPrefix(t *testing.T) {
 		t.Fatal("prefix found when it shouldn't")
 	}
 
-	log.PopPrefix()
-	log.Println("fjklsd")
+	log.popPrefix()
+	log.println("fjklsd")
 	if ok, _ := regexp.MatchString(fmt.Sprintf("%v", `prefix1`), string(mockW.sent)); ok {
 		t.Fatal("prefix found when it shouldn't")
 	}
 
-	log.PopPrefix()
-	log.PopPrefix()
-	log.PopPrefix()
-	log.PopPrefix()
-	log.Println("fjklsd")
+	log.popPrefix()
+	log.popPrefix()
+	log.popPrefix()
+	log.popPrefix()
+	log.println("fjklsd")
 	if ok, _ := regexp.MatchString(fmt.Sprintf("%v", `prefix1`), string(mockW.sent)); ok {
 		t.Fatal("prefix found when it shouldn't")
 	}
@@ -178,10 +178,10 @@ func randFunctionToLog(logger *LoggerWopta) (func(string, ...any), SeverityType)
 		f func(string, ...any)
 		s SeverityType
 	}{
-		makeStruct(logger.ErrorF, ERROR),
-		makeStruct(logger.InfoF, INFO),
-		makeStruct(logger.Printf, DEFAULT),
-		makeStruct(logger.WarningF, WARNING),
+		makeStruct(logger.errorF, ERROR),
+		makeStruct(logger.infoF, INFO),
+		makeStruct(logger.printf, DEFAULT),
+		makeStruct(logger.warningF, WARNING),
 	}
 	i := rand.Intn(len(sev))
 	return sev[i].f, sev[i].s
