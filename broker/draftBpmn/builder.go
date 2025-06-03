@@ -10,9 +10,9 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
-func getKeyInjectedProcess(targetPro, targetAct string, order orderActivity) keyInjected {
+func getKeyInjectProcess(targetPro, targetAct string, order orderActivity) keyInject {
 	order = orderActivity(strings.ToLower(string(order)))
-	return keyInjected{
+	return keyInject{
 		targetProcess:  targetPro,
 		targetActivity: targetAct,
 		orderActivity:  order,
@@ -108,11 +108,11 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 
 	//Return error if some processes haven't been injected, when a process is injected it's removed from b.toInject
 	if len(b.toInject) != 0 {
-		var keyNoInjected string
+		var keyNoInject string
 		for i := range b.toInject {
-			keyNoInjected += fmt.Sprintf("process: %v, activity: %v, order: %v\n", i.targetProcess, i.targetActivity, i.orderActivity)
+			keyNoInject += fmt.Sprintf("process: %v, activity: %v, order: %v\n", i.targetProcess, i.targetActivity, i.orderActivity)
 		}
-		return nil, fmt.Errorf("Following injections haven't been done:\n%v", keyNoInjected)
+		return nil, fmt.Errorf("Following injections haven't been done:\n%v", keyNoInject)
 	}
 	return flow, nil
 }
@@ -126,7 +126,7 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 		b.handlers = make(map[string]activityHandler)
 	}
 	if b.toInject == nil {
-		b.toInject = make(map[keyInjected]*processBpnm)
+		b.toInject = make(map[keyInject]*processBpnm)
 	}
 	var order *order
 	for i, p := range bpnmToInject.Processes { //to have a better error
@@ -134,11 +134,11 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 		if order == nil {
 			return fmt.Errorf("The 'order' field isn't filled")
 		}
-		if order.InWhatActivityInjected == "end" {
-			order.InWhatActivityInjected = getNameEndActivity(order.InWhatProcessInjected)
+		if order.InWhatActivityInject == "end" {
+			order.InWhatActivityInject = getNameEndActivity(order.InWhatProcessInject)
 		}
-		if _, exist := b.toInject[getKeyInjectedProcess(order.InWhatProcessInjected, order.InWhatActivityInjected, order.Order)]; exist {
-			return fmt.Errorf("Injection's been already done for: target process: '%v', process: injected '%v' with order '%v'", order.InWhatProcessInjected, p.Name, order.Order)
+		if _, exist := b.toInject[getKeyInjectProcess(order.InWhatProcessInject, order.InWhatActivityInject, order.Order)]; exist {
+			return fmt.Errorf("Injection's been already done for: target process: '%v', process: injected '%v' with order '%v'", order.InWhatProcessInject, p.Name, order.Order)
 		}
 	}
 	process, err := bpnmToInject.Build()
@@ -148,7 +148,7 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 
 	for i, p := range bpnmToInject.Processes {
 		order = bpnmToInject.Processes[i].Order
-		b.toInject[getKeyInjectedProcess(order.InWhatProcessInjected, order.InWhatActivityInjected, order.Order)] = process.process[p.Name]
+		b.toInject[getKeyInjectProcess(order.InWhatProcessInject, order.InWhatActivityInject, order.Order)] = process.process[p.Name]
 	}
 
 	if err = bpnmToInject.storage.setHigherStorage(b.storage); err != nil {
@@ -193,15 +193,15 @@ func (a *BpnmBuilder) buildActivities(processName string, activitiesToBuild ...a
 		if !activityToBuild.HandlerLess && !exist {
 			return nil, fmt.Errorf("No handler registered for the activity: '%v'", activityToBuild.Name)
 		}
-		if pr := a.toInject[getKeyInjectedProcess(processName, activityToBuild.Name, preActivity)]; pr != nil {
+		if pr := a.toInject[getKeyInjectProcess(processName, activityToBuild.Name, preActivity)]; pr != nil {
 			newActivity.preActivity = pr
 			//To check eventually if the some injection isnt possible
-			delete(a.toInject, getKeyInjectedProcess(processName, activityToBuild.Name, preActivity))
+			delete(a.toInject, getKeyInjectProcess(processName, activityToBuild.Name, preActivity))
 		}
-		if pr := a.toInject[getKeyInjectedProcess(processName, activityToBuild.Name, postActivity)]; pr != nil {
+		if pr := a.toInject[getKeyInjectProcess(processName, activityToBuild.Name, postActivity)]; pr != nil {
 			newActivity.postActivity = pr
 			//To check eventually if the some injection isnt possible
-			delete(a.toInject, getKeyInjectedProcess(processName, activityToBuild.Name, postActivity))
+			delete(a.toInject, getKeyInjectProcess(processName, activityToBuild.Name, postActivity))
 		}
 		newActivity.name = activityToBuild.Name
 		newActivity.description = activityToBuild.Description
