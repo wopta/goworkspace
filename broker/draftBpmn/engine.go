@@ -101,7 +101,7 @@ func (act *activity) runActivity(nameProcess string, storage StorageData) (err e
 		} else {
 			status = "Fail: " + err.Error()
 		}
-		log.InfoF("Run process '%v',stop activity '%v' with status: %v", nameProcess, act.name, status)
+		log.InfoF("Run process '%v',finished activity '%v' with status: %v", nameProcess, act.name, status)
 	}()
 
 	if pre := act.preActivity; pre != nil {
