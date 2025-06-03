@@ -10,7 +10,7 @@ require (
 	github.com/google/uuid v1.6.0
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.167
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.179
-	gitlab.dev.wopta.it/goworkspace/models v1.2.62
+	gitlab.dev.wopta.it/goworkspace/models v1.2.63
 )
 
 require (
