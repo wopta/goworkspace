@@ -6,22 +6,22 @@ import (
 	"testing"
 )
 
-type errorRandomToTest struct {
+type errorRandomForTest struct {
 	Step        string
 	Description string
 	Result      bool
 }
 
-func (e *errorRandomToTest) GetType() string {
+func (e *errorRandomForTest) GetType() string {
 	return "error"
 }
 
-type randomObjectToTest struct {
+type randomObjectForTest struct {
 	Result bool
 	Step   int
 }
 
-func (v *randomObjectToTest) GetType() string {
+func (v *randomObjectForTest) GetType() string {
 	return "validity"
 }
 
@@ -42,7 +42,7 @@ func (m *mockLog) println(mes string) {
 	m.log = append(m.log, mes)
 }
 
-func (m *mockLog) printlnToTesting(t *testing.T) {
+func (m *mockLog) printlnForTesting(t *testing.T) {
 	t.Log("Actual log: ")
 	for _, mes := range m.log {
 		t.Log(" ", mes)
@@ -51,12 +51,12 @@ func (m *mockLog) printlnToTesting(t *testing.T) {
 
 func testLog(log *mockLog, exps []string, t *testing.T) {
 	if len(exps) != len(log.log) {
-		log.printlnToTesting(t)
+		log.printlnForTesting(t)
 		t.Fatalf("exp n message: %v,got: %v", len(exps), len(log.log))
 	}
 	for i, exp := range exps {
 		if log.log[i] != exp {
-			log.printlnToTesting(t)
+			log.printlnForTesting(t)
 			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
 		}
 	}
@@ -80,7 +80,7 @@ func getInjectableFlow(log *mockLog) (*BpnmBuilder, error) {
 		}),
 		injectedFlow.AddHandler("initPre", func(st StorageData) error {
 			log.println("init pre")
-			st.AddLocal("error", &errorRandomToTest{})
+			st.AddLocal("error", &errorRandomForTest{})
 			return nil
 		}),
 		injectedFlow.AddHandler("save", func(st StorageData) error {
@@ -93,19 +93,19 @@ func addDefaultHandlersForTest(g *BpnmBuilder, log *mockLog) error {
 	return IsError(
 		g.AddHandler("init", func(st StorageData) error {
 			log.println("init")
-			st.AddLocal("validationObject", new(randomObjectToTest))
+			st.AddLocal("validationObject", new(randomObjectForTest))
 			return nil
 		}),
 		g.AddHandler("AEvent", func(st StorageData) error {
 			log.println("init A")
-			st.AddLocal("validationObject", new(randomObjectToTest))
-			st.AddLocal("error", &errorRandomToTest{Result: false})
+			st.AddLocal("validationObject", new(randomObjectForTest))
+			st.AddLocal("error", &errorRandomForTest{Result: false})
 			return nil
 		}),
 		g.AddHandler("BEvent", func(st StorageData) error {
 			log.println("init B")
-			st.AddLocal("validationObject", new(randomObjectToTest))
-			st.AddLocal("error", &errorRandomToTest{Result: false})
+			st.AddLocal("validationObject", new(randomObjectForTest))
+			st.AddLocal("error", &errorRandomForTest{Result: false})
 			return nil
 		}),
 		g.AddHandler("CEvent", func(st StorageData) error {
@@ -130,7 +130,7 @@ func TestBpnmHappyPath(t *testing.T) {
 		t.Fatal(err)
 	}
 	storage := NewStorageBpnm()
-	storage.AddLocal("validationObject", new(randomObjectToTest))
+	storage.AddLocal("validationObject", new(randomObjectForTest))
 	storage.AddGlobal("policyPr", &policyMock{Age: 3})
 	g.SetStorage(storage)
 	addDefaultHandlersForTest(g, log)
@@ -158,7 +158,7 @@ func TestBpnmHappyPath2(t *testing.T) {
 		t.Fatal(err)
 	}
 	storage := NewStorageBpnm()
-	storage.AddLocal("validationObject", new(randomObjectToTest))
+	storage.AddLocal("validationObject", new(randomObjectForTest))
 	storage.AddGlobal("policyPr", &policyMock{Age: 3})
 	g.SetStorage(storage)
 
@@ -302,7 +302,7 @@ func TestRunFromSpecificActivity(t *testing.T) {
 	}
 	storage := NewStorageBpnm()
 	storage.AddGlobal("policyPr", &policyMock{Age: 3})
-	storage.AddLocal("validationObject", new(randomObjectToTest))
+	storage.AddLocal("validationObject", new(randomObjectForTest))
 	g.SetStorage(storage)
 	flowCatnat, err := getInjectableFlow(log)
 	if err := g.Inject(flowCatnat); err != nil {
@@ -340,18 +340,18 @@ func TestBpnmStoreClean(t *testing.T) {
 		t.Fatal(err)
 	}
 	storage := NewStorageBpnm()
-	storage.AddLocal("validationObject", new(randomObjectToTest))
+	storage.AddLocal("validationObject", new(randomObjectForTest))
 	storage.AddGlobal("policyPr", &policyMock{Age: 2})
 	g.SetStorage(storage)
 	addDefaultHandlersForTest(g, log)
 
 	g.setHandler("init", func(st StorageData) error {
 		log.println("init")
-		st.AddLocal("validationObject", new(randomObjectToTest))
-		st.AddLocal("error", &errorRandomToTest{Result: false})
-		st.AddLocal("error1", &errorRandomToTest{Result: false})
-		st.AddLocal("error2", &errorRandomToTest{Result: false})
-		st.AddLocal("error3", &errorRandomToTest{Result: false})
+		st.AddLocal("validationObject", new(randomObjectForTest))
+		st.AddLocal("error", &errorRandomForTest{Result: false})
+		st.AddLocal("error1", &errorRandomForTest{Result: false})
+		st.AddLocal("error2", &errorRandomForTest{Result: false})
+		st.AddLocal("error3", &errorRandomForTest{Result: false})
 		_, e := st.GetGlobal("policyPr")
 		if e != nil {
 			return e
@@ -363,13 +363,13 @@ func TestBpnmStoreClean(t *testing.T) {
 	})
 	g.setHandler("AEvent", func(st StorageData) error {
 		log.println("init A")
-		st.AddLocal("error", &errorRandomToTest{Result: false})
-		d, e := GetData[*randomObjectToTest]("validationObject", st)
+		st.AddLocal("error", &errorRandomForTest{Result: false})
+		d, e := GetData[*randomObjectForTest]("validationObject", st)
 		if e != nil {
 			return e
 		}
 		d.Step = 3
-		p, e := GetData[*errorRandomToTest]("error", st)
+		p, e := GetData[*errorRandomForTest]("error", st)
 		if e != nil {
 			return e
 		}
@@ -412,7 +412,7 @@ func TestMergeBuilder(t *testing.T) {
 		log.println("end")
 		return nil
 	})
-	storage.AddLocal("validationObject", new(randomObjectToTest))
+	storage.AddLocal("validationObject", new(randomObjectForTest))
 	storage.AddGlobal("policyPr", &policyMock{Age: 2})
 	g.SetStorage(storage)
 	b2, err := getInjectableFlow(log)
@@ -449,7 +449,7 @@ func TestErrorWithoutRecover(t *testing.T) {
 	g.setHandler("AEvent", func(sd StorageData) error {
 		return errors.New("error")
 	})
-	storage.AddLocal("validationObject", new(randomObjectToTest))
+	storage.AddLocal("validationObject", new(randomObjectForTest))
 	storage.AddGlobal("policyPr", &policyMock{Age: 2})
 	g.SetStorage(storage)
 	f, err := g.Build()
@@ -472,7 +472,7 @@ func TestRecoverWithFunction(t *testing.T) {
 		t.Fatal(err)
 	}
 	storage := NewStorageBpnm()
-	storage.AddLocal("validationObject", new(randomObjectToTest))
+	storage.AddLocal("validationObject", new(randomObjectForTest))
 	storage.AddGlobal("policyPr", &policyMock{Age: 2})
 	addDefaultHandlersForTest(g, log)
 	g.setHandler("DEventWithRec", func(st StorageData) error {
@@ -507,7 +507,7 @@ func TestRecoverFromPanic(t *testing.T) {
 		log.println("init D rec")
 		panic("fjsdklfjd")
 	})
-	storage.AddLocal("validationObject", new(randomObjectToTest))
+	storage.AddLocal("validationObject", new(randomObjectForTest))
 	storage.AddGlobal("policyPr", &policyMock{Age: 2})
 	g.SetStorage(storage)
 	f, err := g.Build()
@@ -532,7 +532,7 @@ func TestEndActivity(t *testing.T) {
 	}
 	storage := NewStorageBpnm()
 	addDefaultHandlersForTest(g, log)
-	storage.AddLocal("validationObject", new(randomObjectToTest))
+	storage.AddLocal("validationObject", new(randomObjectForTest))
 	storage.AddGlobal("policyPr", &policyMock{Age: 2})
 	g.SetStorage(storage)
 	g.AddHandler("end_emit", func(sd StorageData) error {
@@ -564,7 +564,7 @@ func TestDontCallEndAfterInit(t *testing.T) {
 	}
 	storage := NewStorageBpnm()
 	addDefaultHandlersForTest(g, log)
-	storage.AddLocal("validationObject", &randomObjectToTest{})
+	storage.AddLocal("validationObject", &randomObjectForTest{})
 	storage.AddGlobal("policyPr", &policyMock{Age: 20})
 	g.SetStorage(storage)
 	g.AddHandler("end_emit", func(sd StorageData) error {
@@ -594,10 +594,10 @@ func TestHandlerLessTrue(t *testing.T) {
 	}
 	storage := NewStorageBpnm()
 	addDefaultHandlersForTest(g, log)
-	storage.AddLocal("validationObject", &randomObjectToTest{Step: 3})
+	storage.AddLocal("validationObject", &randomObjectForTest{Step: 3})
 	storage.AddGlobal("policyPr", &policyMock{Age: 2})
 	g.setHandler("AEvent", func(sd StorageData) error {
-		sd.AddLocal("error", &errorRandomToTest{Result: true})
+		sd.AddLocal("error", &errorRandomForTest{Result: true})
 		log.println("init A")
 		return nil
 	})

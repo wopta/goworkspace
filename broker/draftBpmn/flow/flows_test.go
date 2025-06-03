@@ -16,7 +16,7 @@ func (m *mockLog) println(mes string) {
 	m.log = append(m.log, mes)
 }
 
-func (m *mockLog) printlnToTesting(t *testing.T) {
+func (m *mockLog) printlnForTesting(t *testing.T) {
 	t.Log("Actual log: ")
 	for _, mes := range m.log {
 		t.Log(" ", mes)
@@ -85,12 +85,12 @@ func testFlow(t *testing.T, process string, expectedACtivities []string, store b
 		t.Fatal(err)
 	}
 	if len(expectedACtivities) != len(log.log) {
-		log.printlnToTesting(t)
+		log.printlnForTesting(t)
 		t.Fatalf("exp n message: %v,got: %v", len(expectedACtivities), len(log.log))
 	}
 	for i, exp := range expectedACtivities {
 		if log.log[i] != exp {
-			log.printlnToTesting(t)
+			log.printlnForTesting(t)
 			t.Fatalf("exp: %v,got: %v", exp, log.log[i])
 		}
 	}
