@@ -3,9 +3,11 @@ package models
 import "gitlab.dev.wopta.it/goworkspace/lib"
 
 type Attachment struct {
-	Name        string `firestore:"name,omitempty"        json:"name,omitempty"`
-	Link        string `firestore:"link,omitempty"        json:"link,omitempty"`
-	Byte        string `firestore:"byte,omitempty"        json:"byte,omitempty"`
+	Name string `firestore:"name,omitempty"        json:"name,omitempty"`
+	Link string `firestore:"link,omitempty"        json:"link,omitempty"`
+	//Dont assign value for policy, but use it as dto for email module
+	Byte string `firestore:"byte,omitempty"        json:"byte,omitempty"`
+
 	FileName    string `firestore:"fileName,omitempty"    json:"fileName,omitempty"`
 	MimeType    string `firestore:"mimeType,omitempty"    json:"mimeType,omitempty"`
 	Url         string `firestore:"url,omitempty"         json:"url,omitempty"`

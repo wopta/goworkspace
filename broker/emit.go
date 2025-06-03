@@ -2,7 +2,6 @@ package broker
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -10,7 +9,6 @@ import (
 	"time"
 
 	"gitlab.dev.wopta.it/goworkspace/broker/internal/utility"
-	//"gitlab.dev.wopta.it/goworkspace/document"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	prd "gitlab.dev.wopta.it/goworkspace/product"
@@ -94,18 +92,18 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	policy, err = plc.GetPolicy(uid, origin)
 	lib.CheckError(err)
-	if policy.Channel == models.NetworkChannel && policy.ProducerUid != authToken.UserID {
-		log.Printf("user %s cannot emit policy %s because producer not equal to request user", authToken.UserID, policy.Uid)
-		return "", nil, errors.New("operation not allowed")
-	}
+	//	if policy.Channel == models.NetworkChannel && policy.ProducerUid != authToken.UserID {
+	//		log.Printf("user %s cannot emit policy %s because producer not equal to request user", authToken.UserID, policy.Uid)
+	//		return "", nil, errors.New("operation not allowed")
+	//	}
 
 	policyJsonLog, _ := policy.Marshal()
 	log.Printf("Policy %s JSON: %s", uid, string(policyJsonLog))
 
-	if policy.IsPay || policy.IsSign || policy.CompanyEmit || policy.CompanyEmitted || policy.IsDeleted {
-		log.Printf("cannot emit policy %s because state is not correct", policy.Uid)
-		return "", nil, errors.New("operation not allowed")
-	}
+	//	if policy.IsPay || policy.IsSign || policy.CompanyEmit || policy.CompanyEmitted || policy.IsDeleted {
+	//		log.Printf("cannot emit policy %s because state is not correct", policy.Uid)
+	//		return "", nil, errors.New("operation not allowed")
+	//	}
 
 	if request.SendEmail == nil {
 		sendEmail = true
@@ -123,7 +121,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	//Only for test!!!!!
 	if policy.Name == models.CatNatProduct {
 		log.Println("Using emitCatnat")
-		responseEmit, err = emitDraftWithPolicy(&policy, origin)
+		responseEmit, err = emitDraft(&policy, request, origin)
 		if err != nil {
 			return "", nil, err
 		}
@@ -328,27 +326,3 @@ func calculatePaymentComponents(policy *models.Policy) {
 	policy.PaymentComponents.PriceSplit = priceSplit
 	policy.PaymentComponents.PriceFirstSplit = priceFirstSplit
 }
-
-// TODO: to remove eventually, use SignFiles instead
-//func EmitSign(policy *models.Policy, product *models.Product, networkNode *models.NetworkNode, sendEmail bool, origin string) error {
-//	log.AddPrefix("emitSign")
-//	defer log.PopPrefix()
-//	log.Printf("Policy Uid %s", policy.Uid)
-//
-//	policy.IsSign = false
-//	policy.Status = models.PolicyStatusToSign
-//	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusContact, models.PolicyStatusToSign)
-//
-//	p := <-document.ContractObj(origin, *policy, networkNode, product)
-//	doc, err := p.SaveWithName("Contratto")
-//	if err != nil {
-//		return err
-//	}
-//
-//	policy.DocumentName = doc.LinkGcs
-//	_, signResponse, _ := document.NamirialOtpV6(*policy, origin, sendEmail)
-//	policy.ContractFileId = signResponse.FileId
-//	policy.IdSign = signResponse.EnvelopeId
-//	policy.SignUrl = signResponse.Url
-//	return nil
-//}

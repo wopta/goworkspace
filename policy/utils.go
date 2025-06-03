@@ -1,7 +1,6 @@
 package policy
 
 import (
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"os"
@@ -212,7 +211,6 @@ func AddSignedDocumentsInPolicy(policy *models.Policy, origin string) error {
 			Section:     models.DocumentSectionContracts,
 			ContentType: lib.GetContentType(typeFile),
 			MimeType:    lib.GetContentType(typeFile),
-			Byte:        base64.StdEncoding.EncodeToString(body),
 		})
 
 	}
