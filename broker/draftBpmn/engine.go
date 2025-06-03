@@ -86,7 +86,7 @@ func (p *processBpnm) loop(nameActivity string) error {
 			return p.activities[getNameEndActivity(p.name)].runActivity(p.name, p.storageBpnm)
 		}
 		p.activeActivities = nextActivities
-		if err = p.storageBpnm.clean(); err != nil {
+		if err = p.storageBpnm.cleanNoMarkedResources(); err != nil {
 			return err
 		}
 	}
