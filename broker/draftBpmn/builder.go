@@ -117,7 +117,7 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 	return flow, nil
 }
 
-// Inject a processes that will be called before or after activities, it depends on the configuration Order
+// Inject a processes that will be called before or after activity's handler, it depends on the configuration Order
 func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 	if b.storage == nil {
 		return errors.New("No storage defined")
