@@ -11,7 +11,7 @@ require (
 	github.com/go-gota/gota v0.12.0
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.166
 	gitlab.dev.wopta.it/goworkspace/models v1.2.62
-	gitlab.dev.wopta.it/goworkspace/network v1.0.127
+	gitlab.dev.wopta.it/goworkspace/network v1.0.128
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.228
 	gitlab.dev.wopta.it/goworkspace/product v1.1.59
 	gitlab.dev.wopta.it/goworkspace/sellable v1.0.162
