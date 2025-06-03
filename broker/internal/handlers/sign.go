@@ -21,8 +21,8 @@ func AddSignHandlers(builder *bpmn.BpnmBuilder) error {
 }
 
 func setSign(state bpmn.StorageData) error {
-	var policy *flow.PolicyDraft
-	var origin *flow.StringBpmn
+	var policy *flow.Policy
+	var origin *flow.String
 	err := bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
 		bpmn.GetDataRef("origin", &origin, state),
@@ -40,8 +40,8 @@ func setSign(state bpmn.StorageData) error {
 	return nil
 }
 func addContract(state bpmn.StorageData) error {
-	var policy *flow.PolicyDraft
-	var origin *flow.StringBpmn
+	var policy *flow.Policy
+	var origin *flow.String
 	err := bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
 		bpmn.GetDataRef("origin", &origin, state),
@@ -55,10 +55,10 @@ func addContract(state bpmn.StorageData) error {
 	return nil
 }
 func sendMailContract(state bpmn.StorageData) error {
-	var policy *flow.PolicyDraft
-	var networkNode *flow.NetworkDraft
-	var flowName *flow.StringBpmn
-	var origin *flow.StringBpmn
+	var policy *flow.Policy
+	var networkNode *flow.Network
+	var flowName *flow.String
+	var origin *flow.String
 	var sendEmail *flow.BoolBpmn
 	var addresses *flow.Addresses
 	err := bpmn.IsError(
@@ -95,8 +95,8 @@ func sendMailContract(state bpmn.StorageData) error {
 }
 
 func fillAttachments(state bpmn.StorageData) error {
-	var policy *flow.PolicyDraft
-	var origin *flow.StringBpmn
+	var policy *flow.Policy
+	var origin *flow.String
 	err := bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
 		bpmn.GetDataRef("origin", &origin, state),
@@ -114,8 +114,8 @@ func fillAttachments(state bpmn.StorageData) error {
 }
 
 func setToPay(state bpmn.StorageData) error {
-	var policy *flow.PolicyDraft
-	var origin *flow.StringBpmn
+	var policy *flow.Policy
+	var origin *flow.String
 	err := bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
 		bpmn.GetDataRef("origin", &origin, state),
@@ -136,9 +136,9 @@ func sendMailPay(state bpmn.StorageData) error {
 	log.AddPrefix("sendMailPay")
 	defer log.PopPrefix()
 
-	var policy *flow.PolicyDraft
-	var flowName *flow.StringBpmn
-	var networkNode *flow.NetworkDraft
+	var policy *flow.Policy
+	var flowName *flow.String
+	var networkNode *flow.Network
 	var sendEmail *flow.BoolBpmn
 	var addresses *flow.Addresses
 	err := bpmn.IsError(

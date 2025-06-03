@@ -137,8 +137,8 @@ func emitDraft(policy *models.Policy, request EmitRequest, origin string) (EmitR
 	} else {
 		storage.AddGlobal("sendEmail", &flow.BoolBpmn{Bool: *request.SendEmail})
 	}
-	storage.AddGlobal("paymentSplit", &flow.StringBpmn{String: request.PaymentSplit})
-	storage.AddGlobal("paymentMode", &flow.StringBpmn{String: request.PaymentMode})
+	storage.AddGlobal("paymentSplit", &flow.String{String: request.PaymentSplit})
+	storage.AddGlobal("paymentMode", &flow.String{String: request.PaymentMode})
 	storage.AddGlobal("addresses", &flow.Addresses{FromAddress: mail.AddressAnna})
 
 	log.Printf("paymentMode: %s", paymentMode)

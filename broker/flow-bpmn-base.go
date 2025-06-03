@@ -28,21 +28,21 @@ func getFlow(policy *models.Policy, originStr string, storage bpmn.StorageData) 
 	product = prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode, warrant)
 	flowNameStr, _ := policy.GetFlow(networkNode, warrant)
 
-	policyDraft := flow.PolicyDraft{Policy: policy}
-	productDraft := flow.ProductDraft{Product: product}
-	mgaProduct := flow.ProductDraft{Product: prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)}
-	flowName := flow.StringBpmn{String: flowNameStr}
-	networkDraft := flow.NetworkDraft{NetworkNode: networkNode}
+	policyBpmn := flow.Policy{Policy: policy}
+	productBpmn := flow.Product{Product: product}
+	mgaProduct := flow.Product{Product: prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)}
+	flowName := flow.String{String: flowNameStr}
+	networkBpmn := flow.Network{NetworkNode: networkNode}
 	if product.Flow == "" {
 		product.Flow = policy.Channel
 	}
 
-	storage.AddGlobal("policy", &policyDraft)
-	storage.AddGlobal("product", &productDraft)
-	storage.AddGlobal("networkNode", &networkDraft)
+	storage.AddGlobal("policy", &policyBpmn)
+	storage.AddGlobal("product", &productBpmn)
+	storage.AddGlobal("networkNode", &networkBpmn)
 	storage.AddGlobal("mgaProduct", &mgaProduct)
 	storage.AddGlobal("flowName", &flowName)
-	storage.AddGlobal("origin", &flow.StringBpmn{String: originStr})
+	storage.AddGlobal("origin", &flow.String{String: originStr})
 	builder.SetStorage(storage)
 
 	if networkNode != nil && networkNode.CallbackConfig != nil {

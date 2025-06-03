@@ -101,8 +101,8 @@ func emitDraftWithPolicy(policy *models.Policy, origin string) (EmitResponse, er
 
 	storage := draftbpnm.NewStorageBpnm()
 	storage.AddGlobal("sendEmail", &flow.BoolBpmn{Bool: true})
-	storage.AddGlobal("paymentSplit", &flow.StringBpmn{String: "monthly"})
-	storage.AddGlobal("paymentMode", &flow.StringBpmn{String: "single"})
+	storage.AddGlobal("paymentSplit", &flow.String{String: "monthly"})
+	storage.AddGlobal("paymentMode", &flow.String{String: "single"})
 	storage.AddGlobal("addresses", &flow.Addresses{FromAddress: mail.AddressAnna})
 
 	log.Printf("paymentMode: %s", paymentMode)

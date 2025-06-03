@@ -21,10 +21,10 @@ func AddPayHandlers(builder *bpmn.BpnmBuilder) error {
 }
 
 func updatePolicy(state bpmn.StorageData) error {
-	var policy *flow.PolicyDraft
-	var origin *flow.StringBpmn
-	var networkNode *flow.NetworkDraft
-	var flowName *flow.StringBpmn
+	var policy *flow.Policy
+	var origin *flow.String
+	var networkNode *flow.Network
+	var flowName *flow.String
 	var addresses *flow.Addresses
 	err := bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
@@ -92,10 +92,10 @@ func updatePolicy(state bpmn.StorageData) error {
 }
 
 func payTransaction(state bpmn.StorageData) error {
-	var policy *flow.PolicyDraft
+	var policy *flow.Policy
 	var paymentInfo *flow.PaymentInfoBpmn
-	var origin *flow.StringBpmn
-	var networkNode *flow.NetworkDraft
+	var origin *flow.String
+	var networkNode *flow.Network
 	err := bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
 		bpmn.GetDataRef("paymentInfo", &paymentInfo, state),

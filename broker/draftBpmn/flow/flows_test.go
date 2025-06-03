@@ -97,10 +97,10 @@ func testFlow(t *testing.T, process string, expectedACtivities []string, store b
 }
 
 var (
-	policyEcommerce = PolicyDraft{&models.Policy{Channel: lib.ECommerceChannel, Name: "test policy"}}
-	policyMga       = PolicyDraft{&models.Policy{Channel: lib.MgaChannel, Name: "test policy"}}
-	policyNetwork   = PolicyDraft{&models.Policy{Channel: lib.NetworkChannel, Name: "test policy"}}
-	policyCatnat    = PolicyDraft{&models.Policy{Channel: lib.NetworkChannel, Name: models.CatNatProduct}}
+	policyEcommerce = Policy{&models.Policy{Channel: lib.ECommerceChannel, Name: "test policy"}}
+	policyMga       = Policy{&models.Policy{Channel: lib.MgaChannel, Name: "test policy"}}
+	policyNetwork   = Policy{&models.Policy{Channel: lib.NetworkChannel, Name: "test policy"}}
+	policyCatnat    = Policy{&models.Policy{Channel: lib.NetworkChannel, Name: models.CatNatProduct}}
 )
 
 var (
@@ -110,19 +110,19 @@ var (
 
 // product
 var (
-	productEcommerce     = ProductDraft{&models.Product{Flow: models.ECommerceFlow}}
-	productMga           = ProductDraft{&models.Product{Flow: models.MgaFlow}}
-	productProviderMga   = ProductDraft{&models.Product{Flow: models.ProviderMgaFlow}}
-	productRemittanceMga = ProductDraft{&models.Product{Flow: models.RemittanceMgaFlow}}
+	productEcommerce     = Product{&models.Product{Flow: models.ECommerceFlow}}
+	productMga           = Product{&models.Product{Flow: models.MgaFlow}}
+	productProviderMga   = Product{&models.Product{Flow: models.ProviderMgaFlow}}
+	productRemittanceMga = Product{&models.Product{Flow: models.RemittanceMgaFlow}}
 )
 
 func initBaseStorage(storage bpmn.StorageData) {
-	storage.AddGlobal("mgaProduct", &ProductDraft{})
-	storage.AddGlobal("flowName", &StringBpmn{})
+	storage.AddGlobal("mgaProduct", &Product{})
+	storage.AddGlobal("flowName", &String{})
 	storage.AddGlobal("addresses", &addresses)
-	storage.AddGlobal("origin", &StringBpmn{})
-	storage.AddGlobal("paymentSplit", &StringBpmn{})
-	storage.AddGlobal("paymentMode", &StringBpmn{})
+	storage.AddGlobal("origin", &String{})
+	storage.AddGlobal("paymentSplit", &String{})
+	storage.AddGlobal("paymentMode", &String{})
 	storage.AddGlobal("sendEmail", &BoolBpmn{})
 }
 

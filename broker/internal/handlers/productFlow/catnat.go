@@ -14,7 +14,7 @@ import (
 )
 
 func CatnatIntegration(store bpmn.StorageData) error {
-	policy, err := bpmn.GetData[*flow.PolicyDraft]("policy", store)
+	policy, err := bpmn.GetData[*flow.Policy]("policy", store)
 	if err != nil {
 		return err
 	}
@@ -28,13 +28,13 @@ func CatnatIntegration(store bpmn.StorageData) error {
 	if err != nil {
 		return err
 	}
-	store.AddLocal("numeroPolizza", &flow.StringBpmn{String: res.PolicyNumber})
+	store.AddLocal("numeroPolizza", &flow.String{String: res.PolicyNumber})
 	return nil
 }
 
 func CatnatDownloadCertification(store bpmn.StorageData) error {
-	var policy *flow.PolicyDraft
-	var numeroPoliza *flow.StringBpmn
+	var policy *flow.Policy
+	var numeroPoliza *flow.String
 	err := bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, store),
 		bpmn.GetDataRef("numeroPolizza", &numeroPoliza, store),

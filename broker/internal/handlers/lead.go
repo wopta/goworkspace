@@ -19,8 +19,8 @@ func AddLeadHandlers(builder *bpmn.BpnmBuilder) error {
 }
 
 func setLead(state bpmn.StorageData) error {
-	var policy *flow.PolicyDraft
-	var networkNode *flow.NetworkDraft
+	var policy *flow.Policy
+	var networkNode *flow.Network
 	err := bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
 		bpmn.GetDataRef("networkNode", &networkNode, state),
@@ -34,10 +34,10 @@ func setLead(state bpmn.StorageData) error {
 }
 
 func sendLeadMail(state bpmn.StorageData) error {
-	var policy *flow.PolicyDraft
-	var networkNode *flow.NetworkDraft
+	var policy *flow.Policy
+	var networkNode *flow.Network
 	var addresses *flow.Addresses
-	var flowName *flow.StringBpmn
+	var flowName *flow.String
 	err := bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
 		bpmn.GetDataRef("networkNode", &networkNode, state),

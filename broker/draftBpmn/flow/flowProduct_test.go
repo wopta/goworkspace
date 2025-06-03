@@ -10,7 +10,7 @@ import (
 func mock_catnatIntegration(log *mockLog) func(bpmn.StorageData) error {
 	return func(sd bpmn.StorageData) error {
 		log.println("catnatIntegration")
-		sd.AddLocal("numeroPolizza", &StringBpmn{String: "provissiamo"})
+		sd.AddLocal("numeroPolizza", &String{String: "provissiamo"})
 		return nil
 	}
 }

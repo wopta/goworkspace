@@ -32,8 +32,8 @@ func AddEmitHandlers(builder *bpmn.BpnmBuilder) error {
 }
 
 func emitBaseWithSequence(state bpmn.StorageData) error {
-	var origin *flow.StringBpmn
-	var policy *flow.PolicyDraft
+	var origin *flow.String
+	var policy *flow.Policy
 	var err = bpmn.IsError(
 		bpmn.GetDataRef("origin", &origin, state),
 		bpmn.GetDataRef("policy", &policy, state),
@@ -65,8 +65,8 @@ func emitBaseWithSequence(state bpmn.StorageData) error {
 }
 
 func emitBaseNoSequence(state bpmn.StorageData) error {
-	var origin *flow.StringBpmn
-	var policy *flow.PolicyDraft
+	var origin *flow.String
+	var policy *flow.Policy
 	var err = bpmn.IsError(
 		bpmn.GetDataRef("origin", &origin, state),
 		bpmn.GetDataRef("policy", &policy, state),
@@ -90,10 +90,10 @@ func emitBaseNoSequence(state bpmn.StorageData) error {
 }
 
 func sendMailSign(state bpmn.StorageData) error {
-	var policy *flow.PolicyDraft
-	var networkNode *flow.NetworkDraft
+	var policy *flow.Policy
+	var networkNode *flow.Network
 	var addresses *flow.Addresses
-	var flowName *flow.StringBpmn
+	var flowName *flow.String
 	var sendEmail *flow.BoolBpmn
 	var err = bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
@@ -128,13 +128,13 @@ func sendMailSign(state bpmn.StorageData) error {
 }
 
 func sign(state bpmn.StorageData) error {
-	var policy *flow.PolicyDraft
-	var product *flow.ProductDraft
-	var networkNode *flow.NetworkDraft
+	var policy *flow.Policy
+	var product *flow.Product
+	var networkNode *flow.Network
 	var addresses *flow.Addresses
-	var flowName *flow.StringBpmn
+	var flowName *flow.String
 	var sendEmail *flow.BoolBpmn
-	var origin *flow.StringBpmn
+	var origin *flow.String
 	var err = bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
 		bpmn.GetDataRef("origin", &origin, state),
@@ -155,11 +155,11 @@ func sign(state bpmn.StorageData) error {
 }
 
 func pay(state bpmn.StorageData) error {
-	var policy *flow.PolicyDraft
-	var product *flow.ProductDraft
-	var mgaProduct *flow.ProductDraft
-	var networkNode *flow.NetworkDraft
-	var origin *flow.StringBpmn
+	var policy *flow.Policy
+	var product *flow.Product
+	var mgaProduct *flow.Product
+	var networkNode *flow.Network
+	var origin *flow.String
 	var err = bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
 		bpmn.GetDataRef("origin", &origin, state),
@@ -179,13 +179,13 @@ func pay(state bpmn.StorageData) error {
 }
 
 func setAdvance(state bpmn.StorageData) error {
-	var policy *flow.PolicyDraft
-	var product *flow.ProductDraft
-	var mgaProduct *flow.ProductDraft
-	var networkNode *flow.NetworkDraft
-	var origin *flow.StringBpmn
-	var paymentSplit *flow.StringBpmn
-	var paymentMode *flow.StringBpmn
+	var policy *flow.Policy
+	var product *flow.Product
+	var mgaProduct *flow.Product
+	var networkNode *flow.Network
+	var origin *flow.String
+	var paymentSplit *flow.String
+	var paymentMode *flow.String
 	var err = bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
 		bpmn.GetDataRef("origin", &origin, state),
@@ -203,9 +203,9 @@ func setAdvance(state bpmn.StorageData) error {
 }
 
 func updateUserAndNetworkNode(state bpmn.StorageData) error {
-	var policy *flow.PolicyDraft
-	var networkNode *flow.NetworkDraft
-	var origin *flow.StringBpmn
+	var policy *flow.Policy
+	var networkNode *flow.Network
+	var origin *flow.String
 	var err = bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
 		bpmn.GetDataRef("origin", &origin, state),
@@ -224,11 +224,11 @@ func updateUserAndNetworkNode(state bpmn.StorageData) error {
 }
 
 func sendEmitProposalMail(state bpmn.StorageData) error {
-	var policy *flow.PolicyDraft
-	var networkNode *flow.NetworkDraft
-	var origin *flow.StringBpmn
+	var policy *flow.Policy
+	var networkNode *flow.Network
+	var origin *flow.String
 	var addresses *flow.Addresses
-	var flowName *flow.StringBpmn
+	var flowName *flow.String
 	var err = bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
 		bpmn.GetDataRef("origin", &origin, state),

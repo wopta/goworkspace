@@ -47,27 +47,27 @@ func (*CallbackConfig) GetType() string {
 	return "callbackConfig"
 }
 
-type PolicyDraft struct {
+type Policy struct {
 	*models.Policy
 }
 
-func (p *PolicyDraft) GetType() string {
+func (p *Policy) GetType() string {
 	return "policy"
 }
 
-type ProductDraft struct {
+type Product struct {
 	*models.Product
 }
 
-func (p *ProductDraft) GetType() string {
+func (p *Product) GetType() string {
 	return "product"
 }
 
-type NetworkDraft struct {
+type Network struct {
 	*models.NetworkNode
 }
 
-func (p *NetworkDraft) GetType() string {
+func (p *Network) GetType() string {
 	return "networkNode"
 }
 
@@ -79,11 +79,11 @@ func (*Addresses) GetType() string {
 	return "addresses"
 }
 
-type StringBpmn struct {
+type String struct {
 	String string
 }
 
-func (*StringBpmn) GetType() string {
+func (*String) GetType() string {
 	return "string"
 }
 

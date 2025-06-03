@@ -18,10 +18,10 @@ func AddProposalHandlers(builder *bpmn.BpnmBuilder) error {
 }
 
 func setProposalData(state bpmn.StorageData) error {
-	var origin *flow.StringBpmn
-	var policy *flow.PolicyDraft
-	var networkNode *flow.NetworkDraft
-	var mgaProduct *flow.ProductDraft
+	var origin *flow.String
+	var policy *flow.Policy
+	var networkNode *flow.Network
+	var mgaProduct *flow.Product
 	var err = bpmn.IsError(
 		bpmn.GetDataRef("origin", &origin, state),
 		bpmn.GetDataRef("policy", &policy, state),
@@ -50,11 +50,11 @@ func setProposalData(state bpmn.StorageData) error {
 }
 
 func sendProposalMail(state bpmn.StorageData) error {
-	var policy *flow.PolicyDraft
+	var policy *flow.Policy
 	var addresses *flow.Addresses
 	var sendEmail *flow.BoolBpmn
-	var flowName *flow.StringBpmn
-	var networkNode *flow.NetworkDraft
+	var flowName *flow.String
+	var networkNode *flow.Network
 	err := bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
 		bpmn.GetDataRef("addresses", &addresses, state),

@@ -85,7 +85,7 @@ func DraftAcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, err
 
 	storage := draftbpmn.NewStorageBpnm()
 	storage.AddGlobal("addresses", addresses)
-	storage.AddGlobal("action", &flow.StringBpmn{String: payload.Action})
+	storage.AddGlobal("action", &flow.String{String: payload.Action})
 
 	flow, err := getFlow(&policy, origin, storage)
 	if err != nil {

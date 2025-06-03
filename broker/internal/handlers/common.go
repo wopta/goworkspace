@@ -10,8 +10,8 @@ import (
 )
 
 func savePolicy(state bpmn.StorageData) error {
-	var policy *flow.PolicyDraft
-	var origin *flow.StringBpmn
+	var policy *flow.Policy
+	var origin *flow.String
 	err := bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
 		bpmn.GetDataRef("origin", &origin, state),

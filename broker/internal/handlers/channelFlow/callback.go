@@ -18,11 +18,11 @@ import (
 )
 
 func CallBackEmit(st bpmn.StorageData) error {
-	node, err := bpmn.GetData[*flow.NetworkDraft]("networkNode", st)
+	node, err := bpmn.GetData[*flow.Network]("networkNode", st)
 	if err != nil {
 		return err
 	}
-	policy, err := bpmn.GetData[*flow.PolicyDraft]("policy", st)
+	policy, err := bpmn.GetData[*flow.Policy]("policy", st)
 	if err != nil {
 		return err
 	}
@@ -40,11 +40,11 @@ func CallBackEmit(st bpmn.StorageData) error {
 }
 
 func CallBackProposal(st bpmn.StorageData) error {
-	node, err := bpmn.GetData[*flow.NetworkDraft]("networkNode", st)
+	node, err := bpmn.GetData[*flow.Network]("networkNode", st)
 	if err != nil {
 		return err
 	}
-	policy, err := bpmn.GetData[*flow.PolicyDraft]("policy", st)
+	policy, err := bpmn.GetData[*flow.Policy]("policy", st)
 	if err != nil {
 		return err
 	}
@@ -62,11 +62,11 @@ func CallBackProposal(st bpmn.StorageData) error {
 }
 
 func CallBackPaid(st bpmn.StorageData) error {
-	node, err := bpmn.GetData[*flow.NetworkDraft]("networkNode", st)
+	node, err := bpmn.GetData[*flow.Network]("networkNode", st)
 	if err != nil {
 		return err
 	}
-	policy, err := bpmn.GetData[*flow.PolicyDraft]("policy", st)
+	policy, err := bpmn.GetData[*flow.Policy]("policy", st)
 	if err != nil {
 		return err
 	}
@@ -84,11 +84,11 @@ func CallBackPaid(st bpmn.StorageData) error {
 }
 
 func CallBackRequestApproval(st bpmn.StorageData) error {
-	node, err := bpmn.GetData[*flow.NetworkDraft]("networkNode", st)
+	node, err := bpmn.GetData[*flow.Network]("networkNode", st)
 	if err != nil {
 		return err
 	}
-	policy, err := bpmn.GetData[*flow.PolicyDraft]("policy", st)
+	policy, err := bpmn.GetData[*flow.Policy]("policy", st)
 	if err != nil {
 		return err
 	}
@@ -106,11 +106,11 @@ func CallBackRequestApproval(st bpmn.StorageData) error {
 }
 
 func CallBackApproved(st bpmn.StorageData) error {
-	node, err := bpmn.GetData[*flow.NetworkDraft]("networkNode", st)
+	node, err := bpmn.GetData[*flow.Network]("networkNode", st)
 	if err != nil {
 		return err
 	}
-	policy, err := bpmn.GetData[*flow.PolicyDraft]("policy", st)
+	policy, err := bpmn.GetData[*flow.Policy]("policy", st)
 	if err != nil {
 		return err
 	}
@@ -128,11 +128,11 @@ func CallBackApproved(st bpmn.StorageData) error {
 }
 
 func CallBackRejected(st bpmn.StorageData) error {
-	node, err := bpmn.GetData[*flow.NetworkDraft]("networkNode", st)
+	node, err := bpmn.GetData[*flow.Network]("networkNode", st)
 	if err != nil {
 		return err
 	}
-	policy, err := bpmn.GetData[*flow.PolicyDraft]("policy", st)
+	policy, err := bpmn.GetData[*flow.Policy]("policy", st)
 	if err != nil {
 		return err
 	}
@@ -150,11 +150,11 @@ func CallBackRejected(st bpmn.StorageData) error {
 }
 
 func CallBackSigned(st bpmn.StorageData) error {
-	node, err := bpmn.GetData[*flow.NetworkDraft]("networkNode", st)
+	node, err := bpmn.GetData[*flow.Network]("networkNode", st)
 	if err != nil {
 		return err
 	}
-	policy, err := bpmn.GetData[*flow.PolicyDraft]("policy", st)
+	policy, err := bpmn.GetData[*flow.Policy]("policy", st)
 	if err != nil {
 		return err
 	}
@@ -172,7 +172,7 @@ func CallBackSigned(st bpmn.StorageData) error {
 }
 
 func BaseRequest(store bpmn.StorageData) error {
-	policy, e := bpmn.GetData[*flow.PolicyDraft]("policy", store)
+	policy, e := bpmn.GetData[*flow.Policy]("policy", store)
 	if e != nil {
 		return e
 
@@ -228,7 +228,7 @@ func SaveAudit(st bpmn.StorageData) error {
 		Error         string                `bigquery:"error"`
 	}
 
-	node, err := bpmn.GetData[*flow.NetworkDraft]("networkNode", st)
+	node, err := bpmn.GetData[*flow.Network]("networkNode", st)
 	if err != nil {
 		return err
 	}

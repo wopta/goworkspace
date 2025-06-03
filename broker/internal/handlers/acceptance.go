@@ -21,8 +21,8 @@ func AddAcceptanceHandlers(builder *bpmn.BpnmBuilder) error {
 }
 
 func draftRejectPolicy(storage draftbpmn.StorageData) error {
-	var policy *flow.PolicyDraft
-	var action *flow.StringBpmn
+	var policy *flow.Policy
+	var action *flow.String
 	err := bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, storage),
 		bpmn.GetDataRef("action", &action, storage),
@@ -40,8 +40,8 @@ func draftRejectPolicy(storage draftbpmn.StorageData) error {
 }
 
 func draftApprovePolicy(storage draftbpmn.StorageData) error {
-	var policy *flow.PolicyDraft
-	var action *flow.StringBpmn
+	var policy *flow.Policy
+	var action *flow.String
 	err := bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, storage),
 		bpmn.GetDataRef("action", &action, storage),
@@ -59,7 +59,7 @@ func draftApprovePolicy(storage draftbpmn.StorageData) error {
 }
 
 func sendAcceptanceMail(state bpmn.StorageData) error {
-	policy, err := bpmn.GetData[*flow.PolicyDraft]("policy", state)
+	policy, err := bpmn.GetData[*flow.Policy]("policy", state)
 	if err != nil {
 		return err
 	}
@@ -68,7 +68,7 @@ func sendAcceptanceMail(state bpmn.StorageData) error {
 		return err
 	}
 
-	node, err := bpmn.GetData[*flow.NetworkDraft]("networkNode", state)
+	node, err := bpmn.GetData[*flow.Network]("networkNode", state)
 	if err != nil {
 		return err
 	}

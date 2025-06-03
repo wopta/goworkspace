@@ -20,10 +20,10 @@ func AddRequestApprovaHandlers(builder *bpmn.BpnmBuilder) error {
 }
 
 func setRequestApprova(state bpmn.StorageData) error {
-	var policy *flow.PolicyDraft
-	var networkNode *flow.NetworkDraft
-	var origin *flow.StringBpmn
-	var mgaProduct *flow.ProductDraft
+	var policy *flow.Policy
+	var networkNode *flow.Network
+	var origin *flow.String
+	var mgaProduct *flow.Product
 	err := bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
 		bpmn.GetDataRef("networkNode", &networkNode, state),
@@ -42,10 +42,10 @@ func setRequestApprova(state bpmn.StorageData) error {
 }
 
 func sendRequestApprovalMail(state bpmn.StorageData) error {
-	var policy *flow.PolicyDraft
+	var policy *flow.Policy
 	var addresses *flow.Addresses
-	var flowName *flow.StringBpmn
-	var networkNode *flow.NetworkDraft
+	var flowName *flow.String
+	var networkNode *flow.Network
 	err := bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
 		bpmn.GetDataRef("addresses", &addresses, state),
