@@ -22,7 +22,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/question v1.0.114
 	gitlab.dev.wopta.it/goworkspace/reserved v1.0.236
 	gitlab.dev.wopta.it/goworkspace/transaction v1.0.222
-	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.8
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.9
 )
 
 require (
