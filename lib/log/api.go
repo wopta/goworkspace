@@ -6,7 +6,7 @@ import (
 )
 
 // Append the prefix, ex: [prefix1] -> [prefix1|prefix2]
-// Remember to use PopPrefix to remove eventually
+// Remember to use PopPrefix to remove it eventually
 func AddPrefix(prefix string) {
 	Log().AddPrefix(prefix)
 }
@@ -26,7 +26,7 @@ func Printf(format string, a ...any) {
 	Log().Printf(format, a...)
 }
 
-// Log a message with severity equal 'DEFAULT'
+// Log a message with severity 'DEFAULT'
 func Println(message ...any) {
 	Log().Println(fmt.Sprint(message...))
 }
