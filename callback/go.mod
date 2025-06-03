@@ -16,7 +16,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/payment v1.0.368
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.230
 	gitlab.dev.wopta.it/goworkspace/product v1.1.61
-	gitlab.dev.wopta.it/goworkspace/transaction v1.0.222
+	gitlab.dev.wopta.it/goworkspace/transaction v1.0.223
 	google.golang.org/api v0.181.0
 )
 
