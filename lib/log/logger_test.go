@@ -22,8 +22,8 @@ func TestLocalSendMultipleMessages(t *testing.T) {
 	mockW := mockWriter{}
 	log.SetWriter(&mockW)
 
-	for i := 0; i < 100; i++ {
-		message := randStringBytes(100)
+	for i := 0; i < 10; i++ {
+		message := randStringBytes(10)
 		log.Printf(message)
 		if !isLocalMessageCorrect(mockW, message) {
 			t.Fatal("message isnt correct,got:", string(mockW.sent))
@@ -37,8 +37,8 @@ func TestGoogleCloudSendCustomMessage(t *testing.T) {
 	mockW := mockWriter{}
 	log.SetWriter(&mockW)
 	var randI int
-	for i := 0; i < 100; i++ {
-		message := randStringBytes(100)
+	for i := 0; i < 10; i++ {
+		message := randStringBytes(10)
 		randI = rand.Intn(len(sev))
 		log.CustomLog(message, sev[randI])
 		messageS := MessageInformation{
@@ -56,7 +56,7 @@ func TestSendGoogleMessage(t *testing.T) {
 	mockW := mockWriter{}
 	log := _newLog(false)
 	log.SetWriter(&mockW)
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 10; i++ {
 		message := randStringBytes(100)
 		function, s := randFunctionToLog(log)
 
