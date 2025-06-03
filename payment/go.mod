@@ -10,7 +10,7 @@ require (
 	github.com/google/uuid v1.6.0
 	gitlab.dev.wopta.it/goworkspace/accounting v1.0.50
 	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.74
-	gitlab.dev.wopta.it/goworkspace/document v1.1.184
+	gitlab.dev.wopta.it/goworkspace/document v1.1.186
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.167
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.180
 	gitlab.dev.wopta.it/goworkspace/models v1.2.63
