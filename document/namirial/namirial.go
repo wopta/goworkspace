@@ -246,7 +246,6 @@ func setContractorDataInSendBody(bodySend *sendNamirialRequest, policy models.Po
 		contactInfo.PhoneNumber = signer.Phone
 		contactInfo.PhoneNumber = signer.Phone
 	}
-	bodySend.Name = policy.Name
 	return nil
 }
 
