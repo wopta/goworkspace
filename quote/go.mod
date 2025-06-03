@@ -14,7 +14,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/network v1.0.129
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.229
 	gitlab.dev.wopta.it/goworkspace/product v1.1.61
-	gitlab.dev.wopta.it/goworkspace/sellable v1.0.163
+	gitlab.dev.wopta.it/goworkspace/sellable v1.0.164
 	github.com/xuri/excelize/v2 v2.8.1
 	google.golang.org/api v0.209.0
 	modernc.org/mathutil v1.5.0
