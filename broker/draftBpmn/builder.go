@@ -10,12 +10,12 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
-func getKeyInjectProcess(targetPro, targetAct string, order orderActivity) keyInject {
-	order = orderActivity(strings.ToLower(string(order)))
-	return keyInject{
+func getKeyInjectProcess(targetPro, targetAct string, order activityOrder) injectionKey {
+	order = activityOrder(strings.ToLower(string(order)))
+	return injectionKey{
 		targetProcess:  targetPro,
 		targetActivity: targetAct,
-		orderActivity:  order,
+		activityOrder:  order,
 	}
 }
 
@@ -110,7 +110,7 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 	if len(b.toInject) != 0 {
 		var keyNoInject string
 		for i := range b.toInject {
-			keyNoInject += fmt.Sprintf("process: %v, activity: %v, order: %v\n", i.targetProcess, i.targetActivity, i.orderActivity)
+			keyNoInject += fmt.Sprintf("process: %v, activity: %v, order: %v\n", i.targetProcess, i.targetActivity, i.activityOrder)
 		}
 		return nil, fmt.Errorf("Following injections haven't been done:\n%v", keyNoInject)
 	}
@@ -126,7 +126,7 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 		b.handlers = make(map[string]activityHandler)
 	}
 	if b.toInject == nil {
-		b.toInject = make(map[keyInject]*processBpnm)
+		b.toInject = make(map[injectionKey]*processBpnm)
 	}
 	var order *order
 	for i, p := range bpnmToInject.Processes { //to have a better error

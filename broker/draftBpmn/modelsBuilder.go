@@ -5,7 +5,7 @@ type BpnmBuilder struct {
 
 	handlers map[string]activityHandler
 	storage  StorageData
-	toInject map[keyInject]*processBpnm
+	toInject map[injectionKey]*processBpnm
 }
 
 type processBuilder struct {
@@ -20,7 +20,7 @@ type processBuilder struct {
 type order struct {
 	InWhatProcessInject  string        `json:"inWhatProcessInject"`
 	InWhatActivityInject string        `json:"inWhatActivityInject"`
-	Order                orderActivity `json:"order"`
+	Order                activityOrder `json:"order"`
 }
 
 type activityBuilder struct {
@@ -39,17 +39,17 @@ type gatewayBlock struct {
 	Decision       string   `json:"decision,omitempty"`
 }
 
-type orderActivity string
+type activityOrder string
 
 const (
-	preActivity  orderActivity = "pre"
-	postActivity orderActivity = "post"
+	preActivity  activityOrder = "pre"
+	postActivity activityOrder = "post"
 )
 
-type keyInject struct {
+type injectionKey struct {
 	targetProcess  string
 	targetActivity string
-	orderActivity
+	activityOrder
 }
 
 type typeData struct {
