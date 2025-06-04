@@ -206,15 +206,6 @@ func buildBodyToSend(prepareteResponse document.PrepareResponse, idFiles []strin
 		ReminderResendIntervalInDays: 1,
 		BeforeExpirationInDays:       1,
 	}
-	var baseUrl string = "https://www.wopta.it"
-	if os.Getenv("env") != "prod" {
-		baseUrl = "https://dev.wopta.it"
-	}
-	body.Activities[0].Action.Sign.FinishActionConfiguration = document.FinishActionConfiguration{
-		SignAnyWhereViewer: document.SignAnyWhereViewer{
-			RedirectUri: baseUrl + `/it/quote/` + policy.Name + "/thank-you",
-		},
-	}
 
 	setContractorDataInSendBody(&body, policy)
 	return body
