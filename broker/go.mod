@@ -11,7 +11,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.12
 	gitlab.dev.wopta.it/goworkspace/bpmn v1.0.44
 	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.75
-	gitlab.dev.wopta.it/goworkspace/document v1.1.187
+	gitlab.dev.wopta.it/goworkspace/document v1.1.188
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.167
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.181
 	gitlab.dev.wopta.it/goworkspace/models v1.2.64
