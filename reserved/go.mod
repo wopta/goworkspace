@@ -10,7 +10,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.167
 	gitlab.dev.wopta.it/goworkspace/models v1.2.64
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.231
-	gitlab.dev.wopta.it/goworkspace/product v1.1.61
+	gitlab.dev.wopta.it/goworkspace/product v1.1.62
 )
 
 require (
