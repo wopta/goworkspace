@@ -8,7 +8,7 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/google/uuid v1.6.0
-	gitlab.dev.wopta.it/goworkspace/accounting v1.0.52
+	gitlab.dev.wopta.it/goworkspace/accounting v1.0.53
 	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.75
 	gitlab.dev.wopta.it/goworkspace/document v1.1.188
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.167
