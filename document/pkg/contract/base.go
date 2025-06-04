@@ -715,7 +715,7 @@ func (bg *baseGenerator) mup() {
 		bg.emptyFooter()
 	}
 
-	producerInfo := bg.productInfo()
+	producerInfo := bg.producerInfo()
 	proponentInfo := bg.proponentInfo()
 	designationInfo := bg.designationInfo()
 	mupSection2Info, mupSection5Info := bg.mupInfo()
@@ -812,7 +812,7 @@ func (bg *baseGenerator) mupSectionV(body string) {
 }
 
 func (bg *baseGenerator) mupSectionVI() {
-	text := "SEZIONE VI – Informazioni sul pagamento dei premi"
+	text := "SEZIONE VI - Informazioni sul pagamento dei premi"
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle))
 
 	text = "Relativamente a questo contratto i premi pagati dal Contraente " +
@@ -850,7 +850,7 @@ func (bg *baseGenerator) mupSectionVII() {
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
 }
 
-func (bg *baseGenerator) productInfo() map[string]string {
+func (bg *baseGenerator) producerInfo() map[string]string {
 	producer := map[string]string{
 		"name":            "LOMAZZI MICHELE",
 		"ruiSection":      "A",
@@ -914,7 +914,6 @@ func (bg *baseGenerator) proponentInfo() map[string]string {
 		if name := proponentNode.Agency.Name; name != "" {
 			proponentInfo["name"] = name
 		}
-
 		if address := proponentNode.GetAddress(); address != "" {
 			proponentInfo["address"] = address
 		}
@@ -1094,7 +1093,7 @@ func (bg *baseGenerator) woptaTable(producerInfo, proponentInfo map[string]strin
 		},
 		{
 			title: "SEDE LEGALE",
-			body:  designation,
+			body:  proponentInfo["address"],
 		},
 	}
 
@@ -1210,7 +1209,7 @@ func (bg *baseGenerator) woptaTable(producerInfo, proponentInfo map[string]strin
 	entries = []entry{
 		{
 			title: "AUTORITÀ COMPETENTE ALLA VIGILANZA DELL’ATTIVITÀ SVOLTA",
-			body: "IVASS – Istituto per la Vigilanza sulle Assicurazioni - Via del Quirinale, " +
+			body: "IVASS - Istituto per la Vigilanza sulle Assicurazioni - Via del Quirinale, " +
 				"21 - 00187 Roma",
 		},
 	}
@@ -1466,7 +1465,7 @@ func (bg *baseGenerator) annex4(producerInfo, proponentInfo map[string]string, d
 			},
 		},
 		{
-			title: "SEZIONE IV – Informazioni sul pagamento dei premi",
+			title: "SEZIONE IV - Informazioni sul pagamento dei premi",
 			body: []string{
 				"Relativamente a questo contratto i premi pagati dal Contraente " +
 					"all’intermediario e le somme destinate ai risarcimenti o ai pagamenti dovuti dalle Imprese di Assicurazione, " +
