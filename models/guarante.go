@@ -140,7 +140,7 @@ type GuaranteFieldConfig struct {
 	Step           float64   `firestore:"step,omitempty" json:"step,omitempty"`
 	Values         []float64 `firestore:"values,omitempty" json:"values,omitempty"`
 	Label          string    `firestore:"label,omitempty" json:"label,omitempty"`
-	DefaultValue   string    `firestore:"defaultValue,omitempty" json:"defaultValue,omitempty"`
+	DefaultValue   float64   `firestore:"defaultValue,omitempty" json:"defaultValue,omitempty"`
 	Description    string    `firestore:"description,omitempty" json:"description,omitempty"`
 	TextFieldLabel string    `firestore:"textFieldLabel,omitempty" json:"textFieldLabel,omitempty"`
 }
