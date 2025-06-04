@@ -10,7 +10,7 @@ require (
 	github.com/google/uuid v1.6.0
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.167
 	gitlab.dev.wopta.it/goworkspace/models v1.2.64
-	gitlab.dev.wopta.it/goworkspace/network v1.0.129
+	gitlab.dev.wopta.it/goworkspace/network v1.0.130
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.231
 	gitlab.dev.wopta.it/goworkspace/product v1.1.61
 	google.golang.org/api v0.181.0
