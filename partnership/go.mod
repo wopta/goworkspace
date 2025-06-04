@@ -70,7 +70,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.181 // indirect
-	gitlab.dev.wopta.it/goworkspace/sellable v1.0.164 // indirect
+	gitlab.dev.wopta.it/goworkspace/sellable v1.0.165 // indirect
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.9 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20230802181842-ad255f2331ca // indirect
