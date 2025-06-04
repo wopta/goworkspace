@@ -76,7 +76,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/document v1.1.187 // indirect
 	gitlab.dev.wopta.it/goworkspace/network v1.0.130 // indirect
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.231 // indirect
-	gitlab.dev.wopta.it/goworkspace/product v1.1.61 // indirect
+	gitlab.dev.wopta.it/goworkspace/product v1.1.62 // indirect
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.9 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
