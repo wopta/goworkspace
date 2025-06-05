@@ -99,6 +99,11 @@ func (c *NetClient) quote(dto QuoteRequest) (response QuoteResponse, err error) 
 	}
 	if response.Result != "OK" {
 		log.ErrorF("Errore quotazione %+v", response.Errors)
+		for i := range response.Errors {
+			if response.Errors[i].Code == "Errore calcolo premio" {
+				return response, errors.New("Importo del premio insufficiente: è necessario assicurare un valore maggiore")
+			}
+		}
 		return response, errors.New("Errore quotazione")
 	}
 	return response, nil
