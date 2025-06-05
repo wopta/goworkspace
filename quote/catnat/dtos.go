@@ -359,12 +359,12 @@ func (d *QuoteRequest) FromPolicyForQuote(policy *models.Policy) error {
 func setGuaranteeValue(asset *assetRequest, guarantee models.Guarante, code string) {
 	var gL guaranteeList
 	if guarantee.Value.SumInsuredLimitOfIndemnity != 0 {
-		gL.GuaranteeCode = code + buildingCode
+		gL.GuaranteeCode = code + contentCode
 		gL.CapitalAmount = int(guarantee.Value.SumInsuredLimitOfIndemnity)
 		asset.GuaranteeList = append(asset.GuaranteeList, gL)
 	}
 	if guarantee.Value.SumInsured != 0 {
-		gL.GuaranteeCode = code + contentCode
+		gL.GuaranteeCode = code + buildingCode
 		gL.CapitalAmount = int(guarantee.Value.SumInsured)
 		asset.GuaranteeList = append(asset.GuaranteeList, gL)
 	}
