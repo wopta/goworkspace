@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"reflect"
 
 	"github.com/maja42/goval"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
@@ -62,7 +63,7 @@ func (p *processBpnm) loop(nameActivity string) error {
 			}
 			callEndIfStop = callEndIfStop && p.activeActivities[i].callEndIfStop
 			//TODO: to improve
-			mapsMerged = mergeMaps(p.storageBpnm.getAllGlobal(), p.storageBpnm.getAllLocal())
+			mapsMerged = mergeMaps(p.storageBpnm.getAllGlobals(), p.storageBpnm.getAllLocals())
 			byte, err = json.Marshal(mapsMerged)
 			if err != nil {
 				return err
@@ -162,20 +163,22 @@ func (act *activity) evaluateDecisions(processName string, storage StorageData, 
 		if err != nil {
 			return nil, fmt.Errorf("Process '%v' with activity '%v' has an eval error: %v", processName, act.name, err.Error())
 		}
-		if resultEvaluation.(bool) {
+		if ok, isBool := resultEvaluation.(bool); ok && isBool {
 			if err = checkLocalResources(storage, act.requiredOutputData); err != nil {
 				return nil, fmt.Errorf("Process '%v' with activity '%v' has an output error: %v", processName, act.name, err.Error())
 			}
 			storage.markWhatNeeded(act.requiredOutputData)
 			res = append(res, ga.nextActivities...)
 			break
+		} else if !isBool {
+			return nil, fmt.Errorf("Process '%v' with activity '%v' has an decision error: expected a 'bool' type, got a %v", processName, act.name, reflect.TypeOf(resultEvaluation).String())
 		}
 	}
 	return res, nil
 }
 
 func checkLocalResources(st StorageData, req []typeData) error {
-	local := st.getAllLocal()
+	local := st.getAllLocals()
 	for _, requiredData := range req {
 		storedData, exist := local[requiredData.Name]
 		if !exist {
@@ -189,7 +192,7 @@ func checkLocalResources(st StorageData, req []typeData) error {
 }
 
 func checkGlobalResources(st StorageData, req []typeData) error {
-	global := st.getAllGlobal()
+	global := st.getAllGlobals()
 	for _, requiredData := range req {
 		storedData, exist := global[requiredData.Name]
 		if !exist {

@@ -53,6 +53,6 @@ type injectionKey struct {
 }
 
 type typeData struct {
-	Name string
-	Type string
+	Name string `json:"name"`
+	Type string `json:"type"`
 }

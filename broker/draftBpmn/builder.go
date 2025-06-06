@@ -87,7 +87,7 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 			return nil, err
 		}
 		if builtActivities[getNameEndActivity(p.Name)] != nil {
-			return nil, fmt.Errorf("Cant use '%v' as name for an activity", getNameEndActivity(p.Name))
+			return nil, fmt.Errorf("Cant use '%v' as name for an activity, since it's a builtin activity", getNameEndActivity(p.Name))
 		}
 		builtEndActivity, err = b.buildActivities(p.Name, getEndingActivityBuilder(p.Name)) //build the end activity
 		if err != nil {
@@ -181,6 +181,8 @@ func (b *BpnmBuilder) SetStorage(pool StorageData) {
 	b.storage = pool
 }
 
+// Build a list of activity, association the handlers and injected processes to each activities
+// The matching between gateways and activities has to been done yet, with 'hydrateGateways'
 func (a *BpnmBuilder) buildActivities(processName string, activitiesToBuild ...activityBuilder) (map[string]*activity, error) {
 	result := make(map[string]*activity)
 	for _, activityToBuild := range activitiesToBuild {
@@ -213,7 +215,7 @@ func (a *BpnmBuilder) buildActivities(processName string, activitiesToBuild ...a
 			activityToBuild.CallEndIfStop = boolPtr(true)
 		}
 		newActivity.callEndIfStop = *activityToBuild.CallEndIfStop
-
+		//Check if a recover handler has been specified
 		if activityToBuild.Recover != "" {
 			rec, exist := a.handlers[activityToBuild.Recover]
 			if !exist {

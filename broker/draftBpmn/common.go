@@ -46,6 +46,8 @@ func mergeUniqueMaps[key comparable, out any](m1 map[key]out, m2 map[key]out) (m
 	return merged, nil
 }
 
+// Get a resource and return it.
+// The priority is Local->Higher-Local..->Global->Higher-Global->Resource not found
 func GetData[t DataBpnm](name string, storage StorageData) (t, error) {
 	data, err := storage.GetLocal(name)
 	var result t
@@ -64,9 +66,11 @@ func GetData[t DataBpnm](name string, storage StorageData) (t, error) {
 	return result, nil
 }
 
+// Get a resource and assign it to 'data' parameter
+// The priority is Local->Higher-Local..->Global->Higher-Global->Resource not found
 func GetDataRef[t DataBpnm](name string, data *t, storage StorageData) (err error) {
 	if data == nil {
-		return errors.New("No reference passed")
+		return errors.New("Reference can't be null")
 	}
 	*data, err = GetData[t](name, storage)
 	return

@@ -23,9 +23,8 @@ type activity struct {
 	recover            activityHandler
 	requiredOutputData []typeData
 	requiredInputData  []typeData
-	//	GatewayType        GatewayType
-	gateway       []*gateway
-	callEndIfStop bool
+	gateway            []*gateway
+	callEndIfStop      bool
 }
 
 type gateway struct {
