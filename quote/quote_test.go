@@ -3,7 +3,6 @@ package quote
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"reflect"
 	"testing"
 
@@ -38,10 +37,11 @@ func (c *mock_clientCatnat) Quote(dto catnat.QuoteRequest, _ *models.Policy) (re
 	if e != nil {
 		panic(e)
 	}
-	log.PrintStruct("policy test", dto)
 	json.Unmarshal(bytes, &dtoExpected)
 	if !reflect.DeepEqual(dto, dtoExpected) {
-		return response, fmt.Errorf("Expected %+v\n\ngot: %+v", dto, dtoExpected)
+		log.PrintStruct("Expected: ", dtoExpected)
+		log.PrintStruct("Got: ", dto)
+		return response, errors.New("dto != expected")
 	}
 	return response, nil
 }
