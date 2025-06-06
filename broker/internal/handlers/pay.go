@@ -71,14 +71,10 @@ func updatePolicy(state bpmn.StorageData) error {
 
 	policy.BigquerySave(origin.String)
 
+	addresses.ToAddress = mail.GetContractorEmail(policy.Policy)
 	switch flowName.String {
-	case models.ProviderMgaFlow:
-		addresses.ToAddress = mail.GetContractorEmail(policy.Policy)
+	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
 		addresses.CcAddress = mail.GetNetworkNodeEmail(networkNode.NetworkNode)
-	case models.RemittanceMgaFlow:
-		addresses.ToAddress = mail.GetNetworkNodeEmail(networkNode.NetworkNode)
-	case models.MgaFlow, models.ECommerceFlow:
-		addresses.ToAddress = mail.GetContractorEmail(policy.Policy)
 	}
 
 	// Send mail with the contract to the user

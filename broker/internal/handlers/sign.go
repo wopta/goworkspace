@@ -73,16 +73,10 @@ func sendMailContract(state bpmn.StorageData) error {
 		return err
 	}
 
+	addresses.ToAddress = mail.GetContractorEmail(policy.Policy)
 	switch flowName.String {
 	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
-		if sendEmail.Bool {
-			addresses.ToAddress = mail.GetContractorEmail(policy.Policy)
-			addresses.CcAddress = mail.GetNetworkNodeEmail(networkNode.NetworkNode)
-		} else {
-			addresses.ToAddress = mail.GetNetworkNodeEmail(networkNode.NetworkNode)
-		}
-	case models.MgaFlow, models.ECommerceFlow:
-		addresses.ToAddress = mail.GetContractorEmail(policy.Policy)
+		addresses.CcAddress = mail.GetNetworkNodeEmail(networkNode.NetworkNode)
 	}
 
 	log.Printf(
