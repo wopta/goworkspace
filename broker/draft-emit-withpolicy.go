@@ -88,13 +88,13 @@ func DraftEmitWithPolicyFx(w http.ResponseWriter, r *http.Request) (string, any,
 }
 
 func emitDraftWithPolicy(policy *models.Policy, origin string) (EmitResponse, error) {
-	log.Println("[Emit] start ------------------------------------------------")
+	log.Println("start ------------------------------------------------")
 	var responseEmit EmitResponse
 
 	fireGuarantee := lib.GetDatasetByEnv(origin, lib.GuaranteeCollection)
 
-	log.Printf("[Emit] Emitting - Policy Uid %s", policy.Uid)
-	log.Println("[Emit] starting bpmn flow...")
+	log.Printf("Emitting - Policy Uid %s", policy.Uid)
+	log.Println("starting bpmn flow...")
 
 	paymentSplit = "monthly"
 	log.Printf("paymentSplit: %s", paymentSplit)
@@ -125,11 +125,11 @@ func emitDraftWithPolicy(policy *models.Policy, origin string) (EmitResponse, er
 
 	policy.Updated = time.Now().UTC()
 	policyJson, _ := policy.Marshal()
-	log.Printf("[Emit] Policy %s: %s", policy.Uid, string(policyJson))
+	log.Printf("Policy %s: %s", policy.Uid, string(policyJson))
 
-	log.Println("[Emit] saving guarantees to bigquery...")
+	log.Println("saving guarantees to bigquery...")
 	models.SetGuaranteBigquery(*policy, "emit", fireGuarantee)
 
-	log.Println("[Emit] end --------------------------------------------------")
+	log.Println("end --------------------------------------------------")
 	return responseEmit, nil
 }
