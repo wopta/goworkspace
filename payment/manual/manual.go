@@ -209,12 +209,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		callback_out.Execute(networkNode, policy, callback_out.Paid)
 
 		// Send mail with the contract to the user
-		switch flowName {
-		case models.ProviderMgaFlow, models.MgaFlow, models.ECommerceFlow:
-			toAddress = mail.GetContractorEmail(&policy)
-		case models.RemittanceMgaFlow:
-			toAddress = mail.GetNetworkNodeEmail(networkNode)
-		}
+		toAddress = mail.GetContractorEmail(&policy)
 
 		// Send mail with the contract to the user
 		log.Printf(

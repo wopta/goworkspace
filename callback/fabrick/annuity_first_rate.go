@@ -150,18 +150,13 @@ func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod string) e
 		}
 
 		flowName, _ := policy.GetFlow(networkNode, warrant)
-		toAddress := mail.Address{}
+		toAddress := mail.GetContractorEmail(&policy)
 		ccAddress := mail.Address{}
 		fromAddress := mail.AddressAnna
 
 		switch flowName {
-		case models.ProviderMgaFlow:
-			toAddress = mail.GetContractorEmail(&policy)
+		case models.ProviderMgaFlow, models.RemittanceMgaFlow:
 			ccAddress = mail.GetNetworkNodeEmail(networkNode)
-		case models.RemittanceMgaFlow:
-			toAddress = mail.GetNetworkNodeEmail(networkNode)
-		case models.MgaFlow, models.ECommerceFlow:
-			toAddress = mail.GetContractorEmail(&policy)
 		}
 
 		err = mail.SendMailContract(policy, policy.Attachments, fromAddress, toAddress, ccAddress, flowName)

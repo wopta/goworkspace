@@ -123,16 +123,10 @@ func sendMailContract(state *bpmn.State) error {
 	log.AddPrefix("sendMailContract")
 	defer log.PopPrefix()
 
+	toAddress = mail.GetContractorEmail(policy)
 	switch flowName {
 	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
-		if sendEmail {
-			toAddress = mail.GetContractorEmail(policy)
-			ccAddress = mail.GetNetworkNodeEmail(networkNode)
-		} else {
-			toAddress = mail.GetNetworkNodeEmail(networkNode)
-		}
-	case models.MgaFlow, models.ECommerceFlow:
-		toAddress = mail.GetContractorEmail(policy)
+		ccAddress = mail.GetNetworkNodeEmail(networkNode)
 	}
 
 	log.Printf(
@@ -236,14 +230,10 @@ func updatePolicy(state *bpmn.State) error {
 
 	policy.BigquerySave(origin)
 
+	toAddress = mail.GetContractorEmail(policy)
 	switch flowName {
-	case models.ProviderMgaFlow:
-		toAddress = mail.GetContractorEmail(policy)
+	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
 		ccAddress = mail.GetNetworkNodeEmail(networkNode)
-	case models.RemittanceMgaFlow:
-		toAddress = mail.GetNetworkNodeEmail(networkNode)
-	case models.MgaFlow, models.ECommerceFlow:
-		toAddress = mail.GetContractorEmail(policy)
 	}
 
 	// Send mail with the contract to the user
