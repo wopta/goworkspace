@@ -5,18 +5,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
-
-	"gitlab.dev.wopta.it/goworkspace/document"
-	"gitlab.dev.wopta.it/goworkspace/lib"
-	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
-	"gitlab.dev.wopta.it/goworkspace/lib/log"
-	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func Sign(input NamirialInput) (response NamirialOutput, err error) {
@@ -95,7 +93,7 @@ func uploadFiles(files ...string) (fileIds []string, err error) {
 	return idsFile, nil
 }
 
-func prepareDocuments(idsDocument ...string) (resp document.PrepareResponse, err error) {
+func prepareDocuments(idsDocument ...string) (resp prepareResponse, err error) {
 	var url = os.Getenv("ESIGN_BASEURL") + "v6/file/prepare"
 
 	log.Println("Start preparing files")
@@ -119,12 +117,12 @@ func prepareDocuments(idsDocument ...string) (resp document.PrepareResponse, err
 		return resp, err
 	}
 
-	resp, err = handleResponse[document.PrepareResponse](lib.RetryDo(req, 5, 30))
+	resp, err = handleResponse[prepareResponse](lib.RetryDo(req, 5, 30))
 	if err != nil {
 		return resp, err
 	}
 	if len(resp.Activities) == 0 {
-		resp.Activities = append(resp.Activities, document.Activity{})
+		resp.Activities = append(resp.Activities, activity{})
 	}
 	//The signatures that dont use the default place holder are put inside Unassigned,so you need to iterate them and fix their size and position
 	for i := range resp.UnassignedElements.Signatures {
@@ -146,7 +144,7 @@ func prepareDocuments(idsDocument ...string) (resp document.PrepareResponse, err
 	return resp, nil
 }
 
-func sendDocuments(preSendBody document.PrepareResponse, idFiles []string, policy models.Policy, callbackUrl string) (idEnvelope string, err error) {
+func sendDocuments(preSendBody prepareResponse, idFiles []string, policy models.Policy, callbackUrl string) (idEnvelope string, err error) {
 	var url = os.Getenv("ESIGN_BASEURL") + "v6/envelope/send"
 	log.Println("Sending documents")
 	body := buildBodyToSend(preSendBody, idFiles, callbackUrl, policy)
@@ -168,7 +166,7 @@ func sendDocuments(preSendBody document.PrepareResponse, idFiles []string, polic
 	return idEnvelope, err
 }
 
-func buildBodyToSend(prepareteResponse document.PrepareResponse, idFiles []string, callbackUrl string, policy models.Policy) (body sendNamirialRequest) {
+func buildBodyToSend(prepareteResponse prepareResponse, idFiles []string, callbackUrl string, policy models.Policy) (body sendNamirialRequest) {
 	body.Name = policy.CodeCompany
 	body.AddDocumentTimestamp = true
 	body.ShareWithTeam = true
@@ -274,8 +272,8 @@ func getCallbackUrl(input NamirialInput) string {
 	return url
 }
 
-func GetFiles(envelopeId string) (document.NamirialFiles, error) {
-	var resp document.NamirialFiles
+func GetFiles(envelopeId string) (namirialFiles, error) {
+	var resp namirialFiles
 	var urlstring = os.Getenv("ESIGN_BASEURL") + "v6/envelope/" + envelopeId + "/files"
 	req, _ := http.NewRequest(http.MethodGet, urlstring, nil)
 	req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))

@@ -41,18 +41,6 @@ var documentRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
-	{
-		Route:   "/v1/sign",
-		Handler: lib.ResponseLoggerWrapper(SignNamirial),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
-	},
-	{
-		Route:   "/v2/sign",
-		Handler: lib.ResponseLoggerWrapper(SignNamirialV6),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
-	},
 }
 
 func init() {

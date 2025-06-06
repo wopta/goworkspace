@@ -138,29 +138,7 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) error {
 	return err
 }
 
-// Not sure if this is the right place
-// because it creates a dependency with document
-// DEPRECATED
-func AddContract(policy *models.Policy, origin string) error {
-	if slices.Contains(policy.StatusHistory, models.PolicyStatusManualSigned) {
-		return nil
-	}
-	gsLink := <-document.GetFileV6(*policy, policy.Uid)
-	filename := strings.ReplaceAll(fmt.Sprintf(models.ContractDocumentFormat, policy.NameDesc, policy.CodeCompany), " ", "_")
-	*policy.Attachments = append(*policy.Attachments, models.Attachment{
-		Name:     models.ContractAttachmentName,
-		Link:     gsLink,
-		FileName: filename,
-		Section:  models.DocumentSectionContracts,
-	})
-	policy.Updated = time.Now().UTC()
-
-	firePolicy := lib.PolicyCollection
-
-	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
-}
-
-// Download the signed file from the envelope and add them inside the policy's attachments, and save the policy.
+// Download the signed file from the envelope, add them inside the policy's attachments and save the policy.
 // The name of the attachment is given by file's name sent to namirial(with the extension removed)
 func AddSignedDocumentsInPolicy(policy *models.Policy, origin string) error {
 	log.AddPrefix("AddDocumentsInPolicy")

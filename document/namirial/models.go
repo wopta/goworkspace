@@ -1,7 +1,6 @@
 package namirial
 
 import (
-	"gitlab.dev.wopta.it/goworkspace/document"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
@@ -16,13 +15,6 @@ type NamirialOutput struct {
 	Url        string
 	IdEnvelope string
 	FileIds    []string
-}
-
-type dataForDocument struct {
-	policy     *models.Policy
-	product    *models.Product
-	warrant    *models.Warrant
-	idDocument string
 }
 
 type prepareNamirialDocumentRequest struct {
@@ -49,8 +41,8 @@ type sendNamirialRequest struct {
 	AddDocumentTimestamp       bool                       `json:"AddDocumentTimestamp"`
 	ShareWithTeam              bool                       `json:"ShareWithTeam"`
 	LockFormFieldsOnFinish     bool                       `json:"LockFormFieldsOnFinish"`
-	Activities                 []document.Activity        `json:"Activities"`
-	UnassignedElements         document.Elements          `json:"UnassignedElements"`
+	Activities                 []activity                 `json:"Activities"`
+	UnassignedElements         elements                   `json:"UnassignedElements"`
 	CallbackConfiguration      callbackConfiguration      `json:"CallbackConfiguration"`
 	AgentRedirectConfiguration agentRedirectConfiguration `json:"AgentRedirectConfiguration"`
 	ReminderConfiguration      reminderConfiguration      `json:"ReminderConfiguration"`
@@ -124,15 +116,144 @@ type viewerLink struct {
 	ViewerLink string `json:"ViewerLink"`
 }
 
-type documentDesc struct {
-	FileId         string   `json:"FileId"`
-	FileName       string   `json:"FileName"`
-	Attachments    []string `json:"Attachments"`
-	PageCount      int      `json:"PageCount"`
-	DocumentNumber int      `json:"DocumentNumber"`
-}
-
 type auditTrail struct {
 	FileId    string `json:"FileId"`
 	XmlFileId string `json:"XmlFileId"`
+}
+
+type prepareResponse struct {
+	UnassignedElements elements   `json:"UnassignedElements"`
+	Activities         []activity `json:"Activities"`
+}
+
+type activity struct {
+	Action action `json:"Action"`
+}
+
+type action struct {
+	Sign sign `json:"Sign"`
+}
+
+type sign struct {
+	Elements                  elements                  `json:"Elements"`
+	RecipientConfiguration    recipientConfiguration    `json:"RecipientConfiguration"`
+	FinishActionConfiguration finishActionConfiguration `json:"FinishActionConfiguration"`
+}
+type finishActionConfiguration struct {
+	SignAnyWhereViewer signAnyWhereViewer `json:"SignAnyWhereViewer"`
+}
+
+type signAnyWhereViewer struct {
+	RedirectUri string `json:"RedirectUri"`
+}
+
+type recipientConfiguration struct {
+	SendEmails                  bool                        `json:"SendEmails"`
+	AllowAccessAfterFinish      bool                        `json:"AllowAccessAfterFinish"`
+	AllowDelegation             bool                        `json:"AllowDelegation"`
+	ContactInformation          contactInformation          `json:"ContactInformation"`
+	PersonalMessage             string                      `json:"PersonalMessage"`
+	AuthenticationConfiguration authenticationConfiguration `json:"AuthenticationConfiguration"`
+}
+
+type contactInformation struct {
+	Email        string `json:"Email"`
+	GivenName    string `json:"GivenName"`
+	Surname      string `json:"Surname"`
+	PhoneNumber  string `json:"PhoneNumber"`
+	LanguageCode string `json:"LanguageCode"`
+}
+
+type authenticationConfiguration struct {
+	SmsOneTimePassword smsOneTimePassword `json:"SmsOneTimePassword"`
+	AccessCode         accessCode
+}
+
+type accessCode struct {
+	Code string
+}
+
+type smsOneTimePassword struct {
+	PhoneNumber string `json:"PhoneNumber"`
+}
+type elements struct {
+	TextBoxes    []any `json:"TextBoxes"`
+	CheckBoxes   []any `json:"CheckBoxes"`
+	ComboBoxes   []any `json:"ComboBoxes"`
+	RadioButtons []any `json:"RadioButtons"`
+	ListBoxes    []any `json:"ListBoxes"`
+	Attachments  []any `json:"Attachments"`
+
+	Signatures []signature `json:"Signatures"`
+}
+
+type signature struct {
+	ElementID             string                `json:"ElementId"`
+	Required              bool                  `json:"Required"`
+	DocumentNumber        int64                 `json:"DocumentNumber"`
+	DisplayName           string                `json:"DisplayName"`
+	AllowedSignatureTypes allowedSignatureTypes `json:"AllowedSignatureTypes"`
+	FieldDefinition       fieldDefinition       `json:"FieldDefinition"`
+	TaskConfiguration     taskConfiguration     `json:"TaskConfiguration"`
+}
+
+type allowedSignatureTypes struct {
+	ClickToSign      clickToSign `json:"ClickToSign"`
+	SignaturePlugins []any       `json:"SignaturePlugins"`
+}
+
+type clickToSign struct {
+	UseExternalSignatureImage string `json:"UseExternalSignatureImage"`
+}
+
+type fieldDefinition struct {
+	Position position `json:"Position"`
+	Size     size     `json:"Size"`
+}
+
+type position struct {
+	PageNumber int64   `json:"PageNumber"`
+	X          float64 `json:"X"`
+	Y          float64 `json:"Y"`
+}
+
+type size struct {
+	Width  float64 `json:"Width"`
+	Height float64 `json:"Height"`
+}
+
+type taskConfiguration struct {
+	BatchGroup      string          `json:"BatchGroup"`
+	OrderDefinition orderDefinition `json:"OrderDefinition"`
+}
+
+type orderDefinition struct {
+	OrderIndex int64 `json:"OrderIndex"`
+}
+
+type namirialFiles struct {
+	Documents      []documents     `json:"Documents"`
+	AuditTrail     auditTrail      `json:"AuditTrail"`
+	LegalDocuments []legalDocument `json:"LegalDocuments"`
+}
+
+type documents struct {
+	FileID           string       `json:"FileId"`
+	FileName         string       `json:"FileName"`
+	AuditTrailFileID string       `json:"AuditTrailFileId"`
+	Attachments      []attachment `json:"Attachments"`
+	PageCount        int64        `json:"PageCount"`
+	DocumentNumber   int64        `json:"DocumentNumber"`
+}
+
+type attachment struct {
+	FileID   string `json:"FileId"`
+	FileName string `json:"FileName"`
+}
+
+type legalDocument struct {
+	FileID     string `json:"FileId"`
+	FileName   string `json:"FileName"`
+	ActivityID string `json:"ActivityId"`
+	Email      string `json:"Email"`
 }
