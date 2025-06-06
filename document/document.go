@@ -41,6 +41,18 @@ var documentRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
+	{ //DEPRECATED
+		Route:   "/v1/sign",
+		Handler: lib.ResponseLoggerWrapper(SignNamirial),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{ //DEPRECATED
+		Route:   "/v2/sign",
+		Handler: lib.ResponseLoggerWrapper(SignNamirial),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
 }
 
 func init() {
