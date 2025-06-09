@@ -152,6 +152,7 @@ const catNatSoleProp = "3"
 const yes = "si"
 const no = "no"
 
+// TODO: use companyCodec instead
 var guaranteeSlugToCode = map[string]string{
 	earthquakeSlug: "211",
 	floodSlug:      "212",

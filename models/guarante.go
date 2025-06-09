@@ -14,9 +14,8 @@ type Guarante struct {
 	OrderAsset                 int                        `firestore:"orderAsset,omitempty" json:"orderAsset,omitempty"  bigquery:"-"`
 	DependsOr                  []string                   `firestore:"dependsOr,omitempty" json:"dependsOr,omitempty"  bigquery:"-"`
 	Depends                    []string                   `firestore:"depends,omitempty" json:"depends,omitempty"  bigquery:"-"`
-	SynchrozineFields          []string                   `firestore:"synchronizefields,omitempty" json:"synchrozinefields,omitempty"  bigquery:"-"`
 	Childrens                  []string                   `firestore:"childrens ,omitempty" json:"childrens,omitempty"  bigquery:"-"`
-	SelectedEsclude            []string                   `firestore:"selectedEsclude,omitempty" json:"selectedEsclude,omitempty"  bigquery:"-"`
+	SelectedExclude            []string                   `firestore:"selectedExclude,omitempty" json:"selectedExclude,omitempty"  bigquery:"-"`
 	LegalDefence               string                     `firestore:"legalDefence" json:"legalDefence,omitempty"  bigquery:"legalDefence"`
 	Assistance                 string                     `firestore:"assistance" json:"assistance,omitempty"  bigquery:"-"`
 	Type                       string                     `firestore:"type,omitempty" json:"type,omitempty"  bigquery:"type"`
@@ -60,7 +59,8 @@ type Guarante struct {
 	Commissions                *Commissions               `json:"commissions,omitempty" firestore:"commissions,omitempty" bigquery:"-"`
 	IsSelected                 bool                       `json:"isSelected" firestore:"isSelected" bigquery:"-"`
 	IsDeleted                  bool                       `json:"isDeleted" firestore:"isDeleted" bigquery:"-"`
-	SyncrhozineFieldSlug       string                     `json:"syncrhozineFieldSlug" firestore:"syncrhozineFieldSlug" bigquery:"-"`
+	//TODO: tochange in : SynchronizeSlug            string                     `json:"synchronizeSlug" firestore:"synchronizeSlug" bigquery:"-"`
+	SyncrhozineFieldSlug string `json:"syncrhozineFieldSlug" firestore:"syncrhozineFieldSlug" bigquery:"-"`
 }
 
 type GuaranteValue struct {

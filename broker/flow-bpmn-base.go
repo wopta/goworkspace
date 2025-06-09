@@ -28,20 +28,16 @@ func getFlow(policy *models.Policy, originStr string, storage bpmn.StorageData) 
 	product = prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode, warrant)
 	flowNameStr, _ := policy.GetFlow(networkNode, warrant)
 
-	policyBpmn := flow.Policy{Policy: policy}
-	productBpmn := flow.Product{Product: product}
 	mgaProduct := flow.Product{Product: prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)}
-	flowName := flow.String{String: flowNameStr}
-	networkBpmn := flow.Network{NetworkNode: networkNode}
 	if product.Flow == "" {
 		product.Flow = policy.Channel
 	}
 
-	storage.AddGlobal("policy", &policyBpmn)
-	storage.AddGlobal("product", &productBpmn)
-	storage.AddGlobal("networkNode", &networkBpmn)
+	storage.AddGlobal("policy", &flow.Policy{Policy: policy})
+	storage.AddGlobal("product", &flow.Product{Product: product})
+	storage.AddGlobal("networkNode", &flow.Network{NetworkNode: networkNode})
 	storage.AddGlobal("mgaProduct", &mgaProduct)
-	storage.AddGlobal("flowName", &flowName)
+	storage.AddGlobal("flowName", &flow.String{String: flowNameStr})
 	storage.AddGlobal("origin", &flow.String{String: originStr})
 	builder.SetStorage(storage)
 
