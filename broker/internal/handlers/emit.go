@@ -148,7 +148,7 @@ func sign(state bpmn.StorageData) error {
 	if err != nil {
 		return err
 	}
-	err = utility.SignFiles(policy.Policy, product.Product, networkNode.NetworkNode, sendEmail.Bool, origin.String)
+	err = utility.SignFiles(policy.Policy, product.Product, networkNode.NetworkNode, true, origin.String)
 	if err != nil {
 		return err
 	}
