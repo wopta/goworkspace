@@ -219,7 +219,6 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 			ccAddress.String(),
 		)
 		err = mail.SendMailContract(policy, policy.Attachments, fromAddress, toAddress, ccAddress, flowName)
-		return "", nil, err
 	} else if !policy.IsPay && policy.Annuity > 0 && isFirstTransactionAnnuity {
 		policy.SanitizePaymentData()
 		// Update Policy as paid and renewed
@@ -242,7 +241,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		policy.BigquerySave("")
 	}
 
-	return "{}", nil, nil
+	return "{}", nil, err
 }
 
 func manualPayment(transaction *models.Transaction, payload *ManualPaymentPayload) {
