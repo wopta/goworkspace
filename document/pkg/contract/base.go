@@ -2,7 +2,6 @@ package contract
 
 import (
 	"fmt"
-	"math"
 	"strings"
 	"time"
 
@@ -13,7 +12,6 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
 const (
@@ -21,12 +19,13 @@ const (
 )
 
 type baseGenerator struct {
-	engine      *engine.Fpdf
-	isProposal  bool
-	now         time.Time
-	signatureID uint32
-	networkNode *models.NetworkNode
-	policy      *models.Policy
+	engine       *engine.Fpdf
+	isProposal   bool
+	now          time.Time
+	signatureID  uint32
+	networkNode  *models.NetworkNode
+	worksForNode *models.NetworkNode
+	policy       *models.Policy
 }
 
 func (bg *baseGenerator) emptyHeader() {
@@ -745,7 +744,7 @@ func (bg *baseGenerator) mupTitle() {
 
 	bg.engine.NewLine(3)
 
-	text = "Il distributore ha l’obbligo di consegnare/trasmettere al contraente il presente Modulo, " +
+	text = "L’intermediario ha l’obbligo di consegnare/trasmettere al contraente il presente Modulo, " +
 		"prima della sottoscrizione della proposta o del contratto di assicurazione. Il documento può " +
 		"essere fornito con modalità non cartacea se appropriato rispetto alle modalità di distribuzione " +
 		"del prodotto assicurativo e il contraente lo consente (art. 120-quater del " +
@@ -754,11 +753,11 @@ func (bg *baseGenerator) mupTitle() {
 }
 
 func (bg *baseGenerator) mupSectionI(producerInfo, proponentInfo map[string]string, designation string) {
-	text := "SEZIONE I - Informazioni generali sul distributore che entra in contatto con " +
+	text := "SEZIONE I - Informazioni generali sull’intermediario che entra in contatto con " +
 		"il contraente"
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle))
 
-	bg.woptaTable(producerInfo, proponentInfo, designation)
+	bg.mupProducerTable(producerInfo, proponentInfo, designation)
 
 	text = "Gli estremi identificativi e di iscrizione dell’Intermediario e dei soggetti che " +
 		"operano per lo stesso possono essere verificati consultando il Registro Unico degli Intermediari assicurativi " +
@@ -799,6 +798,21 @@ func (bg *baseGenerator) mupSectionIV() {
 		"contrattuali che impongano di offrire esclusivamente i contratti di una o più imprese di " +
 		"assicurazioni."
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
+
+	website := "https://www.wopta.it/it/information-sets/"
+	if bg.worksForNode != nil {
+		website = bg.worksForNode.Agency.Website
+	}
+
+	bg.engine.RawWriteText(
+		bg.engine.GetTableCell("L’elenco delle Imprese con cui l’Intermediario ha rapporti d’affari diretti è "+
+			"pubblicato sul proprio sito internet ", constants.BlackColor),
+	)
+	bg.engine.WriteLink(website, bg.engine.GetTableCell(website, constants.PinkColor))
+	bg.engine.RawWriteText(
+		bg.engine.GetTableCell(". È facoltà del contraente chiedere la consegna o la trasmissione di tale elenco.",
+			constants.BlackColor))
+	bg.engine.NewLine(constants.CellHeight)
 }
 
 func (bg *baseGenerator) mupSectionV(body string) {
@@ -815,18 +829,15 @@ func (bg *baseGenerator) mupSectionVI() {
 	text := "SEZIONE VI - Informazioni sul pagamento dei premi"
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle))
 
-	text = "Relativamente a questo contratto i premi pagati dal Contraente " +
+	text = "a) Relativamente a questo contratto i premi pagati dal Contraente " +
 		"all’intermediario e le somme destinate ai risarcimenti o ai pagamenti dovuti dalle Imprese di Assicurazione, " +
-		"se regolati per il tramite dell’intermediario costituiscono patrimonio autonomo e separato dal patrimonio " +
+		"se regolati per il tramite dell’Intermediario, costituiscono patrimonio autonomo e separato dal patrimonio " +
 		"dello stesso."
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
-
-	text = "Indicare le modalità di pagamento ammesse"
-	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle))
-
-	text = "Sono consentiti, nei confronti dell'intermediario, esclusivamente bonifico e strumenti di " +
-		"pagamento elettronico, quali ad esempio, carte di credito e/o carte di debito, incluse le carte " +
-		"prepagate."
+	bg.engine.NewLine(constants.CellHeight / 2)
+	text = "b) Le modalità di pagamento consentite, nei confronti dell’Intermediario, sono esclusivamente mediante " +
+		"bonifico e strumenti di pagamento elettronico, quali ad esempio, carte di credito e/o carte di debito, " +
+		"incluse le carte prepagate."
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
 }
 
@@ -881,7 +892,6 @@ func (bg *baseGenerator) producerInfo() map[string]string {
 	return producer
 }
 
-// TODO: private
 func (bg *baseGenerator) proponentInfo() map[string]string {
 	proponentInfo := make(map[string]string)
 
@@ -899,7 +909,7 @@ func (bg *baseGenerator) proponentInfo() map[string]string {
 	} else {
 		proponentNode := bg.networkNode
 		if proponentNode.WorksForUid != "" {
-			proponentNode = network.GetNetworkNodeByUid(proponentNode.WorksForUid)
+			proponentNode = bg.worksForNode
 			if proponentNode == nil {
 				panic("could not find node for proponent with uid " + bg.networkNode.WorksForUid)
 			}
@@ -937,10 +947,11 @@ func (bg *baseGenerator) proponentInfo() map[string]string {
 func (bg *baseGenerator) designationInfo() string {
 	var (
 		designation                           string
+		agentContact                          string
 		mgaProponentDirectDesignationFormat   = "%s %s"
 		mgaRuiInfo                            = "Wopta Assicurazioni Srl, Società iscritta alla Sezione A del RUI con numero A000701923 in data 14/02/2022"
 		designationDirectManager              = "Responsabile dell’attività di intermediazione assicurativa di"
-		mgaProponentIndirectDesignationFormat = "%s di %s, iscritta in sezione E del RUI con numero %s in data %s, che opera per conto di %s"
+		mgaProponentIndirectDesignationFormat = "%s di %s con sede legale in %s, iscritta in sezione E del RUI con numero %s in data %s, che opera per conto di %s"
 		mgaEmitterDesignationFormat           = "%s dell’intermediario di %s iscritta alla sezione %s del RUI con numero %s in data %s"
 	)
 
@@ -952,21 +963,22 @@ func (bg *baseGenerator) designationInfo() string {
 		} else {
 			worksForNode := bg.networkNode
 			if bg.networkNode.WorksForUid != "" {
-				worksForNode = network.GetNetworkNodeByUid(bg.networkNode.WorksForUid)
+				worksForNode = bg.worksForNode
 			}
 			designation = fmt.Sprintf(
 				mgaProponentIndirectDesignationFormat,
 				bg.networkNode.Designation,
-				worksForNode.Agency.Name,
-				worksForNode.Agency.RuiCode,
-				worksForNode.Agency.RuiRegistration.Format(constants.DayMonthYearFormat),
+				worksForNode.GetName(),
+				worksForNode.GetAddress(),
+				worksForNode.GetRuiCode(),
+				worksForNode.GetRuiRegistration().Format(constants.DayMonthYearFormat),
 				mgaRuiInfo,
 			)
 		}
 	} else {
 		worksForNode := bg.networkNode
 		if bg.networkNode.WorksForUid != "" {
-			worksForNode = network.GetNetworkNodeByUid(bg.networkNode.WorksForUid)
+			worksForNode = bg.worksForNode
 		}
 		designation = fmt.Sprintf(
 			mgaEmitterDesignationFormat,
@@ -978,59 +990,65 @@ func (bg *baseGenerator) designationInfo() string {
 		)
 	}
 
+	if bg.policy.Channel == lib.NetworkChannel {
+		agentContact = fmt.Sprintf(". Contatti Itermediario - mail: %s", bg.networkNode.Mail)
+		if phone := bg.networkNode.GetPhone(); phone != "" {
+			agentContact += " - telefono: " + phone
+		}
+	}
+	designation += agentContact
+
 	log.Printf("designation info: %+v", designation)
 
 	return designation
 }
 
-func (bg *baseGenerator) mupInfo() (section1Info, section3Info string) {
+func (bg *baseGenerator) mupInfo() (section2Info, section5Info string) {
 	const (
-		mgaProponentFormat = "Secondo quanto indicato nel modulo di proposta/polizza e documentazione " +
-			"precontrattuale ricevuta, la distribuzione  relativamente a questa proposta/contratto è svolta per " +
-			"conto della seguente impresa di assicurazione: %s"
+		mgaProponentFormat = "La distribuzione relativamente a questa proposta/contratto è svolta per conto della " +
+			"seguente Impresa di assicurazione: %s"
 		mgaEmitterFormat = "Il contratto viene intermediato da %s, in qualità di soggetto proponente, che opera in " +
 			"virtù della collaborazione con Wopta Assicurazioni Srl (intermediario emittente dell'Impresa di " +
 			"Assicurazione %s, iscritto al RUI sezione A nr A000701923 dal 14.02.2022, ai sensi dell’articolo 22, " +
 			"comma 10, del decreto legge 18 ottobre 2012, n. 179, convertito nella legge 17 dicembre 2012, n. 221"
-		withoutConsultacy = "Per il prodotto intermediato, è corrisposto all’intermediario, da parte " +
-			"dell’impresa di assicurazione, un compenso sotto forma di commissione inclusa nel premio " +
-			"assicurativo."
-		withConsultacyFormat = "Per il prodotto intermediato, è corrisposto un compenso all’intermediario, da parte " +
-			"dell’impresa di assicurazione, sotto forma di commissione inclusa nel premio assicurativo " +
-			"e un contributo per servizi di intermediazione, a carico del cliente, pari ad %s."
+		withoutConsultacy = "Per il prodotto intermediato, è corrisposto all’Intermediario un compenso da parte " +
+			"dell’Impresa di assicurazione, sotto forma di commissione inclusa nel premio assicurativo."
+		withConsultacyFormat = "Per il prodotto intermediato, è corrisposto all’Intermediario un compenso da parte " +
+			"dell’Impresa di assicurazione, sotto forma di commissione inclusa nel premio assicurativo, " +
+			"e un compenso direttamente dal Contraente, pari ad %s."
 	)
 
 	companyName := constants.CompanyMap[bg.policy.Company]
 
 	if bg.policy.Channel != models.NetworkChannel || bg.networkNode == nil || bg.networkNode.IsMgaProponent {
-		section1Info = fmt.Sprintf(
+		section2Info = fmt.Sprintf(
 			mgaProponentFormat,
 			companyName,
 		)
 	} else {
 		worksForNode := bg.networkNode
 		if bg.networkNode.WorksForUid != "" {
-			worksForNode = network.GetNetworkNodeByUid(bg.networkNode.WorksForUid)
+			worksForNode = bg.worksForNode
 		}
-		section1Info = fmt.Sprintf(
+		section2Info = fmt.Sprintf(
 			mgaEmitterFormat,
 			worksForNode.Agency.Name,
 			companyName,
 		)
 	}
 
-	section3Info = withoutConsultacy
+	section5Info = withoutConsultacy
 	if bg.policy.ConsultancyValue.Price > 0 {
-		section3Info = fmt.Sprintf(
+		section5Info = fmt.Sprintf(
 			withConsultacyFormat,
 			lib.HumanaizePriceEuro(bg.policy.ConsultancyValue.Price),
 		)
 	}
 
-	return section1Info, section3Info
+	return section2Info, section5Info
 }
 
-func (bg *baseGenerator) woptaTable(producerInfo, proponentInfo map[string]string, designation string) {
+func (bg *baseGenerator) mupProducerTable(producerInfo, proponentInfo map[string]string, designation string) {
 	type entry struct {
 		title string
 		body  string
@@ -1082,7 +1100,7 @@ func (bg *baseGenerator) woptaTable(producerInfo, proponentInfo map[string]strin
 
 	entries := []entry{
 		{
-			title: "DATI DELLA PERSONA FISICA CHE ENTRA IN CONTATTO CON IL CONTRAENTE",
+			title: "DATI SULL’IDENTIFICAZIONE DELL’INTERMEDIARIO",
 			body: producerInfo["name"] + " iscritto alla Sezione " +
 				producerInfo["ruiSection"] + " del RUI con numero " + producerInfo["ruiCode"] + " in data " +
 				producerInfo["ruiRegistration"],
@@ -1218,417 +1236,6 @@ func (bg *baseGenerator) woptaTable(producerInfo, proponentInfo map[string]strin
 	bg.engine.SetDrawColor(constants.PinkColor)
 	bg.engine.DrawTable(table)
 	bg.engine.NewLine(2)
-}
-
-func (bg *baseGenerator) annex3(producerInfo, proponentInfo map[string]string, designation string) {
-	type section struct {
-		title string
-		body  []string
-	}
-
-	bg.engine.WriteText(domain.TableCell{
-		Text:      "ALLEGATO 3 - INFORMATIVA SUL DISTRIBUTORE",
-		Height:    3,
-		Width:     constants.FullPageWidth,
-		FontSize:  constants.LargeFontSize,
-		FontStyle: constants.BoldFontStyle,
-		FontColor: constants.BlackColor,
-		Fill:      false,
-		FillColor: domain.Color{},
-		Align:     constants.CenterAlign,
-		Border:    "",
-	})
-	bg.engine.NewLine(3)
-
-	bg.engine.WriteText(domain.TableCell{
-		Text: "Il distributore ha l’obbligo di consegnare/trasmettere al contraente il presente" +
-			" documento, prima della sottoscrizione della prima proposta o, qualora non prevista, del primo contratto di " +
-			"assicurazione, di metterlo a disposizione del pubblico nei propri locali, anche mediante apparecchiature " +
-			"tecnologiche, oppure di pubblicarlo sul proprio sito internet ove utilizzato per la promozione e collocamento " +
-			"di prodotti assicurativi, dando avviso della pubblicazione nei propri locali. In occasione di rinnovo o " +
-			"stipula di un nuovo contratto o di qualsiasi operazione avente ad oggetto un prodotto di investimento " +
-			"assicurativo il distributore consegna o trasmette le informazioni di cui all’Allegato 3 solo in caso di " +
-			"successive modifiche di rilievo delle stesse.",
-		Height:    3,
-		Width:     constants.FullPageWidth,
-		FontSize:  constants.RegularFontSize,
-		FontStyle: constants.RegularFontStyle,
-		FontColor: constants.BlackColor,
-		Fill:      false,
-		FillColor: domain.Color{},
-		Align:     constants.LeftAlign,
-		Border:    "",
-	})
-	bg.engine.NewLine(3)
-
-	bg.engine.WriteText(domain.TableCell{
-		Text: "SEZIONE I - Informazioni generali sull’intermediario che entra in contatto con " +
-			"il contraente",
-		Height:    3,
-		Width:     constants.FullPageWidth,
-		FontSize:  constants.LargeFontSize,
-		FontStyle: constants.BoldFontStyle,
-		FontColor: constants.BlackColor,
-		Fill:      false,
-		FillColor: domain.Color{},
-		Align:     constants.LeftAlign,
-		Border:    "",
-	})
-	bg.engine.NewLine(3)
-
-	bg.woptaTable(producerInfo, proponentInfo, designation)
-
-	bg.engine.WriteText(domain.TableCell{
-		Text: "Gli estremi identificativi e di iscrizione dell’Intermediario e dei soggetti che " +
-			"operano per lo stesso possono essere verificati consultando il Registro Unico degli Intermediari assicurativi " +
-			"e riassicurativi sul sito internet dell’IVASS (www.ivass.it)",
-		Height:    3,
-		Width:     constants.FullPageWidth,
-		FontSize:  constants.RegularFontSize,
-		FontStyle: constants.RegularFontStyle,
-		FontColor: constants.BlackColor,
-		Fill:      false,
-		FillColor: domain.Color{},
-		Align:     constants.LeftAlign,
-		Border:    "",
-	})
-
-	sections := []section{
-		{
-			title: "SEZIONE II - Informazioni sull’attività svolta dall’intermediario assicurativo",
-			body: []string{
-				proponentInfo["name"] + " comunica di aver messo a disposizione nei propri " +
-					"locali l’elenco degli obblighi di comportamento cui adempie, come indicati nell’allegato 4-ter del Regolamento" +
-					" IVASS n. 40/2018.",
-				"Si comunica che nel caso di offerta fuori sede o nel caso in cui la fase " +
-					"precontrattuale si svolga mediante tecniche di comunicazione a distanza il contraente riceve l’elenco " +
-					"degli obblighi.",
-			},
-		},
-		{
-			title: "SEZIONE III - Informazioni relative a potenziali situazioni di conflitto " +
-				"d’interessi",
-			body: []string{
-				proponentInfo["name"] + " ed i soggetti che operano per la stessa non sono " +
-					"detentori di una partecipazione, diretta o indiretta, pari o superiore al 10% del capitale sociale o dei " +
-					"diritti di voto di alcuna Impresa di assicurazione.",
-				"Le Imprese di assicurazione o Imprese controllanti un’Impresa di assicurazione " +
-					"non sono detentrici di una partecipazione, diretta o indiretta, pari o superiore al 10% del capitale sociale " +
-					"o dei diritti di voto dell’Intermediario.",
-			},
-		},
-		{
-			title: "SEZIONE IV - Informazioni sugli strumenti di tutela del contraente",
-			body: []string{
-				"L’attività di distribuzione è garantita da un contratto di assicurazione della " +
-					"responsabilità civile che copre i danni arrecati ai contraenti da negligenze ed errori professionali " +
-					"dell’intermediario o da negligenze, errori professionali ed infedeltà dei dipendenti, dei collaboratori o " +
-					"delle persone del cui operato l’intermediario deve rispondere a norma di legge.",
-				"Il contraente ha la facoltà, ferma restando la possibilità di rivolgersi " +
-					"all’Autorità Giudiziaria, di inoltrare reclamo per iscritto all’intermediario, via posta all’indirizzo di " +
-					"sede legale o a mezzo mail alla PEC sopra indicati, oppure all’Impresa secondo le modalità e presso i " +
-					"recapiti indicati nel DIP aggiuntivo nella relativa sezione, nonché la possibilità, qualora non dovesse " +
-					"ritenersi soddisfatto dall’esito del reclamo o in caso di assenza di riscontro da parte dell’intermediario " +
-					"o dell’impresa entro il termine di legge, di rivolgersi all’IVASS secondo quanto indicato nei DIP aggiuntivi.",
-				"Il contraente ha la facoltà di avvalersi di altri eventuali sistemi alternativi " +
-					"di risoluzione delle controversie previsti dalla normativa vigente nonché quelli indicati nei" +
-					" DIP aggiuntivi.",
-			},
-		},
-	}
-
-	for _, s := range sections {
-		bg.engine.NewLine(3)
-		bg.engine.WriteText(domain.TableCell{
-			Text:      s.title,
-			Height:    3,
-			Width:     constants.FullPageWidth,
-			FontSize:  constants.LargeFontSize,
-			FontStyle: constants.BoldFontStyle,
-			FontColor: constants.BlackColor,
-			Fill:      false,
-			FillColor: domain.Color{},
-			Align:     constants.LeftAlign,
-			Border:    "",
-		})
-		bg.engine.NewLine(1)
-		for _, b := range s.body {
-			bg.engine.WriteText(domain.TableCell{
-				Text:      b,
-				Height:    3,
-				Width:     constants.FullPageWidth,
-				FontSize:  constants.RegularFontSize,
-				FontStyle: constants.RegularFontStyle,
-				FontColor: constants.BlackColor,
-				Fill:      false,
-				FillColor: domain.Color{},
-				Align:     constants.LeftAlign,
-				Border:    "",
-			})
-			bg.engine.NewLine(1)
-		}
-	}
-}
-
-func (bg *baseGenerator) annex4(producerInfo, proponentInfo map[string]string, designation, annex4Section1Info, annex4Section3Info string) {
-	type section struct {
-		title string
-		body  []string
-	}
-
-	bg.engine.WriteText(domain.TableCell{
-		Text:      "ALLEGATO 4 - INFORMAZIONI SULLA DISTRIBUZIONE\nDEL PRODOTTO ASSICURATIVO NON IBIP",
-		Height:    3,
-		Width:     constants.FullPageWidth,
-		FontSize:  constants.LargeFontSize,
-		FontStyle: constants.BoldFontStyle,
-		FontColor: constants.BlackColor,
-		Fill:      false,
-		FillColor: domain.Color{},
-		Align:     constants.CenterAlign,
-		Border:    "",
-	})
-	bg.engine.NewLine(3)
-
-	bg.engine.WriteText(domain.TableCell{
-		Text: "Il distributore ha l’obbligo di consegnare o trasmettere al contraente, prima " +
-			"della sottoscrizione di ciascuna proposta o, qualora non prevista, di ciascun contratto assicurativo, il " +
-			"presente documento, che contiene notizie sul modello e l’attività di distribuzione, sulla consulenza fornita " +
-			"e sulle remunerazioni percepite.",
-		Height:    3,
-		Width:     constants.FullPageWidth,
-		FontSize:  constants.RegularFontSize,
-		FontStyle: constants.RegularFontStyle,
-		FontColor: constants.BlackColor,
-		Fill:      false,
-		FillColor: domain.Color{},
-		Align:     constants.LeftAlign,
-		Border:    "",
-	})
-	bg.engine.NewLine(3)
-
-	bg.engine.WriteText(domain.TableCell{
-		Text: "SEZIONE I - Informazioni generali sull’intermediario che entra in contatto con " +
-			"il contraente",
-		Height:    3,
-		Width:     constants.FullPageWidth,
-		FontSize:  constants.LargeFontSize,
-		FontStyle: constants.BoldFontStyle,
-		FontColor: constants.BlackColor,
-		Fill:      false,
-		FillColor: domain.Color{},
-		Align:     constants.LeftAlign,
-		Border:    "",
-	})
-	bg.engine.NewLine(3)
-
-	bg.woptaTable(producerInfo, proponentInfo, designation)
-
-	bg.engine.WriteText(domain.TableCell{
-		Text: "Gli estremi identificativi e di iscrizione dell’Intermediario e dei soggetti che " +
-			"operano per lo stesso possono essere verificati consultando il Registro Unico degli Intermediari assicurativi " +
-			"e riassicurativi sul sito internet dell’IVASS (www.ivass.it)",
-		Height:    3,
-		Width:     constants.FullPageWidth,
-		FontSize:  constants.RegularFontSize,
-		FontStyle: constants.RegularFontStyle,
-		FontColor: constants.BlackColor,
-		Fill:      false,
-		FillColor: domain.Color{},
-		Align:     constants.LeftAlign,
-		Border:    "",
-	})
-
-	sections := []section{
-		{
-			title: "SEZIONE I - Informazioni sul modello di distribuzione",
-			body:  []string{annex4Section1Info},
-		},
-		{
-			title: "SEZIONE II: Informazioni sull’attività di distribuzione e consulenza",
-			body: []string{
-				"Nello svolgimento dell’attività di distribuzione, l’intermediario non presta " +
-					"attività di consulenza prima della conclusione del contratto né fornisce al contraente una raccomandazione " +
-					"personalizzata ai sensi dell’art. 119-ter, comma 3, del decreto legislativo n. 209/2005 " +
-					"(Codice delle Assicurazioni Private)",
-				"L'attività di distribuzione assicurativa è svolta in assenza di obblighi " +
-					"contrattuali che impongano di offrire esclusivamente i contratti di una o più imprese di " +
-					"assicurazioni.",
-			},
-		},
-		{
-			title: "SEZIONE III - Informazioni relative alle remunerazioni",
-			body: []string{
-				annex4Section3Info,
-				"L’informazione sopra resa riguarda i compensi complessivamente percepiti da tutti " +
-					"gli intermediari coinvolti nella distribuzione del prodotto.",
-			},
-		},
-		{
-			title: "SEZIONE IV - Informazioni sul pagamento dei premi",
-			body: []string{
-				"Relativamente a questo contratto i premi pagati dal Contraente " +
-					"all’intermediario e le somme destinate ai risarcimenti o ai pagamenti dovuti dalle Imprese di Assicurazione, " +
-					"se regolati per il tramite dell’intermediario costituiscono patrimonio autonomo e separato dal patrimonio " +
-					"dello stesso.",
-				"Indicare le modalità di pagamento ammesse",
-				"Sono consentiti, nei confronti dell'intermediario, esclusivamente bonifico e strumenti di " +
-					"pagamento elettronico, quali ad esempio, carte di credito e/o carte di debito, incluse le carte " +
-					"prepagate.",
-			},
-		},
-	}
-
-	for _, s := range sections {
-		bg.engine.NewLine(3)
-		bg.engine.WriteText(domain.TableCell{
-			Text:      s.title,
-			Height:    3,
-			Width:     constants.FullPageWidth,
-			FontSize:  constants.LargeFontSize,
-			FontStyle: constants.BoldFontStyle,
-			FontColor: constants.BlackColor,
-			Fill:      false,
-			FillColor: domain.Color{},
-			Align:     constants.LeftAlign,
-			Border:    "",
-		})
-		bg.engine.NewLine(1)
-		for _, b := range s.body {
-			bg.engine.WriteText(domain.TableCell{
-				Text:      b,
-				Height:    3,
-				Width:     constants.FullPageWidth,
-				FontSize:  constants.RegularFontSize,
-				FontStyle: constants.RegularFontStyle,
-				FontColor: constants.BlackColor,
-				Fill:      false,
-				FillColor: domain.Color{},
-				Align:     constants.LeftAlign,
-				Border:    "",
-			})
-			bg.engine.NewLine(1)
-		}
-	}
-}
-
-func (bg *baseGenerator) annex4Ter(producerInfo, proponentInfo map[string]string, designation string) {
-	type section struct {
-		title string
-		body  []string
-	}
-
-	bg.engine.WriteText(domain.TableCell{
-		Text:      "ALLEGATO 4 TER - ELENCO DELLE REGOLE DI COMPORTAMENTO DEL DISTRIBUTORE",
-		Height:    3,
-		Width:     constants.FullPageWidth,
-		FontSize:  constants.LargeFontSize,
-		FontStyle: constants.BoldFontStyle,
-		FontColor: constants.BlackColor,
-		Fill:      false,
-		FillColor: domain.Color{},
-		Align:     constants.CenterAlign,
-		Border:    "",
-	})
-	bg.engine.NewLine(3)
-
-	bg.engine.WriteText(domain.TableCell{
-		Text: "Il distributore ha l’obbligo di mettere a disposizione del pubblico il " +
-			"presente documento nei propri locali, anche mediante apparecchiature tecnologiche, oppure pubblicarlo su " +
-			"un sito internet ove utilizzato per la promozione e il collocamento di prodotti assicurativi, dando avviso " +
-			"della pubblicazione nei propri locali. Nel caso di offerta fuori sede o nel caso in cui la fase " +
-			"precontrattuale si svolga mediante tecniche di comunicazione a distanza, il distributore consegna o " +
-			"trasmette al contraente il presente documento prima della sottoscrizione della proposta o, qualora non " +
-			"prevista, del contratto di assicurazione.",
-		Height:    3,
-		Width:     constants.FullPageWidth,
-		FontSize:  constants.RegularFontSize,
-		FontStyle: constants.RegularFontStyle,
-		FontColor: constants.BlackColor,
-		Fill:      false,
-		FillColor: domain.Color{},
-		Align:     constants.LeftAlign,
-		Border:    "",
-	})
-	bg.engine.NewLine(3)
-
-	bg.woptaTable(producerInfo, proponentInfo, designation)
-
-	bg.engine.WriteText(domain.TableCell{
-		Text: "Gli estremi identificativi e di iscrizione dell’Intermediario e dei soggetti che " +
-			"operano per lo stesso possono essere verificati consultando il Registro Unico degli Intermediari assicurativi " +
-			"e riassicurativi sul sito internet dell’IVASS (www.ivass.it)",
-		Height:    3,
-		Width:     constants.FullPageWidth,
-		FontSize:  constants.RegularFontSize,
-		FontStyle: constants.RegularFontStyle,
-		FontColor: constants.BlackColor,
-		Fill:      false,
-		FillColor: domain.Color{},
-		Align:     constants.LeftAlign,
-		Border:    "",
-	})
-
-	sections := []section{
-		{
-			title: "Sezione I - Regole generali per la distribuzione di prodotti assicurativi",
-			body: []string{
-				"a. obbligo di consegna al contraente dell’allegato 3 al Regolamento IVASS " +
-					"n. 40 del 2 agosto 2018, prima della sottoscrizione della prima proposta o, qualora non prevista, del primo " +
-					"contratto di assicurazione, di metterlo a disposizione del pubblico nei locali del distributore, anche " +
-					"mediante apparecchiature tecnologiche, e di pubblicarlo sul sito internet, ove esistente",
-				"b. obbligo di consegna dell’allegato 4 al Regolamento IVASS n. 40 del 2 agosto " +
-					"2018, prima della sottoscrizione di ciascuna proposta di assicurazione o, qualora non prevista, del contratto " +
-					"di assicurazione",
-				"c. obbligo di consegnare copia della documentazione precontrattuale e " +
-					"contrattuale prevista dalle vigenti disposizioni, copia della polizza e di ogni altro atto o documento " +
-					"sottoscritto dal contraente",
-				"d. obbligo di proporre o raccomandare contratti coerenti con le richieste e le " +
-					"esigenze di copertura assicurativa e previdenziale del contraente o dell’assicurato, acquisendo a tal fine, " +
-					"ogni utile informazione",
-				"e. obbligo di valutare se il contraente rientra nel mercato di riferimento " +
-					"identificato per il contratto di assicurazione proposto e non appartiene alle categorie di clienti per i quali " +
-					"il prodotto non è compatibile, nonché l’obbligo di adottare opportune disposizioni per ottenere dai produttori" +
-					" le informazioni di cui all’articolo 30-decies comma 5 del Codice e per comprendere le caratteristiche e il " +
-					"mercato di riferimento individuato per ciascun prodotto",
-				"f. obbligo di fornire in forma chiara e comprensibile le informazioni " +
-					"oggettive sul prodotto, illustrandone le caratteristiche, la durata, i costi e i limiti della copertura ed " +
-					"ogni altro elemento utile a consentire al contraente di prendere una decisione informata",
-			},
-		},
-	}
-
-	for _, s := range sections {
-		bg.engine.NewLine(3)
-		bg.engine.WriteText(domain.TableCell{
-			Text:      s.title,
-			Height:    3,
-			Width:     constants.FullPageWidth,
-			FontSize:  constants.LargeFontSize,
-			FontStyle: constants.BoldFontStyle,
-			FontColor: constants.BlackColor,
-			Fill:      false,
-			FillColor: domain.Color{},
-			Align:     constants.LeftAlign,
-			Border:    "",
-		})
-		bg.engine.NewLine(1)
-		for _, b := range s.body {
-			bg.engine.WriteText(domain.TableCell{
-				Text:      b,
-				Height:    3,
-				Width:     constants.FullPageWidth,
-				FontSize:  constants.RegularFontSize,
-				FontStyle: constants.RegularFontStyle,
-				FontColor: constants.BlackColor,
-				Fill:      false,
-				FillColor: domain.Color{},
-				Align:     constants.LeftAlign,
-				Border:    "",
-			})
-			bg.engine.NewLine(1)
-		}
-	}
 }
 
 func (bg *baseGenerator) howYouCanPaySection() {
@@ -1770,190 +1377,6 @@ func (bg *baseGenerator) companySignature() {
 	bg.engine.SetY(bg.engine.GetY() - 6)
 	bg.engine.InsertImage(lib.GetAssetPathByEnvV2()+logo.path, logo.x, bg.engine.GetY()+logo.y, logo.width,
 		logo.height)
-}
-
-func (bg *baseGenerator) checkSurveySpace(survey models.Survey) {
-	var answer string
-	leftMargin, _, rightMargin, _ := bg.engine.GetMargins()
-	pageWidth, pageHeight := bg.engine.GetPageSize()
-	availableWidth := pageWidth - leftMargin - rightMargin - 2
-	requiredHeight := 5.0
-	currentY := bg.engine.GetY()
-
-	surveyTitle := survey.Title
-	surveySubtitle := survey.Subtitle
-
-	if surveyTitle != "" {
-		bg.engine.SetFontStyle(constants.BoldFontStyle)
-		bg.engine.SetFontSize(constants.LargeFontSize)
-		lines := bg.engine.SplitText(surveyTitle, availableWidth)
-		requiredHeight += 3.5 * float64(len(lines))
-	}
-	if surveySubtitle != "" {
-		bg.engine.SetFontStyle(constants.BoldFontStyle)
-		bg.engine.SetFontSize(constants.RegularFontSize)
-		lines := bg.engine.SplitText(surveySubtitle, availableWidth)
-		requiredHeight += 3.5 * float64(len(lines))
-	}
-
-	for _, question := range survey.Questions {
-		availableWidth = pageWidth - leftMargin - rightMargin - 2
-
-		questionText := question.Question
-
-		if question.IsBold {
-			bg.engine.SetFontStyle(constants.BoldFontStyle)
-			bg.engine.SetFontSize(constants.LargeFontSize)
-		} else {
-			bg.engine.SetFontStyle(constants.RegularFontStyle)
-			bg.engine.SetFontSize(constants.RegularFontSize)
-		}
-		if question.Indent {
-			availableWidth -= tabDimension / 2
-		}
-
-		if question.HasAnswer {
-			answer = "NO"
-			if *question.Answer {
-				answer = "SI"
-			}
-		}
-
-		lines := bg.engine.SplitText(questionText+answer, availableWidth)
-		requiredHeight += 3 * float64(len(lines))
-	}
-
-	if (!bg.isProposal && survey.ContractorSign) || survey.CompanySign {
-		requiredHeight += 35
-	}
-
-	if (pageHeight-18)-currentY < requiredHeight {
-		bg.engine.NewPage()
-	}
-}
-
-func (bg *baseGenerator) printSurvey(survey models.Survey) error {
-	var dotsString string
-	leftMargin, _, rightMargin, _ := bg.engine.GetMargins()
-	pageWidth, _ := bg.engine.GetPageSize()
-	availableWidth := pageWidth - leftMargin - rightMargin - 2
-
-	bg.checkSurveySpace(survey)
-
-	surveyTitle := survey.Title
-	surveySubtitle := survey.Subtitle
-
-	bg.engine.SetFontStyle(constants.BoldFontStyle)
-	bg.engine.SetFontSize(constants.RegularFontSize)
-	if survey.HasAnswer {
-		answer := "NO"
-		if *survey.Answer {
-			answer = "SI"
-		}
-
-		answerWidth := bg.engine.GetStringWidth(answer)
-		dotWidth := bg.engine.GetStringWidth(".")
-
-		var surveyWidth, paddingWidth float64
-		var lines []string
-		if surveyTitle != "" {
-			lines = bg.engine.SplitText(surveyTitle+answer, availableWidth)
-		} else if surveySubtitle != "" {
-			lines = bg.engine.SplitText(surveySubtitle+answer, availableWidth)
-		}
-
-		surveyWidth = bg.engine.GetStringWidth(lines[len(lines)-1])
-		paddingWidth = availableWidth - surveyWidth - answerWidth
-
-		dotsString = strings.Repeat(".", int(math.Max((paddingWidth/dotWidth)-2, 0))) + answer
-	}
-	if surveyTitle != "" {
-		bg.engine.WriteText(domain.TableCell{
-			Text:      surveyTitle + dotsString,
-			Height:    4,
-			Width:     constants.FullPageWidth,
-			FontSize:  constants.LargeFontSize,
-			FontStyle: constants.BoldFontStyle,
-			FontColor: constants.PinkColor,
-			Fill:      false,
-			FillColor: domain.Color{},
-			Align:     constants.LeftAlign,
-			Border:    "",
-		})
-	}
-	if surveySubtitle != "" {
-		bg.engine.WriteText(domain.TableCell{
-			Text:      surveySubtitle + dotsString,
-			Height:    3.5,
-			Width:     availableWidth,
-			FontSize:  constants.RegularFontSize,
-			FontStyle: constants.BoldFontStyle,
-			FontColor: constants.BlackColor,
-			Fill:      false,
-			FillColor: domain.Color{},
-			Align:     constants.LeftAlign,
-			Border:    "",
-		})
-	}
-
-	for _, question := range survey.Questions {
-		dotsString = ""
-		availableWidth = pageWidth - leftMargin - rightMargin - 2
-		fontStyle := constants.RegularFontStyle
-		fontSize := constants.RegularFontSize
-
-		if question.IsBold {
-			fontStyle = constants.BoldFontStyle
-		}
-
-		if question.Indent {
-			bg.engine.SetX(tabDimension)
-			availableWidth -= tabDimension / 2
-		}
-
-		if question.HasAnswer {
-			var questionWidth, paddingWidth float64
-			answer := "NO"
-			if *question.Answer {
-				answer = "SI"
-			}
-
-			answerWidth := bg.engine.GetStringWidth(answer)
-			dotWidth := bg.engine.GetStringWidth(".")
-
-			lines := bg.engine.SplitText(question.Question+answer, availableWidth)
-
-			questionWidth = bg.engine.GetStringWidth(lines[len(lines)-1])
-			paddingWidth = availableWidth - questionWidth - answerWidth
-
-			dotsString = strings.Repeat(".", int(math.Max((paddingWidth/dotWidth)-2, 0))) + answer
-		}
-		bg.engine.WriteText(domain.TableCell{
-			Text:      question.Question + dotsString,
-			Height:    3.5,
-			Width:     availableWidth,
-			FontSize:  fontSize,
-			FontStyle: fontStyle,
-			FontColor: constants.BlackColor,
-			Fill:      false,
-			FillColor: domain.Color{},
-			Align:     constants.LeftAlign,
-			Border:    "",
-		})
-	}
-	bg.engine.NewLine(3)
-
-	if survey.CompanySign {
-		bg.companySignature()
-		if bg.isProposal {
-			bg.engine.NewLine(20)
-		}
-	}
-	if !bg.isProposal && survey.ContractorSign {
-		bg.signatureForm()
-		bg.engine.NewLine(10)
-	}
-	return nil
 }
 
 func (bg *baseGenerator) checkStatementSpace(statement models.Statement) {

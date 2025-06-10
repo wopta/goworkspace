@@ -427,6 +427,23 @@ func (nn *NetworkNode) GetManagerRuiResgistration() time.Time {
 	return ruiRegistration
 }
 
+func (nn *NetworkNode) GetPhone() string {
+	var phone string
+
+	switch nn.Type {
+	case AgentNetworkNodeType:
+		phone = nn.Agent.Phone
+	case AgencyNetworkNodeType:
+		phone = nn.Agency.Phone
+	case BrokerNetworkNodeType:
+		phone = nn.Broker.Phone
+	case AreaManagerNetworkNodeType:
+		phone = nn.AreaManager.Phone
+	}
+
+	return phone
+}
+
 func (nn *NetworkNode) IsJwtProtected() bool {
 	c := nn.JwtConfig
 	return (c.KeyAlgorithm != "" && c.ContentEncryption != "") || c.SignatureAlgorithm != ""

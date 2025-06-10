@@ -5,6 +5,7 @@ import (
 
 	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
 	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
 type PersonaGenerator struct {
@@ -12,14 +13,20 @@ type PersonaGenerator struct {
 }
 
 func NewPersonaGenerator(engine *engine.Fpdf, policy *models.Policy, node *models.NetworkNode, product models.Product, isProposal bool) *PersonaGenerator {
+	var worksForNode *models.NetworkNode
+	if node.WorksForUid != "" {
+		worksForNode = network.GetNetworkNodeByUid(node.WorksForUid)
+	}
+
 	return &PersonaGenerator{
 		baseGenerator: &baseGenerator{
-			engine:      engine,
-			isProposal:  isProposal,
-			now:         time.Now(),
-			signatureID: 0,
-			networkNode: node,
-			policy:      policy,
+			engine:       engine,
+			isProposal:   isProposal,
+			now:          time.Now(),
+			signatureID:  0,
+			networkNode:  node,
+			worksForNode: worksForNode,
+			policy:       policy,
 		},
 	}
 }

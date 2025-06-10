@@ -10,6 +10,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
 type LifeGenerator struct {
@@ -18,17 +19,23 @@ type LifeGenerator struct {
 }
 
 func NewLifeGenerator(engine *engine.Fpdf, policy *models.Policy, node *models.NetworkNode, product models.Product, isProposal bool) *LifeGenerator {
-
 	dto := dto.NewLifeDto()
 	dto.FromPolicy(policy, node)
+
+	var worksForNode *models.NetworkNode
+	if node.WorksForUid != "" {
+		worksForNode = network.GetNetworkNodeByUid(node.WorksForUid)
+	}
+
 	return &LifeGenerator{
 		baseGenerator: &baseGenerator{
-			engine:      engine,
-			isProposal:  isProposal,
-			now:         time.Now(),
-			signatureID: 0,
-			networkNode: node,
-			policy:      policy,
+			engine:       engine,
+			isProposal:   isProposal,
+			now:          time.Now(),
+			signatureID:  0,
+			networkNode:  node,
+			policy:       policy,
+			worksForNode: worksForNode,
 		},
 		dtoLife: dto,
 	}
