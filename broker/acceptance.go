@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"github.com/go-chi/chi/v5"
@@ -28,7 +29,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		payload       AcceptancePayload
 		policy        models.Policy
 		toAddress     mail.Address
-		callbackEvent string
+		callbackEvent base.CallbackoutAction
 	)
 
 	log.AddPrefix("AcceptanceFx")
@@ -81,10 +82,10 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	switch payload.Action {
 	case models.PolicyStatusRejected:
 		rejectPolicy(&policy, lib.ToUpper(payload.Reasons))
-		callbackEvent = callback_out.Rejected
+		callbackEvent = base.Rejected
 	case models.PolicyStatusApproved:
 		approvePolicy(&policy, lib.ToUpper(payload.Reasons))
-		callbackEvent = callback_out.Approved
+		callbackEvent = base.Approved
 	default:
 		log.Printf("Unhandled action %s", payload.Action)
 		return "", nil, fmt.Errorf("unhandled action %s", payload.Action)

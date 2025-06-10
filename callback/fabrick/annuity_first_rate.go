@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"gitlab.dev.wopta.it/goworkspace/callback/internal"
@@ -164,7 +165,7 @@ func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod string) e
 			return err
 		}
 
-		defer callback_out.Execute(networkNode, policy, callback_out.Paid)
+		defer callback_out.Execute(networkNode, policy, base.Paid)
 	}
 
 	if err := consultancy.GenerateInvoice(policy, transaction); err != nil {

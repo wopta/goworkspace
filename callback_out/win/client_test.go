@@ -3,8 +3,7 @@ package win_test
 import (
 	"testing"
 
-	"gitlab.dev.wopta.it/goworkspace/callback_out/internal"
-	md "gitlab.dev.wopta.it/goworkspace/callback_out/models"
+	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	"gitlab.dev.wopta.it/goworkspace/callback_out/win"
 )
 
@@ -14,38 +13,38 @@ func TestWinDecodeAction(t *testing.T) {
 
 	var testCases = []struct {
 		name  string
-		input string
-		want  []string
+		input base.CallbackoutAction
+		want  []base.CallbackoutAction
 	}{
 		{
 			name:  "Paid",
-			input: md.Paid,
-			want:  []string{internal.Paid},
+			input: base.Paid,
+			want:  []base.CallbackoutAction{base.Paid},
 		},
 		{
 			name:  "Proposal",
-			input: md.Proposal,
-			want:  []string{internal.Proposal},
+			input: base.Proposal,
+			want:  []base.CallbackoutAction{base.Proposal},
 		},
 		{
 			name:  "RequestApproval",
-			input: md.RequestApproval,
-			want:  []string{internal.RequestApproval},
+			input: base.RequestApproval,
+			want:  []base.CallbackoutAction{base.RequestApproval},
 		},
 		{
 			name:  "Emit",
-			input: md.Emit,
-			want:  []string{internal.Emit},
+			input: base.Emit,
+			want:  []base.CallbackoutAction{base.Emit},
 		},
 		{
 			name:  "EmitRemittance",
-			input: md.EmitRemittance,
-			want:  []string{internal.Emit, internal.Paid},
+			input: base.EmitRemittance,
+			want:  []base.CallbackoutAction{base.Emit, base.Paid},
 		},
 		{
 			name:  "Unhandled action",
 			input: "NON_EXISTING",
-			want:  []string{},
+			want:  []base.CallbackoutAction{},
 		},
 	}
 

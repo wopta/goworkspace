@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 
+	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/payment/fabrick"
 
@@ -73,7 +74,7 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		return fmt.Sprintf(responseFormat, false, string(request)), nil, nil
 	}
 
-	callback_out.Execute(networkNode, policy, callback_out.Paid)
+	callback_out.Execute(networkNode, policy, base.Paid)
 
 	response := fmt.Sprintf(responseFormat, true, string(request))
 

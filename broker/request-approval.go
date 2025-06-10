@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"gitlab.dev.wopta.it/goworkspace/callback_out"
+	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
@@ -121,7 +122,7 @@ func requestApproval(policy *models.Policy) error {
 	log.Printf("saving policy with uid %s to bigquery...", policy.Uid)
 	policy.BigquerySave(origin)
 
-	callback_out.Execute(networkNode, *policy, callback_out.RequestApproval)
+	callback_out.Execute(networkNode, *policy, base.RequestApproval)
 
 	log.Println("end ---------------------------------------")
 

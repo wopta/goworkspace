@@ -31,3 +31,13 @@ type gateway struct {
 	nextActivities []*activity
 	decision       string
 }
+
+type StatusFlow struct {
+	Parent          *StatusFlow
+	CurrentProcess  string
+	CurrentActivity string
+}
+
+func (*StatusFlow) GetType() string {
+	return "_statusFlow"
+}

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"github.com/go-chi/chi/v5"
@@ -206,7 +207,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 		policy.BigquerySave("")
 
-		callback_out.Execute(networkNode, policy, callback_out.Paid)
+		callback_out.Execute(networkNode, policy, base.Paid)
 
 		// Send mail with the contract to the user
 		toAddress = mail.GetContractorEmail(&policy)

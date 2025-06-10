@@ -35,10 +35,11 @@ func (f *FlowBpnm) RunAt(processName, startingActivity string) error {
 }
 
 func (p *processBpnm) loop(nameActivity string) error {
-
+	p.storageBpnm.AddGlobal("statusFlow", &StatusFlow{CurrentProcess: p.name})
 	if e := checkGlobalResources(p.storageBpnm, p.requiredGlobalData); e != nil {
 		return e
 	}
+
 	p.activeActivities = nil
 	if act := p.activities[nameActivity]; act != nil {
 		p.activeActivities = []*activity{p.activities[nameActivity]}
@@ -64,7 +65,7 @@ func (p *processBpnm) loop(nameActivity string) error {
 			}
 			callEndIfStop = callEndIfStop && p.activeActivities[i].callEndIfStop
 			//TODO: to improve
-			log.Printf("Gateways processing: Process '%s' activity '%s'", p.name, p.activeActivities[i].name)
+			log.InfoF("Gateways processing: Process '%s' activity '%s'", p.name, p.activeActivities[i].name)
 			mapsMerged = mergeMaps(p.storageBpnm.getAllGlobals(), p.storageBpnm.getAllLocals())
 			byte, err = json.Marshal(mapsMerged)
 			if err != nil {
@@ -135,6 +136,11 @@ func callWithRecover(nameProcess string, storage StorageData, act *activity) (er
 		}
 		log.InfoF("Run process '%v', finished activity '%v' with status: %v", nameProcess, act.name, status)
 	}()
+	status, err := storage.GetGlobal("statusFlow")
+	if err != nil {
+		return fmt.Errorf("Error setting status flow of Process '%v' with activity '%v'", nameProcess, act.name)
+	}
+	status.(*StatusFlow).CurrentActivity = act.name
 	return act.handler(storage)
 }
 

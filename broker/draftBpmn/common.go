@@ -76,6 +76,31 @@ func GetDataRef[t DataBpnm](name string, data *t, storage StorageData) (err erro
 	return
 }
 
+func GetStatusFlow(_storage StorageData) (*StatusFlow, error) {
+	storage := _storage.(*StorageBpnm)
+	var statusFlow *StatusFlow
+	if _statusFlow, ok := storage.global["statusFlow"]; ok {
+		statusFlow = _statusFlow.(*StatusFlow)
+	} else {
+		return statusFlow, fmt.Errorf("Error getting status flow")
+	}
+	var lastStatusFlowInserted *StatusFlow = statusFlow
+	for {
+		if storage.higherStore == nil {
+			break
+		}
+		storage = storage.higherStore.(*StorageBpnm)
+		if _statusFlow, ok := storage.global["statusFlow"]; ok {
+			lastStatusFlowInserted.Parent = _statusFlow.(*StatusFlow)
+			lastStatusFlowInserted = lastStatusFlowInserted.Parent
+		} else {
+			return statusFlow, fmt.Errorf("Error getting status flow")
+		}
+	}
+	return statusFlow, nil
+
+}
+
 // IsError gathers all errors(whether there are) and return them, otherwise return nil
 func IsError(errs ...error) error {
 	var res = strings.Builder{}

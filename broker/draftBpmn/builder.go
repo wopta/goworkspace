@@ -83,6 +83,12 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 		newProcess.storageBpnm = b.storage
 		newProcess.name = p.Name
 		newProcess.requiredGlobalData = p.GlobalDataRequired
+
+		newProcess.requiredGlobalData = append(newProcess.requiredGlobalData, typeData{
+			Name: "statusFlow",
+			Type: "_statusFlow",
+		})
+
 		builtActivities, err = b.buildActivities(p.Name, p.Activities...)
 		if err != nil {
 			return nil, err

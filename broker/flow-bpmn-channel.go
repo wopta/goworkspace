@@ -37,6 +37,7 @@ func getNodeFlow(callbackConfigName string) (*bpmn.BpnmBuilder, error) {
 	err = bpmn.IsError(
 		builder.AddHandler("baseCallback", channelFlow.BaseRequest),
 		builder.AddHandler("winEmit", channelFlow.CallBackEmit),
+		builder.AddHandler("winEmitRemittance", channelFlow.CallBackEmitRemittance),
 		builder.AddHandler("winSign", channelFlow.CallBackSigned),
 		builder.AddHandler("saveAudit", channelFlow.SaveAudit),
 		builder.AddHandler("winPay", channelFlow.CallBackPaid),

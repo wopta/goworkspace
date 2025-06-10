@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"gitlab.dev.wopta.it/goworkspace/broker/internal/utility"
+	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	prd "gitlab.dev.wopta.it/goworkspace/product"
@@ -190,9 +191,9 @@ func emit(policy *models.Policy, request EmitRequest, origin string) EmitRespons
 	log.Println("saving guarantees to bigquery...")
 	models.SetGuaranteBigquery(*policy, "emit", fireGuarantee)
 
-	callbackAction := callback_out.Emit
+	callbackAction := base.Emit
 	if warrant != nil && warrant.GetFlowName(policy.Name) == models.RemittanceMgaFlow {
-		callbackAction = callback_out.EmitRemittance
+		callbackAction = base.EmitRemittance
 	}
 
 	callback_out.Execute(networkNode, *policy, callbackAction)

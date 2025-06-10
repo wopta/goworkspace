@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"gitlab.dev.wopta.it/goworkspace/callback_out"
@@ -97,5 +98,5 @@ func namirialStepFinished(origin, policyUid string) {
 
 	policy.BigquerySave(origin)
 
-	callback_out.Execute(networkNode, policy, callback_out.Signed)
+	callback_out.Execute(networkNode, policy, base.Signed)
 }

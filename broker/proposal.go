@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"gitlab.dev.wopta.it/goworkspace/broker/internal/utility"
+	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"gitlab.dev.wopta.it/goworkspace/callback_out"
@@ -138,7 +139,7 @@ func proposal(policy *models.Policy) error {
 	policy.BigquerySave(origin)
 
 	if !policy.IsReserved {
-		callback_out.Execute(networkNode, *policy, callback_out.Proposal)
+		callback_out.Execute(networkNode, *policy, base.Proposal)
 	}
 
 	return nil

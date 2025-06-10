@@ -1,28 +1,16 @@
 package callback_out
 
 import (
-	"gitlab.dev.wopta.it/goworkspace/callback_out/internal"
-	md "gitlab.dev.wopta.it/goworkspace/callback_out/models"
+	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-var (
-	Proposal        internal.CallbackoutAction = md.Proposal
-	RequestApproval internal.CallbackoutAction = md.RequestApproval
-	Emit            internal.CallbackoutAction = md.Emit
-	Paid            internal.CallbackoutAction = md.Paid
-	Signed          internal.CallbackoutAction = md.Signed
-	EmitRemittance  internal.CallbackoutAction = md.EmitRemittance
-	Approved        internal.CallbackoutAction = md.Approved
-	Rejected        internal.CallbackoutAction = md.Rejected
-)
-
-func Execute(node *models.NetworkNode, policy models.Policy, rawAction internal.CallbackoutAction) {
+func Execute(node *models.NetworkNode, policy models.Policy, rawAction base.CallbackoutAction) {
 	var (
 		client CallbackClient
 		err    error
-		fx     func(models.Policy) internal.CallbackInfo
+		fx     func(models.Policy) base.CallbackInfo
 	)
 
 	if node == nil || node.CallbackConfig == nil {
@@ -49,19 +37,19 @@ func Execute(node *models.NetworkNode, policy models.Policy, rawAction internal.
 
 	for _, action := range actions {
 		switch action {
-		case Proposal:
+		case base.Proposal:
 			fx = client.Proposal
-		case RequestApproval:
+		case base.RequestApproval:
 			fx = client.RequestApproval
-		case Emit:
+		case base.Emit:
 			fx = client.Emit
-		case Signed:
+		case base.Signed:
 			fx = client.Signed
-		case Paid:
+		case base.Paid:
 			fx = client.Paid
-		case Approved:
+		case base.Approved:
 			fx = client.Approved
-		case Rejected:
+		case base.Rejected:
 			fx = client.Rejected
 		default:
 			log.Printf("unhandled callback action '%s'", action)
@@ -71,8 +59,6 @@ func Execute(node *models.NetworkNode, policy models.Policy, rawAction internal.
 		log.Printf("executing action '%s'", action)
 
 		res := fx(policy)
-		log.Printf("Callback request: %v", res.Request)
-		log.Printf("Callback response: %v", res.Response)
 		log.Printf("Callback error: %s", res.Error)
 
 		saveAudit(node, action, res)

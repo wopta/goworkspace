@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
+	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
@@ -13,7 +14,7 @@ import (
 func funcTestWithInfo(message string, log *mockLog) func(bpmn.StorageData) error {
 	return func(st bpmn.StorageData) error {
 		log.println(message)
-		st.AddLocal("callbackInfo", &CallbackInfo{RequestBody: []byte("prova request")})
+		st.AddLocal("callbackInfo", &CallbackInfo{base.CallbackInfo{ReqBody: []byte("prova request")}})
 		return nil
 	}
 }
@@ -27,6 +28,7 @@ func getBuilderFlowNode(log *mockLog, store bpmn.StorageData) (*bpmn.BpnmBuilder
 	builder.SetStorage(store)
 	e = bpmn.IsError(
 		builder.AddHandler("winEmit", funcTestWithInfo("winEmit", log)),
+		builder.AddHandler("winEmitRemittance", funcTestWithInfo("winEmitRemittance", log)),
 		builder.AddHandler("winPay", funcTestWithInfo("winPay", log)),
 		builder.AddHandler("winProposal", funcTestWithInfo("winProposal", log)),
 		builder.AddHandler("winRequestApproval", funcTestWithInfo("winRequestApproval", log)),
@@ -39,10 +41,10 @@ func getBuilderFlowNode(log *mockLog, store bpmn.StorageData) (*bpmn.BpnmBuilder
 			if e != nil {
 				return e
 			}
-			if string(d.RequestBody) != "prova request" {
+			if string(d.ReqBody) != "prova request" {
 				return errors.New("no correct body request")
 			}
-			log.println("saveAudit " + string(d.RequestBody))
+			log.println("saveAudit " + string(d.ReqBody))
 			return nil
 		}),
 	)
@@ -53,15 +55,16 @@ func getBuilderFlowNode(log *mockLog, store bpmn.StorageData) (*bpmn.BpnmBuilder
 }
 
 var (
-	winNode    = models.NetworkNode{CallbackConfig: &models.CallbackConfig{Name: "winClient"}}
-	baseNode   = models.NetworkNode{CallbackConfig: &models.CallbackConfig{Name: "facileBrokerClient"}}
-	brokenNode = models.NetworkNode{CallbackConfig: &models.CallbackConfig{Name: "booo"}}
+	winNode    = Network{&models.NetworkNode{CallbackConfig: &models.CallbackConfig{Name: "winClient"}}}
+	baseNode   = Network{&models.NetworkNode{CallbackConfig: &models.CallbackConfig{Name: "facileBrokerClient"}}}
+	brokenNode = Network{&models.NetworkNode{CallbackConfig: &models.CallbackConfig{Name: "booo"}}}
 )
 
 func TestEmitForWinNodeWithConfigTrue(t *testing.T) {
 	store := bpmn.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("networkNode", &winNode)
+	store.AddGlobal("product", &productEcommerce)
 
 	store.AddLocal("config", &CallbackConfig{Emit: true})
 	exps := []string{
@@ -75,9 +78,24 @@ func TestEmitForWinNodeWithConfigFalse(t *testing.T) {
 	store := bpmn.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("networkNode", &winNode)
+	store.AddGlobal("product", &productEcommerce)
 
 	exps := []string{}
 	store.AddLocal("config", &CallbackConfig{Emit: false})
+
+	testFlow(t, "emitCallBack", exps, store, getBuilderFlowNode)
+}
+
+func TestEmitForWinWithProductFlowWinEmitRemittance(t *testing.T) {
+	store := bpmn.NewStorageBpnm()
+	store.AddGlobal("policy", &policyEcommerce)
+	store.AddGlobal("networkNode", &winNode)
+	store.AddGlobal("product", &productRemittanceMga)
+
+	exps := []string{
+		"winEmitRemittance",
+	}
+	store.AddLocal("config", &CallbackConfig{Emit: true})
 
 	testFlow(t, "emitCallBack", exps, store, getBuilderFlowNode)
 }

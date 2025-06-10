@@ -1,19 +1,15 @@
 package flow
 
 import (
-	"net/http"
 	"net/mail"
 
+	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	"gitlab.dev.wopta.it/goworkspace/models"
 	"gitlab.dev.wopta.it/goworkspace/payment/fabrick"
 )
 
 type CallbackInfo struct {
-	Request     *http.Request
-	RequestBody []byte
-	Response    *http.Response
-	Error       error
-	Action      string
+	base.CallbackInfo
 }
 
 func (c *CallbackInfo) GetType() string {
@@ -78,4 +74,3 @@ type Addresses struct {
 func (*Addresses) GetType() string {
 	return "addresses"
 }
-
