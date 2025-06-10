@@ -7,7 +7,8 @@ import (
 	"io"
 	"net/http"
 
-	draftbpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
+	"gitlab.dev.wopta.it/goworkspace/callback_out"
+	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
@@ -17,7 +18,7 @@ import (
 
 type RequestApprovalReq = BrokerBaseRequest
 
-func DraftRequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err    error
 		req    RequestApprovalReq
@@ -106,19 +107,24 @@ func requestApproval(policy *models.Policy) error {
 
 	log.Println("starting bpmn flow...")
 
-	storage := draftbpmn.NewStorageBpnm()
-
-	flow, err := getFlow(policy, origin, storage)
-	if err != nil {
-		return err
+	state := runBrokerBpmn(policy, requestApprovalFlowKey)
+	if state == nil || state.Data == nil {
+		log.Println("error bpmn - state not set")
+		return errors.New("error on bpmn - no data present")
 	}
-	err = flow.Run("acceptance")
-	if err != nil {
-		return err
+	if state.IsFailed {
+		log.Println("error bpmn - state failed")
+		return nil
 	}
 
-	log.Println("Handler end -------------------------------------------------")
+	*policy = *state.Data
 
+	log.Printf("saving policy with uid %s to bigquery...", policy.Uid)
 	policy.BigquerySave(origin)
+
+	callback_out.Execute(networkNode, *policy, base.RequestApproval)
+
+	log.Println("end ---------------------------------------")
+
 	return err
 }

@@ -2,14 +2,16 @@ package broker
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 
-	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
 	"gitlab.dev.wopta.it/goworkspace/broker/internal/utility"
+	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
+	"gitlab.dev.wopta.it/goworkspace/callback_out"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
 	"gitlab.dev.wopta.it/goworkspace/network"
@@ -21,7 +23,7 @@ type ProposalReq struct {
 	SendEmail *bool `json:"sendEmail"`
 }
 
-func DraftProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err    error
 		policy models.Policy
@@ -79,7 +81,7 @@ func DraftProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 		brokerUpdatePolicy(&policy, req.BrokerBaseRequest)
 
-		err = proposalDraft(&policy)
+		err = proposal(&policy)
 		if err != nil {
 			log.ErrorF("error creating proposal: %s", err.Error())
 			return "", nil, err
@@ -110,7 +112,8 @@ func DraftProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	return string(resp), &policy, err
 }
-func proposalDraft(policy *models.Policy) error {
+
+func proposal(policy *models.Policy) error {
 	log.AddPrefix("proposal")
 	defer log.PopPrefix()
 	log.Println("starting bpmn flow...")
@@ -120,17 +123,24 @@ func proposalDraft(policy *models.Policy) error {
 		warrant = networkNode.GetWarrant()
 	}
 
-	storage := bpmn.NewStorageBpnm()
-	flow, err := getFlow(policy, origin, storage)
-	if err != nil {
-		return err
+	state := runBrokerBpmn(policy, proposalFlowKey)
+	if state == nil || state.Data == nil {
+		log.Println("error bpmn - state not set")
+		return errors.New("error on bpmn - no data present")
 	}
-	err = flow.Run("proposal")
-	if err != nil {
-		return err
+	if state.IsFailed {
+		log.Println("error bpmn - state failed")
+		return errors.New("error bpmn - state failed")
 	}
 
+	*policy = *state.Data
+
+	log.Printf("saving proposal n. %d to bigquery...", policy.ProposalNumber)
 	policy.BigquerySave(origin)
+
+	if !policy.IsReserved {
+		callback_out.Execute(networkNode, *policy, base.Proposal)
+	}
 
 	return nil
 }
