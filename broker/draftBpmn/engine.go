@@ -35,6 +35,7 @@ func (f *FlowBpnm) RunAt(processName, startingActivity string) error {
 }
 
 func (p *processBpnm) loop(nameActivity string) error {
+
 	if e := checkGlobalResources(p.storageBpnm, p.requiredGlobalData); e != nil {
 		return e
 	}
@@ -63,6 +64,7 @@ func (p *processBpnm) loop(nameActivity string) error {
 			}
 			callEndIfStop = callEndIfStop && p.activeActivities[i].callEndIfStop
 			//TODO: to improve
+			log.Printf("Gateways processing: Process '%s' activity '%s'", p.name, p.activeActivities[i].name)
 			mapsMerged = mergeMaps(p.storageBpnm.getAllGlobals(), p.storageBpnm.getAllLocals())
 			byte, err = json.Marshal(mapsMerged)
 			if err != nil {
@@ -72,7 +74,6 @@ func (p *processBpnm) loop(nameActivity string) error {
 			if err != nil {
 				return err
 			}
-
 			listNewActivities, err = p.activeActivities[i].evaluateDecisions(p.name, p.storageBpnm, mapsMerged)
 			if err != nil {
 				return err
@@ -94,20 +95,9 @@ func (p *processBpnm) loop(nameActivity string) error {
 }
 
 func (act *activity) runActivity(nameProcess string, storage StorageData) (err error) {
-	log.InfoF("Run process '%v',start activity '%v'", nameProcess, act.name)
-	defer func() {
-		status := ""
-		if err == nil {
-			status = "OK"
-		} else {
-			status = "Fail: " + err.Error()
-		}
-		log.InfoF("Run process '%v',finished activity '%v' with status: %v", nameProcess, act.name, status)
-	}()
-
 	if pre := act.preActivity; pre != nil {
-		if err := pre.loop(pre.defaultStart); err != nil {
-			return err
+		if e := pre.loop(pre.defaultStart); e != nil {
+			return e
 		}
 	}
 	if e := checkLocalResources(storage, act.requiredInputData); e != nil {
@@ -129,14 +119,21 @@ func (act *activity) runActivity(nameProcess string, storage StorageData) (err e
 }
 
 func callWithRecover(nameProcess string, storage StorageData, act *activity) (err error) {
+	log.InfoF("Run process '%v', start activity '%v'", nameProcess, act.name)
 	defer func() {
-		if act.recover == nil {
-			return
+		if act.recover != nil {
+			if r := recover(); r != nil || (err != nil) {
+				log.InfoF("Run recorver process '%v', activity '%v'", nameProcess, act.name)
+				err = act.recover(storage)
+			}
 		}
-		if r := recover(); r != nil || (err != nil) {
-			log.InfoF("Run recorver process '%v', activity '%v'", nameProcess, act.name)
-			err = act.recover(storage)
+		status := ""
+		if err == nil {
+			status = "OK"
+		} else {
+			status = "Fail: " + err.Error()
 		}
+		log.InfoF("Run process '%v', finished activity '%v' with status: %v", nameProcess, act.name, status)
 	}()
 	return act.handler(storage)
 }
@@ -158,8 +155,8 @@ func (act *activity) evaluateDecisions(processName string, storage StorageData, 
 			log.InfoF("Process '%v' has not activities", processName)
 			return []*activity{}, nil
 		}
-		log.InfoF("Decision evaluation: %v", ga.decision)
 		resultEvaluation, err = eval.Evaluate(ga.decision, date, nil)
+		log.InfoF("Decision evaluation: %v  => %+v", ga.decision, resultEvaluation)
 		if err != nil {
 			return nil, fmt.Errorf("Process '%v' with activity '%v' has an eval error: %v", processName, act.name, err.Error())
 		}

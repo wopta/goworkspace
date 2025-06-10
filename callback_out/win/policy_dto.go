@@ -100,10 +100,12 @@ func policyDto(p models.Policy, producer string) policy {
 	)
 
 	// Map contractor data
-	an.Cap = p.Contractor.Residence.PostalCode
+	if p.Contractor.Residence != nil {
+		an.Cap = p.Contractor.Residence.PostalCode
+		an.Comune = p.Contractor.Residence.City
+	}
 	an.Cf = p.Contractor.FiscalCode
 	an.Cognome = p.Contractor.Surname
-	an.Comune = p.Contractor.Residence.City
 	if contractorBirthDate, err = time.Parse(time.RFC3339, p.Contractor.BirthDate); err != nil {
 		return policy{}
 	}
