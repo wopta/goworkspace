@@ -1,14 +1,12 @@
 package channelFlow
 
 import (
-	"fmt"
 	"time"
 
 	"cloud.google.com/go/bigquery"
 	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
 	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
 	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
-	"gitlab.dev.wopta.it/goworkspace/callback_out/win"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
@@ -34,28 +32,32 @@ func CallBackEmit(st bpmn.StorageData) error {
 }
 
 func CallBackEmitRemittance(st bpmn.StorageData) error {
-	node, err := bpmn.GetData[*flow.Network]("networkNode", st)
-	if err != nil {
-		return err
-	}
-	policy, err := bpmn.GetData[*flow.Policy]("policy", st)
-	if err != nil {
-		return err
-	}
-	win := win.NewClient(node.NetworkNode.ExternalNetworkCode)
+	var networkNode *flow.Network
+	var policy *flow.Policy
+	var client *flow.ClientCallback
 
-	info := win.Emit(*policy.Policy)
-	if err = saveAudit(node.NetworkNode, info); err != nil {
+	var err = bpmn.IsError(
+		bpmn.GetDataRef("policy", &policy, st),
+		bpmn.GetDataRef("networkNode", &networkNode, st),
+		bpmn.GetDataRef("clientCallback", &client, st),
+	)
+	if err != nil {
 		return err
 	}
-	info = win.Paid(*policy.Policy)
-	if err = saveAudit(node.NetworkNode, info); err != nil {
+
+	info := client.Emit(*policy.Policy)
+	if err = saveAudit(networkNode.NetworkNode, info); err != nil {
+		return err
+	}
+	info = client.Paid(*policy.Policy)
+	if err = saveAudit(networkNode.NetworkNode, info); err != nil {
 		return err
 	}
 
 	st.AddLocal("callbackInfo", &flow.CallbackInfo{CallbackInfo: info})
 	return nil
 }
+
 func CallBackProposal(st bpmn.StorageData) error {
 	var networkNode *flow.Network
 	var policy *flow.Policy
@@ -174,24 +176,6 @@ func CallBackSigned(st bpmn.StorageData) error {
 
 	st.AddLocal("callbackInfo", &flow.CallbackInfo{CallbackInfo: info})
 	return nil
-}
-
-func fromCurrentProcessToCallbackoutAction(currentProcess string) (base.CallbackoutAction, error) {
-	//EmitRemittance is done directly on CallBackEmitRemittance
-	var callbackActions = map[string]base.CallbackoutAction{
-		"emitCallBack":            base.Emit,
-		"payCallBack":             base.Paid,
-		"proposalCallback":        base.Proposal,
-		"requestApprovalCallBack": base.RequestApproval,
-		"signCallback":            base.Signed,
-		"approvedCallBack":        base.Approved,
-		"rejectedCallback":        base.Rejected,
-	}
-	callbackAction, ok := callbackActions[currentProcess]
-	if !ok {
-		return "", fmt.Errorf("No callback action for process '%s'", currentProcess)
-	}
-	return callbackAction, nil
 }
 
 type auditSchema struct {
