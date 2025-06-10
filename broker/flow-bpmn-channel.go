@@ -45,15 +45,15 @@ func getNodeFlow(callbackConfigName string) (*bpmn.BpnmBuilder, error) {
 	}
 	builder.SetStorage(store)
 	err = bpmn.IsError(
-		builder.AddHandler("winEmitRemittance", channelFlow.CallBackEmitRemittance),
-		builder.AddHandler("winEmit", channelFlow.CallBackEmit),
-		builder.AddHandler("winSign", channelFlow.CallBackSigned),
+		builder.AddHandler("EmitRemittance", channelFlow.CallBackEmitRemittance),
+		builder.AddHandler("Emit", channelFlow.CallBackEmit),
+		builder.AddHandler("Sign", channelFlow.CallBackSigned),
 		builder.AddHandler("saveAudit", channelFlow.SaveAudit),
-		builder.AddHandler("winPay", channelFlow.CallBackPaid),
-		builder.AddHandler("winProposal", channelFlow.CallBackProposal),
-		builder.AddHandler("winRequestApproval", channelFlow.CallBackRequestApproval),
-		builder.AddHandler("winApproved", channelFlow.CallBackApproved),
-		builder.AddHandler("winRejected", channelFlow.CallBackRejected),
+		builder.AddHandler("Pay", channelFlow.CallBackPaid),
+		builder.AddHandler("Proposal", channelFlow.CallBackProposal),
+		builder.AddHandler("RequestApproval", channelFlow.CallBackRequestApproval),
+		builder.AddHandler("Approved", channelFlow.CallBackApproved),
+		builder.AddHandler("Rejected", channelFlow.CallBackRejected),
 	)
 	if err != nil {
 		return nil, err

@@ -166,7 +166,7 @@ func (act *activity) evaluateDecisions(processName string, storage StorageData, 
 			return ga.nextActivities, nil
 		}
 		resultEvaluation, err = eval.Evaluate(ga.decision, date, nil)
-		log.InfoF("Decision evaluation: %v  => %+v", ga.decision, resultEvaluation)
+		log.InfoF("Decision evaluation: ( %v )  => %+v", ga.decision, resultEvaluation)
 		if err != nil {
 			return nil, fmt.Errorf("Process '%v' with activity '%v' has an eval error: %v", processName, act.name, err.Error())
 		}

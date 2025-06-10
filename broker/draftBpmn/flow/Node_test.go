@@ -28,14 +28,14 @@ func getBuilderFlowNode(log *mockLog, store bpmn.StorageData) (*bpmn.BpnmBuilder
 	}
 	builder.SetStorage(store)
 	e = bpmn.IsError(
-		builder.AddHandler("winEmit", funcTestWithInfo("winEmit", log)),
-		builder.AddHandler("winEmitRemittance", funcTestWithInfo("winEmitRemittance", log)),
-		builder.AddHandler("winPay", funcTestWithInfo("winPay", log)),
-		builder.AddHandler("winProposal", funcTestWithInfo("winProposal", log)),
-		builder.AddHandler("winRequestApproval", funcTestWithInfo("winRequestApproval", log)),
-		builder.AddHandler("winSign", funcTestWithInfo("winSign", log)),
-		builder.AddHandler("winApproved", funcTestWithInfo("winApproved", log)),
-		builder.AddHandler("winRejected", funcTestWithInfo("winApproved", log)),
+		builder.AddHandler("Emit", funcTestWithInfo("Emit", log)),
+		builder.AddHandler("EmitRemittance", funcTestWithInfo("EmitRemittance", log)),
+		builder.AddHandler("Pay", funcTestWithInfo("Pay", log)),
+		builder.AddHandler("Proposal", funcTestWithInfo("Proposal", log)),
+		builder.AddHandler("RequestApproval", funcTestWithInfo("RequestApproval", log)),
+		builder.AddHandler("Sign", funcTestWithInfo("Sign", log)),
+		builder.AddHandler("Approved", funcTestWithInfo("Approved", log)),
+		builder.AddHandler("Rejected", funcTestWithInfo("Approved", log)),
 		builder.AddHandler("saveAudit", func(sd bpmn.StorageData) error {
 			d, e := bpmn.GetData[*CallbackInfo]("callbackInfo", sd)
 			if e != nil {
@@ -70,7 +70,7 @@ func TestEmitForWinNodeWithConfigTrue(t *testing.T) {
 
 	store.AddLocal("config", &CallbackConfig{Emit: true})
 	exps := []string{
-		"winEmit",
+		"Emit",
 		"saveAudit prova request",
 	}
 	testFlow(t, "emitCallBack", exps, store, getBuilderFlowNode)
@@ -97,7 +97,7 @@ func TestEmitForWinWithProductFlowWinEmitRemittance(t *testing.T) {
 	store.AddGlobal("clientCallback", &callbackClient)
 
 	exps := []string{
-		"winEmitRemittance",
+		"EmitRemittance",
 	}
 	store.AddLocal("config", &CallbackConfig{Emit: true})
 
@@ -126,7 +126,7 @@ func TestCallbackProposalWithIsReservedFalse(t *testing.T) {
 
 	store.AddLocal("config", &CallbackConfig{Proposal: true})
 	exps := []string{
-		"winProposal",
+		"Proposal",
 		"saveAudit prova request",
 	}
 	testFlow(t, "proposalCallback", exps, store, getBuilderFlowNode)

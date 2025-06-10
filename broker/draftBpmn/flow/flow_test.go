@@ -500,7 +500,7 @@ func TestEmitForEcommerceWithNodeFlow(t *testing.T) {
 		"pay",
 		"sendEmitProposalMail",
 		"sendMailSign",
-		"winEmit",
+		"Emit",
 		"saveAudit prova request",
 	}
 	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpmn.StorageData) (*bpmn.BpnmBuilder, error) {

@@ -18,11 +18,6 @@ import (
 	plc "gitlab.dev.wopta.it/goworkspace/policy"
 )
 
-type ProposalReq struct {
-	BrokerBaseRequest
-	SendEmail *bool `json:"sendEmail"`
-}
-
 func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err    error

@@ -18,11 +18,6 @@ import (
 	plc "gitlab.dev.wopta.it/goworkspace/policy"
 )
 
-type AcceptancePayload struct {
-	Action  string `json:"action"` // models.PolicyStatusRejected (Rejected) | models.PolicyStatusApproved (Approved)
-	Reasons string `json:"reasons"`
-}
-
 func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err           error
