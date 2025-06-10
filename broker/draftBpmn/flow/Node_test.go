@@ -7,6 +7,7 @@ import (
 
 	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
 	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
@@ -101,4 +102,32 @@ func TestEmitForWinWithProductFlowWinEmitRemittance(t *testing.T) {
 	store.AddLocal("config", &CallbackConfig{Emit: true})
 
 	testFlow(t, "emitCallBack", exps, store, getBuilderFlowNode)
+}
+func TestCallbackProposalWithIsReservedTrue(t *testing.T) {
+	store := bpmn.NewStorageBpnm()
+	policyRes := Policy{&models.Policy{Channel: lib.ECommerceChannel, IsReserved: true}}
+	store.AddGlobal("policy", &policyRes)
+	store.AddGlobal("networkNode", &winNode)
+	store.AddGlobal("product", &productEcommerce)
+	store.AddGlobal("clientCallback", &callbackClient)
+
+	store.AddLocal("config", &CallbackConfig{Proposal: true})
+	exps := []string{}
+	testFlow(t, "proposalCallback", exps, store, getBuilderFlowNode)
+}
+
+func TestCallbackProposalWithIsReservedFalse(t *testing.T) {
+	store := bpmn.NewStorageBpnm()
+	policyRes := Policy{&models.Policy{Channel: lib.ECommerceChannel, IsReserved: false}}
+	store.AddGlobal("policy", &policyRes)
+	store.AddGlobal("networkNode", &winNode)
+	store.AddGlobal("product", &productEcommerce)
+	store.AddGlobal("clientCallback", &callbackClient)
+
+	store.AddLocal("config", &CallbackConfig{Proposal: true})
+	exps := []string{
+		"winProposal",
+		"saveAudit prova request",
+	}
+	testFlow(t, "proposalCallback", exps, store, getBuilderFlowNode)
 }
