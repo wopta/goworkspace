@@ -149,17 +149,21 @@ func (act *activity) evaluateDecisions(processName string, storage StorageData, 
 	var resultEvaluation any
 	var err error
 	eval := goval.NewEvaluator()
+	if len(act.gateway) == 0 {
+		log.InfoF("Process '%v' with activity '%v' has not next activities", processName, act.name)
+		return []*activity{}, nil
+	}
 	for _, ga := range act.gateway {
+		if len(ga.nextActivities) == 0 {
+			log.InfoF("Process '%v' with activity '%v' has not next activities", processName, act.name)
+			return []*activity{}, nil
+		}
 		if ga.decision == "" {
 			if err = checkLocalResources(storage, act.requiredOutputData); err != nil {
 				return nil, fmt.Errorf("Process '%v' with activity '%v' has an output error: %v", processName, act.name, err.Error())
 			}
 			storage.markWhatNeeded(act.requiredOutputData)
 			return ga.nextActivities, nil
-		}
-		if len(ga.nextActivities) == 0 {
-			log.InfoF("Process '%v' has not activities", processName)
-			return []*activity{}, nil
 		}
 		resultEvaluation, err = eval.Evaluate(ga.decision, date, nil)
 		log.InfoF("Decision evaluation: %v  => %+v", ga.decision, resultEvaluation)

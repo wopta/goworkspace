@@ -124,6 +124,7 @@ func initBaseStorage(storage bpmn.StorageData) {
 	storage.AddGlobal("paymentSplit", &String{})
 	storage.AddGlobal("paymentMode", &String{})
 	storage.AddGlobal("sendEmail", &BoolBpmn{})
+	storage.AddGlobal("clientCallback", &callbackClient)
 }
 
 func TestEmitForEcommerceForCatnat(t *testing.T) {

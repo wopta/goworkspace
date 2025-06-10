@@ -61,6 +61,6 @@ func Execute(node *models.NetworkNode, policy models.Policy, rawAction base.Call
 		res := fx(policy)
 		log.Printf("Callback error: %s", res.Error)
 
-		saveAudit(node, action, res)
+		saveAudit(node, res)
 	}
 }

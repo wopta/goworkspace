@@ -25,7 +25,7 @@ type auditSchema struct {
 	Error         string                `bigquery:"error"`
 }
 
-func saveAudit(node *models.NetworkNode, action base.CallbackoutAction, res base.CallbackInfo) {
+func saveAudit(node *models.NetworkNode, res base.CallbackInfo) {
 	var (
 		audit auditSchema
 	)
@@ -33,7 +33,7 @@ func saveAudit(node *models.NetworkNode, action base.CallbackoutAction, res base
 	audit.CreationDate = lib.GetBigQueryNullDateTime(time.Now().UTC())
 	audit.Client = node.CallbackConfig.Name
 	audit.NodeUid = node.Uid
-	audit.Action = string(action)
+	audit.Action = string(res.ResAction)
 
 	audit.ReqBody = string(res.ReqBody)
 	audit.ReqMethod = res.ReqMethod

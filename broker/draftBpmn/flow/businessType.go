@@ -3,6 +3,7 @@ package flow
 import (
 	"net/mail"
 
+	"gitlab.dev.wopta.it/goworkspace/callback_out"
 	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	"gitlab.dev.wopta.it/goworkspace/models"
 	"gitlab.dev.wopta.it/goworkspace/payment/fabrick"
@@ -41,6 +42,14 @@ type CallbackConfig struct {
 
 func (*CallbackConfig) GetType() string {
 	return "callbackConfig"
+}
+
+type ClientCallback struct {
+	callback_out.CallbackClient
+}
+
+func (*ClientCallback) GetType() string {
+	return "clientCallback"
 }
 
 type Policy struct {

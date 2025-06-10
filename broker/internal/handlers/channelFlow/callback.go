@@ -1,12 +1,7 @@
 package channelFlow
 
 import (
-	"bytes"
-	"encoding/json"
-	"errors"
 	"fmt"
-	"net/http"
-	"os"
 	"time"
 
 	"cloud.google.com/go/bigquery"
@@ -19,16 +14,20 @@ import (
 )
 
 func CallBackEmit(st bpmn.StorageData) error {
-	node, err := bpmn.GetData[*flow.Network]("networkNode", st)
+	var networkNode *flow.Network
+	var policy *flow.Policy
+	var client *flow.ClientCallback
+
+	var err = bpmn.IsError(
+		bpmn.GetDataRef("policy", &policy, st),
+		bpmn.GetDataRef("networkNode", &networkNode, st),
+		bpmn.GetDataRef("clientCallback", &client, st),
+	)
 	if err != nil {
 		return err
 	}
-	policy, err := bpmn.GetData[*flow.Policy]("policy", st)
-	if err != nil {
-		return err
-	}
-	win := win.NewClient(node.NetworkNode.ExternalNetworkCode)
-	info := win.Emit(*policy.Policy)
+
+	info := client.Emit(*policy.Policy)
 
 	st.AddLocal("callbackInfo", &flow.CallbackInfo{CallbackInfo: info})
 	return nil
@@ -58,96 +57,120 @@ func CallBackEmitRemittance(st bpmn.StorageData) error {
 	return nil
 }
 func CallBackProposal(st bpmn.StorageData) error {
-	node, err := bpmn.GetData[*flow.Network]("networkNode", st)
+	var networkNode *flow.Network
+	var policy *flow.Policy
+	var client *flow.ClientCallback
+
+	var err = bpmn.IsError(
+		bpmn.GetDataRef("policy", &policy, st),
+		bpmn.GetDataRef("networkNode", &networkNode, st),
+		bpmn.GetDataRef("clientCallback", &client, st),
+	)
 	if err != nil {
 		return err
 	}
-	policy, err := bpmn.GetData[*flow.Policy]("policy", st)
-	if err != nil {
-		return err
-	}
-	win := win.NewClient(node.ExternalNetworkCode)
-	info := win.Proposal(*policy.Policy)
+
+	info := client.Proposal(*policy.Policy)
 
 	st.AddLocal("callbackInfo", &flow.CallbackInfo{CallbackInfo: info})
 	return nil
 }
 
 func CallBackPaid(st bpmn.StorageData) error {
-	node, err := bpmn.GetData[*flow.Network]("networkNode", st)
+	var networkNode *flow.Network
+	var policy *flow.Policy
+	var client *flow.ClientCallback
+
+	var err = bpmn.IsError(
+		bpmn.GetDataRef("policy", &policy, st),
+		bpmn.GetDataRef("networkNode", &networkNode, st),
+		bpmn.GetDataRef("clientCallback", &client, st),
+	)
 	if err != nil {
 		return err
 	}
-	policy, err := bpmn.GetData[*flow.Policy]("policy", st)
-	if err != nil {
-		return err
-	}
-	win := win.NewClient(node.ExternalNetworkCode)
-	info := win.Paid(*policy.Policy)
+
+	info := client.Paid(*policy.Policy)
 
 	st.AddLocal("callbackInfo", &flow.CallbackInfo{CallbackInfo: info})
 	return nil
 }
 
 func CallBackRequestApproval(st bpmn.StorageData) error {
-	node, err := bpmn.GetData[*flow.Network]("networkNode", st)
+	var networkNode *flow.Network
+	var policy *flow.Policy
+	var client *flow.ClientCallback
+
+	var err = bpmn.IsError(
+		bpmn.GetDataRef("policy", &policy, st),
+		bpmn.GetDataRef("networkNode", &networkNode, st),
+		bpmn.GetDataRef("clientCallback", &client, st),
+	)
 	if err != nil {
 		return err
 	}
-	policy, err := bpmn.GetData[*flow.Policy]("policy", st)
-	if err != nil {
-		return err
-	}
-	win := win.NewClient(node.ExternalNetworkCode)
-	info := win.RequestApproval(*policy.Policy)
+
+	info := client.RequestApproval(*policy.Policy)
 
 	st.AddLocal("callbackInfo", &flow.CallbackInfo{CallbackInfo: info})
 	return nil
 }
 
 func CallBackApproved(st bpmn.StorageData) error {
-	node, err := bpmn.GetData[*flow.Network]("networkNode", st)
+	var networkNode *flow.Network
+	var policy *flow.Policy
+	var client *flow.ClientCallback
+
+	var err = bpmn.IsError(
+		bpmn.GetDataRef("policy", &policy, st),
+		bpmn.GetDataRef("networkNode", &networkNode, st),
+		bpmn.GetDataRef("clientCallback", &client, st),
+	)
 	if err != nil {
 		return err
 	}
-	policy, err := bpmn.GetData[*flow.Policy]("policy", st)
-	if err != nil {
-		return err
-	}
-	win := win.NewClient(node.ExternalNetworkCode)
-	info := win.Approved(*policy.Policy)
+
+	info := client.Approved(*policy.Policy)
 
 	st.AddLocal("callbackInfo", &flow.CallbackInfo{CallbackInfo: info})
 	return nil
 }
 
 func CallBackRejected(st bpmn.StorageData) error {
-	node, err := bpmn.GetData[*flow.Network]("networkNode", st)
+	var networkNode *flow.Network
+	var policy *flow.Policy
+	var client *flow.ClientCallback
+
+	var err = bpmn.IsError(
+		bpmn.GetDataRef("policy", &policy, st),
+		bpmn.GetDataRef("networkNode", &networkNode, st),
+		bpmn.GetDataRef("clientCallback", &client, st),
+	)
 	if err != nil {
 		return err
 	}
-	policy, err := bpmn.GetData[*flow.Policy]("policy", st)
-	if err != nil {
-		return err
-	}
-	win := win.NewClient(node.ExternalNetworkCode)
-	info := win.Rejected(*policy.Policy)
+
+	info := client.Rejected(*policy.Policy)
 
 	st.AddLocal("callbackInfo", &flow.CallbackInfo{CallbackInfo: info})
 	return nil
 }
 
 func CallBackSigned(st bpmn.StorageData) error {
-	node, err := bpmn.GetData[*flow.Network]("networkNode", st)
+	var networkNode *flow.Network
+	var policy *flow.Policy
+	var client *flow.ClientCallback
+
+	var err = bpmn.IsError(
+		bpmn.GetDataRef("policy", &policy, st),
+		bpmn.GetDataRef("networkNode", &networkNode, st),
+		bpmn.GetDataRef("clientCallback", &client, st),
+	)
 	if err != nil {
 		return err
 	}
-	policy, err := bpmn.GetData[*flow.Policy]("policy", st)
-	if err != nil {
-		return err
-	}
-	win := win.NewClient(node.ExternalNetworkCode)
-	info := win.Signed(*policy.Policy)
+
+	info := client.Signed(*policy.Policy)
 
 	st.AddLocal("callbackInfo", &flow.CallbackInfo{CallbackInfo: info})
 	return nil
@@ -169,52 +192,6 @@ func fromCurrentProcessToCallbackoutAction(currentProcess string) (base.Callback
 		return "", fmt.Errorf("No callback action for process '%s'", currentProcess)
 	}
 	return callbackAction, nil
-}
-
-func BaseRequest(store bpmn.StorageData) error {
-	policy, e := bpmn.GetData[*flow.Policy]("policy", store)
-	if e != nil {
-		return e
-
-	}
-	network := "facile_broker"
-	basePath := os.Getenv(fmt.Sprintf("%s_CALLBACK_ENDPOINT", lib.ToUpper(network)))
-	if basePath == "" {
-		return errors.New("no base path for callback founded")
-
-	}
-
-	rawBody, err := json.Marshal(policy.Policy)
-	if err != nil {
-		return err
-	}
-
-	req, err := http.NewRequest(http.MethodPost, basePath, bytes.NewReader(rawBody))
-	if err != nil {
-		return err
-	}
-
-	req.SetBasicAuth(
-		os.Getenv(fmt.Sprintf("%s_CALLBACK_AUTH_USER", network)),
-		os.Getenv(fmt.Sprintf("%s_CALLBACK_AUTH_PASS", network)))
-	req.Header.Set("Content-Type", "application/json")
-
-	client := http.Client{
-		Timeout: 30 * time.Second,
-	}
-	res, err := client.Do(req)
-	info := flow.CallbackInfo{}
-	status, err := bpmn.GetStatusFlow(store)
-	if err != nil {
-		return err
-	}
-	callbackAction, err := fromCurrentProcessToCallbackoutAction(status.CurrentProcess)
-	if err != nil {
-		return err
-	}
-	info.FromRequestResponse(callbackAction, res, req)
-	store.AddLocal("callbackInfo", &info)
-	return nil
 }
 
 type auditSchema struct {

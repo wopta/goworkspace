@@ -35,7 +35,6 @@ func getBuilderFlowNode(log *mockLog, store bpmn.StorageData) (*bpmn.BpnmBuilder
 		builder.AddHandler("winSign", funcTestWithInfo("winSign", log)),
 		builder.AddHandler("winApproved", funcTestWithInfo("winApproved", log)),
 		builder.AddHandler("winRejected", funcTestWithInfo("winApproved", log)),
-		builder.AddHandler("baseCallback", funcTestWithInfo("baseCallback", log)),
 		builder.AddHandler("saveAudit", func(sd bpmn.StorageData) error {
 			d, e := bpmn.GetData[*CallbackInfo]("callbackInfo", sd)
 			if e != nil {
@@ -55,9 +54,10 @@ func getBuilderFlowNode(log *mockLog, store bpmn.StorageData) (*bpmn.BpnmBuilder
 }
 
 var (
-	winNode    = Network{&models.NetworkNode{CallbackConfig: &models.CallbackConfig{Name: "winClient"}}}
-	baseNode   = Network{&models.NetworkNode{CallbackConfig: &models.CallbackConfig{Name: "facileBrokerClient"}}}
-	brokenNode = Network{&models.NetworkNode{CallbackConfig: &models.CallbackConfig{Name: "booo"}}}
+	winNode        = Network{&models.NetworkNode{CallbackConfig: &models.CallbackConfig{Name: "winClient"}}}
+	baseNode       = Network{&models.NetworkNode{CallbackConfig: &models.CallbackConfig{Name: "facileBrokerClient"}}}
+	brokenNode     = Network{&models.NetworkNode{CallbackConfig: &models.CallbackConfig{Name: "booo"}}}
+	callbackClient = ClientCallback{}
 )
 
 func TestEmitForWinNodeWithConfigTrue(t *testing.T) {
@@ -65,6 +65,7 @@ func TestEmitForWinNodeWithConfigTrue(t *testing.T) {
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("networkNode", &winNode)
 	store.AddGlobal("product", &productEcommerce)
+	store.AddGlobal("clientCallback", &callbackClient)
 
 	store.AddLocal("config", &CallbackConfig{Emit: true})
 	exps := []string{
@@ -79,6 +80,7 @@ func TestEmitForWinNodeWithConfigFalse(t *testing.T) {
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("networkNode", &winNode)
 	store.AddGlobal("product", &productEcommerce)
+	store.AddGlobal("clientCallback", &callbackClient)
 
 	exps := []string{}
 	store.AddLocal("config", &CallbackConfig{Emit: false})
@@ -91,6 +93,7 @@ func TestEmitForWinWithProductFlowWinEmitRemittance(t *testing.T) {
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("networkNode", &winNode)
 	store.AddGlobal("product", &productRemittanceMga)
+	store.AddGlobal("clientCallback", &callbackClient)
 
 	exps := []string{
 		"winEmitRemittance",
