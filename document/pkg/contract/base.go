@@ -268,10 +268,10 @@ func (bg *baseGenerator) woptaPrivacySection() {
 		Text: "La base giuridica del trattamento di dati personali per le finalità di cui sopra " +
 			"è l’art. 6.1 lett. b), c), f) del Regolamento in quanto i trattamenti sono necessari all'erogazione dei " +
 			"servizi o per il riscontro di richieste dell’interessato, in conformità a quanto previsto dall’incarico " +
-			"conferito all’intermediario, nonché ove il trattamento risulti necessario per l’adempimento di un preciso " +
+			"conferito all’Intermediario, nonché ove il trattamento risulti necessario per l’adempimento di un preciso " +
 			"obbligo di legge posto in capo al Titolare, o al fine di accertare, esercitare o difendere un diritto in " +
 			"sede giudiziaria. Il conferimento dei dati personali per queste finalità è facoltativo, ma l'eventuale " +
-			"mancato conferimento comporterebbe l'impossibilità per l’intermediario di eseguire le proprie obbligazioni " +
+			"mancato conferimento comporterebbe l'impossibilità per l’Intermediario di eseguire le proprie obbligazioni " +
 			"contrattuali.",
 		Height:    rowHeight,
 		Width:     columnWidth,
@@ -744,7 +744,7 @@ func (bg *baseGenerator) mupTitle() {
 
 	bg.engine.NewLine(3)
 
-	text = "L’intermediario ha l’obbligo di consegnare/trasmettere al contraente il presente Modulo, " +
+	text = "L’Intermediario ha l’obbligo di consegnare/trasmettere al contraente il presente Modulo, " +
 		"prima della sottoscrizione della proposta o del contratto di assicurazione. Il documento può " +
 		"essere fornito con modalità non cartacea se appropriato rispetto alle modalità di distribuzione " +
 		"del prodotto assicurativo e il contraente lo consente (art. 120-quater del " +
@@ -753,7 +753,7 @@ func (bg *baseGenerator) mupTitle() {
 }
 
 func (bg *baseGenerator) mupSectionI(producerInfo, proponentInfo map[string]string, designation string) {
-	text := "SEZIONE I - Informazioni generali sull’intermediario che entra in contatto con " +
+	text := "SEZIONE I - Informazioni generali sull’Intermediario che entra in contatto con " +
 		"il contraente"
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle))
 
@@ -790,9 +790,9 @@ func (bg *baseGenerator) mupSectionIV() {
 	text := "SEZIONE IV - Informazioni sull’attività di distribuzione e consulenza"
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle))
 
-	text = "Nello svolgimento dell’attività di distribuzione, l’intermediario non presta " +
+	text = "Nello svolgimento dell’attività di distribuzione, l’Intermediario non presta " +
 		"attività di consulenza prima della conclusione del contratto né fornisce al contraente una raccomandazione " +
-		"personalizzata ai sensi dell’art. 119-ter, comma 3, del decreto legislativo n. 209/2005 " +
+		"personalizzata ai sensi dell’art. 119-ter, comma 3 e 4, del decreto legislativo n. 209/2005 " +
 		"(Codice delle Assicurazioni Private)." + "\n" +
 		"L'attività di distribuzione assicurativa è svolta in assenza di obblighi " +
 		"contrattuali che impongano di offrire esclusivamente i contratti di una o più imprese di " +
@@ -800,8 +800,12 @@ func (bg *baseGenerator) mupSectionIV() {
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
 
 	website := "https://www.wopta.it/it/information-sets/"
-	if bg.worksForNode != nil {
-		website = bg.worksForNode.Agency.Website
+	websiteNode := bg.worksForNode
+	if bg.networkNode.Type == models.AgencyNetworkNodeType || bg.networkNode.Type == models.BrokerNetworkNodeType {
+		websiteNode = bg.networkNode
+	}
+	if websiteNode != nil {
+		website = websiteNode.GetWebsite()
 	}
 
 	bg.engine.RawWriteText(
@@ -820,7 +824,7 @@ func (bg *baseGenerator) mupSectionV(body string) {
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle))
 
 	text = body + "\n" +
-		"L’informazione sopra resa riguarda i compensi complessivamente percepiti da tutti " +
+		"Le informazioni sopra rese riguardano i compensi complessivamente percepiti da tutti " +
 		"gli intermediari coinvolti nella distribuzione del prodotto."
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
 }
@@ -829,8 +833,8 @@ func (bg *baseGenerator) mupSectionVI() {
 	text := "SEZIONE VI - Informazioni sul pagamento dei premi"
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle))
 
-	text = "a) Relativamente a questo contratto i premi pagati dal Contraente " +
-		"all’intermediario e le somme destinate ai risarcimenti o ai pagamenti dovuti dalle Imprese di Assicurazione, " +
+	text = "a) Relativamente al prodotto intermediato, i premi pagati dal Contraente " +
+		"all’Intermediario e le somme destinate ai risarcimenti o ai pagamenti dovuti dalle Imprese di Assicurazione, " +
 		"se regolati per il tramite dell’Intermediario, costituiscono patrimonio autonomo e separato dal patrimonio " +
 		"dello stesso."
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
@@ -847,14 +851,14 @@ func (bg *baseGenerator) mupSectionVII() {
 
 	text = "L’attività di distribuzione è garantita da un contratto di assicurazione della " +
 		"responsabilità civile che copre i danni arrecati ai contraenti da negligenze ed errori professionali " +
-		"dell’intermediario o da negligenze, errori professionali ed infedeltà dei dipendenti, dei collaboratori o " +
-		"delle persone del cui operato l’intermediario deve rispondere a norma di legge." + "\n" +
+		"dell’Intermediario o da negligenze, errori professionali ed infedeltà dei dipendenti, dei collaboratori o " +
+		"delle persone del cui operato l’Intermediario deve rispondere a norma di legge." + "\n" +
 		"Il contraente ha la facoltà, ferma restando la possibilità di rivolgersi " +
-		"all’Autorità Giudiziaria, di inoltrare reclamo per iscritto all’intermediario, via posta all’indirizzo di " +
+		"all’Autorità Giudiziaria, di inoltrare reclamo per iscritto all’Intermediario, via posta all’indirizzo di " +
 		"sede legale o a mezzo mail alla PEC sopra indicati, oppure all’Impresa secondo le modalità e presso i " +
 		"recapiti indicati nel DIP aggiuntivo nella relativa sezione, nonché la possibilità, qualora non dovesse " +
-		"ritenersi soddisfatto dall’esito del reclamo o in caso di assenza di riscontro da parte dell’intermediario " +
-		"o dell’impresa entro il termine di legge, di rivolgersi all’IVASS secondo quanto indicato nei DIP aggiuntivi." + "\n" +
+		"ritenersi soddisfatto dall’esito del reclamo o in caso di assenza di riscontro da parte dell’Intermediario " +
+		"o dell’Impresa entro il termine di legge, di rivolgersi all’IVASS secondo quanto indicato nei DIP aggiuntivi." + "\n" +
 		"Il contraente ha la facoltà di avvalersi di altri eventuali sistemi alternativi " +
 		"di risoluzione delle controversie previsti dalla normativa vigente nonché quelli indicati nei" +
 		" DIP aggiuntivi."
@@ -952,7 +956,7 @@ func (bg *baseGenerator) designationInfo() string {
 		mgaRuiInfo                            = "Wopta Assicurazioni Srl, Società iscritta alla Sezione A del RUI con numero A000701923 in data 14/02/2022"
 		designationDirectManager              = "Responsabile dell’attività di intermediazione assicurativa di"
 		mgaProponentIndirectDesignationFormat = "%s di %s con sede legale in %s, iscritta in sezione E del RUI con numero %s in data %s, che opera per conto di %s"
-		mgaEmitterDesignationFormat           = "%s dell’intermediario di %s iscritta alla sezione %s del RUI con numero %s in data %s"
+		mgaEmitterDesignationFormat           = "%s dell’Intermediario di %s iscritta alla sezione %s del RUI con numero %s in data %s"
 	)
 
 	if bg.networkNode == nil || bg.networkNode.Type == models.PartnershipNetworkNodeType {
@@ -991,10 +995,32 @@ func (bg *baseGenerator) designationInfo() string {
 	}
 
 	if bg.policy.Channel == lib.NetworkChannel {
-		agentContact = fmt.Sprintf(". Contatti Itermediario - mail: %s", bg.networkNode.Mail)
-		if phone := bg.networkNode.GetPhone(); phone != "" {
-			agentContact += " - telefono: " + phone
+		contactPrefix := ". Contatti Itermediario"
+		contactPhoneFormat := "- telefono: %s"
+		contactPhone := ""
+		contactMailFormat := "- mail: %s"
+		contactMail := ""
+
+		if bg.networkNode.Type == models.AgencyNetworkNodeType || bg.networkNode.Type == models.BrokerNetworkNodeType {
+			if phone := bg.networkNode.GetManagerPhone(); phone != "" {
+				contactPhone = fmt.Sprintf(contactPhoneFormat, phone)
+			}
+		} else {
+			if phone := bg.networkNode.GetPhone(); phone != "" {
+				contactPhone = fmt.Sprintf(contactPhoneFormat, phone)
+			}
+			contactMail = fmt.Sprintf(contactMailFormat, bg.networkNode.Mail)
 		}
+
+		parts := []string{contactPrefix}
+		if contactMail != "" {
+			parts = append(parts, contactMail)
+		}
+		if contactPhone != "" {
+			parts = append(parts, contactPhone)
+		}
+		agentContact = strings.Join(parts, " ")
+
 	}
 	designation += agentContact
 

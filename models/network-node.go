@@ -427,6 +427,32 @@ func (nn *NetworkNode) GetManagerRuiResgistration() time.Time {
 	return ruiRegistration
 }
 
+func (nn *NetworkNode) GetManagerPhone() string {
+	var phone string
+
+	switch nn.Type {
+	case AgencyNetworkNodeType:
+		phone = nn.Agency.Manager.Phone
+	case BrokerNetworkNodeType:
+		phone = nn.Broker.Manager.Phone
+	}
+
+	return phone
+}
+
+func (nn *NetworkNode) GetWebsite() string {
+	var website string
+
+	switch nn.Type {
+	case AgencyNetworkNodeType:
+		website = nn.Agency.Website
+	case BrokerNetworkNodeType:
+		website = nn.Broker.Website
+	}
+
+	return website
+}
+
 func (nn *NetworkNode) GetPhone() string {
 	var phone string
 
