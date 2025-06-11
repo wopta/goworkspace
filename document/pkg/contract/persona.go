@@ -14,7 +14,7 @@ type PersonaGenerator struct {
 
 func NewPersonaGenerator(engine *engine.Fpdf, policy *models.Policy, node *models.NetworkNode, product models.Product, isProposal bool) *PersonaGenerator {
 	var worksForNode *models.NetworkNode
-	if node.WorksForUid != "" {
+	if node != nil && node.WorksForUid != "" {
 		worksForNode = network.GetNetworkNodeByUid(node.WorksForUid)
 	}
 

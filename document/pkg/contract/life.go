@@ -23,7 +23,7 @@ func NewLifeGenerator(engine *engine.Fpdf, policy *models.Policy, node *models.N
 	dto.FromPolicy(policy, node)
 
 	var worksForNode *models.NetworkNode
-	if node.WorksForUid != "" {
+	if node != nil && node.WorksForUid != "" {
 		worksForNode = network.GetNetworkNodeByUid(node.WorksForUid)
 	}
 

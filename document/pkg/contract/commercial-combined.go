@@ -50,7 +50,7 @@ func NewCommercialCombinedGenerator(engine *engine.Fpdf, policy *models.Policy, 
 	commercialCombinedDTO.FromPolicy(*policy, product, isProposal)
 
 	var worksForNode *models.NetworkNode
-	if node.WorksForUid != "" {
+	if node != nil && node.WorksForUid != "" {
 		worksForNode = network.GetNetworkNodeByUid(node.WorksForUid)
 	}
 
