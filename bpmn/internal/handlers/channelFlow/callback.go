@@ -4,22 +4,22 @@ import (
 	"time"
 
 	"cloud.google.com/go/bigquery"
-	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
-	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func CallBackEmit(st bpmn.StorageData) error {
+func CallBackEmit(st bpmnEngine.StorageData) error {
 	var networkNode *flow.Network
 	var policy *flow.Policy
 	var client *flow.ClientCallback
 
-	var err = bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, st),
-		bpmn.GetDataRef("networkNode", &networkNode, st),
-		bpmn.GetDataRef("clientCallback", &client, st),
+	var err = bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, st),
+		bpmnEngine.GetDataRef("networkNode", &networkNode, st),
+		bpmnEngine.GetDataRef("clientCallback", &client, st),
 	)
 	if err != nil {
 		return err
@@ -31,15 +31,15 @@ func CallBackEmit(st bpmn.StorageData) error {
 	return nil
 }
 
-func CallBackEmitRemittance(st bpmn.StorageData) error {
+func CallBackEmitRemittance(st bpmnEngine.StorageData) error {
 	var networkNode *flow.Network
 	var policy *flow.Policy
 	var client *flow.ClientCallback
 
-	var err = bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, st),
-		bpmn.GetDataRef("networkNode", &networkNode, st),
-		bpmn.GetDataRef("clientCallback", &client, st),
+	var err = bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, st),
+		bpmnEngine.GetDataRef("networkNode", &networkNode, st),
+		bpmnEngine.GetDataRef("clientCallback", &client, st),
 	)
 	if err != nil {
 		return err
@@ -58,15 +58,15 @@ func CallBackEmitRemittance(st bpmn.StorageData) error {
 	return nil
 }
 
-func CallBackProposal(st bpmn.StorageData) error {
+func CallBackProposal(st bpmnEngine.StorageData) error {
 	var networkNode *flow.Network
 	var policy *flow.Policy
 	var client *flow.ClientCallback
 
-	var err = bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, st),
-		bpmn.GetDataRef("networkNode", &networkNode, st),
-		bpmn.GetDataRef("clientCallback", &client, st),
+	var err = bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, st),
+		bpmnEngine.GetDataRef("networkNode", &networkNode, st),
+		bpmnEngine.GetDataRef("clientCallback", &client, st),
 	)
 	if err != nil {
 		return err
@@ -78,15 +78,15 @@ func CallBackProposal(st bpmn.StorageData) error {
 	return nil
 }
 
-func CallBackPaid(st bpmn.StorageData) error {
+func CallBackPaid(st bpmnEngine.StorageData) error {
 	var networkNode *flow.Network
 	var policy *flow.Policy
 	var client *flow.ClientCallback
 
-	var err = bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, st),
-		bpmn.GetDataRef("networkNode", &networkNode, st),
-		bpmn.GetDataRef("clientCallback", &client, st),
+	var err = bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, st),
+		bpmnEngine.GetDataRef("networkNode", &networkNode, st),
+		bpmnEngine.GetDataRef("clientCallback", &client, st),
 	)
 	if err != nil {
 		return err
@@ -98,15 +98,15 @@ func CallBackPaid(st bpmn.StorageData) error {
 	return nil
 }
 
-func CallBackRequestApproval(st bpmn.StorageData) error {
+func CallBackRequestApproval(st bpmnEngine.StorageData) error {
 	var networkNode *flow.Network
 	var policy *flow.Policy
 	var client *flow.ClientCallback
 
-	var err = bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, st),
-		bpmn.GetDataRef("networkNode", &networkNode, st),
-		bpmn.GetDataRef("clientCallback", &client, st),
+	var err = bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, st),
+		bpmnEngine.GetDataRef("networkNode", &networkNode, st),
+		bpmnEngine.GetDataRef("clientCallback", &client, st),
 	)
 	if err != nil {
 		return err
@@ -118,15 +118,15 @@ func CallBackRequestApproval(st bpmn.StorageData) error {
 	return nil
 }
 
-func CallBackApproved(st bpmn.StorageData) error {
+func CallBackApproved(st bpmnEngine.StorageData) error {
 	var networkNode *flow.Network
 	var policy *flow.Policy
 	var client *flow.ClientCallback
 
-	var err = bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, st),
-		bpmn.GetDataRef("networkNode", &networkNode, st),
-		bpmn.GetDataRef("clientCallback", &client, st),
+	var err = bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, st),
+		bpmnEngine.GetDataRef("networkNode", &networkNode, st),
+		bpmnEngine.GetDataRef("clientCallback", &client, st),
 	)
 	if err != nil {
 		return err
@@ -138,15 +138,15 @@ func CallBackApproved(st bpmn.StorageData) error {
 	return nil
 }
 
-func CallBackRejected(st bpmn.StorageData) error {
+func CallBackRejected(st bpmnEngine.StorageData) error {
 	var networkNode *flow.Network
 	var policy *flow.Policy
 	var client *flow.ClientCallback
 
-	var err = bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, st),
-		bpmn.GetDataRef("networkNode", &networkNode, st),
-		bpmn.GetDataRef("clientCallback", &client, st),
+	var err = bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, st),
+		bpmnEngine.GetDataRef("networkNode", &networkNode, st),
+		bpmnEngine.GetDataRef("clientCallback", &client, st),
 	)
 	if err != nil {
 		return err
@@ -158,15 +158,15 @@ func CallBackRejected(st bpmn.StorageData) error {
 	return nil
 }
 
-func CallBackSigned(st bpmn.StorageData) error {
+func CallBackSigned(st bpmnEngine.StorageData) error {
 	var networkNode *flow.Network
 	var policy *flow.Policy
 	var client *flow.ClientCallback
 
-	var err = bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, st),
-		bpmn.GetDataRef("networkNode", &networkNode, st),
-		bpmn.GetDataRef("clientCallback", &client, st),
+	var err = bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, st),
+		bpmnEngine.GetDataRef("networkNode", &networkNode, st),
+		bpmnEngine.GetDataRef("clientCallback", &client, st),
 	)
 	if err != nil {
 		return err
@@ -191,13 +191,13 @@ type auditSchema struct {
 	Error         string                `bigquery:"error"`
 }
 
-func SaveAudit(st bpmn.StorageData) error {
+func SaveAudit(st bpmnEngine.StorageData) error {
 
-	node, err := bpmn.GetData[*flow.Network]("networkNode", st)
+	node, err := bpmnEngine.GetData[*flow.Network]("networkNode", st)
 	if err != nil {
 		return err
 	}
-	res, err := bpmn.GetData[*flow.CallbackInfo]("callbackInfo", st)
+	res, err := bpmnEngine.GetData[*flow.CallbackInfo]("callbackInfo", st)
 	if err != nil {
 		return err
 	}

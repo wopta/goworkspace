@@ -6,13 +6,14 @@ import (
 	"io"
 	"net/http"
 
-	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
-	"gitlab.dev.wopta.it/goworkspace/broker/internal/utility"
+	"gitlab.dev.wopta.it/goworkspace/bpmn"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/mail"
 
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/network"
 	plc "gitlab.dev.wopta.it/goworkspace/policy"
 )
 
@@ -49,55 +50,33 @@ func DraftProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		authToken.Email,
 	)
 
-	origin = r.Header.Get("Origin")
+	origin := r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
-	if lib.GetBoolEnv("PROPOSAL_V2") {
-		err = json.Unmarshal(body, &req)
-		if err != nil {
-			log.ErrorF("error proposal body: %s", err.Error())
-			return "", nil, err
-		}
+	err = json.Unmarshal(body, &req)
+	if err != nil {
+		log.ErrorF("error proposal body: %s", err.Error())
+		return "", nil, err
+	}
 
-		if req.SendEmail == nil {
-			sendEmail = true
-		} else {
-			sendEmail = *req.SendEmail
-		}
+	policy, err = plc.GetPolicy(req.PolicyUid, origin)
+	if err != nil {
+		log.ErrorF("error fetching policy %s from Firestore...: %s", req.PolicyUid, err.Error())
+		return "", nil, err
+	}
 
-		policy, err = plc.GetPolicy(req.PolicyUid, origin)
-		if err != nil {
-			log.ErrorF("error fetching policy %s from Firestore...: %s", req.PolicyUid, err.Error())
-			return "", nil, err
-		}
+	if policy.Status != models.PolicyStatusInitLead {
+		log.Printf("cannot save proposal for policy with status %s", policy.Status)
+		return "", nil, fmt.Errorf("cannot save proposal for policy with status %s", policy.Status)
+	}
 
-		if policy.Status != models.PolicyStatusInitLead {
-			log.Printf("cannot save proposal for policy with status %s", policy.Status)
-			return "", nil, fmt.Errorf("cannot save proposal for policy with status %s", policy.Status)
-		}
+	brokerUpdatePolicy(&policy, req.BrokerBaseRequest)
 
-		brokerUpdatePolicy(&policy, req.BrokerBaseRequest)
-
-		err = proposalDraft(&policy)
-		if err != nil {
-			log.ErrorF("error creating proposal: %s", err.Error())
-			return "", nil, err
-		}
-	} else {
-		err = json.Unmarshal(body, &policy)
-		if err != nil {
-			log.ErrorF("error unmarshaling policy: %s", err.Error())
-			return "", nil, err
-		}
-
-		err = leaddraft(authToken, &policy)
-		if err != nil {
-			log.ErrorF("error creating lead: %s", err.Error())
-			return "", nil, err
-		}
-		utility.SetProposalNumber(&policy)
-		policy.RenewDate = policy.CreationDate.AddDate(1, 0, 0)
+	err = proposalDraft(&policy, origin, *req.SendEmail)
+	if err != nil {
+		log.ErrorF("error creating proposal: %s", err.Error())
+		return "", nil, err
 	}
 
 	resp, err := policy.Marshal()
@@ -110,18 +89,19 @@ func DraftProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	return string(resp), &policy, err
 }
-func proposalDraft(policy *models.Policy) error {
+func proposalDraft(policy *models.Policy, origin string, sendEmail bool) error {
 	log.AddPrefix("proposal")
 	defer log.PopPrefix()
 	log.Println("starting bpmn flow...")
-
-	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
-	}
-
-	storage := bpmn.NewStorageBpnm()
-	flow, err := getFlow(policy, origin, storage)
+	storage := bpmnEngine.NewStorageBpnm()
+	storage.AddGlobal("is_PROPOSAL_V2", &flow.BoolBpmn{Bool: lib.GetBoolEnv("PROPOSAL_V2")})
+	storage.AddGlobal("addresses", &flow.Addresses{
+		FromAddress: mail.AddressAnna,
+	})
+	storage.AddGlobal("sendEmail", &flow.BoolBpmn{
+		Bool: sendEmail,
+	})
+	flow, err := bpmn.GetFlow(policy, origin, storage)
 	if err != nil {
 		return err
 	}

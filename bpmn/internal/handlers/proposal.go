@@ -1,32 +1,56 @@
 package handlers
 
 import (
-	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
-	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
-	"gitlab.dev.wopta.it/goworkspace/broker/internal/utility"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/internal/utility"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/mail"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func AddProposalHandlers(builder *bpmn.BpnmBuilder) error {
-	return bpmn.IsError(
+func AddProposalHandlers(builder *bpmnEngine.BpnmBuilder) error {
+	return bpmnEngine.IsError(
 		builder.AddHandler("sendProposalMail", sendProposalMail),
 		builder.AddHandler("setProposalData", setProposalData),
+		builder.AddHandler("end_proposal", endProposal),
 	)
 }
 
-func setProposalData(state bpmn.StorageData) error {
+func endProposal(state bpmnEngine.StorageData) error {
+	var policy *flow.Policy
+	var isProposal *flow.BoolBpmn
+	var origin *flow.String
+	var networkNode *flow.Network
+	var mgaProduct *flow.Product
+	err := bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, state),
+		bpmnEngine.GetDataRef("is_PROPOSAL_V2", &isProposal, state),
+		bpmnEngine.GetDataRef("origin", &origin, state),
+		bpmnEngine.GetDataRef("networkNode", &networkNode, state),
+		bpmnEngine.GetDataRef("mgaProduct", &mgaProduct, state),
+	)
+	if err != nil {
+		return err
+	}
+	if !isProposal.Bool {
+		utility.SetProposalNumber(policy.Policy)
+		policy.RenewDate = policy.CreationDate.AddDate(1, 0, 0)
+	}
+	return nil
+}
+
+func setProposalData(state bpmnEngine.StorageData) error {
 	var origin *flow.String
 	var policy *flow.Policy
 	var networkNode *flow.Network
 	var mgaProduct *flow.Product
-	var err = bpmn.IsError(
-		bpmn.GetDataRef("origin", &origin, state),
-		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("networkNode", &networkNode, state),
-		bpmn.GetDataRef("mgaProduct", &mgaProduct, state),
+	var err = bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("origin", &origin, state),
+		bpmnEngine.GetDataRef("policy", &policy, state),
+		bpmnEngine.GetDataRef("networkNode", &networkNode, state),
+		bpmnEngine.GetDataRef("mgaProduct", &mgaProduct, state),
 	)
 	if err != nil {
 		return err
@@ -49,18 +73,18 @@ func setProposalData(state bpmn.StorageData) error {
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
-func sendProposalMail(state bpmn.StorageData) error {
+func sendProposalMail(state bpmnEngine.StorageData) error {
 	var policy *flow.Policy
 	var addresses *flow.Addresses
 	var sendEmail *flow.BoolBpmn
 	var flowName *flow.String
 	var networkNode *flow.Network
-	err := bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("addresses", &addresses, state),
-		bpmn.GetDataRef("sendEmail", &sendEmail, state),
-		bpmn.GetDataRef("flowName", &flowName, state),
-		bpmn.GetDataRef("networkNode", &networkNode, state),
+	err := bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, state),
+		bpmnEngine.GetDataRef("addresses", &addresses, state),
+		bpmnEngine.GetDataRef("sendEmail", &sendEmail, state),
+		bpmnEngine.GetDataRef("flowName", &flowName, state),
+		bpmnEngine.GetDataRef("networkNode", &networkNode, state),
 	)
 	if err != nil {
 		return err

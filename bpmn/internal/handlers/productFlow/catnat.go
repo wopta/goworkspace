@@ -6,15 +6,15 @@ import (
 	"os"
 	"strings"
 
-	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
-	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
 	"gitlab.dev.wopta.it/goworkspace/quote/catnat"
 )
 
-func CatnatIntegration(store bpmn.StorageData) error {
-	policy, err := bpmn.GetData[*flow.Policy]("policy", store)
+func CatnatIntegration(store bpmnEngine.StorageData) error {
+	policy, err := bpmnEngine.GetData[*flow.Policy]("policy", store)
 	if err != nil {
 		return err
 	}
@@ -32,12 +32,12 @@ func CatnatIntegration(store bpmn.StorageData) error {
 	return nil
 }
 
-func CatnatDownloadCertification(store bpmn.StorageData) error {
+func CatnatDownloadCertification(store bpmnEngine.StorageData) error {
 	var policy *flow.Policy
 	var numeroPoliza *flow.String
-	err := bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, store),
-		bpmn.GetDataRef("numeroPolizza", &numeroPoliza, store),
+	err := bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, store),
+		bpmnEngine.GetDataRef("numeroPolizza", &numeroPoliza, store),
 	)
 	if err != nil {
 		return err

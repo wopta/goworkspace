@@ -2,21 +2,19 @@ package broker
 
 import (
 	"encoding/json"
+	//"errors"
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 	"time"
 
-	"cloud.google.com/go/civil"
-	draftbpnm "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
-	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
-	"gitlab.dev.wopta.it/goworkspace/broker/internal/utility"
+	"gitlab.dev.wopta.it/goworkspace/bpmn"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/mail"
 	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/network"
 	plc "gitlab.dev.wopta.it/goworkspace/policy"
 	prd "gitlab.dev.wopta.it/goworkspace/product"
 	"gitlab.dev.wopta.it/goworkspace/question"
@@ -83,7 +81,7 @@ func DraftEmitFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		authToken.Email,
 	)
 
-	origin = r.Header.Get("origin")
+	origin := r.Header.Get("origin")
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		return "", nil, err
@@ -99,7 +97,7 @@ func DraftEmitFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	uid := request.Uid
 	log.Printf("Uid: %s", uid)
 
-	paymentMode = request.PaymentMode
+	paymentMode := request.PaymentMode
 	log.Printf("paymentMode: %s", paymentMode)
 
 	policy, err = plc.GetPolicy(uid, origin)
@@ -122,11 +120,6 @@ func DraftEmitFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	}
 
 	emitUpdatePolicy(&policy, request)
-
-	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
-	}
 
 	if policy.IsReserved && policy.Status != models.PolicyStatusApproved {
 		log.Printf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
@@ -153,10 +146,10 @@ func emitDraft(policy *models.Policy, request EmitRequest, origin string) (EmitR
 	log.Printf("Emitting - Policy Uid %s", policy.Uid)
 	log.Println("starting bpmn flow...")
 
-	paymentSplit = request.PaymentSplit
+	paymentSplit := request.PaymentSplit
 	log.Printf("paymentSplit: %s", paymentSplit)
 
-	storage := draftbpnm.NewStorageBpnm()
+	storage := bpmnEngine.NewStorageBpnm()
 	if request.SendEmail == nil {
 		storage.AddGlobal("sendEmail", &flow.BoolBpmn{Bool: true})
 	} else {
@@ -166,8 +159,7 @@ func emitDraft(policy *models.Policy, request EmitRequest, origin string) (EmitR
 	storage.AddGlobal("paymentMode", &flow.String{String: request.PaymentMode})
 	storage.AddGlobal("addresses", &flow.Addresses{FromAddress: mail.AddressAnna})
 
-	log.Printf("paymentMode: %s", paymentMode)
-	flow, err := getFlow(policy, origin, storage)
+	flow, err := bpmn.GetFlow(policy, origin, storage)
 	if err != nil {
 		return responseEmit, err
 	}
@@ -246,28 +238,6 @@ func brokerUpdatePolicy(policy *models.Policy, request BrokerBaseRequest) {
 	policy.SanitizePaymentData()
 
 	log.Println("end --------------------------------------")
-}
-
-func emitBase(policy *models.Policy, origin string) {
-	log.AddPrefix("emitBase")
-	defer log.PopPrefix()
-	log.Printf("Policy Uid %s", policy.Uid)
-	firePolicy := lib.PolicyCollection
-	now := time.Now().UTC()
-
-	policy.CompanyEmit = true
-	policy.CompanyEmitted = false
-	policy.EmitDate = now
-	policy.BigEmitDate = civil.DateTimeOf(now)
-	company, numb, tot := utility.GetSequenceByCompany(strings.ToLower(policy.Company), firePolicy)
-	log.Printf("codeCompany: %s", company)
-	log.Printf("numberCompany: %d", numb)
-	log.Printf("number: %d", tot)
-	policy.Number = tot
-	policy.NumberCompany = numb
-	policy.CodeCompany = company
-	policy.RenewDate = policy.StartDate.AddDate(1, 0, 0)
-	policy.BigRenewDate = civil.DateTimeOf(policy.RenewDate)
 }
 
 func calculatePaymentComponents(policy *models.Policy) {

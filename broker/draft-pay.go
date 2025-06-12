@@ -13,8 +13,9 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/payment/fabrick"
 	tr "gitlab.dev.wopta.it/goworkspace/transaction"
 
-	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
-	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
+	"gitlab.dev.wopta.it/goworkspace/bpmn"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
 	plc "gitlab.dev.wopta.it/goworkspace/policy"
@@ -35,7 +36,7 @@ func DraftPaymentFx(w http.ResponseWriter, r *http.Request) (string, any, error)
 	log.Println("Handler start -----------------------------------------------")
 
 	policyUid := r.URL.Query().Get("uid")
-	origin = r.URL.Query().Get("origin")
+	origin := r.URL.Query().Get("origin")
 
 	request := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
@@ -97,12 +98,12 @@ func fabrickPayment(origin, providerId string, policy *models.Policy, paymentInf
 		log.ErrorF("error Policy %s with transaction %s already paid", policy.Uid, transaction.Uid)
 		return errors.New("transaction already paid")
 	}
-	storage := bpmn.NewStorageBpnm()
+	storage := bpmnEngine.NewStorageBpnm()
 	storage.AddGlobal("paymentInfo", &paymentInfo)
 	storage.AddGlobal("addresses", &flow.Addresses{
 		FromAddress: mail.AddressAnna,
 	})
-	flowPayment, err := getFlow(policy, origin, storage)
+	flowPayment, err := bpmn.GetFlow(policy, origin, storage)
 	if err != nil {
 		return err
 	}

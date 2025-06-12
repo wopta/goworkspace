@@ -1,4 +1,4 @@
-package draftbpmn
+package bpmnEngine
 
 type BpnmBuilder struct {
 	Processes []*processBuilder `json:"processes"`
@@ -6,6 +6,8 @@ type BpnmBuilder struct {
 	handlers map[string]activityHandler
 	storage  StorageData
 	toInject map[injectionKey]*processBpnm
+	//These callbacks are called at the end of the building phase, when every processes and activities have been done
+	callbacks []func(builder *BpnmBuilder, flow *FlowBpnm) error
 }
 
 type processBuilder struct {

@@ -7,13 +7,13 @@ import (
 	"net/http"
 	"time"
 
-	draftbpnm "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
-	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
+	"gitlab.dev.wopta.it/goworkspace/bpmn"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/mail"
 	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/network"
 	prd "gitlab.dev.wopta.it/goworkspace/product"
 )
 
@@ -46,7 +46,7 @@ func DraftEmitWithPolicyFx(w http.ResponseWriter, r *http.Request) (string, any,
 		authToken.Email,
 	)
 
-	origin = r.Header.Get("origin")
+	origin := r.Header.Get("origin")
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		return "", nil, err
@@ -62,11 +62,6 @@ func DraftEmitWithPolicyFx(w http.ResponseWriter, r *http.Request) (string, any,
 	productConfig := prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 	if err = policy.CheckStartDateValidity(productConfig.EmitMaxElapsedDays); err != nil {
 		return "", "", err
-	}
-
-	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
 	}
 
 	if policy.IsReserved && policy.Status != models.PolicyStatusApproved {
@@ -96,17 +91,17 @@ func emitDraftWithPolicy(policy *models.Policy, origin string) (EmitResponse, er
 	log.Printf("Emitting - Policy Uid %s", policy.Uid)
 	log.Println("starting bpmn flow...")
 
-	paymentSplit = "monthly"
-	log.Printf("paymentSplit: %s", paymentSplit)
+	paymentSplit := "monthly"
+	paymentMode := "single"
 
-	storage := draftbpnm.NewStorageBpnm()
+	storage := bpmnEngine.NewStorageBpnm()
 	storage.AddGlobal("sendEmail", &flow.BoolBpmn{Bool: true})
-	storage.AddGlobal("paymentSplit", &flow.String{String: "monthly"})
-	storage.AddGlobal("paymentMode", &flow.String{String: "single"})
+	storage.AddGlobal("paymentSplit", &flow.String{String: paymentSplit})
+	storage.AddGlobal("paymentMode", &flow.String{String: paymentMode})
 	storage.AddGlobal("addresses", &flow.Addresses{FromAddress: mail.AddressAnna})
 
 	log.Printf("paymentMode: %s", paymentMode)
-	flow, err := getFlow(policy, origin, storage)
+	flow, err := bpmn.GetFlow(policy, origin, storage)
 	if err != nil {
 		return responseEmit, err
 	}

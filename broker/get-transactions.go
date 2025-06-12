@@ -39,6 +39,7 @@ func GetPolicyTransactionsFx(w http.ResponseWriter, r *http.Request) (string, in
 		return "", nil, err
 	}
 
+	origin := r.Header.Get("origin")
 	policy, err := plc.GetPolicy(policyUid, origin)
 	if err != nil {
 		log.ErrorF("error fetching policy %s from Firestore: %s", policyUid, err.Error())

@@ -3,7 +3,7 @@ package flow
 import (
 	"testing"
 
-	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
@@ -22,20 +22,20 @@ func (m *mockLog) printlnForTesting(t *testing.T) {
 		t.Log(" ", mes)
 	}
 }
-func funcTest(message string, log *mockLog) func(bpmn.StorageData) error {
-	return func(sd bpmn.StorageData) error {
+func funcTest(message string, log *mockLog) func(bpmnEngine.StorageData) error {
+	return func(sd bpmnEngine.StorageData) error {
 		log.println(message)
 		return nil
 	}
 }
 
-func getBuilderFlowChannel(log *mockLog, store bpmn.StorageData) (*bpmn.BpnmBuilder, error) {
-	builder, e := bpmn.NewBpnmBuilderRawPath("../../../../function-data/dev//flows/draft/channel_flows.json")
+func getBuilderFlowChannel(log *mockLog, store bpmnEngine.StorageData) (*bpmnEngine.BpnmBuilder, error) {
+	builder, e := bpmnEngine.NewBpnmBuilderRawPath("../../../../function-data/dev//flows/draft/channel_flows.json")
 	if e != nil {
 		return nil, e
 	}
 	builder.SetStorage(store)
-	e = bpmn.IsError(
+	e = bpmnEngine.IsError(
 		builder.AddHandler("setProposalData", funcTest("setProposalData", log)),
 		builder.AddHandler("emitWithSequence", funcTest("emitWithSequence", log)),
 		builder.AddHandler("emitNoSequence", funcTest("emitNoSequence", log)),
@@ -61,6 +61,7 @@ func getBuilderFlowChannel(log *mockLog, store bpmn.StorageData) (*bpmn.BpnmBuil
 		builder.AddHandler("rejected", funcTest("rejected", log)),
 		builder.AddHandler("approved", funcTest("approved", log)),
 		builder.AddHandler("sendAcceptanceMail", funcTest("sendAcceptanceMail", log)),
+		builder.AddHandler("end_proposal", funcTest("end_proposal", log)),
 	)
 	if e != nil {
 		return nil, e
@@ -69,9 +70,9 @@ func getBuilderFlowChannel(log *mockLog, store bpmn.StorageData) (*bpmn.BpnmBuil
 	return builder, nil
 }
 
-type builderFlow func(*mockLog, bpmn.StorageData) (*bpmn.BpnmBuilder, error)
+type builderFlow func(*mockLog, bpmnEngine.StorageData) (*bpmnEngine.BpnmBuilder, error)
 
-func testFlow(t *testing.T, process string, expectedACtivities []string, store bpmn.StorageData, builbuilderFlow builderFlow) {
+func testFlow(t *testing.T, process string, expectedACtivities []string, store bpmnEngine.StorageData, builbuilderFlow builderFlow) {
 	log := mockLog{}
 	build, e := builbuilderFlow(&log, store)
 	if e != nil {
@@ -116,7 +117,7 @@ var (
 	productRemittanceMga = Product{&models.Product{Flow: models.RemittanceMgaFlow}}
 )
 
-func initBaseStorage(storage bpmn.StorageData) {
+func initBaseStorage(storage bpmnEngine.StorageData) {
 	storage.AddGlobal("mgaProduct", &Product{})
 	storage.AddGlobal("flowName", &String{})
 	storage.AddGlobal("addresses", &addresses)
@@ -128,7 +129,7 @@ func initBaseStorage(storage bpmn.StorageData) {
 }
 
 func TestEmitForEcommerceForCatnat(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("product", &productEcommerce)
 	store.AddGlobal("networkNode", &winNode)
@@ -145,7 +146,7 @@ func TestEmitForEcommerceForCatnat(t *testing.T) {
 	testFlow(t, "emit", exps, store, getBuilderFlowChannel)
 }
 func TestLeadForEcommerce(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("product", &productEcommerce)
 	store.AddGlobal("networkNode", &winNode)
@@ -159,10 +160,11 @@ func TestLeadForEcommerce(t *testing.T) {
 }
 
 func TestProposalForEcommerce(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("product", &productEcommerce)
 	store.AddGlobal("networkNode", &winNode)
+	store.AddGlobal("is_PROPOSAL_V2", &BoolBpmn{Bool: false})
 	initBaseStorage(store)
 
 	exps := []string{}
@@ -170,7 +172,7 @@ func TestProposalForEcommerce(t *testing.T) {
 }
 
 func TestPayForEcommerce(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("product", &productEcommerce)
 	store.AddGlobal("networkNode", &winNode)
@@ -184,7 +186,7 @@ func TestPayForEcommerce(t *testing.T) {
 }
 
 func TestSignForEcommerce(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("product", &productEcommerce)
 	store.AddGlobal("networkNode", &winNode)
@@ -200,7 +202,7 @@ func TestSignForEcommerce(t *testing.T) {
 }
 
 func TestEmitForMga(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyMga)
 	store.AddGlobal("product", &productMga)
 	store.AddGlobal("networkNode", &winNode)
@@ -211,7 +213,7 @@ func TestEmitForMga(t *testing.T) {
 }
 
 func TestLeadForMga(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyMga)
 	store.AddGlobal("product", &productMga)
 	store.AddGlobal("networkNode", &winNode)
@@ -224,20 +226,22 @@ func TestLeadForMga(t *testing.T) {
 }
 
 func TestProposalForMga(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyMga)
 	store.AddGlobal("product", &productMga)
 	store.AddGlobal("networkNode", &winNode)
+	store.AddGlobal("is_PROPOSAL_V2", &BoolBpmn{Bool: false})
 	initBaseStorage(store)
 
 	exps := []string{
 		"setProposalData",
+		"end_proposal",
 	}
 	testFlow(t, "proposal", exps, store, getBuilderFlowChannel)
 }
 
 func TestApprovalForMga(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyMga)
 	store.AddGlobal("product", &productMga)
 	store.AddGlobal("networkNode", &winNode)
@@ -248,7 +252,7 @@ func TestApprovalForMga(t *testing.T) {
 }
 
 func TestPayForMga(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyMga)
 	store.AddGlobal("product", &productMga)
 	store.AddGlobal("networkNode", &winNode)
@@ -262,7 +266,7 @@ func TestPayForMga(t *testing.T) {
 }
 
 func TestSignForMga(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyMga)
 	store.AddGlobal("product", &productMga)
 	store.AddGlobal("networkNode", &winNode)
@@ -277,7 +281,7 @@ func TestSignForMga(t *testing.T) {
 }
 
 func TestEmitForProviderMga(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productProviderMga)
 	store.AddGlobal("networkNode", &winNode)
@@ -295,7 +299,7 @@ func TestEmitForProviderMga(t *testing.T) {
 }
 
 func TestLeadForProviderMga(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productProviderMga)
 	store.AddGlobal("networkNode", &winNode)
@@ -308,21 +312,23 @@ func TestLeadForProviderMga(t *testing.T) {
 }
 
 func TestProposalForProviderMga(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productProviderMga)
 	store.AddGlobal("networkNode", &winNode)
+	store.AddGlobal("is_PROPOSAL_V2", &BoolBpmn{Bool: false})
 	initBaseStorage(store)
 
 	exps := []string{
 		"setProposalData",
 		"sendProposalMail",
+		"end_proposal",
 	}
 	testFlow(t, "proposal", exps, store, getBuilderFlowChannel)
 }
 
 func TestApprovalForProviderMga(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productProviderMga)
 	store.AddGlobal("networkNode", &winNode)
@@ -336,7 +342,7 @@ func TestApprovalForProviderMga(t *testing.T) {
 }
 
 func TestPayForProviderMga(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productProviderMga)
 	store.AddGlobal("networkNode", &winNode)
@@ -350,7 +356,7 @@ func TestPayForProviderMga(t *testing.T) {
 }
 
 func TestSignForProviderMga(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("product", &productProviderMga)
 	store.AddGlobal("networkNode", &winNode)
@@ -366,7 +372,7 @@ func TestSignForProviderMga(t *testing.T) {
 }
 
 func TestEmitForRemittanceMga(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productRemittanceMga)
 	store.AddGlobal("networkNode", &winNode)
@@ -384,7 +390,7 @@ func TestEmitForRemittanceMga(t *testing.T) {
 }
 
 func TestLeadForRemittanceMga(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productRemittanceMga)
 	store.AddGlobal("networkNode", &winNode)
@@ -397,21 +403,23 @@ func TestLeadForRemittanceMga(t *testing.T) {
 }
 
 func TestProposalForRemittanceMga(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productRemittanceMga)
 	store.AddGlobal("networkNode", &winNode)
+	store.AddGlobal("is_PROPOSAL_V2", &BoolBpmn{Bool: false})
 	initBaseStorage(store)
 
 	exps := []string{
 		"setProposalData",
 		"sendProposalMail",
+		"end_proposal",
 	}
 	testFlow(t, "proposal", exps, store, getBuilderFlowChannel)
 }
 
 func TestApprovalForRemittanceMga(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productRemittanceMga)
 	store.AddGlobal("networkNode", &winNode)
@@ -425,7 +433,7 @@ func TestApprovalForRemittanceMga(t *testing.T) {
 }
 
 func TestPayForRemittanceMga(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productRemittanceMga)
 	store.AddGlobal("networkNode", &winNode)
@@ -436,7 +444,7 @@ func TestPayForRemittanceMga(t *testing.T) {
 }
 
 func TestSignForRemittanceMga(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productRemittanceMga)
 	store.AddGlobal("networkNode", &winNode)
@@ -452,13 +460,13 @@ func TestSignForRemittanceMga(t *testing.T) {
 
 // With node flow
 func TestSignForRemittanceMgaWithNodeFlow(t *testing.T) {
-	storeFlowChannel := bpmn.NewStorageBpnm()
+	storeFlowChannel := bpmnEngine.NewStorageBpnm()
 	storeFlowChannel.AddGlobal("policy", &policyNetwork)
 	storeFlowChannel.AddGlobal("product", &productRemittanceMga)
 	storeFlowChannel.AddGlobal("networkNode", &winNode)
 	initBaseStorage(storeFlowChannel)
 
-	storeNode := bpmn.NewStorageBpnm()
+	storeNode := bpmnEngine.NewStorageBpnm()
 	storeNode.AddLocal("config", &CallbackConfig{Sign: false})
 
 	exps := []string{
@@ -466,7 +474,7 @@ func TestSignForRemittanceMgaWithNodeFlow(t *testing.T) {
 		"addContract",
 		"sendMailContract",
 	}
-	testFlow(t, "sign", exps, storeFlowChannel, func(log *mockLog, sd bpmn.StorageData) (*bpmn.BpnmBuilder, error) {
+	testFlow(t, "sign", exps, storeFlowChannel, func(log *mockLog, sd bpmnEngine.StorageData) (*bpmnEngine.BpnmBuilder, error) {
 		build, e := getBuilderFlowChannel(log, storeFlowChannel)
 		if e != nil {
 			return nil, e
@@ -484,13 +492,13 @@ func TestSignForRemittanceMgaWithNodeFlow(t *testing.T) {
 }
 
 func TestEmitForEcommerceWithNodeFlow(t *testing.T) {
-	storeFlowChannel := bpmn.NewStorageBpnm()
+	storeFlowChannel := bpmnEngine.NewStorageBpnm()
 	storeFlowChannel.AddGlobal("policy", &policyEcommerce)
 	storeFlowChannel.AddGlobal("product", &productEcommerce)
 	storeFlowChannel.AddGlobal("networkNode", &winNode)
 	initBaseStorage(storeFlowChannel)
 
-	storeNode := bpmn.NewStorageBpnm()
+	storeNode := bpmnEngine.NewStorageBpnm()
 	storeNode.AddLocal("config", &CallbackConfig{Emit: true})
 
 	exps := []string{
@@ -503,7 +511,7 @@ func TestEmitForEcommerceWithNodeFlow(t *testing.T) {
 		"Emit",
 		"saveAudit prova request",
 	}
-	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpmn.StorageData) (*bpmn.BpnmBuilder, error) {
+	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpmnEngine.StorageData) (*bpmnEngine.BpnmBuilder, error) {
 		build, e := getBuilderFlowChannel(log, storeFlowChannel)
 		if e != nil {
 			return nil, e
@@ -520,17 +528,17 @@ func TestEmitForEcommerceWithNodeFlow(t *testing.T) {
 	})
 }
 func TestEmitForWgaWithNodeFlow(t *testing.T) {
-	storeFlowChannel := bpmn.NewStorageBpnm()
+	storeFlowChannel := bpmnEngine.NewStorageBpnm()
 	storeFlowChannel.AddGlobal("policy", &policyMga)
 	storeFlowChannel.AddGlobal("product", &productEcommerce)
 	storeFlowChannel.AddGlobal("networkNode", &winNode)
 	initBaseStorage(storeFlowChannel)
 
-	storeNode := bpmn.NewStorageBpnm()
+	storeNode := bpmnEngine.NewStorageBpnm()
 	storeNode.AddLocal("config", &CallbackConfig{Emit: true})
 
 	exps := []string{}
-	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpmn.StorageData) (*bpmn.BpnmBuilder, error) {
+	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpmnEngine.StorageData) (*bpmnEngine.BpnmBuilder, error) {
 		build, e := getBuilderFlowChannel(log, storeFlowChannel)
 		if e != nil {
 			return nil, e
@@ -548,16 +556,16 @@ func TestEmitForWgaWithNodeFlow(t *testing.T) {
 	})
 }
 func TestEmitForEcommerceWithNodeFlowConfFalse(t *testing.T) {
-	storeFlowChannel := bpmn.NewStorageBpnm()
+	storeFlowChannel := bpmnEngine.NewStorageBpnm()
 	storeFlowChannel.AddGlobal("policy", &policyEcommerce)
 	storeFlowChannel.AddGlobal("product", &productEcommerce)
 	storeFlowChannel.AddGlobal("networkNode", &winNode)
 	initBaseStorage(storeFlowChannel)
 
-	storeNode := bpmn.NewStorageBpnm()
+	storeNode := bpmnEngine.NewStorageBpnm()
 	storeNode.AddLocal("config", &CallbackConfig{Emit: false})
 
-	storeProduct := bpmn.NewStorageBpnm()
+	storeProduct := bpmnEngine.NewStorageBpnm()
 	exps := []string{
 		"setProposalData",
 		"emitWithSequence",
@@ -566,7 +574,7 @@ func TestEmitForEcommerceWithNodeFlowConfFalse(t *testing.T) {
 		"sendEmitProposalMail",
 		"sendMailSign",
 	}
-	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpmn.StorageData) (*bpmn.BpnmBuilder, error) {
+	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpmnEngine.StorageData) (*bpmnEngine.BpnmBuilder, error) {
 		build, e := getBuilderFlowChannel(log, storeFlowChannel)
 		if e != nil {
 			return nil, e
@@ -590,16 +598,16 @@ func TestEmitForEcommerceWithNodeFlowConfFalse(t *testing.T) {
 	})
 }
 func TestEmitForEcommerceCatnat(t *testing.T) {
-	storeFlowChannel := bpmn.NewStorageBpnm()
+	storeFlowChannel := bpmnEngine.NewStorageBpnm()
 	storeFlowChannel.AddGlobal("policy", &policyCatnat)
 	storeFlowChannel.AddGlobal("product", &productEcommerce)
 	storeFlowChannel.AddGlobal("networkNode", &winNode)
 	initBaseStorage(storeFlowChannel)
 
-	storeNode := bpmn.NewStorageBpnm()
+	storeNode := bpmnEngine.NewStorageBpnm()
 	storeNode.AddLocal("config", &CallbackConfig{Emit: false})
 
-	storeProduct := bpmn.NewStorageBpnm()
+	storeProduct := bpmnEngine.NewStorageBpnm()
 	exps := []string{
 		"setProposalData",
 		"emitNoSequence",
@@ -610,7 +618,7 @@ func TestEmitForEcommerceCatnat(t *testing.T) {
 		"sendEmitProposalMail",
 		"sendMailSign",
 	}
-	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpmn.StorageData) (*bpmn.BpnmBuilder, error) {
+	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpmnEngine.StorageData) (*bpmnEngine.BpnmBuilder, error) {
 		build, e := getBuilderFlowChannel(log, storeFlowChannel)
 		if e != nil {
 			return nil, e

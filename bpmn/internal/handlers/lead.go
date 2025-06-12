@@ -1,29 +1,42 @@
 package handlers
 
 import (
-	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
-	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
-	"gitlab.dev.wopta.it/goworkspace/broker/internal/utility"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/internal/utility"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/mail"
 	"gitlab.dev.wopta.it/goworkspace/models"
 	prd "gitlab.dev.wopta.it/goworkspace/product"
 )
 
-func AddLeadHandlers(builder *bpmn.BpnmBuilder) error {
-	return bpmn.IsError(
+func AddLeadHandlers(builder *bpmnEngine.BpnmBuilder) error {
+	return bpmnEngine.IsError(
 		builder.AddHandler("setLeadData", setLead),
 		builder.AddHandler("sendLeadMail", sendLeadMail),
+		builder.AddHandler("setProposalNumber", setProposalNumber),
 		builder.AddHandler("end_lead", savePolicy),
 	)
 }
 
-func setLead(state bpmn.StorageData) error {
+func setProposalNumber(state bpmnEngine.StorageData) error {
+	var policy *flow.Policy
+	err := bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, state),
+	)
+	if err != nil {
+		return err
+	}
+	utility.SetProposalNumber(policy.Policy)
+	return nil
+}
+
+func setLead(state bpmnEngine.StorageData) error {
 	var policy *flow.Policy
 	var networkNode *flow.Network
-	err := bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("networkNode", &networkNode, state),
+	err := bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, state),
+		bpmnEngine.GetDataRef("networkNode", &networkNode, state),
 	)
 	if err != nil {
 		return err
@@ -33,16 +46,16 @@ func setLead(state bpmn.StorageData) error {
 	return nil
 }
 
-func sendLeadMail(state bpmn.StorageData) error {
+func sendLeadMail(state bpmnEngine.StorageData) error {
 	var policy *flow.Policy
 	var networkNode *flow.Network
 	var addresses *flow.Addresses
 	var flowName *flow.String
-	err := bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("networkNode", &networkNode, state),
-		bpmn.GetDataRef("addresses", &addresses, state),
-		bpmn.GetDataRef("flowName", &flowName, state),
+	err := bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, state),
+		bpmnEngine.GetDataRef("networkNode", &networkNode, state),
+		bpmnEngine.GetDataRef("addresses", &addresses, state),
+		bpmnEngine.GetDataRef("flowName", &flowName, state),
 	)
 	if err != nil {
 		return err

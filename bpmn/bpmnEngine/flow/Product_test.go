@@ -4,27 +4,27 @@ import (
 	"os"
 	"testing"
 
-	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
 	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func mock_catnatIntegration(log *mockLog) func(bpmn.StorageData) error {
-	return func(sd bpmn.StorageData) error {
+func mock_catnatIntegration(log *mockLog) func(bpmnEngine.StorageData) error {
+	return func(sd bpmnEngine.StorageData) error {
 		log.println("catnatIntegration")
 		sd.AddLocal("numeroPolizza", &String{String: "provissiamo"})
 		return nil
 	}
 }
 
-func getBuilderFlowProduct(log *mockLog, store bpmn.StorageData) (*bpmn.BpnmBuilder, error) {
+func getBuilderFlowProduct(log *mockLog, store bpmnEngine.StorageData) (*bpmnEngine.BpnmBuilder, error) {
 	os.Setenv("env", env.LocalTest)
-	builder, e := bpmn.NewBpnmBuilderRawPath("../../../../function-data/dev/flows/draft/product_flows.json")
+	builder, e := bpmnEngine.NewBpnmBuilderRawPath("../../../../function-data/dev/flows/draft/product_flows.json")
 	if e != nil {
 		return nil, e
 	}
 	builder.SetStorage(store)
-	e = bpmn.IsError(
+	e = bpmnEngine.IsError(
 		builder.AddHandler("catnatIntegration", mock_catnatIntegration(log)),
 		builder.AddHandler("catnatdownloadPolicy", funcTest("catnatdownloadPolicy", log)),
 	)
@@ -34,7 +34,7 @@ func getBuilderFlowProduct(log *mockLog, store bpmn.StorageData) (*bpmn.BpnmBuil
 	return builder, nil
 }
 func TestCatnatIntegrationWithNoCatnatPolicy(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &Policy{&models.Policy{Name: "noCatnat"}})
 	store.AddGlobal("networkNode", &winNode)
 
@@ -45,7 +45,7 @@ func TestCatnatIntegrationWithNoCatnatPolicy(t *testing.T) {
 }
 
 func TestCatnatIntegrationWithCatnatPolicy(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyCatnat)
 	store.AddGlobal("networkNode", &winNode)
 

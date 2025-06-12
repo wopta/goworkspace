@@ -6,13 +6,13 @@ import (
 	"strconv"
 	"strings"
 
-	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
-	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
+	bpmn "gitlab.dev.wopta.it/goworkspace/bpmn"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/mail"
 	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
 const (
@@ -28,10 +28,10 @@ func DraftSignFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	policyUid := r.URL.Query().Get("uid")
 	envelope := r.URL.Query().Get("envelope")
 	action := r.URL.Query().Get("action")
-	origin = r.URL.Query().Get("origin")
+	origin := r.URL.Query().Get("origin")
 	sendEmailParam := r.URL.Query().Get("sendEmail")
 	log.Printf("Uid: '%s', Envelope: '%s', Action: '%s', SendEmailParam: '%s'", policyUid, envelope, action, sendEmailParam)
-
+	var sendEmail bool
 	if v, err := strconv.ParseBool(sendEmailParam); err == nil {
 		sendEmail = v
 	} else {
@@ -81,15 +81,14 @@ func namirialStepFinished(origin, policyUid string, sendEmail bool) error {
 	}
 
 	log.Println("starting bpmn flow...")
-	storage := bpmn.NewStorageBpnm()
+	storage := bpmnEngine.NewStorageBpnm()
 	storage.AddGlobal("addresses", &flow.Addresses{
 		FromAddress: mail.AddressAnna,
 	})
 	storage.AddGlobal("sendEmail", &flow.BoolBpmn{
 		Bool: sendEmail,
 	})
-	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-	flow, err := getFlow(&policy, origin, storage)
+	flow, err := bpmn.GetFlow(&policy, origin, storage)
 	if err != nil {
 		return err
 	}

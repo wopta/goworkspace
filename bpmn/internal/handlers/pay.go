@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
-	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/mail"
@@ -13,25 +13,25 @@ import (
 	tr "gitlab.dev.wopta.it/goworkspace/transaction"
 )
 
-func AddPayHandlers(builder *bpmn.BpnmBuilder) error {
-	return bpmn.IsError(
+func AddPayHandlers(builder *bpmnEngine.BpnmBuilder) error {
+	return bpmnEngine.IsError(
 		builder.AddHandler("updatePolicy", updatePolicy),
 		builder.AddHandler("payTransaction", payTransaction),
 	)
 }
 
-func updatePolicy(state bpmn.StorageData) error {
+func updatePolicy(state bpmnEngine.StorageData) error {
 	var policy *flow.Policy
 	var origin *flow.String
 	var networkNode *flow.Network
 	var flowName *flow.String
 	var addresses *flow.Addresses
-	err := bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("origin", &origin, state),
-		bpmn.GetDataRef("networkNode", &networkNode, state),
-		bpmn.GetDataRef("flowName", &flowName, state),
-		bpmn.GetDataRef("addresses", &addresses, state),
+	err := bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, state),
+		bpmnEngine.GetDataRef("origin", &origin, state),
+		bpmnEngine.GetDataRef("networkNode", &networkNode, state),
+		bpmnEngine.GetDataRef("flowName", &flowName, state),
+		bpmnEngine.GetDataRef("addresses", &addresses, state),
 	)
 	if err != nil {
 		return err
@@ -87,16 +87,16 @@ func updatePolicy(state bpmn.StorageData) error {
 	return mail.SendMailContract(*policy.Policy, policy.Attachments, addresses.FromAddress, addresses.ToAddress, addresses.CcAddress, flowName.String)
 }
 
-func payTransaction(state bpmn.StorageData) error {
+func payTransaction(state bpmnEngine.StorageData) error {
 	var policy *flow.Policy
 	var paymentInfo *flow.PaymentInfoBpmn
 	var origin *flow.String
 	var networkNode *flow.Network
-	err := bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("paymentInfo", &paymentInfo, state),
-		bpmn.GetDataRef("origin", &origin, state),
-		bpmn.GetDataRef("networkNode", &networkNode, state),
+	err := bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, state),
+		bpmnEngine.GetDataRef("paymentInfo", &paymentInfo, state),
+		bpmnEngine.GetDataRef("origin", &origin, state),
+		bpmnEngine.GetDataRef("networkNode", &networkNode, state),
 	)
 	if err != nil {
 		return err

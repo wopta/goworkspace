@@ -7,11 +7,11 @@ import (
 	"io"
 	"net/http"
 
-	draftbpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
+	bpmn "gitlab.dev.wopta.it/goworkspace/bpmn"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/network"
 	plc "gitlab.dev.wopta.it/goworkspace/policy"
 )
 
@@ -45,7 +45,7 @@ func DraftRequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, int
 		authToken.Email,
 	)
 
-	origin = r.Header.Get("Origin")
+	origin := r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
@@ -77,7 +77,7 @@ func DraftRequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, int
 
 	brokerUpdatePolicy(&policy, req)
 
-	err = requestApproval(&policy)
+	err = requestApproval(&policy, origin)
 	if err != nil {
 		log.ErrorF("error request approval: %s", err.Error())
 		return "", nil, err
@@ -90,7 +90,7 @@ func DraftRequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, int
 	return string(jsonOut), policy, err
 }
 
-func requestApproval(policy *models.Policy) error {
+func requestApproval(policy *models.Policy, origin string) error {
 	var (
 		err error
 	)
@@ -99,16 +99,11 @@ func requestApproval(policy *models.Policy) error {
 
 	log.Println("start -------------------------------------")
 
-	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
-	}
-
 	log.Println("starting bpmn flow...")
 
-	storage := draftbpmn.NewStorageBpnm()
+	storage := bpmnEngine.NewStorageBpnm()
 
-	flow, err := getFlow(policy, origin, storage)
+	flow, err := bpmn.GetFlow(policy, origin, storage)
 	if err != nil {
 		return err
 	}

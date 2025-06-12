@@ -3,16 +3,15 @@ package handlers
 import (
 	"time"
 
-	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
-	draftbpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
-	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/mail"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func AddAcceptanceHandlers(builder *bpmn.BpnmBuilder) error {
-	return bpmn.IsError(
+func AddAcceptanceHandlers(builder *bpmnEngine.BpnmBuilder) error {
+	return bpmnEngine.IsError(
 		builder.AddHandler("rejected", draftRejectPolicy),
 		builder.AddHandler("approved", draftApprovePolicy),
 		builder.AddHandler("sendAcceptanceMail", sendAcceptanceMail),
@@ -20,12 +19,12 @@ func AddAcceptanceHandlers(builder *bpmn.BpnmBuilder) error {
 	)
 }
 
-func draftRejectPolicy(storage draftbpmn.StorageData) error {
+func draftRejectPolicy(storage bpmnEngine.StorageData) error {
 	var policy *flow.Policy
 	var action *flow.String
-	err := bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, storage),
-		bpmn.GetDataRef("action", &action, storage),
+	err := bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, storage),
+		bpmnEngine.GetDataRef("action", &action, storage),
 	)
 	if err != nil {
 		return err
@@ -39,12 +38,12 @@ func draftRejectPolicy(storage draftbpmn.StorageData) error {
 	return nil
 }
 
-func draftApprovePolicy(storage draftbpmn.StorageData) error {
+func draftApprovePolicy(storage bpmnEngine.StorageData) error {
 	var policy *flow.Policy
 	var action *flow.String
-	err := bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, storage),
-		bpmn.GetDataRef("action", &action, storage),
+	err := bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, storage),
+		bpmnEngine.GetDataRef("action", &action, storage),
 	)
 	if err != nil {
 		return err
@@ -58,17 +57,17 @@ func draftApprovePolicy(storage draftbpmn.StorageData) error {
 	return nil
 }
 
-func sendAcceptanceMail(state bpmn.StorageData) error {
-	policy, err := bpmn.GetData[*flow.Policy]("policy", state)
+func sendAcceptanceMail(state bpmnEngine.StorageData) error {
+	policy, err := bpmnEngine.GetData[*flow.Policy]("policy", state)
 	if err != nil {
 		return err
 	}
-	addresses, err := bpmn.GetData[*flow.Addresses]("addresses", state)
+	addresses, err := bpmnEngine.GetData[*flow.Addresses]("addresses", state)
 	if err != nil {
 		return err
 	}
 
-	node, err := bpmn.GetData[*flow.Network]("networkNode", state)
+	node, err := bpmnEngine.GetData[*flow.Network]("networkNode", state)
 	if err != nil {
 		return err
 	}

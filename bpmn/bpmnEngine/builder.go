@@ -1,4 +1,4 @@
-package draftbpmn
+package bpmnEngine
 
 import (
 	"encoding/json"
@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"gitlab.dev.wopta.it/goworkspace/lib"
-	"gitlab.dev.wopta.it/goworkspace/lib/log"
 )
 
 func getKeyInjectProcess(targetPro, targetAct string, order activityOrder) injectionKey {
@@ -29,6 +28,7 @@ func NewBpnmBuilderRawPath(path string) (*BpnmBuilder, error) {
 	json.Unmarshal(jsonProva, &Bpnm)
 	return &Bpnm, nil
 }
+
 func NewBpnmBuilder(path string) (*BpnmBuilder, error) {
 	var Bpnm BpnmBuilder
 	jsonProva, err := lib.GetFilesByEnvV2(path)
@@ -69,7 +69,6 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 		return nil, errors.New("miss storage")
 	}
 	var builtActivities map[string]*activity
-	var builtEndActivity map[string]*activity
 	var err error
 	var isInMap bool
 
@@ -88,31 +87,27 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 			Name: "statusFlow",
 			Type: "_statusFlow",
 		})
-
+		p.Activities = append(p.Activities, getBuilderForEndActivity(p.Name))
 		builtActivities, err = b.buildActivities(p.Name, p.Activities...)
 		if err != nil {
 			return nil, err
 		}
-		if builtActivities[getNameEndActivity(p.Name)] != nil {
-			return nil, fmt.Errorf("Cant use '%v' as name for an activity, since it's a builtin activity", getNameEndActivity(p.Name))
+		newProcess.activities = builtActivities
+		if err = newProcess.hydrateGateways(p.Activities, flow, b); err != nil {
+			return nil, fmt.Errorf("Process '%v' with error: %v", p.Name, err)
 		}
-		builtEndActivity, err = b.buildActivities(p.Name, getEndingActivityBuilder(p.Name)) //build the end activity
-		if err != nil {
-			return nil, err
-		}
-		builtActivities[getNameEndActivity(p.Name)] = builtEndActivity[getNameEndActivity(p.Name)]
-
 		if _, isInMap = builtActivities[p.DefaultStart]; !isInMap {
 			return nil, fmt.Errorf("Process '%v' has no activity named '%v' that can be used as default start", newProcess.name, p.DefaultStart)
-		}
-		newProcess.activities = builtActivities
-		if err = newProcess.hydrateGateways(p.Activities); err != nil {
-			return nil, fmt.Errorf("Process '%v' with %v", p.Name, err)
 		}
 		newProcess.defaultStart = p.DefaultStart
 		flow.process[newProcess.name] = newProcess
 	}
 
+	for _, callback := range b.callbacks {
+		if err := callback(b, flow); err != nil {
+			return nil, err
+		}
+	}
 	//Return error if some processes haven't been injected, when a process is injected it's removed from b.toInject
 	if len(b.toInject) != 0 {
 		var keyNoInject string
@@ -240,9 +235,8 @@ func (a *BpnmBuilder) buildActivities(processName string, activitiesToBuild ...a
 
 // hydrateGateways links each activity's gateways to their corresponding next activities.
 // Returns an error if any referenced activity is missing.
-func (p *processBpnm) hydrateGateways(activities []activityBuilder) error {
+func (p *processBpnm) hydrateGateways(activities []activityBuilder, bpmn *FlowBpnm, builder *BpnmBuilder) error {
 	for _, builderActivity := range activities {
-		log.Printf("--- Process %v Activity building %v", p.name, builderActivity.Name)
 		var gateways []*gateway = make([]*gateway, len(builderActivity.Gateways))
 		for igat, builderGateway := range builderActivity.Gateways {
 			gateway := &gateway{
@@ -253,15 +247,41 @@ func (p *processBpnm) hydrateGateways(activities []activityBuilder) error {
 				if nextJump == "end" {
 					nextJump = getNameEndActivity(p.name)
 				}
-				if _, exist := p.activities[nextJump]; !exist {
-					return fmt.Errorf("No event named %v", nextJump)
+				processName, actioneName, itCallAnotherProcess := strings.Cut(nextJump, "->")
+				if itCallAnotherProcess {
+					if processName == "" || actioneName == "" {
+						return fmt.Errorf("Missing right definition to execute the process, exp: <process>-><activity> got: %v", nextJump)
+					}
+					gateway.nextActivities[iact] = new(activity)
+					gateway.nextActivities[iact].name = nextJump
+					//Should pass input and output too
+					gateway.nextActivities[iact].handler = func(sd StorageData) error {
+						return bpmn.RunAt(processName, actioneName)
+					}
+					builder.callbacks = append(builder.callbacks, func(builder *BpnmBuilder, flow *FlowBpnm) error {
+						var process *processBpnm
+						var activity *activity
+						var ok bool
+						if process, ok = flow.process[processName]; !ok {
+							return fmt.Errorf("Can't use process '%s' with activity '%s' since process doesn't exist", processName, actioneName)
+						}
+						if activity, ok = process.activities[actioneName]; !ok {
+							return fmt.Errorf("Can't use process '%s' with activity '%s' since activity doesn't exist", processName, actioneName)
+						}
+						if e := isInputProvidedByOutput(activity.requiredInputData, builderActivity.OutputDataRequired); e != nil {
+							return fmt.Errorf("Between activity '%s' and activity '%s' there is an error: %v", builderActivity.Name, nextJump, e.Error())
+						}
+						return nil
+					})
+				} else {
+					if _, exist := p.activities[nextJump]; !exist {
+						return fmt.Errorf("No event named %v", nextJump)
+					}
+					gateway.nextActivities[iact] = p.activities[nextJump]
+					if e := isInputProvidedByOutput(gateway.nextActivities[iact].requiredInputData, builderActivity.OutputDataRequired); e != nil {
+						return fmt.Errorf("Between activity '%s' and activity '%s' there is an error: %v", builderActivity.Name, nextJump, e.Error())
+					}
 				}
-				gateway.nextActivities[iact] = p.activities[nextJump]
-				if e := isInputProvidedByOutput(gateway.nextActivities[iact].requiredInputData, builderActivity.OutputDataRequired); e != nil {
-					prefix := fmt.Sprintf("input activity: '%v' and output activity: '%v'", gateway.nextActivities[iact].name, builderActivity.Name)
-					return fmt.Errorf(prefix+", has error: %v", e.Error())
-				}
-				log.Printf("Linked with %v", nextJump)
 			}
 			gateways[igat] = gateway
 		}
@@ -270,7 +290,7 @@ func (p *processBpnm) hydrateGateways(activities []activityBuilder) error {
 	return nil
 }
 
-func getEndingActivityBuilder(nameProcess string) activityBuilder {
+func getBuilderForEndActivity(nameProcess string) activityBuilder {
 	return activityBuilder{
 		Name:        getNameEndActivity(nameProcess),
 		Description: fmt.Sprint("end activity"),

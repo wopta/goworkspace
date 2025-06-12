@@ -1,27 +1,28 @@
-package broker
+package bpmn
 
 import (
 	"encoding/json"
 	"fmt"
 
-	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
-	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
-	"gitlab.dev.wopta.it/goworkspace/broker/internal/handlers/channelFlow"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/internal/handlers/channelFlow"
 	"gitlab.dev.wopta.it/goworkspace/callback_out"
 	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	"gitlab.dev.wopta.it/goworkspace/callback_out/win"
 	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func getNodeFlow(callbackConfigName string) (*bpmn.BpnmBuilder, error) {
-	store := bpmn.NewStorageBpnm()
-	builder, err := bpmn.NewBpnmBuilder("flows/draft/node_flows.json")
+func getNodeFlow(networkNode *models.NetworkNode) (*bpmnEngine.BpnmBuilder, error) {
+	store := bpmnEngine.NewStorageBpnm()
+	builder, err := bpmnEngine.NewBpnmBuilder("flows/draft/node_flows.json")
 	if err != nil {
 		return nil, err
 	}
 	var callbackConfigFile []byte
 	var client callback_out.CallbackClient
-	switch callbackConfigName {
+	switch networkNode.CallbackConfig.Name {
 	case "winClient":
 		callbackConfigFile, err = lib.GetFilesByEnvV2("flows/draft/callback/win.json")
 		client = win.NewClient(networkNode.ExternalNetworkCode)
@@ -29,7 +30,7 @@ func getNodeFlow(callbackConfigName string) (*bpmn.BpnmBuilder, error) {
 		callbackConfigFile, err = lib.GetFilesByEnvV2("flows/draft/callback/base.json")
 		client = base.NewClient(networkNode, "facile_broker")
 	default:
-		return nil, fmt.Errorf("CallbackCConfigName not valid '%v'", callbackConfigName)
+		return nil, fmt.Errorf("CallbackCConfigName not valid '%v'", networkNode.CallbackConfig.Name)
 	}
 
 	var callbackConf flow.CallbackConfig
@@ -44,7 +45,7 @@ func getNodeFlow(callbackConfigName string) (*bpmn.BpnmBuilder, error) {
 		return nil, err
 	}
 	builder.SetStorage(store)
-	err = bpmn.IsError(
+	err = bpmnEngine.IsError(
 		builder.AddHandler("EmitRemittance", channelFlow.CallBackEmitRemittance),
 		builder.AddHandler("Emit", channelFlow.CallBackEmit),
 		builder.AddHandler("Sign", channelFlow.CallBackSigned),

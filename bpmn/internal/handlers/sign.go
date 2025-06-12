@@ -1,16 +1,16 @@
 package handlers
 
 import (
-	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
-	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/mail"
 	"gitlab.dev.wopta.it/goworkspace/models"
 	plc "gitlab.dev.wopta.it/goworkspace/policy"
 )
 
-func AddSignHandlers(builder *bpmn.BpnmBuilder) error {
-	return bpmn.IsError(
+func AddSignHandlers(builder *bpmnEngine.BpnmBuilder) error {
+	return bpmnEngine.IsError(
 		builder.AddHandler("setSign", setSign),
 		builder.AddHandler("addContract", addContract),
 		builder.AddHandler("sendMailContract", sendMailContract),
@@ -20,12 +20,12 @@ func AddSignHandlers(builder *bpmn.BpnmBuilder) error {
 	)
 }
 
-func setSign(state bpmn.StorageData) error {
+func setSign(state bpmnEngine.StorageData) error {
 	var policy *flow.Policy
 	var origin *flow.String
-	err := bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("origin", &origin, state),
+	err := bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, state),
+		bpmnEngine.GetDataRef("origin", &origin, state),
 	)
 	if err != nil {
 		return err
@@ -39,12 +39,12 @@ func setSign(state bpmn.StorageData) error {
 
 	return nil
 }
-func addContract(state bpmn.StorageData) error {
+func addContract(state bpmnEngine.StorageData) error {
 	var policy *flow.Policy
 	var origin *flow.String
-	err := bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("origin", &origin, state),
+	err := bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, state),
+		bpmnEngine.GetDataRef("origin", &origin, state),
 	)
 	if err != nil {
 		return err
@@ -54,20 +54,20 @@ func addContract(state bpmn.StorageData) error {
 
 	return nil
 }
-func sendMailContract(state bpmn.StorageData) error {
+func sendMailContract(state bpmnEngine.StorageData) error {
 	var policy *flow.Policy
 	var networkNode *flow.Network
 	var flowName *flow.String
 	var origin *flow.String
 	var sendEmail *flow.BoolBpmn
 	var addresses *flow.Addresses
-	err := bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("origin", &origin, state),
-		bpmn.GetDataRef("flowName", &flowName, state),
-		bpmn.GetDataRef("networkNode", &networkNode, state),
-		bpmn.GetDataRef("addresses", &addresses, state),
-		bpmn.GetDataRef("sendEmail", &sendEmail, state),
+	err := bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, state),
+		bpmnEngine.GetDataRef("origin", &origin, state),
+		bpmnEngine.GetDataRef("flowName", &flowName, state),
+		bpmnEngine.GetDataRef("networkNode", &networkNode, state),
+		bpmnEngine.GetDataRef("addresses", &addresses, state),
+		bpmnEngine.GetDataRef("sendEmail", &sendEmail, state),
 	)
 	if err != nil {
 		return err
@@ -88,12 +88,12 @@ func sendMailContract(state bpmn.StorageData) error {
 	return mail.SendMailContract(*policy.Policy, policy.Attachments, addresses.FromAddress, addresses.ToAddress, addresses.CcAddress, flowName.String)
 }
 
-func fillAttachments(state bpmn.StorageData) error {
+func fillAttachments(state bpmnEngine.StorageData) error {
 	var policy *flow.Policy
 	var origin *flow.String
-	err := bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("origin", &origin, state),
+	err := bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, state),
+		bpmnEngine.GetDataRef("origin", &origin, state),
 	)
 	if err != nil {
 		return err
@@ -107,12 +107,12 @@ func fillAttachments(state bpmn.StorageData) error {
 	return nil
 }
 
-func setToPay(state bpmn.StorageData) error {
+func setToPay(state bpmnEngine.StorageData) error {
 	var policy *flow.Policy
 	var origin *flow.String
-	err := bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("origin", &origin, state),
+	err := bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, state),
+		bpmnEngine.GetDataRef("origin", &origin, state),
 	)
 	if err != nil {
 		return err
@@ -126,7 +126,7 @@ func setToPay(state bpmn.StorageData) error {
 	return nil
 }
 
-func sendMailPay(state bpmn.StorageData) error {
+func sendMailPay(state bpmnEngine.StorageData) error {
 	log.AddPrefix("sendMailPay")
 	defer log.PopPrefix()
 
@@ -135,12 +135,12 @@ func sendMailPay(state bpmn.StorageData) error {
 	var networkNode *flow.Network
 	var sendEmail *flow.BoolBpmn
 	var addresses *flow.Addresses
-	err := bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("flowName", &flowName, state),
-		bpmn.GetDataRef("networkNode", &networkNode, state),
-		bpmn.GetDataRef("addresses", &addresses, state),
-		bpmn.GetDataRef("sendEmail", &sendEmail, state),
+	err := bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, state),
+		bpmnEngine.GetDataRef("flowName", &flowName, state),
+		bpmnEngine.GetDataRef("networkNode", &networkNode, state),
+		bpmnEngine.GetDataRef("addresses", &addresses, state),
+		bpmnEngine.GetDataRef("sendEmail", &sendEmail, state),
 	)
 	if err != nil {
 		return err

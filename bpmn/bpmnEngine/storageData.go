@@ -1,4 +1,4 @@
-package draftbpmn
+package bpmnEngine
 
 import (
 	"errors"

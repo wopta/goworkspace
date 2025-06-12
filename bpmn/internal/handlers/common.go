@@ -4,17 +4,17 @@ import (
 	"log"
 	"time"
 
-	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
-	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
-func savePolicy(state bpmn.StorageData) error {
+func savePolicy(state bpmnEngine.StorageData) error {
 	var policy *flow.Policy
 	var origin *flow.String
-	err := bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("origin", &origin, state),
+	err := bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, state),
+		bpmnEngine.GetDataRef("origin", &origin, state),
 	)
 	if err != nil {
 		return err

@@ -1,4 +1,4 @@
-package draftbpmn
+package bpmnEngine
 
 import (
 	"encoding/json"
@@ -65,7 +65,6 @@ func (p *processBpnm) loop(nameActivity string) error {
 			}
 			callEndIfStop = callEndIfStop && p.activeActivities[i].callEndIfStop
 			//TODO: to improve
-			log.InfoF("Gateways processing: Process '%s' activity '%s'", p.name, p.activeActivities[i].name)
 			mapsMerged = mergeMaps(p.storageBpnm.getAllGlobals(), p.storageBpnm.getAllLocals())
 			byte, err = json.Marshal(mapsMerged)
 			if err != nil {

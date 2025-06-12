@@ -3,32 +3,32 @@ package handlers
 import (
 	"os"
 
-	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
-	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
-	"gitlab.dev.wopta.it/goworkspace/broker/internal/utility"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/internal/utility"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/mail"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func AddRequestApprovaHandlers(builder *bpmn.BpnmBuilder) error {
-	return bpmn.IsError(
+func AddRequestApprovaHandlers(builder *bpmnEngine.BpnmBuilder) error {
+	return bpmnEngine.IsError(
 		builder.AddHandler("setRequestApprovalData", setRequestApprova),
 		builder.AddHandler("sendRequestApprovalMail", sendRequestApprovalMail),
 	)
 }
 
-func setRequestApprova(state bpmn.StorageData) error {
+func setRequestApprova(state bpmnEngine.StorageData) error {
 	var policy *flow.Policy
 	var networkNode *flow.Network
 	var origin *flow.String
 	var mgaProduct *flow.Product
-	err := bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("networkNode", &networkNode, state),
-		bpmn.GetDataRef("origin", &origin, state),
-		bpmn.GetDataRef("mgaProduct", &mgaProduct, state),
+	err := bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, state),
+		bpmnEngine.GetDataRef("networkNode", &networkNode, state),
+		bpmnEngine.GetDataRef("origin", &origin, state),
+		bpmnEngine.GetDataRef("mgaProduct", &mgaProduct, state),
 	)
 	if err != nil {
 		return err
@@ -41,16 +41,16 @@ func setRequestApprova(state bpmn.StorageData) error {
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
-func sendRequestApprovalMail(state bpmn.StorageData) error {
+func sendRequestApprovalMail(state bpmnEngine.StorageData) error {
 	var policy *flow.Policy
 	var addresses *flow.Addresses
 	var flowName *flow.String
 	var networkNode *flow.Network
-	err := bpmn.IsError(
-		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("addresses", &addresses, state),
-		bpmn.GetDataRef("flowName", &flowName, state),
-		bpmn.GetDataRef("networkNode", &networkNode, state),
+	err := bpmnEngine.IsError(
+		bpmnEngine.GetDataRef("policy", &policy, state),
+		bpmnEngine.GetDataRef("addresses", &addresses, state),
+		bpmnEngine.GetDataRef("flowName", &flowName, state),
+		bpmnEngine.GetDataRef("networkNode", &networkNode, state),
 	)
 	if err != nil {
 		return err

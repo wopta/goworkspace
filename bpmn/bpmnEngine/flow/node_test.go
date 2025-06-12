@@ -5,29 +5,29 @@ import (
 	"os"
 	"testing"
 
-	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
 	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func funcTestWithInfo(message string, log *mockLog) func(bpmn.StorageData) error {
-	return func(st bpmn.StorageData) error {
+func funcTestWithInfo(message string, log *mockLog) func(bpmnEngine.StorageData) error {
+	return func(st bpmnEngine.StorageData) error {
 		log.println(message)
 		st.AddLocal("callbackInfo", &CallbackInfo{base.CallbackInfo{ReqBody: []byte("prova request")}})
 		return nil
 	}
 }
 
-func getBuilderFlowNode(log *mockLog, store bpmn.StorageData) (*bpmn.BpnmBuilder, error) {
+func getBuilderFlowNode(log *mockLog, store bpmnEngine.StorageData) (*bpmnEngine.BpnmBuilder, error) {
 	os.Setenv("env", env.LocalTest)
-	builder, e := bpmn.NewBpnmBuilderRawPath("../../../../function-data/dev//flows/draft/node_flows.json")
+	builder, e := bpmnEngine.NewBpnmBuilderRawPath("../../../../function-data/dev//flows/draft/node_flows.json")
 	if e != nil {
 		return nil, e
 	}
 	builder.SetStorage(store)
-	e = bpmn.IsError(
+	e = bpmnEngine.IsError(
 		builder.AddHandler("Emit", funcTestWithInfo("Emit", log)),
 		builder.AddHandler("EmitRemittance", funcTestWithInfo("EmitRemittance", log)),
 		builder.AddHandler("Pay", funcTestWithInfo("Pay", log)),
@@ -36,8 +36,8 @@ func getBuilderFlowNode(log *mockLog, store bpmn.StorageData) (*bpmn.BpnmBuilder
 		builder.AddHandler("Sign", funcTestWithInfo("Sign", log)),
 		builder.AddHandler("Approved", funcTestWithInfo("Approved", log)),
 		builder.AddHandler("Rejected", funcTestWithInfo("Approved", log)),
-		builder.AddHandler("saveAudit", func(sd bpmn.StorageData) error {
-			d, e := bpmn.GetData[*CallbackInfo]("callbackInfo", sd)
+		builder.AddHandler("saveAudit", func(sd bpmnEngine.StorageData) error {
+			d, e := bpmnEngine.GetData[*CallbackInfo]("callbackInfo", sd)
 			if e != nil {
 				return e
 			}
@@ -62,7 +62,7 @@ var (
 )
 
 func TestEmitForWinNodeWithConfigTrue(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("networkNode", &winNode)
 	store.AddGlobal("product", &productEcommerce)
@@ -77,7 +77,7 @@ func TestEmitForWinNodeWithConfigTrue(t *testing.T) {
 }
 
 func TestEmitForWinNodeWithConfigFalse(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("networkNode", &winNode)
 	store.AddGlobal("product", &productEcommerce)
@@ -90,7 +90,7 @@ func TestEmitForWinNodeWithConfigFalse(t *testing.T) {
 }
 
 func TestEmitForWinWithProductFlowWinEmitRemittance(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("networkNode", &winNode)
 	store.AddGlobal("product", &productRemittanceMga)
@@ -104,7 +104,7 @@ func TestEmitForWinWithProductFlowWinEmitRemittance(t *testing.T) {
 	testFlow(t, "emitCallBack", exps, store, getBuilderFlowNode)
 }
 func TestCallbackProposalWithIsReservedTrue(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	policyRes := Policy{&models.Policy{Channel: lib.ECommerceChannel, IsReserved: true}}
 	store.AddGlobal("policy", &policyRes)
 	store.AddGlobal("networkNode", &winNode)
@@ -117,7 +117,7 @@ func TestCallbackProposalWithIsReservedTrue(t *testing.T) {
 }
 
 func TestCallbackProposalWithIsReservedFalse(t *testing.T) {
-	store := bpmn.NewStorageBpnm()
+	store := bpmnEngine.NewStorageBpnm()
 	policyRes := Policy{&models.Policy{Channel: lib.ECommerceChannel, IsReserved: false}}
 	store.AddGlobal("policy", &policyRes)
 	store.AddGlobal("networkNode", &winNode)

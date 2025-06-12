@@ -7,14 +7,14 @@ import (
 	"net/http"
 	"slices"
 
-	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
-	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
+	"gitlab.dev.wopta.it/goworkspace/bpmn"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/mail"
 
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
 func DraftLeadFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
@@ -30,6 +30,7 @@ func DraftLeadFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 
 	log.Println("loading authToken from idToken...")
 
+	origin := r.Header.Get("origin")
 	token := r.Header.Get("Authorization")
 	authToken, err := lib.GetAuthTokenFromIdToken(token)
 	if err != nil {
@@ -44,7 +45,6 @@ func DraftLeadFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		authToken.Email,
 	)
 
-	origin = r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
@@ -56,7 +56,7 @@ func DraftLeadFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 
 	policy.Normalize()
 
-	err = leaddraft(authToken, &policy)
+	err = leaddraft(authToken, &policy, origin)
 	if err != nil {
 		log.ErrorF("error creating lead: %s", err.Error())
 		return "", nil, err
@@ -73,7 +73,7 @@ func DraftLeadFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	return string(resp), &policy, err
 }
 
-func leaddraft(authToken models.AuthToken, policy *models.Policy) error {
+func leaddraft(authToken models.AuthToken, policy *models.Policy, origin string) error {
 	var err error
 	log.AddPrefix("lead")
 	defer log.PopPrefix()
@@ -92,17 +92,12 @@ func leaddraft(authToken models.AuthToken, policy *models.Policy) error {
 		log.Printf("setting policy channel to '%s'", policy.Channel)
 	}
 
-	networkNode = network.GetNetworkNodeByUid(authToken.UserID)
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
-	}
-
 	log.Println("starting bpmn flow...")
-	storage := bpmn.NewStorageBpnm()
+	storage := bpmnEngine.NewStorageBpnm()
 	storage.AddGlobal("addresses", &flow.Addresses{
 		FromAddress: mail.AddressAnna,
 	})
-	flowLead, e := getFlow(policy, origin, storage)
+	flowLead, e := bpmn.GetFlow(policy, origin, storage)
 	if e != nil {
 		return e
 	}
