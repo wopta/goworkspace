@@ -114,12 +114,6 @@ var brokerRoutes []lib.Route = []lib.Route{
 		Roles:   []string{},
 	},
 	{
-		Route:   "/draft/policy/sign",
-		Handler: lib.ResponseLoggerWrapper(DraftSignFx),
-		Method:  http.MethodGet,
-		Roles:   []string{},
-	},
-	{
 		Route:   "/policy/v1/{uid}",
 		Handler: lib.ResponseLoggerWrapper(UpdatePolicyFx),
 		Method:  http.MethodPatch,

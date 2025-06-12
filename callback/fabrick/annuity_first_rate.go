@@ -27,7 +27,7 @@ a transaction that is the first in it's annuity. Other then pay the related
 transaction, it should also update the policy state, and promote certain data
 if it is the first transaction ever
 */
-func AnnuityFirstRateFx(_ http.ResponseWriter, r *http.Request) (string, any, error) {
+func (FabrickCallback) AnnuityFirstRateFx(_ http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		err            error
 		requestPayload FabrickRequestPayload
@@ -35,7 +35,7 @@ func AnnuityFirstRateFx(_ http.ResponseWriter, r *http.Request) (string, any, er
 		response       = FabrickResponse{Result: true, Locale: "it"}
 	)
 
-	log.AddPrefix("AnnuityFirstRateFx")
+	log.AddPrefix("FabrickAnnuityFirstRateFx")
 	defer func() {
 		log.Println("Handler end ---------------------------------------------")
 		log.PopPrefix()

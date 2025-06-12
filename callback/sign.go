@@ -1,30 +1,26 @@
 package callback
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 
-	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
-	"gitlab.dev.wopta.it/goworkspace/lib/log"
-
-	"gitlab.dev.wopta.it/goworkspace/callback_out"
+	bpmn "gitlab.dev.wopta.it/goworkspace/bpmn"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/mail"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 const (
-	namirialFinished       string = "workstepFinished"                      // when the workstep was finished
-	namirialRejected       string = "workstepRejected"                      // when the workstep was rejected
-	namirialDelegated      string = "workstepDelegated"                     // whe the workstep was delegated
-	namirialOpened         string = "workstepOpened"                        // when the workstep was opened
-	namirialNotification   string = "sendSignNotification"                  // when the sign notification was sent
-	namirialExpired        string = "envelopeExpired"                       // when the envelope was expired
-	namirialActionRequired string = "workstepDelegatedSenderActionRequired" // when an action from the sender is required because of the delegation
+	namirialFinished string = "workstepFinished" // when the workstep was finished
 )
 
-func SignFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.AddPrefix("SignFx")
+func DraftSignFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
+	log.AddPrefix("DraftSignFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
@@ -32,10 +28,10 @@ func SignFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	policyUid := r.URL.Query().Get("uid")
 	envelope := r.URL.Query().Get("envelope")
 	action := r.URL.Query().Get("action")
-	origin = r.URL.Query().Get("origin")
+	origin := r.URL.Query().Get("origin")
 	sendEmailParam := r.URL.Query().Get("sendEmail")
 	log.Printf("Uid: '%s', Envelope: '%s', Action: '%s', SendEmailParam: '%s'", policyUid, envelope, action, sendEmailParam)
-
+	var sendEmail bool
 	if v, err := strconv.ParseBool(sendEmailParam); err == nil {
 		sendEmail = v
 	} else {
@@ -45,7 +41,10 @@ func SignFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	switch action {
 	case namirialFinished:
-		namirialStepFinished(origin, policyUid)
+		if e := namirialStepFinished(origin, policyUid, sendEmail); e != nil {
+			return "", nil, e
+		}
+
 	default:
 	}
 
@@ -54,7 +53,7 @@ func SignFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	return "", nil, nil
 }
 
-func namirialStepFinished(origin, policyUid string) {
+func namirialStepFinished(origin, policyUid string, sendEmail bool) error {
 	log.AddPrefix("namirialStepFinished")
 	defer log.PopPrefix()
 	log.Printf("Policy: %s", policyUid)
@@ -63,40 +62,42 @@ func namirialStepFinished(origin, policyUid string) {
 		err    error
 	)
 
-	firePolicy := lib.PolicyCollection
+	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 
 	docSnap, err := lib.GetFirestoreErr(firePolicy, policyUid)
 	if err != nil {
-		log.ErrorF("error getting policy from firestore: %s", err.Error())
-		return
+		return err
 	}
 	err = docSnap.DataTo(&policy)
 	if err != nil {
-		log.ErrorF("error populating policy: %s", err.Error())
-		return
+		return err
 	}
 
 	if policy.IsSign || !lib.SliceContains(policy.StatusHistory, models.PolicyStatusToSign) {
-		log.Printf(
+		return fmt.Errorf(
 			"ERROR cannot sign policy %s with isSign %t and statusHistory %s",
 			policy.Uid, policy.IsSign, strings.Join(policy.StatusHistory, ","),
 		)
-		return
 	}
 
 	log.Println("starting bpmn flow...")
-	state := runCallbackBpmn(&policy, signFlowKey)
-	if state == nil || state.Data == nil {
-		log.ErrorF("error bpmn - state not set")
-		return
+	storage := bpmnEngine.NewStorageBpnm()
+	storage.AddGlobal("addresses", &flow.Addresses{
+		FromAddress: mail.AddressAnna,
+	})
+	storage.AddGlobal("sendEmail", &flow.BoolBpmn{
+		Bool: sendEmail,
+	})
+	flow, err := bpmn.GetFlow(&policy, origin, storage)
+	if err != nil {
+		return err
 	}
-	if state.IsFailed {
-		log.ErrorF("ERROR bpmn failed")
-		return
+	err = flow.Run("sign")
+	if err != nil {
+		return err
 	}
-	policy = *state.Data
 
 	policy.BigquerySave(origin)
 
-	callback_out.Execute(networkNode, policy, base.Signed)
+	return nil
 }

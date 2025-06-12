@@ -20,7 +20,7 @@ This handler is intended to handle all callbacks from fabrick that represent
 a transaction that is in an already valid policy annuity. It should only pay the
 transaction and have no other side effects
 */
-func AnnuitySingleRateFx(_ http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func (FabrickCallback) AnnuitySingleRateFx(_ http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err            error
 		requestPayload FabrickRequestPayload
@@ -28,7 +28,7 @@ func AnnuitySingleRateFx(_ http.ResponseWriter, r *http.Request) (string, interf
 		response       = FabrickResponse{Result: true, Locale: "it"}
 	)
 
-	log.AddPrefix("AnnuitySingleRateFx")
+	log.AddPrefix("FabrickAnnuitySingleRateFx")
 	defer func() {
 		log.Println("Handler end ---------------------------------------------")
 		log.PopPrefix()
