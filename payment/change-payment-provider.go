@@ -17,13 +17,13 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/transaction"
 )
 
-type ChangePaymentProviderReq struct {
+type changePaymentProviderReq struct {
 	PolicyUid         string `json:"policyUid"`
 	ProviderName      string `json:"providerName"`
 	ScheduleFirstRate bool   `json:"scheduleFirstRate"`
 }
 
-type ChangePaymentProviderResp struct {
+type changePaymentProviderResp struct {
 	Policy       models.Policy        `json:"policy"`
 	Transactions []models.Transaction `json:"transactions"`
 }
@@ -39,8 +39,8 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 		payUrl               string
 		policy               models.Policy
 		updatedTransactions  []models.Transaction
-		req                  ChangePaymentProviderReq
-		resp                 ChangePaymentProviderResp
+		req                  changePaymentProviderReq
+		resp                 changePaymentProviderResp
 		responseTransactions = make([]models.Transaction, 0)
 		unpaidTransactions   = make([]models.Transaction, 0)
 	)

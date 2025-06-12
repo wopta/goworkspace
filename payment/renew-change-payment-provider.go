@@ -31,8 +31,8 @@ func RenewChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (strin
 		policy               models.Policy
 		activeTransactions   []models.Transaction
 		updatedTransactions  []models.Transaction
-		req                  ChangePaymentProviderReq
-		resp                 ChangePaymentProviderResp
+		req                  changePaymentProviderReq
+		resp                 changePaymentProviderResp
 		responseTransactions = make([]models.Transaction, 0)
 		unpaidTransactions   = make([]models.Transaction, 0)
 	)
