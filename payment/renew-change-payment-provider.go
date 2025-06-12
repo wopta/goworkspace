@@ -11,7 +11,8 @@ import (
 
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/payment/common"
+	"gitlab.dev.wopta.it/goworkspace/payment/client"
+	"gitlab.dev.wopta.it/goworkspace/payment/internal"
 	plcRenew "gitlab.dev.wopta.it/goworkspace/policy/renew"
 	prd "gitlab.dev.wopta.it/goworkspace/product"
 	"gitlab.dev.wopta.it/goworkspace/transaction"
@@ -81,7 +82,7 @@ func RenewChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (strin
 
 	policy.SanitizePaymentData()
 
-	err = common.UpdatePaymentProvider(&policy, req.ProviderName)
+	err = internal.UpdatePaymentProvider(&policy, req.ProviderName)
 	if err != nil {
 		log.Printf("provider update failed: %s", err.Error())
 		return "", nil, err
@@ -89,7 +90,7 @@ func RenewChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (strin
 
 	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, nil, nil)
 
-	client := NewClient(policy.Payment, policy, *product, unpaidTransactions, req.ScheduleFirstRate, "")
+	client := client.NewClient(policy.Payment, policy, *product, unpaidTransactions, req.ScheduleFirstRate, "")
 	payUrl, updatedTransactions, err = client.Update()
 	if err != nil {
 		log.ErrorF("error changing payment provider to %s: %s", req.ProviderName, err.Error())
@@ -101,7 +102,7 @@ func RenewChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (strin
 	policy.Updated = time.Now().UTC()
 	policy.BigQueryParse()
 
-	if err = common.SaveTransactionsToDB(updatedTransactions, lib.RenewTransactionCollection); err != nil {
+	if err = internal.SaveTransactionsToDB(updatedTransactions, lib.RenewTransactionCollection); err != nil {
 		log.ErrorF("error saving transactions")
 		return "", nil, err
 	}

@@ -1,7 +1,7 @@
 package bpmn
 
 import (
-	bpmn "gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
 	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/bpmn/internal/handlers"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
@@ -10,8 +10,8 @@ import (
 	prd "gitlab.dev.wopta.it/goworkspace/product"
 )
 
-func GetFlow(policy *models.Policy, originStr string, storage bpmn.StorageData) (*bpmn.FlowBpnm, error) {
-	builder, err := bpmn.NewBpnmBuilder("flows/draft/channel_flows.json")
+func GetFlow(policy *models.Policy, originStr string, storage bpmnEngine.StorageData) (*bpmnEngine.FlowBpnm, error) {
+	builder, err := bpmnEngine.NewBpnmBuilder("flows/draft/channel_flows.json")
 	if err != nil {
 		return nil, err
 	}
@@ -64,8 +64,8 @@ func GetFlow(policy *models.Policy, originStr string, storage bpmn.StorageData) 
 	return builder.Build()
 }
 
-func addHandlersDraft(builder *bpmn.BpnmBuilder) error {
-	return bpmn.IsError(
+func addHandlersDraft(builder *bpmnEngine.BpnmBuilder) error {
+	return bpmnEngine.IsError(
 		handlers.AddAcceptanceHandlers(builder),
 		handlers.AddEmitHandlers(builder),
 		handlers.AddLeadHandlers(builder),

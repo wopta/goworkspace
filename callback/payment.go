@@ -38,7 +38,6 @@ func payment(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	switch rate {
 	case "first-rate":
 		return handler.AnnuityFirstRateFx(w, r)
-
 	case "single-rate":
 		return handler.AnnuitySingleRateFx(w, r)
 	}

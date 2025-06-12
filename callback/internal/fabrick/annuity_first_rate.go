@@ -6,11 +6,11 @@ import (
 	"strings"
 	"time"
 
-	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
+	"gitlab.dev.wopta.it/goworkspace/bpmn"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"gitlab.dev.wopta.it/goworkspace/callback/internal"
-	"gitlab.dev.wopta.it/goworkspace/callback_out"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/mail"
 	"gitlab.dev.wopta.it/goworkspace/models"
@@ -75,7 +75,7 @@ func (FabrickCallback) AnnuityFirstRateFx(_ http.ResponseWriter, r *http.Request
 
 	paymentMethod = strings.ToLower(request.Bill.Transactions[0].PaymentMethod)
 
-	err = annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod)
+	err = annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod, r.Header.Get("Origin"))
 	if err != nil {
 		log.ErrorF("error paying first annuity rate: %s", err)
 		response.Result = false
@@ -89,7 +89,7 @@ func (FabrickCallback) AnnuityFirstRateFx(_ http.ResponseWriter, r *http.Request
 	return string(stringRes), response, nil
 }
 
-func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod string) error {
+func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod, origin string) error {
 	var (
 		policy                 models.Policy
 		renewPolicy            models.Policy
@@ -164,8 +164,12 @@ func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod string) e
 		if err != nil {
 			return err
 		}
-
-		defer callback_out.Execute(networkNode, policy, base.Paid)
+		storage := bpmnEngine.NewStorageBpnm()
+		flow, err := bpmn.GetFlow(&policy, origin, storage)
+		if err != nil {
+			return err
+		}
+		defer flow.Run("pay")
 	}
 
 	if err := consultancy.GenerateInvoice(policy, transaction); err != nil {

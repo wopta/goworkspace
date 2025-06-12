@@ -17,6 +17,7 @@ import (
 	_ "gitlab.dev.wopta.it/goworkspace/mail"
 	_ "gitlab.dev.wopta.it/goworkspace/mga"
 	_ "gitlab.dev.wopta.it/goworkspace/partnership"
+	_ "gitlab.dev.wopta.it/goworkspace/payment"
 	_ "gitlab.dev.wopta.it/goworkspace/policy"
 	_ "gitlab.dev.wopta.it/goworkspace/question"
 	_ "gitlab.dev.wopta.it/goworkspace/quote"

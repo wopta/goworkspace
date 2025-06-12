@@ -1,4 +1,4 @@
-package payment
+package client
 
 import (
 	"gitlab.dev.wopta.it/goworkspace/models"

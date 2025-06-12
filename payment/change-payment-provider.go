@@ -10,7 +10,8 @@ import (
 
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/payment/common"
+	"gitlab.dev.wopta.it/goworkspace/payment/client"
+	"gitlab.dev.wopta.it/goworkspace/payment/internal"
 	plc "gitlab.dev.wopta.it/goworkspace/policy"
 	prd "gitlab.dev.wopta.it/goworkspace/product"
 	"gitlab.dev.wopta.it/goworkspace/transaction"
@@ -65,7 +66,7 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 
 	policy.SanitizePaymentData()
 
-	err = common.UpdatePaymentProvider(&policy, req.ProviderName)
+	err = internal.UpdatePaymentProvider(&policy, req.ProviderName)
 	if err != nil {
 		log.Printf("provider update failed: %s", err.Error())
 		return "{}", nil, err
@@ -87,7 +88,7 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 
 	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, nil, nil)
 
-	client := NewClient(policy.Payment, policy, *product, unpaidTransactions, req.ScheduleFirstRate, "")
+	client := client.NewClient(policy.Payment, policy, *product, unpaidTransactions, req.ScheduleFirstRate, "")
 	payUrl, updatedTransactions, err = client.Update()
 	if err != nil {
 		log.ErrorF("error changing payment provider to %s: %s", req.ProviderName, err.Error())
@@ -97,7 +98,7 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 	policy.PayUrl = payUrl
 	responseTransactions = append(responseTransactions, updatedTransactions...)
 
-	err = common.SaveTransactionsToDB(updatedTransactions, lib.TransactionsCollection)
+	err = internal.SaveTransactionsToDB(updatedTransactions, lib.TransactionsCollection)
 	if err != nil {
 		return "{}", nil, err
 	}

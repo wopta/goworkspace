@@ -10,7 +10,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/payment"
+	"gitlab.dev.wopta.it/goworkspace/payment/client"
 	"gitlab.dev.wopta.it/goworkspace/payment/consultancy"
 	"gitlab.dev.wopta.it/goworkspace/transaction"
 )
@@ -86,7 +86,7 @@ func CreatePolicyTransactions(policy *models.Policy, product *models.Product, mg
 		return "", errors.New("no transactions created")
 	}
 
-	client := payment.NewClient(policy.Payment, *policy, *product, transactions, false, "")
+	client := client.NewClient(policy.Payment, *policy, *product, transactions, false, "")
 	payUrl, updatedTransactions, err := client.NewBusiness()
 	if err != nil {
 		log.ErrorF("error emitPay policy %s: %s", policy.Uid, err.Error())

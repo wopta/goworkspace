@@ -1,4 +1,4 @@
-package manual
+package payment
 
 import (
 	"errors"
@@ -7,17 +7,17 @@ import (
 	"net/http"
 	"time"
 
-	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
+	"gitlab.dev.wopta.it/goworkspace/bpmn"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"github.com/go-chi/chi/v5"
-	"gitlab.dev.wopta.it/goworkspace/callback_out"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/mail"
 	"gitlab.dev.wopta.it/goworkspace/models"
 	"gitlab.dev.wopta.it/goworkspace/network"
-	"gitlab.dev.wopta.it/goworkspace/payment/common"
 	"gitlab.dev.wopta.it/goworkspace/payment/consultancy"
+	"gitlab.dev.wopta.it/goworkspace/payment/internal"
 	plc "gitlab.dev.wopta.it/goworkspace/policy"
 	prd "gitlab.dev.wopta.it/goworkspace/product"
 	trn "gitlab.dev.wopta.it/goworkspace/transaction"
@@ -76,7 +76,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	isMethodAllowed := lib.SliceContains[string](methods, payload.PaymentMethod)
 	if !isMethodAllowed {
-		err = fmt.Errorf("ERROR %s", errPaymentMethodNotAllowed)
+		err = fmt.Errorf("ERROR %s", internal.ErrPaymentMethodNotAllowed)
 		return "", nil, err
 	}
 
@@ -120,12 +120,12 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	}
 
 	if transaction.IsPay {
-		err = errTransactionPaid
+		err = internal.ErrTransactionPaid
 		return "", nil, err
 	}
 
 	if transaction.IsDelete {
-		err = errTransactionDeleted
+		err = internal.ErrTransactionDeleted
 		return "", nil, err
 	}
 
@@ -145,20 +145,20 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	}
 
 	if !canPayTransaction {
-		err = errTransactionOutOfOrder
+		err = internal.ErrTransactionOutOfOrder
 		return "", nil, err
 	}
 
 	if !policy.IsSign {
-		err = errPolicyNotSigned
+		err = internal.ErrPolicyNotSigned
 		return "", nil, err
 	}
 
 	manualPayment(&transaction, &payload)
 
-	err = common.SaveTransactionsToDB([]models.Transaction{transaction}, lib.TransactionsCollection)
+	err = internal.SaveTransactionsToDB([]models.Transaction{transaction}, lib.TransactionsCollection)
 	if err != nil {
-		err = errPaymentFailed
+		err = internal.ErrPaymentFailed
 		return "", nil, err
 	}
 
@@ -207,8 +207,12 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 		policy.BigquerySave("")
 
-		callback_out.Execute(networkNode, policy, base.Paid)
-
+		storage := bpmnEngine.NewStorageBpnm()
+		flow, err := bpmn.GetFlow(&policy, r.Header.Get("Origin"), storage)
+		if err != nil {
+			return "", nil, err
+		}
+		flow.Run("pay")
 		// Send mail with the contract to the user
 		toAddress = mail.GetContractorEmail(&policy)
 

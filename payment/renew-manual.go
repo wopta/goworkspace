@@ -1,4 +1,4 @@
-package manual
+package payment
 
 import (
 	"encoding/json"
@@ -13,8 +13,8 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
 	"gitlab.dev.wopta.it/goworkspace/network"
-	"gitlab.dev.wopta.it/goworkspace/payment/common"
 	"gitlab.dev.wopta.it/goworkspace/payment/consultancy"
+	"gitlab.dev.wopta.it/goworkspace/payment/internal"
 	plcRenew "gitlab.dev.wopta.it/goworkspace/policy/renew"
 	prd "gitlab.dev.wopta.it/goworkspace/product"
 	tr "gitlab.dev.wopta.it/goworkspace/transaction"
@@ -60,7 +60,7 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 
 	isMethodAllowed := lib.SliceContains(methods, payload.PaymentMethod)
 	if !isMethodAllowed {
-		err = errPaymentMethodNotAllowed
+		err = internal.ErrPaymentMethodNotAllowed
 		return "", nil, err
 	}
 
@@ -71,7 +71,7 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 		return "", nil, err
 	}
 	if transaction.IsPay {
-		err = errTransactionPaid
+		err = internal.ErrTransactionPaid
 		return "", nil, err
 	}
 
@@ -121,7 +121,7 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 		return "", nil, err
 	}
 
-	err = common.SaveTransactionsToDB([]models.Transaction{*transaction}, lib.RenewTransactionCollection)
+	err = internal.SaveTransactionsToDB([]models.Transaction{*transaction}, lib.RenewTransactionCollection)
 	if err != nil {
 		return "", nil, err
 	}
