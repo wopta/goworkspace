@@ -104,10 +104,8 @@ func (act *activity) runActivity(nameProcess string, storage StorageData) (err e
 		return fmt.Errorf("has an input error: %v", e.Error())
 	}
 
-	if act.handler != nil {
-		if err := callWithRecover(nameProcess, storage, act); err != nil {
-			return err
-		}
+	if err := callWithRecover(nameProcess, storage, act); err != nil {
+		return err
 	}
 
 	if post := act.postActivity; post != nil {
@@ -140,6 +138,9 @@ func callWithRecover(nameProcess string, storage StorageData, act *activity) (er
 		return fmt.Errorf("Error setting status flow of Process '%v' with activity '%v'", nameProcess, act.name)
 	}
 	status.(*StatusFlow).CurrentActivity = act.name
+	if act.handler == nil {
+		return nil
+	}
 	return act.handler(storage)
 }
 

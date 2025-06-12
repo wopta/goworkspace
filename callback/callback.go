@@ -30,11 +30,7 @@ var callbackRoutes []lib.Route = []lib.Route{
 	//		Roles:   []string{},
 	//	},
 	{
-		//	Route: "/v1/payment/{provider}/first-rate",
-		//Route: "/v1/payment/{provider}/single-rate",
-		Route: "/v1/payment/{provider}/{rate}",
-		// TODO: create an extra handler wrapper that switches on provider.
-		// For now as fabrick is the single provider it is hardcoded.
+		Route:   "/v1/payment/{provider}/{rate}",
 		Handler: lib.ResponseLoggerWrapper(payment),
 		Method:  http.MethodPost,
 		Roles:   []string{},
