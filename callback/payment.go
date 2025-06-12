@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"gitlab.dev.wopta.it/goworkspace/callback/fabrick"
+	"gitlab.dev.wopta.it/goworkspace/callback/internal/fabrick"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
