@@ -50,6 +50,9 @@ func draftApprovePolicy(storage bpmnEngine.StorageData) error {
 	}
 	policy.Status = models.PolicyStatusApproved
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
+	if policy.ReservedInfo == nil {
+		policy.ReservedInfo = new(models.ReservedInfo)
+	}
 	policy.ReservedInfo.AcceptanceNote = action.String
 	policy.ReservedInfo.AcceptanceDate = time.Now().UTC()
 	log.Printf("Policy Uid %s APPROVED", policy.Uid)

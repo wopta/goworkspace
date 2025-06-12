@@ -55,6 +55,7 @@ func (p *processBpnm) loop(nameActivity string) error {
 	var listNewActivities []*activity
 	var nextActivities []*activity
 	var callEndIfStop bool
+	var lastActivity string
 	var mapsMerged map[string]any
 	for {
 		nextActivities = make([]*activity, 0)
@@ -75,6 +76,7 @@ func (p *processBpnm) loop(nameActivity string) error {
 				return err
 			}
 			listNewActivities, err = p.activeActivities[i].evaluateDecisions(p.name, p.storageBpnm, mapsMerged)
+			lastActivity = p.activeActivities[i].name
 			if err != nil {
 				return err
 			}
@@ -85,7 +87,10 @@ func (p *processBpnm) loop(nameActivity string) error {
 			if !callEndIfStop {
 				return nil
 			}
-			return p.activities[getNameEndActivity(p.name)].runActivity(p.name, p.storageBpnm)
+			if lastActivity != getNameEndActivity(p.name) {
+				return p.activities[getNameEndActivity(p.name)].runActivity(p.name, p.storageBpnm)
+			}
+			return nil
 		}
 		p.activeActivities = nextActivities
 		if err = p.storageBpnm.cleanNoMarkedResources(); err != nil {
@@ -149,6 +154,7 @@ func (act *activity) evaluateDecisions(processName string, storage StorageData, 
 	var resultEvaluation any
 	var err error
 	eval := goval.NewEvaluator()
+	log.ErrorF("name   %v", act.name)
 	if len(act.gateway) == 0 {
 		log.InfoF("Process '%v' with activity '%v' has not next activities", processName, act.name)
 		return []*activity{}, nil
