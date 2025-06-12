@@ -5,14 +5,14 @@ import (
 	"strings"
 	"time"
 
-	"gitlab.dev.wopta.it/goworkspace/lib/log"
-
 	"gitlab.dev.wopta.it/goworkspace/document/internal/constants"
 	"gitlab.dev.wopta.it/goworkspace/document/internal/domain"
 	"gitlab.dev.wopta.it/goworkspace/document/internal/dto"
 	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
 	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
 const (
@@ -48,14 +48,21 @@ func NewCommercialCombinedGenerator(engine *engine.Fpdf, policy *models.Policy, 
 	product models.Product, isProposal bool) *CommercialCombinedGenerator {
 	commercialCombinedDTO := dto.NewCommercialCombinedDto()
 	commercialCombinedDTO.FromPolicy(*policy, product, isProposal)
+
+	var worksForNode *models.NetworkNode
+	if node != nil && node.WorksForUid != "" {
+		worksForNode = network.GetNetworkNodeByUid(node.WorksForUid)
+	}
+
 	return &CommercialCombinedGenerator{
 		baseGenerator: &baseGenerator{
-			engine:      engine,
-			isProposal:  isProposal,
-			now:         time.Now(),
-			signatureID: 0,
-			networkNode: node,
-			policy:      policy,
+			engine:       engine,
+			isProposal:   isProposal,
+			now:          time.Now(),
+			signatureID:  0,
+			networkNode:  node,
+			policy:       policy,
+			worksForNode: worksForNode,
 		},
 		dto: commercialCombinedDTO,
 	}
