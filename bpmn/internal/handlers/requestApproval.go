@@ -19,7 +19,7 @@ func AddRequestApprovaHandlers(builder *bpmnEngine.BpnmBuilder) error {
 	)
 }
 
-func setRequestApprova(state bpmnEngine.StorageData) error {
+func setRequestApprova(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var networkNode *flow.Network
 	var origin *flow.String
@@ -41,7 +41,7 @@ func setRequestApprova(state bpmnEngine.StorageData) error {
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
-func sendRequestApprovalMail(state bpmnEngine.StorageData) error {
+func sendRequestApprovalMail(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var addresses *flow.Addresses
 	var flowName *flow.String

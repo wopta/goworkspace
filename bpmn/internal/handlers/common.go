@@ -9,7 +9,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
-func savePolicy(state bpmnEngine.StorageData) error {
+func savePolicy(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var origin *flow.String
 	err := bpmnEngine.IsError(

@@ -11,7 +11,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func CallBackEmit(st bpmnEngine.StorageData) error {
+func CallBackEmit(st *bpmnEngine.StorageBpnm) error {
 	var networkNode *flow.Network
 	var policy *flow.Policy
 	var client *flow.ClientCallback
@@ -31,7 +31,7 @@ func CallBackEmit(st bpmnEngine.StorageData) error {
 	return nil
 }
 
-func CallBackProposal(st bpmnEngine.StorageData) error {
+func CallBackProposal(st *bpmnEngine.StorageBpnm) error {
 	var networkNode *flow.Network
 	var policy *flow.Policy
 	var client *flow.ClientCallback
@@ -51,7 +51,7 @@ func CallBackProposal(st bpmnEngine.StorageData) error {
 	return nil
 }
 
-func CallBackPaid(st bpmnEngine.StorageData) error {
+func CallBackPaid(st *bpmnEngine.StorageBpnm) error {
 	var networkNode *flow.Network
 	var policy *flow.Policy
 	var client *flow.ClientCallback
@@ -71,7 +71,7 @@ func CallBackPaid(st bpmnEngine.StorageData) error {
 	return nil
 }
 
-func CallBackRequestApproval(st bpmnEngine.StorageData) error {
+func CallBackRequestApproval(st *bpmnEngine.StorageBpnm) error {
 	var networkNode *flow.Network
 	var policy *flow.Policy
 	var client *flow.ClientCallback
@@ -91,7 +91,7 @@ func CallBackRequestApproval(st bpmnEngine.StorageData) error {
 	return nil
 }
 
-func CallBackApproved(st bpmnEngine.StorageData) error {
+func CallBackApproved(st *bpmnEngine.StorageBpnm) error {
 	var networkNode *flow.Network
 	var policy *flow.Policy
 	var client *flow.ClientCallback
@@ -111,7 +111,7 @@ func CallBackApproved(st bpmnEngine.StorageData) error {
 	return nil
 }
 
-func CallBackRejected(st bpmnEngine.StorageData) error {
+func CallBackRejected(st *bpmnEngine.StorageBpnm) error {
 	var networkNode *flow.Network
 	var policy *flow.Policy
 	var client *flow.ClientCallback
@@ -131,7 +131,7 @@ func CallBackRejected(st bpmnEngine.StorageData) error {
 	return nil
 }
 
-func CallBackSigned(st bpmnEngine.StorageData) error {
+func CallBackSigned(st *bpmnEngine.StorageBpnm) error {
 	var networkNode *flow.Network
 	var policy *flow.Policy
 	var client *flow.ClientCallback
@@ -164,7 +164,7 @@ type auditSchema struct {
 	Error         string                `bigquery:"error"`
 }
 
-func SaveAudit(st bpmnEngine.StorageData) error {
+func SaveAudit(st *bpmnEngine.StorageBpnm) error {
 
 	node, err := bpmnEngine.GetData[*flow.Network]("networkNode", st)
 	if err != nil {

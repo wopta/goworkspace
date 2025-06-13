@@ -9,15 +9,15 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func mock_catnatIntegration(log *mockLog) func(bpmnEngine.StorageData) error {
-	return func(sd bpmnEngine.StorageData) error {
+func mock_catnatIntegration(log *mockLog) func(*bpmnEngine.StorageBpnm) error {
+	return func(sd *bpmnEngine.StorageBpnm) error {
 		log.println("catnatIntegration")
 		sd.AddLocal("numeroPolizza", &String{String: "provissiamo"})
 		return nil
 	}
 }
 
-func getBuilderFlowProduct(log *mockLog, store bpmnEngine.StorageData) (*bpmnEngine.BpnmBuilder, error) {
+func getBuilderFlowProduct(log *mockLog, store *bpmnEngine.StorageBpnm) (*bpmnEngine.BpnmBuilder, error) {
 	os.Setenv("env", env.LocalTest)
 	builder, e := bpmnEngine.NewBpnmBuilderRawPath("../../../../function-data/dev/flows/draft/product-flows.json")
 	if e != nil {

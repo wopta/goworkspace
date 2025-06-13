@@ -4,7 +4,7 @@ type BpnmBuilder struct {
 	Processes []*processBuilder `json:"processes"`
 
 	handlers map[string]activityHandler
-	storage  StorageData
+	storage  *StorageBpnm
 	toInject map[injectionKey]*processBpnm
 	//These callbacks are called at the end of the building phase, when every processes and activities have been done
 	callbacks []func(builder *BpnmBuilder, flow *FlowBpnm) error

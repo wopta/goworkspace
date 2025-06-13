@@ -1,7 +1,6 @@
 package bpmnEngine
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"reflect"
@@ -49,7 +48,7 @@ func (f *FlowBpnm) RunAt(processName, startingActivity string) error {
 	return nil
 }
 
-func (p *processBpnm) loop(initialStorage StorageData, activities ...*activity) (err error) {
+func (p *processBpnm) loop(initialStorage *StorageBpnm, activities ...*activity) (err error) {
 	for i := range activities {
 		newStorage := NewStorageBpnm()
 		err := newStorage.setHigherStorage(initialStorage)
@@ -61,16 +60,8 @@ func (p *processBpnm) loop(initialStorage StorageData, activities ...*activity) 
 		if err = activities[i].runActivity(p.name, newStorage); err != nil {
 			return err
 		}
-		//TODO: to improve
-		mapsMerged := mergeMaps(newStorage.getAllGlobals(), newStorage.getAllLocals())
-		byte, err := json.Marshal(mapsMerged)
-		if err != nil {
-			return err
-		}
-		err = json.Unmarshal(byte, &mapsMerged)
-		if err != nil {
-			return err
-		}
+
+		mapsMerged := newStorage.GetMap()
 		listNewActivities, err := activities[i].evaluateDecisions(p.name, newStorage, mapsMerged)
 		lastActivity := activities[i].name
 		if err != nil {
@@ -97,7 +88,7 @@ func (p *processBpnm) loop(initialStorage StorageData, activities ...*activity) 
 	return err
 }
 
-func (act *activity) runActivity(nameProcess string, storage StorageData) (err error) {
+func (act *activity) runActivity(nameProcess string, storage *StorageBpnm) (err error) {
 	if pre := act.preActivity; pre != nil {
 		err = pre.storageBpnm.setHigherStorage(storage)
 		if err != nil {
@@ -127,7 +118,7 @@ func (act *activity) runActivity(nameProcess string, storage StorageData) (err e
 	return nil
 }
 
-func callWithRecover(nameProcess string, storage StorageData, act *activity) (err error) {
+func callWithRecover(nameProcess string, storage *StorageBpnm, act *activity) (err error) {
 	log.InfoF("Run process '%v', start activity '%v'", nameProcess, act.name)
 	defer func() {
 		if act.recover != nil {
@@ -155,7 +146,7 @@ func callWithRecover(nameProcess string, storage StorageData, act *activity) (er
 	return act.handler(storage)
 }
 
-func (act *activity) evaluateDecisions(processName string, storage StorageData, date map[string]any) ([]*activity, error) {
+func (act *activity) evaluateDecisions(processName string, storage *StorageBpnm, date map[string]any) ([]*activity, error) {
 	var res []*activity
 	var resultEvaluation any
 	var err error
@@ -202,7 +193,7 @@ func (act *activity) evaluateDecisions(processName string, storage StorageData, 
 	return res, nil
 }
 
-func checkLocalResources(st StorageData, req []typeData) error {
+func checkLocalResources(st *StorageBpnm, req []typeData) error {
 	local := st.getAllLocals()
 	for _, requiredData := range req {
 		storedData, exist := local[requiredData.Name]
@@ -216,7 +207,7 @@ func checkLocalResources(st StorageData, req []typeData) error {
 	return nil
 }
 
-func checkGlobalResources(st StorageData, req []typeData) error {
+func checkGlobalResources(st *StorageBpnm, req []typeData) error {
 	global := st.getAllGlobals()
 	for _, requiredData := range req {
 		storedData, exist := global[requiredData.Name]

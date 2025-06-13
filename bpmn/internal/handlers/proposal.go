@@ -18,7 +18,7 @@ func AddProposalHandlers(builder *bpmnEngine.BpnmBuilder) error {
 	)
 }
 
-func endProposal(state bpmnEngine.StorageData) error {
+func endProposal(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var isProposal *flow.BoolBpmn
 	var origin *flow.String
@@ -41,7 +41,7 @@ func endProposal(state bpmnEngine.StorageData) error {
 	return nil
 }
 
-func setProposalData(state bpmnEngine.StorageData) error {
+func setProposalData(state *bpmnEngine.StorageBpnm) error {
 	var origin *flow.String
 	var policy *flow.Policy
 	var networkNode *flow.Network
@@ -73,7 +73,7 @@ func setProposalData(state bpmnEngine.StorageData) error {
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
-func sendProposalMail(state bpmnEngine.StorageData) error {
+func sendProposalMail(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var addresses *flow.Addresses
 	var sendEmail *flow.BoolBpmn

@@ -10,7 +10,7 @@ import (
 	prd "gitlab.dev.wopta.it/goworkspace/product"
 )
 
-func GetFlow(policy *models.Policy, originStr string, storage bpmnEngine.StorageData) (*bpmnEngine.FlowBpnm, error) {
+func GetFlow(policy *models.Policy, originStr string, storage *bpmnEngine.StorageBpnm) (*bpmnEngine.FlowBpnm, error) {
 	builder, err := bpmnEngine.NewBpnmBuilder("flows/draft/base-flows.json")
 	if err != nil {
 		return nil, err

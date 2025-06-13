@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-type activityHandler func(StorageData) error
+type activityHandler func(*StorageBpnm) error
 type DataBpnm interface {
 	GetType() string
 }
@@ -48,7 +48,7 @@ func mergeUniqueMaps[key comparable, out any](m1 map[key]out, m2 map[key]out) (m
 
 // Get a resource and return it.
 // The priority is Local->Higher-Local..->Global->Higher-Global->Resource not found
-func GetData[t DataBpnm](name string, storage StorageData) (t, error) {
+func GetData[t DataBpnm](name string, storage *StorageBpnm) (t, error) {
 	data, err := storage.GetLocal(name)
 	var result t
 	if err != nil {
@@ -68,7 +68,7 @@ func GetData[t DataBpnm](name string, storage StorageData) (t, error) {
 
 // Get a resource and assign it to 'data' parameter
 // The priority is Local->Higher-Local..->Global->Higher-Global->Resource not found
-func GetDataRef[t DataBpnm](name string, data *t, storage StorageData) (err error) {
+func GetDataRef[t DataBpnm](name string, data *t, storage *StorageBpnm) (err error) {
 	if data == nil {
 		return errors.New("Reference can't be null")
 	}
@@ -76,8 +76,7 @@ func GetDataRef[t DataBpnm](name string, data *t, storage StorageData) (err erro
 	return
 }
 
-func GetStatusFlow(_storage StorageData) (*StatusFlow, error) {
-	storage := _storage.(*StorageBpnm)
+func GetStatusFlow(storage *StorageBpnm) (*StatusFlow, error) {
 	var statusFlow *StatusFlow
 	if _statusFlow, ok := storage.global["statusFlow"]; ok {
 		statusFlow = _statusFlow.(*StatusFlow)
@@ -89,7 +88,7 @@ func GetStatusFlow(_storage StorageData) (*StatusFlow, error) {
 		if storage.higherStore == nil {
 			break
 		}
-		storage = storage.higherStore.(*StorageBpnm)
+		storage = storage.higherStore
 		if _statusFlow, ok := storage.global["statusFlow"]; ok {
 			lastStatusFlowInserted.Parent = _statusFlow.(*StatusFlow)
 			lastStatusFlowInserted = lastStatusFlowInserted.Parent

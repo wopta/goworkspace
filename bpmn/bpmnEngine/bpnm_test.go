@@ -69,21 +69,21 @@ func getInjectableFlow(log *mockLog) (*BpnmBuilder, error) {
 	}
 	injectedFlow.SetStorage(NewStorageBpnm())
 	return injectedFlow, IsError(
-		injectedFlow.AddHandler("initPost", func(st StorageData) error {
+		injectedFlow.AddHandler("initPost", func(st *StorageBpnm) error {
 			log.println("init post")
 			return nil
 		}),
 
-		injectedFlow.AddHandler("pre-B", func(st StorageData) error {
+		injectedFlow.AddHandler("pre-B", func(st *StorageBpnm) error {
 			log.println("init pre-B")
 			return nil
 		}),
-		injectedFlow.AddHandler("initPre", func(st StorageData) error {
+		injectedFlow.AddHandler("initPre", func(st *StorageBpnm) error {
 			log.println("init pre")
 			st.AddLocal("error", &errorRandomForTest{})
 			return nil
 		}),
-		injectedFlow.AddHandler("save", func(st StorageData) error {
+		injectedFlow.AddHandler("save", func(st *StorageBpnm) error {
 			log.println("end injected process")
 			return nil
 		}),
@@ -91,32 +91,32 @@ func getInjectableFlow(log *mockLog) (*BpnmBuilder, error) {
 }
 func addDefaultHandlersForTest(g *BpnmBuilder, log *mockLog) error {
 	return IsError(
-		g.AddHandler("init", func(st StorageData) error {
+		g.AddHandler("init", func(st *StorageBpnm) error {
 			log.println("init")
 			st.AddLocal("validationObject", new(randomObjectForTest))
 			return nil
 		}),
-		g.AddHandler("AEvent", func(st StorageData) error {
+		g.AddHandler("AEvent", func(st *StorageBpnm) error {
 			log.println("init A")
 			st.AddLocal("validationObject", new(randomObjectForTest))
 			st.AddLocal("error", &errorRandomForTest{Result: false})
 			return nil
 		}),
-		g.AddHandler("BEvent", func(st StorageData) error {
+		g.AddHandler("BEvent", func(st *StorageBpnm) error {
 			log.println("init B")
 			st.AddLocal("validationObject", new(randomObjectForTest))
 			st.AddLocal("error", &errorRandomForTest{Result: false})
 			return nil
 		}),
-		g.AddHandler("CEvent", func(st StorageData) error {
+		g.AddHandler("CEvent", func(st *StorageBpnm) error {
 			log.println("init C")
 			return nil
 		}),
-		g.AddHandler("DEventWithRec", func(st StorageData) error {
+		g.AddHandler("DEventWithRec", func(st *StorageBpnm) error {
 			log.println("init D rec")
 			return nil
 		}),
-		g.AddHandler("DRec", func(st StorageData) error {
+		g.AddHandler("DRec", func(st *StorageBpnm) error {
 			log.println("recover D")
 			return nil
 		}),
@@ -190,7 +190,7 @@ func TestBpnmMissingOutput(t *testing.T) {
 	storage.AddGlobal("policyPr", &policyMock{Age: 1})
 	g.SetStorage(storage)
 	addDefaultHandlersForTest(g, &log)
-	g.setHandler("init", func(st StorageData) error {
+	g.setHandler("init", func(st *StorageBpnm) error {
 		log.println("init")
 		return nil
 	})
@@ -346,7 +346,7 @@ func TestBpnmStoreClean(t *testing.T) {
 	g.SetStorage(storage)
 	addDefaultHandlersForTest(g, log)
 
-	g.setHandler("init", func(st StorageData) error {
+	g.setHandler("init", func(st *StorageBpnm) error {
 		log.println("init")
 		st.AddLocal("validationObject", new(randomObjectForTest))
 		st.AddLocal("error", &errorRandomForTest{Result: false})
@@ -362,7 +362,7 @@ func TestBpnmStoreClean(t *testing.T) {
 		}
 		return nil
 	})
-	g.setHandler("AEvent", func(st StorageData) error {
+	g.setHandler("AEvent", func(st *StorageBpnm) error {
 		log.println("init A")
 		st.AddLocal("error", &errorRandomForTest{Result: false})
 		d, e := GetData[*randomObjectForTest]("validationObject", st)
@@ -377,7 +377,7 @@ func TestBpnmStoreClean(t *testing.T) {
 		p.Result = true
 		return nil
 	})
-	g.setHandler("BEvent", func(st StorageData) error {
+	g.setHandler("BEvent", func(st *StorageBpnm) error {
 		log.println("init B")
 		if len(st.getAllLocals()) != 2 { //output of AEvent
 			return fmt.Errorf("Expected 2 resource from AEvent, got: %v", len(st.getAllLocals()))
@@ -409,7 +409,7 @@ func TestMergeBuilder(t *testing.T) {
 	}
 	storage := NewStorageBpnm()
 	addDefaultHandlersForTest(g, log)
-	g.AddHandler("end", func(sd StorageData) error {
+	g.AddHandler("end", func(sd *StorageBpnm) error {
 		log.println("end")
 		return nil
 	})
@@ -447,7 +447,7 @@ func TestErrorWithoutRecover(t *testing.T) {
 	}
 	storage := NewStorageBpnm()
 	addDefaultHandlersForTest(g, log)
-	g.setHandler("AEvent", func(sd StorageData) error {
+	g.setHandler("AEvent", func(sd *StorageBpnm) error {
 		return errors.New("error")
 	})
 	storage.AddLocal("validationObject", new(randomObjectForTest))
@@ -476,7 +476,7 @@ func TestRecoverWithFunction(t *testing.T) {
 	storage.AddLocal("validationObject", new(randomObjectForTest))
 	storage.AddGlobal("policyPr", &policyMock{Age: 2})
 	addDefaultHandlersForTest(g, log)
-	g.setHandler("DEventWithRec", func(st StorageData) error {
+	g.setHandler("DEventWithRec", func(st *StorageBpnm) error {
 		log.println("init D")
 		return errors.New("error of DEvent")
 	})
@@ -504,7 +504,7 @@ func TestRecoverFromPanic(t *testing.T) {
 	}
 	storage := NewStorageBpnm()
 	addDefaultHandlersForTest(g, log)
-	g.setHandler("DEventWithRec", func(st StorageData) error {
+	g.setHandler("DEventWithRec", func(st *StorageBpnm) error {
 		log.println("init D rec")
 		panic("fjsdklfjd")
 	})
@@ -536,7 +536,7 @@ func TestEndActivity(t *testing.T) {
 	storage.AddLocal("validationObject", new(randomObjectForTest))
 	storage.AddGlobal("policyPr", &policyMock{Age: 2})
 	g.SetStorage(storage)
-	g.AddHandler("end_emit", func(sd StorageData) error {
+	g.AddHandler("end_emit", func(sd *StorageBpnm) error {
 		log.println("end")
 		return nil
 	})
@@ -568,7 +568,7 @@ func TestDontCallEndAfterInit(t *testing.T) {
 	storage.AddLocal("validationObject", &randomObjectForTest{})
 	storage.AddGlobal("policyPr", &policyMock{Age: 20})
 	g.SetStorage(storage)
-	g.AddHandler("end_emit", func(sd StorageData) error {
+	g.AddHandler("end_emit", func(sd *StorageBpnm) error {
 		log.println("end")
 		return nil
 	})
@@ -597,7 +597,7 @@ func TestHandlerLessTrue(t *testing.T) {
 	addDefaultHandlersForTest(g, log)
 	storage.AddLocal("validationObject", &randomObjectForTest{Step: 3})
 	storage.AddGlobal("policyPr", &policyMock{Age: 2})
-	g.setHandler("AEvent", func(sd StorageData) error {
+	g.setHandler("AEvent", func(sd *StorageBpnm) error {
 		sd.AddLocal("error", &errorRandomForTest{Result: true})
 		log.println("init A")
 		return nil

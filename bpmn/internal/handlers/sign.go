@@ -20,7 +20,7 @@ func AddSignHandlers(builder *bpmnEngine.BpnmBuilder) error {
 	)
 }
 
-func setSign(state bpmnEngine.StorageData) error {
+func setSign(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var origin *flow.String
 	err := bpmnEngine.IsError(
@@ -39,7 +39,7 @@ func setSign(state bpmnEngine.StorageData) error {
 
 	return nil
 }
-func addContract(state bpmnEngine.StorageData) error {
+func addContract(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var origin *flow.String
 	err := bpmnEngine.IsError(
@@ -54,7 +54,7 @@ func addContract(state bpmnEngine.StorageData) error {
 
 	return nil
 }
-func sendMailContract(state bpmnEngine.StorageData) error {
+func sendMailContract(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var networkNode *flow.Network
 	var flowName *flow.String
@@ -88,7 +88,7 @@ func sendMailContract(state bpmnEngine.StorageData) error {
 	return mail.SendMailContract(*policy.Policy, policy.Attachments, addresses.FromAddress, addresses.ToAddress, addresses.CcAddress, flowName.String)
 }
 
-func fillAttachments(state bpmnEngine.StorageData) error {
+func fillAttachments(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var origin *flow.String
 	err := bpmnEngine.IsError(
@@ -107,7 +107,7 @@ func fillAttachments(state bpmnEngine.StorageData) error {
 	return nil
 }
 
-func setToPay(state bpmnEngine.StorageData) error {
+func setToPay(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var origin *flow.String
 	err := bpmnEngine.IsError(
@@ -126,7 +126,7 @@ func setToPay(state bpmnEngine.StorageData) error {
 	return nil
 }
 
-func sendMailPay(state bpmnEngine.StorageData) error {
+func sendMailPay(state *bpmnEngine.StorageBpnm) error {
 	log.AddPrefix("sendMailPay")
 	defer log.PopPrefix()
 

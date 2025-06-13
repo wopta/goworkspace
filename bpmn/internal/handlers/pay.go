@@ -20,7 +20,7 @@ func AddPayHandlers(builder *bpmnEngine.BpnmBuilder) error {
 	)
 }
 
-func updatePolicy(state bpmnEngine.StorageData) error {
+func updatePolicy(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var origin *flow.String
 	var networkNode *flow.Network
@@ -87,7 +87,7 @@ func updatePolicy(state bpmnEngine.StorageData) error {
 	return mail.SendMailContract(*policy.Policy, policy.Attachments, addresses.FromAddress, addresses.ToAddress, addresses.CcAddress, flowName.String)
 }
 
-func payTransaction(state bpmnEngine.StorageData) error {
+func payTransaction(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var paymentInfo *flow.PaymentInfoBpmn
 	var origin *flow.String

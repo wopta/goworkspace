@@ -19,7 +19,7 @@ func AddLeadHandlers(builder *bpmnEngine.BpnmBuilder) error {
 	)
 }
 
-func setProposalNumber(state bpmnEngine.StorageData) error {
+func setProposalNumber(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	err := bpmnEngine.IsError(
 		bpmnEngine.GetDataRef("policy", &policy, state),
@@ -31,7 +31,7 @@ func setProposalNumber(state bpmnEngine.StorageData) error {
 	return nil
 }
 
-func setLead(state bpmnEngine.StorageData) error {
+func setLead(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var networkNode *flow.Network
 	err := bpmnEngine.IsError(
@@ -46,7 +46,7 @@ func setLead(state bpmnEngine.StorageData) error {
 	return nil
 }
 
-func sendLeadMail(state bpmnEngine.StorageData) error {
+func sendLeadMail(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var networkNode *flow.Network
 	var addresses *flow.Addresses

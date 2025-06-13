@@ -11,14 +11,14 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func funcTestWithInfo(message string, log *mockLog, metaData ...string) func(bpmnEngine.StorageData) error {
-	return func(st bpmnEngine.StorageData) error {
+func funcTestWithInfo(message string, log *mockLog, metaData ...string) func(*bpmnEngine.StorageBpnm) error {
+	return func(st *bpmnEngine.StorageBpnm) error {
 		log.println(message)
 		return st.AddLocal("callbackInfo", &CallbackInfo{base.CallbackInfo{ReqBody: []byte("prova request " + message)}})
 	}
 }
 
-func getBuilderFlowNode(log *mockLog, store bpmnEngine.StorageData) (*bpmnEngine.BpnmBuilder, error) {
+func getBuilderFlowNode(log *mockLog, store *bpmnEngine.StorageBpnm) (*bpmnEngine.BpnmBuilder, error) {
 	os.Setenv("env", env.LocalTest)
 	builder, e := bpmnEngine.NewBpnmBuilderRawPath("../../../../function-data/dev//flows/draft/callback-flows.json")
 	if e != nil {
@@ -33,7 +33,7 @@ func getBuilderFlowNode(log *mockLog, store bpmnEngine.StorageData) (*bpmnEngine
 		builder.AddHandler("Sign", funcTestWithInfo("Sign", log)),
 		builder.AddHandler("Approved", funcTestWithInfo("Approved", log)),
 		builder.AddHandler("Rejected", funcTestWithInfo("Approved", log)),
-		builder.AddHandler("saveAudit", func(sd bpmnEngine.StorageData) error {
+		builder.AddHandler("saveAudit", func(sd *bpmnEngine.StorageBpnm) error {
 			d, e := bpmnEngine.GetData[*CallbackInfo]("callbackInfo", sd)
 			if e != nil {
 				return e

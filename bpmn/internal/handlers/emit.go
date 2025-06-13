@@ -31,7 +31,7 @@ func AddEmitHandlers(builder *bpmnEngine.BpnmBuilder) error {
 	)
 }
 
-func emitBaseWithSequence(state bpmnEngine.StorageData) error {
+func emitBaseWithSequence(state *bpmnEngine.StorageBpnm) error {
 	var origin *flow.String
 	var policy *flow.Policy
 	var err = bpmnEngine.IsError(
@@ -64,7 +64,7 @@ func emitBaseWithSequence(state bpmnEngine.StorageData) error {
 	return nil
 }
 
-func emitBaseNoSequence(state bpmnEngine.StorageData) error {
+func emitBaseNoSequence(state *bpmnEngine.StorageBpnm) error {
 	var origin *flow.String
 	var policy *flow.Policy
 	var err = bpmnEngine.IsError(
@@ -90,7 +90,7 @@ func emitBaseNoSequence(state bpmnEngine.StorageData) error {
 	return nil
 }
 
-func sendMailSign(state bpmnEngine.StorageData) error {
+func sendMailSign(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var networkNode *flow.Network
 	var addresses *flow.Addresses
@@ -128,7 +128,7 @@ func sendMailSign(state bpmnEngine.StorageData) error {
 	return nil
 }
 
-func sign(state bpmnEngine.StorageData) error {
+func sign(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var product *flow.Product
 	var networkNode *flow.Network
@@ -155,7 +155,7 @@ func sign(state bpmnEngine.StorageData) error {
 	return nil
 }
 
-func pay(state bpmnEngine.StorageData) error {
+func pay(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var product *flow.Product
 	var mgaProduct *flow.Product
@@ -179,7 +179,7 @@ func pay(state bpmnEngine.StorageData) error {
 	return nil
 }
 
-func setAdvance(state bpmnEngine.StorageData) error {
+func setAdvance(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var product *flow.Product
 	var mgaProduct *flow.Product
@@ -203,7 +203,7 @@ func setAdvance(state bpmnEngine.StorageData) error {
 	return nil
 }
 
-func updateUserAndNetworkNode(state bpmnEngine.StorageData) error {
+func updateUserAndNetworkNode(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var networkNode *flow.Network
 	var origin *flow.String
@@ -224,7 +224,7 @@ func updateUserAndNetworkNode(state bpmnEngine.StorageData) error {
 	return network.UpdateNetworkNodePortfolio(origin.String, policy.Policy, networkNode.NetworkNode)
 }
 
-func sendEmitProposalMail(state bpmnEngine.StorageData) error {
+func sendEmitProposalMail(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var networkNode *flow.Network
 	var origin *flow.String

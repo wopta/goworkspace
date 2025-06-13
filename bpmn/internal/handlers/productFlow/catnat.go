@@ -13,7 +13,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/quote/catnat"
 )
 
-func CatnatIntegration(store bpmnEngine.StorageData) error {
+func CatnatIntegration(store *bpmnEngine.StorageBpnm) error {
 	policy, err := bpmnEngine.GetData[*flow.Policy]("policy", store)
 	if err != nil {
 		return err
@@ -32,7 +32,7 @@ func CatnatIntegration(store bpmnEngine.StorageData) error {
 	return nil
 }
 
-func CatnatDownloadCertification(store bpmnEngine.StorageData) error {
+func CatnatDownloadCertification(store *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var numeroPoliza *flow.String
 	err := bpmnEngine.IsError(

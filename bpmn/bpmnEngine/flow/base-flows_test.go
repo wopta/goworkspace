@@ -22,14 +22,14 @@ func (m *mockLog) printlnForTesting(t *testing.T) {
 		t.Log(" ", mes)
 	}
 }
-func funcTest(message string, log *mockLog) func(bpmnEngine.StorageData) error {
-	return func(sd bpmnEngine.StorageData) error {
+func funcTest(message string, log *mockLog) func(*bpmnEngine.StorageBpnm) error {
+	return func(sd *bpmnEngine.StorageBpnm) error {
 		log.println(message)
 		return nil
 	}
 }
 
-func getBuilderFlowChannel(log *mockLog, store bpmnEngine.StorageData) (*bpmnEngine.BpnmBuilder, error) {
+func getBuilderFlowChannel(log *mockLog, store *bpmnEngine.StorageBpnm) (*bpmnEngine.BpnmBuilder, error) {
 	builder, e := bpmnEngine.NewBpnmBuilderRawPath("../../../../function-data/dev//flows/draft/base-flows.json")
 	if e != nil {
 		return nil, e
@@ -69,9 +69,9 @@ func getBuilderFlowChannel(log *mockLog, store bpmnEngine.StorageData) (*bpmnEng
 	return builder, nil
 }
 
-type builderFlow func(*mockLog, bpmnEngine.StorageData) (*bpmnEngine.BpnmBuilder, error)
+type builderFlow func(*mockLog, *bpmnEngine.StorageBpnm) (*bpmnEngine.BpnmBuilder, error)
 
-func testFlow(t *testing.T, process string, expectedACtivities []string, store bpmnEngine.StorageData, builbuilderFlow builderFlow) {
+func testFlow(t *testing.T, process string, expectedACtivities []string, store *bpmnEngine.StorageBpnm, builbuilderFlow builderFlow) {
 	log := mockLog{}
 	build, e := builbuilderFlow(&log, store)
 	if e != nil {
@@ -116,7 +116,7 @@ var (
 	productRemittanceMga = Product{&models.Product{Flow: models.RemittanceMgaFlow}}
 )
 
-func initBaseStorage(storage bpmnEngine.StorageData) {
+func initBaseStorage(storage *bpmnEngine.StorageBpnm) {
 	storage.AddGlobal("mgaProduct", &Product{})
 	storage.AddGlobal("flowName", &String{})
 	storage.AddGlobal("addresses", &addresses)
@@ -469,7 +469,7 @@ func TestSignForRemittanceMgaWithNodeFlow(t *testing.T) {
 		"addContract",
 		"sendMailContract",
 	}
-	testFlow(t, "sign", exps, storeFlowChannel, func(log *mockLog, sd bpmnEngine.StorageData) (*bpmnEngine.BpnmBuilder, error) {
+	testFlow(t, "sign", exps, storeFlowChannel, func(log *mockLog, sd *bpmnEngine.StorageBpnm) (*bpmnEngine.BpnmBuilder, error) {
 		build, e := getBuilderFlowChannel(log, storeFlowChannel)
 		if e != nil {
 			return nil, e
@@ -506,7 +506,7 @@ func TestEmitForEcommerceWithNodeFlow(t *testing.T) {
 		"Emit",
 		"saveAudit prova request Emit",
 	}
-	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpmnEngine.StorageData) (*bpmnEngine.BpnmBuilder, error) {
+	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd *bpmnEngine.StorageBpnm) (*bpmnEngine.BpnmBuilder, error) {
 		build, e := getBuilderFlowChannel(log, storeFlowChannel)
 		if e != nil {
 			return nil, e
@@ -533,7 +533,7 @@ func TestEmitForWgaWithNodeFlow(t *testing.T) {
 	storeNode.AddLocal("config", &CallbackConfig{Emit: true})
 
 	exps := []string{}
-	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpmnEngine.StorageData) (*bpmnEngine.BpnmBuilder, error) {
+	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd *bpmnEngine.StorageBpnm) (*bpmnEngine.BpnmBuilder, error) {
 		build, e := getBuilderFlowChannel(log, storeFlowChannel)
 		if e != nil {
 			return nil, e
@@ -569,7 +569,7 @@ func TestEmitForEcommerceWithNodeFlowConfFalse(t *testing.T) {
 		"sendEmitProposalMail",
 		"sendMailSign",
 	}
-	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpmnEngine.StorageData) (*bpmnEngine.BpnmBuilder, error) {
+	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd *bpmnEngine.StorageBpnm) (*bpmnEngine.BpnmBuilder, error) {
 		build, e := getBuilderFlowChannel(log, storeFlowChannel)
 		if e != nil {
 			return nil, e
@@ -613,7 +613,7 @@ func TestEmitForEcommerceCatnat(t *testing.T) {
 		"sendEmitProposalMail",
 		"sendMailSign",
 	}
-	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpmnEngine.StorageData) (*bpmnEngine.BpnmBuilder, error) {
+	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd *bpmnEngine.StorageBpnm) (*bpmnEngine.BpnmBuilder, error) {
 		build, e := getBuilderFlowChannel(log, storeFlowChannel)
 		if e != nil {
 			return nil, e

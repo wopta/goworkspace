@@ -181,7 +181,7 @@ func (b *BpnmBuilder) setHandler(nameHandler string, handler activityHandler) {
 	b.handlers[nameHandler] = handler
 }
 
-func (b *BpnmBuilder) SetStorage(pool StorageData) {
+func (b *BpnmBuilder) SetStorage(pool *StorageBpnm) {
 	b.storage = pool
 }
 

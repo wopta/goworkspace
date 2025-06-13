@@ -10,7 +10,7 @@ type processBpnm struct {
 	requiredGlobalData []typeData
 	description        string
 	activities         map[string]*activity
-	storageBpnm        StorageData
+	storageBpnm        *StorageBpnm
 }
 
 type activity struct {

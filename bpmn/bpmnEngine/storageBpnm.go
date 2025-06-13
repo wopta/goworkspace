@@ -1,39 +1,19 @@
 package bpmnEngine
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"maps"
 )
 
 type InitializeDataType func() DataBpnm
-type StorageData interface {
-	ResetLocal()
-	ResetGlobal()
-	AddLocal(string, DataBpnm) error
-	AddGlobal(string, DataBpnm) error
-	GetLocal(string) (DataBpnm, error)
-	GetGlobal(string) (DataBpnm, error)
-
-	getAllLocals() map[string]any
-	getAllGlobals() map[string]any
-	// setHigherStorage sets a higher-level storage,
-	// which will be used as a fallback when a local/global key is not found in the current storage.
-	setHigherStorage(StorageData) error
-	// It merges two unique storage
-	// If both storage contain the same key, return error
-	mergeUnique(StorageData) error
-	//Mark what local data keep when clean is called
-	markWhatNeeded([]typeData)
-	//Delete the dat that aren't needed(aren't marked)
-	cleanNoMarkedResources() error
-}
 
 type StorageBpnm struct {
 	local       map[string]any
 	global      map[string]any
 	marked      []string
-	higherStore StorageData
+	higherStore *StorageBpnm
 }
 
 // The storage manages his own data:
@@ -90,7 +70,6 @@ func (p *StorageBpnm) getAllLocals() map[string]any {
 	res = mergeMaps(p.higherStore.getAllLocals(), res)
 	return res
 }
-
 func (p *StorageBpnm) getAllGlobals() map[string]any {
 	var res map[string]any = make(map[string]any)
 	res = p.global
@@ -151,7 +130,19 @@ func (p *StorageBpnm) GetLocal(name string) (DataBpnm, error) {
 	return nil, fmt.Errorf("No data found %v", name)
 }
 
-func (base *StorageBpnm) setHigherStorage(higher StorageData) error {
+func (p *StorageBpnm) GetMap() map[string]any {
+	mapsMerged := mergeMaps(p.getAllGlobals(), p.getAllLocals())
+	bytes, err := json.Marshal(mapsMerged)
+	if err != nil {
+		return nil
+	}
+	err = json.Unmarshal(bytes, &mapsMerged)
+	if err != nil {
+		return nil
+	}
+	return mapsMerged
+}
+func (base *StorageBpnm) setHigherStorage(higher *StorageBpnm) error {
 	if base == higher {
 		return fmt.Errorf("A storage can't reference itself as Higher-level storage")
 	}
@@ -159,7 +150,7 @@ func (base *StorageBpnm) setHigherStorage(higher StorageData) error {
 	return nil
 }
 
-func (base *StorageBpnm) mergeUnique(source StorageData) error {
+func (base *StorageBpnm) mergeUnique(source *StorageBpnm) error {
 	var err error
 	if source == nil {
 		return nil

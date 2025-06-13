@@ -19,7 +19,7 @@ func AddAcceptanceHandlers(builder *bpmnEngine.BpnmBuilder) error {
 	)
 }
 
-func draftRejectPolicy(storage bpmnEngine.StorageData) error {
+func draftRejectPolicy(storage *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var action *flow.String
 	err := bpmnEngine.IsError(
@@ -38,7 +38,7 @@ func draftRejectPolicy(storage bpmnEngine.StorageData) error {
 	return nil
 }
 
-func draftApprovePolicy(storage bpmnEngine.StorageData) error {
+func draftApprovePolicy(storage *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var action *flow.String
 	err := bpmnEngine.IsError(
@@ -60,7 +60,7 @@ func draftApprovePolicy(storage bpmnEngine.StorageData) error {
 	return nil
 }
 
-func sendAcceptanceMail(state bpmnEngine.StorageData) error {
+func sendAcceptanceMail(state *bpmnEngine.StorageBpnm) error {
 	policy, err := bpmnEngine.GetData[*flow.Policy]("policy", state)
 	if err != nil {
 		return err
