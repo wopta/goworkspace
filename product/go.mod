@@ -6,7 +6,7 @@ replace gitlab.dev.wopta.it/goworkspace/product => ./
 
 require (
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.167
-	gitlab.dev.wopta.it/goworkspace/models v1.2.65
+	gitlab.dev.wopta.it/goworkspace/models v1.2.66
 )
 
 require (
