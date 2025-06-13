@@ -50,7 +50,6 @@ func (f *FlowBpnm) RunAt(processName, startingActivity string) error {
 }
 
 func (p *processBpnm) loop(initialStorage StorageData, activities ...*activity) (err error) {
-	var callEndIfStop bool = true
 	for i := range activities {
 		newStorage := NewStorageBpnm()
 		err := newStorage.setHigherStorage(initialStorage)
@@ -62,7 +61,6 @@ func (p *processBpnm) loop(initialStorage StorageData, activities ...*activity) 
 		if err = activities[i].runActivity(p.name, newStorage); err != nil {
 			return err
 		}
-		callEndIfStop = callEndIfStop && activities[i].callEndIfStop
 		//TODO: to improve
 		mapsMerged := mergeMaps(newStorage.getAllGlobals(), newStorage.getAllLocals())
 		byte, err := json.Marshal(mapsMerged)
@@ -79,7 +77,7 @@ func (p *processBpnm) loop(initialStorage StorageData, activities ...*activity) 
 			return err
 		}
 		if len(listNewActivities) == 0 {
-			if !callEndIfStop {
+			if !activities[i].callEndIfStop {
 				log.InfoF("Finished %v", p.name)
 				continue
 			}
