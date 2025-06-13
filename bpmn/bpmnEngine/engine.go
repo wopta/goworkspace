@@ -51,12 +51,9 @@ func (f *FlowBpnm) RunAt(processName, startingActivity string) error {
 
 func (p *processBpnm) loop(initialStorage StorageData, activities ...*activity) (err error) {
 	var callEndIfStop bool = true
-	log.Printf("---Process %v", p.name)
 	for i := range activities {
-		log.Printf("Activity: %v", activities[i].name)
 		newStorage := NewStorageBpnm()
 		err := newStorage.setHigherStorage(initialStorage)
-		log.Printf("Initial Storage %+v", newStorage.getAllLocals())
 		if err != nil {
 			return err
 		}
@@ -65,7 +62,6 @@ func (p *processBpnm) loop(initialStorage StorageData, activities ...*activity) 
 		if err = activities[i].runActivity(p.name, newStorage); err != nil {
 			return err
 		}
-		log.Printf("After handler Storage %+v", newStorage.getAllLocals())
 		callEndIfStop = callEndIfStop && activities[i].callEndIfStop
 		//TODO: to improve
 		mapsMerged := mergeMaps(newStorage.getAllGlobals(), newStorage.getAllLocals())
@@ -96,7 +92,6 @@ func (p *processBpnm) loop(initialStorage StorageData, activities ...*activity) 
 			continue
 		}
 		newStorage.cleanNoMarkedResources()
-		log.Printf("End Storage %+v", newStorage.getAllLocals())
 		if err = p.loop(newStorage, listNewActivities...); err != nil {
 			return err
 		}
@@ -127,7 +122,6 @@ func (act *activity) runActivity(nameProcess string, storage StorageData) (err e
 		if err != nil {
 			return err
 		}
-		log.Printf("Pre post handler Storage %+v", post.storageBpnm.getAllLocals())
 		if err := post.loop(post.storageBpnm, post.activities[post.defaultStart]); err != nil {
 			return err
 		}
