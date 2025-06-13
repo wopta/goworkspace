@@ -73,7 +73,7 @@ func proposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	brokerUpdatePolicy(&policy, req.BrokerBaseRequest)
 
-	err = proposalDraft(&policy, origin, *req.SendEmail)
+	err = proposal(&policy, origin, *req.SendEmail)
 	if err != nil {
 		log.ErrorF("error creating proposal: %s", err.Error())
 		return "", nil, err
@@ -89,7 +89,7 @@ func proposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	return string(resp), &policy, err
 }
-func proposalDraft(policy *models.Policy, origin string, sendEmail bool) error {
+func proposal(policy *models.Policy, origin string, sendEmail bool) error {
 	log.AddPrefix("proposal")
 	defer log.PopPrefix()
 	log.Println("starting bpmn flow...")

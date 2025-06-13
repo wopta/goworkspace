@@ -12,14 +12,14 @@ import (
 
 func AddAcceptanceHandlers(builder *bpmnEngine.BpnmBuilder) error {
 	return bpmnEngine.IsError(
-		builder.AddHandler("rejected", draftRejectPolicy),
-		builder.AddHandler("approved", draftApprovePolicy),
+		builder.AddHandler("rejected", rejectPolicy),
+		builder.AddHandler("approved", approvePolicy),
 		builder.AddHandler("sendAcceptanceMail", sendAcceptanceMail),
 		builder.AddHandler("end_accepance", savePolicy),
 	)
 }
 
-func draftRejectPolicy(storage *bpmnEngine.StorageBpnm) error {
+func rejectPolicy(storage *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var action *flow.String
 	err := bpmnEngine.IsError(
@@ -38,7 +38,7 @@ func draftRejectPolicy(storage *bpmnEngine.StorageBpnm) error {
 	return nil
 }
 
-func draftApprovePolicy(storage *bpmnEngine.StorageBpnm) error {
+func approvePolicy(storage *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var action *flow.String
 	err := bpmnEngine.IsError(
