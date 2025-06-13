@@ -19,7 +19,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/payment v1.0.377
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.236
 	gitlab.dev.wopta.it/goworkspace/product v1.1.64
-	gitlab.dev.wopta.it/goworkspace/question v1.0.117
+	gitlab.dev.wopta.it/goworkspace/question v1.0.118
 	gitlab.dev.wopta.it/goworkspace/reserved v1.0.243
 	gitlab.dev.wopta.it/goworkspace/transaction v1.0.229
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.9
