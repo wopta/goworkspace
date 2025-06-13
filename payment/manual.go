@@ -212,7 +212,10 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		if err != nil {
 			return "", nil, err
 		}
-		flow.Run("pay")
+		err = flow.Run("pay")
+		if err != nil {
+			return "", nil, err
+		}
 		// Send mail with the contract to the user
 		toAddress = mail.GetContractorEmail(&policy)
 
