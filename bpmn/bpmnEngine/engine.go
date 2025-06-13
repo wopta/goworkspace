@@ -27,8 +27,8 @@ func (f *FlowBpnm) RunAt(processName, startingActivity string) error {
 	}
 
 	process.storageBpnm.AddGlobal("statusFlow", &StatusFlow{CurrentProcess: process.name})
-	if e := checkGlobalResources(process.storageBpnm, process.requiredGlobalData); e != nil {
-		return e
+	if err := checkGlobalResources(process.storageBpnm, process.requiredGlobalData); err != nil {
+		return err
 	}
 
 	var firstActivities []*activity
@@ -109,8 +109,8 @@ func (act *activity) runActivity(nameProcess string, storage StorageData) (err e
 			return err
 		}
 	}
-	if e := checkLocalResources(storage, act.requiredInputData); e != nil {
-		return fmt.Errorf("Process '%v' with Activity  '%v' has an input error: %v", nameProcess, act.name, e.Error())
+	if err = checkLocalResources(storage, act.requiredInputData); err != nil {
+		return fmt.Errorf("Process '%v' with Activity  '%v' has an input error: %v", nameProcess, act.name, err.Error())
 	}
 
 	if err := callWithRecover(nameProcess, storage, act); err != nil {

@@ -265,8 +265,8 @@ func (p *processBpnm) hydrateGateways(activities []activityBuilder, bpmn *FlowBp
 						if activityOb, ok = process.activities[activityName]; !ok {
 							return fmt.Errorf("Can't use process '%s' with activity '%s' since activity doesn't exist", processName, activityName)
 						}
-						if e := isInputProvidedByOutput(activityOb.requiredInputData, preActivity.OutputDataRequired); e != nil {
-							return fmt.Errorf("Between previeus activity '%s' and next activity '%s' there is an error: %v", preActivity.Name, nextJump, e.Error())
+						if err := isInputProvidedByOutput(activityOb.requiredInputData, preActivity.OutputDataRequired); err != nil {
+							return fmt.Errorf("Between previeus activity '%s' and next activity '%s' there is an error: %v", preActivity.Name, nextJump, err.Error())
 						}
 
 						gateway.nextActivities[iact] = flow.process[processName].activities[activityName]
@@ -277,8 +277,8 @@ func (p *processBpnm) hydrateGateways(activities []activityBuilder, bpmn *FlowBp
 						return fmt.Errorf("No event named %v", nextJump)
 					}
 					gateway.nextActivities[iact] = p.activities[nextJump]
-					if e := isInputProvidedByOutput(gateway.nextActivities[iact].requiredInputData, builderActivity.OutputDataRequired); e != nil {
-						return fmt.Errorf("Between previeus activity '%s' and next activity '%s' there is an error: %v", builderActivity.Name, nextJump, e.Error())
+					if err := isInputProvidedByOutput(gateway.nextActivities[iact].requiredInputData, builderActivity.OutputDataRequired); err != nil {
+						return fmt.Errorf("Between previeus activity '%s' and next activity '%s' there is an error: %v", builderActivity.Name, nextJump, err.Error())
 					}
 				}
 			}
