@@ -8,7 +8,6 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	"gitlab.dev.wopta.it/goworkspace/lib"
-	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
@@ -47,7 +46,9 @@ func CallBackProposal(st bpmnEngine.StorageData) error {
 	}
 
 	info := client.Proposal(*policy.Policy)
-	return saveAudit(networkNode.NetworkNode, info)
+
+	st.AddLocal("callbackInfo", &flow.CallbackInfo{CallbackInfo: info})
+	return nil
 }
 
 func CallBackPaid(st bpmnEngine.StorageData) error {
@@ -66,7 +67,8 @@ func CallBackPaid(st bpmnEngine.StorageData) error {
 
 	info := client.Paid(*policy.Policy)
 
-	return saveAudit(networkNode.NetworkNode, info)
+	st.AddLocal("callbackInfo", &flow.CallbackInfo{CallbackInfo: info})
+	return nil
 }
 
 func CallBackRequestApproval(st bpmnEngine.StorageData) error {
@@ -85,7 +87,8 @@ func CallBackRequestApproval(st bpmnEngine.StorageData) error {
 
 	info := client.RequestApproval(*policy.Policy)
 
-	return saveAudit(networkNode.NetworkNode, info)
+	st.AddLocal("callbackInfo", &flow.CallbackInfo{CallbackInfo: info})
+	return nil
 }
 
 func CallBackApproved(st bpmnEngine.StorageData) error {
@@ -104,7 +107,8 @@ func CallBackApproved(st bpmnEngine.StorageData) error {
 
 	info := client.Approved(*policy.Policy)
 
-	return saveAudit(networkNode.NetworkNode, info)
+	st.AddLocal("callbackInfo", &flow.CallbackInfo{CallbackInfo: info})
+	return nil
 }
 
 func CallBackRejected(st bpmnEngine.StorageData) error {
@@ -123,7 +127,8 @@ func CallBackRejected(st bpmnEngine.StorageData) error {
 
 	info := client.Rejected(*policy.Policy)
 
-	return saveAudit(networkNode.NetworkNode, info)
+	st.AddLocal("callbackInfo", &flow.CallbackInfo{CallbackInfo: info})
+	return nil
 }
 
 func CallBackSigned(st bpmnEngine.StorageData) error {
@@ -142,7 +147,8 @@ func CallBackSigned(st bpmnEngine.StorageData) error {
 
 	info := client.Signed(*policy.Policy)
 
-	return saveAudit(networkNode.NetworkNode, info)
+	st.AddLocal("callbackInfo", &flow.CallbackInfo{CallbackInfo: info})
+	return nil
 }
 
 type auditSchema struct {
@@ -158,8 +164,20 @@ type auditSchema struct {
 	Error         string                `bigquery:"error"`
 }
 
+func SaveAudit(st bpmnEngine.StorageData) error {
+
+	node, err := bpmnEngine.GetData[*flow.Network]("networkNode", st)
+	if err != nil {
+		return err
+	}
+	res, err := bpmnEngine.GetData[*flow.CallbackInfo]("callbackInfo", st)
+	if err != nil {
+		return err
+	}
+
+	return saveAudit(node.NetworkNode, res.CallbackInfo)
+}
 func saveAudit(node *models.NetworkNode, callbackInfo base.CallbackInfo) error {
-	log.Println("Saving audit")
 	var audit auditSchema
 	audit.CreationDate = lib.GetBigQueryNullDateTime(time.Now().UTC())
 	audit.Client = node.CallbackConfig.Name

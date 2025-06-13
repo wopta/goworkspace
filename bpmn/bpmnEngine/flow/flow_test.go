@@ -61,7 +61,6 @@ func getBuilderFlowChannel(log *mockLog, store bpmnEngine.StorageData) (*bpmnEng
 		builder.AddHandler("rejected", funcTest("rejected", log)),
 		builder.AddHandler("approved", funcTest("approved", log)),
 		builder.AddHandler("sendAcceptanceMail", funcTest("sendAcceptanceMail", log)),
-		builder.AddHandler("end_proposal", funcTest("end_proposal", log)),
 	)
 	if e != nil {
 		return nil, e
@@ -235,7 +234,6 @@ func TestProposalForMga(t *testing.T) {
 
 	exps := []string{
 		"setProposalData",
-		"end_proposal",
 	}
 	testFlow(t, "proposal", exps, store, getBuilderFlowChannel)
 }
@@ -322,7 +320,6 @@ func TestProposalForProviderMga(t *testing.T) {
 	exps := []string{
 		"setProposalData",
 		"sendProposalMail",
-		"end_proposal",
 	}
 	testFlow(t, "proposal", exps, store, getBuilderFlowChannel)
 }
@@ -507,6 +504,7 @@ func TestEmitForEcommerceWithNodeFlow(t *testing.T) {
 		"sendEmitProposalMail",
 		"sendMailSign",
 		"Emit",
+		"saveAudit prova request Emit",
 	}
 	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd bpmnEngine.StorageData) (*bpmnEngine.BpnmBuilder, error) {
 		build, e := getBuilderFlowChannel(log, storeFlowChannel)

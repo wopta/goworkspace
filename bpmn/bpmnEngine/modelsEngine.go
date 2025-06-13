@@ -6,7 +6,6 @@ type FlowBpnm struct {
 
 type processBpnm struct {
 	name               string
-	activeActivities   []*activity
 	defaultStart       string
 	requiredGlobalData []typeData
 	description        string

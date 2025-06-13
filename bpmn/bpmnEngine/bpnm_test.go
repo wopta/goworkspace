@@ -84,7 +84,7 @@ func getInjectableFlow(log *mockLog) (*BpnmBuilder, error) {
 			return nil
 		}),
 		injectedFlow.AddHandler("save", func(st StorageData) error {
-			log.println("end process")
+			log.println("end injected process")
 			return nil
 		}),
 	)
@@ -264,9 +264,10 @@ func TestBpnmInjection(t *testing.T) {
 		"init B",
 		"init A",
 		"init post",
+		"end injected process",
 		"init A",
 		"init post",
-		"end process",
+		"end injected process",
 	}
 	testLog(log, exps, t)
 }
@@ -325,7 +326,7 @@ func TestRunFromSpecificActivity(t *testing.T) {
 		"init B",
 		"init A",
 		"init post",
-		"end process",
+		"end injected process",
 	}
 	testLog(log, exps, t)
 }

@@ -56,7 +56,12 @@ func (p *StorageBpnm) ResetGlobal() {
 }
 
 func (p *StorageBpnm) markWhatNeeded(toTouch []typeData) {
+	var toHigherStorage []typeData
 	for _, t := range toTouch {
+		if _, exist := p.local[t.Name]; !exist {
+			toHigherStorage = append(toHigherStorage, t)
+			continue
+		}
 		p.marked = append(p.marked, t.Name)
 	}
 }
@@ -65,6 +70,9 @@ func (p *StorageBpnm) cleanNoMarkedResources() error {
 	backup := maps.Clone(p.local)
 	p.ResetLocal()
 	for i, toSave := range p.marked {
+		if backup[toSave] == nil {
+			continue
+		}
 		if err := p.AddLocal(p.marked[i], backup[toSave].(DataBpnm)); err != nil {
 			return err
 		}

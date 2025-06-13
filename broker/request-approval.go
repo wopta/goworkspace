@@ -2,8 +2,6 @@ package broker
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 	"io"
 	"net/http"
 
@@ -64,18 +62,18 @@ func DraftRequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, int
 		return "", nil, err
 	}
 
-	if policy.ProducerUid != authToken.UserID {
-		log.Printf("user %s cannot request approval for policy %s because producer not equal to request user",
-			authToken.UserID, policy.Uid)
-		return "", nil, errors.New("operation not allowed")
-	}
+	//	if policy.ProducerUid != authToken.UserID {
+	//		log.Printf("user %s cannot request approval for policy %s because producer not equal to request user",
+	//			authToken.UserID, policy.Uid)
+	//		return "", nil, errors.New("operation not allowed")
+	//	}
 
-	allowedStatus := []string{models.PolicyStatusInitLead, models.PolicyStatusNeedsApproval}
+	//allowedStatus := []string{models.PolicyStatusInitLead, models.PolicyStatusNeedsApproval}
 
-	if !policy.IsReserved || !lib.SliceContains(allowedStatus, policy.Status) {
-		log.Printf("cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
-		return "", nil, fmt.Errorf("cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
-	}
+	//	if !policy.IsReserved || !lib.SliceContains(allowedStatus, policy.Status) {
+	//		log.Printf("cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
+	//		return "", nil, fmt.Errorf("cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
+	//	}
 
 	brokerUpdatePolicy(&policy, req)
 

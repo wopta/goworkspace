@@ -53,6 +53,7 @@ func getNodeFlow(networkNode *models.NetworkNode) (*bpmnEngine.BpnmBuilder, erro
 		builder.AddHandler("RequestApproval", channelFlow.CallBackRequestApproval),
 		builder.AddHandler("Approved", channelFlow.CallBackApproved),
 		builder.AddHandler("Rejected", channelFlow.CallBackRejected),
+		builder.AddHandler("saveAudit", channelFlow.CallBackRejected),
 	)
 	if err != nil {
 		return nil, err

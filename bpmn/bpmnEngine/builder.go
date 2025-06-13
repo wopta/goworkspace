@@ -252,31 +252,27 @@ func (p *processBpnm) hydrateGateways(activities []activityBuilder, bpmn *FlowBp
 				if nextJump == "end" {
 					nextJump = getNameEndActivity(p.name)
 				}
-				processName, actioneName, itCallAnotherProcess := strings.Cut(nextJump, "->")
+				processName, activityName, itCallAnotherProcess := strings.Cut(nextJump, "->")
 				if itCallAnotherProcess {
-					if processName == "" || actioneName == "" {
+					if processName == "" || activityName == "" {
 						return fmt.Errorf("Missing right definition to execute the process, exp: <process>-><activity> got: %v", nextJump)
-					}
-					gateway.nextActivities[iact] = new(activity)
-					gateway.nextActivities[iact].name = nextJump
-					//Should pass input and output too
-					gateway.nextActivities[iact].handler = func(sd StorageData) error {
-						return bpmn.RunAt(processName, actioneName)
 					}
 					var preActivity activityBuilder = builderActivity
 					builder.callbacks = append(builder.callbacks, func(builder *BpnmBuilder, flow *FlowBpnm) error {
 						var process *processBpnm
-						var activity *activity
+						var activityOb *activity
 						var ok bool
 						if process, ok = flow.process[processName]; !ok {
-							return fmt.Errorf("Can't use process '%s' with activity '%s' since process doesn't exist", processName, actioneName)
+							return fmt.Errorf("Can't use process '%s' with activity '%s' since process doesn't exist", processName, activityName)
 						}
-						if activity, ok = process.activities[actioneName]; !ok {
-							return fmt.Errorf("Can't use process '%s' with activity '%s' since activity doesn't exist", processName, actioneName)
+						if activityOb, ok = process.activities[activityName]; !ok {
+							return fmt.Errorf("Can't use process '%s' with activity '%s' since activity doesn't exist", processName, activityName)
 						}
-						if e := isInputProvidedByOutput(activity.requiredInputData, preActivity.OutputDataRequired); e != nil {
+						if e := isInputProvidedByOutput(activityOb.requiredInputData, preActivity.OutputDataRequired); e != nil {
 							return fmt.Errorf("Between previeus activity '%s' and next activity '%s' there is an error: %v", preActivity.Name, nextJump, e.Error())
 						}
+
+						gateway.nextActivities[iact] = flow.process[processName].activities[activityName]
 						return nil
 					})
 				} else {
