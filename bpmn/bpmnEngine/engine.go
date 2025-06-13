@@ -154,7 +154,6 @@ func (act *activity) evaluateDecisions(processName string, storage StorageData, 
 	var resultEvaluation any
 	var err error
 	eval := goval.NewEvaluator()
-	log.ErrorF("name   %v", act.name)
 	if len(act.gateway) == 0 {
 		log.InfoF("Process '%v' with activity '%v' has not next activities", processName, act.name)
 		return []*activity{}, nil

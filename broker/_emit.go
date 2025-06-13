@@ -180,4 +180,3 @@ func emit(policy *models.Policy, request EmitRequest, origin string) EmitRespons
 	log.Println("end --------------------------------------------------")
 	return responseEmit
 }
-

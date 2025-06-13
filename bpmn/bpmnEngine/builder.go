@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 )
 
 func getKeyInjectProcess(targetPro, targetAct string, order activityOrder) injectionKey {
@@ -134,7 +135,8 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 	for i, p := range bpnmToInject.Processes { //to have a better error
 		order = bpnmToInject.Processes[i].Order
 		if order == nil {
-			return fmt.Errorf("The 'order' field isn't filled")
+			log.Println("The 'order' field isn't filled")
+			continue
 		}
 		if order.InWhatActivityInject == "end" {
 			order.InWhatActivityInject = getNameEndActivity(order.InWhatProcessInject)
@@ -150,6 +152,9 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 
 	for i, p := range bpnmToInject.Processes {
 		order = bpnmToInject.Processes[i].Order
+		if order == nil {
+			continue
+		}
 		b.toInject[getKeyInjectProcess(order.InWhatProcessInject, order.InWhatActivityInject, order.Order)] = process.process[p.Name]
 	}
 
@@ -258,6 +263,7 @@ func (p *processBpnm) hydrateGateways(activities []activityBuilder, bpmn *FlowBp
 					gateway.nextActivities[iact].handler = func(sd StorageData) error {
 						return bpmn.RunAt(processName, actioneName)
 					}
+					var preActivity activityBuilder = builderActivity
 					builder.callbacks = append(builder.callbacks, func(builder *BpnmBuilder, flow *FlowBpnm) error {
 						var process *processBpnm
 						var activity *activity
@@ -268,8 +274,8 @@ func (p *processBpnm) hydrateGateways(activities []activityBuilder, bpmn *FlowBp
 						if activity, ok = process.activities[actioneName]; !ok {
 							return fmt.Errorf("Can't use process '%s' with activity '%s' since activity doesn't exist", processName, actioneName)
 						}
-						if e := isInputProvidedByOutput(activity.requiredInputData, builderActivity.OutputDataRequired); e != nil {
-							return fmt.Errorf("Between activity '%s' and activity '%s' there is an error: %v", builderActivity.Name, nextJump, e.Error())
+						if e := isInputProvidedByOutput(activity.requiredInputData, preActivity.OutputDataRequired); e != nil {
+							return fmt.Errorf("Between previeus activity '%s' and next activity '%s' there is an error: %v", preActivity.Name, nextJump, e.Error())
 						}
 						return nil
 					})
@@ -279,7 +285,7 @@ func (p *processBpnm) hydrateGateways(activities []activityBuilder, bpmn *FlowBp
 					}
 					gateway.nextActivities[iact] = p.activities[nextJump]
 					if e := isInputProvidedByOutput(gateway.nextActivities[iact].requiredInputData, builderActivity.OutputDataRequired); e != nil {
-						return fmt.Errorf("Between activity '%s' and activity '%s' there is an error: %v", builderActivity.Name, nextJump, e.Error())
+						return fmt.Errorf("Between previeus activity '%s' and next activity '%s' there is an error: %v", builderActivity.Name, nextJump, e.Error())
 					}
 				}
 			}
@@ -317,7 +323,7 @@ func isInputProvidedByOutput(inputs []typeData, outputs []typeData) error {
 		return false, nil
 	}
 	if len(inputs) > len(outputs) {
-		return errors.New("Insufficient number of output data")
+		return errors.New("Next activity require more inputs")
 	}
 	for _, input := range inputs {
 		err := fmt.Errorf("The input %v isn't provided by output", input)

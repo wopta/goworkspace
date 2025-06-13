@@ -1,7 +1,6 @@
 package flow
 
 import (
-	"errors"
 	"os"
 	"testing"
 
@@ -36,17 +35,6 @@ func getBuilderFlowNode(log *mockLog, store bpmnEngine.StorageData) (*bpmnEngine
 		builder.AddHandler("Sign", funcTestWithInfo("Sign", log)),
 		builder.AddHandler("Approved", funcTestWithInfo("Approved", log)),
 		builder.AddHandler("Rejected", funcTestWithInfo("Approved", log)),
-		builder.AddHandler("saveAudit", func(sd bpmnEngine.StorageData) error {
-			d, e := bpmnEngine.GetData[*CallbackInfo]("callbackInfo", sd)
-			if e != nil {
-				return e
-			}
-			if string(d.ReqBody) != "prova request" {
-				return errors.New("no correct body request")
-			}
-			log.println("saveAudit " + string(d.ReqBody))
-			return nil
-		}),
 	)
 	if e != nil {
 		return nil, e
@@ -71,7 +59,6 @@ func TestEmitForWinNodeWithConfigTrue(t *testing.T) {
 	store.AddLocal("config", &CallbackConfig{Emit: true})
 	exps := []string{
 		"Emit",
-		"saveAudit prova request",
 	}
 	testFlow(t, "emitCallBack", exps, store, getBuilderFlowNode)
 }
@@ -97,7 +84,8 @@ func TestEmitForWinWithProductFlowWinEmitRemittance(t *testing.T) {
 	store.AddGlobal("clientCallback", &callbackClient)
 
 	exps := []string{
-		"EmitRemittance",
+		"Emit",
+		"Pay",
 	}
 	store.AddLocal("config", &CallbackConfig{Emit: true})
 
@@ -110,8 +98,9 @@ func TestCallbackProposalWithIsReservedTrue(t *testing.T) {
 	store.AddGlobal("networkNode", &winNode)
 	store.AddGlobal("product", &productEcommerce)
 	store.AddGlobal("clientCallback", &callbackClient)
-
+	store.AddGlobal("is_PROPOSAL_V2", &BoolBpmn{Bool: true})
 	store.AddLocal("config", &CallbackConfig{Proposal: true})
+
 	exps := []string{}
 	testFlow(t, "proposalCallback", exps, store, getBuilderFlowNode)
 }
@@ -127,7 +116,6 @@ func TestCallbackProposalWithIsReservedFalse(t *testing.T) {
 	store.AddLocal("config", &CallbackConfig{Proposal: true})
 	exps := []string{
 		"Proposal",
-		"saveAudit prova request",
 	}
 	testFlow(t, "proposalCallback", exps, store, getBuilderFlowNode)
 }

@@ -46,10 +46,8 @@ func getNodeFlow(networkNode *models.NetworkNode) (*bpmnEngine.BpnmBuilder, erro
 	}
 	builder.SetStorage(store)
 	err = bpmnEngine.IsError(
-		builder.AddHandler("EmitRemittance", channelFlow.CallBackEmitRemittance),
 		builder.AddHandler("Emit", channelFlow.CallBackEmit),
 		builder.AddHandler("Sign", channelFlow.CallBackSigned),
-		builder.AddHandler("saveAudit", channelFlow.SaveAudit),
 		builder.AddHandler("Pay", channelFlow.CallBackPaid),
 		builder.AddHandler("Proposal", channelFlow.CallBackProposal),
 		builder.AddHandler("RequestApproval", channelFlow.CallBackRequestApproval),

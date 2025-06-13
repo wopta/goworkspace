@@ -9,8 +9,10 @@ import (
 
 	bpmn "gitlab.dev.wopta.it/goworkspace/bpmn"
 	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/mail"
 	"gitlab.dev.wopta.it/goworkspace/models"
 	plc "gitlab.dev.wopta.it/goworkspace/policy"
 )
@@ -99,18 +101,18 @@ func requestApproval(policy *models.Policy, origin string) error {
 
 	log.Println("start -------------------------------------")
 
-	log.Println("starting bpmn flow...")
-
 	storage := bpmnEngine.NewStorageBpnm()
 
+	log.Println("starting bpmn flow...")
+
+	storage.AddGlobal("addresses", &flow.Addresses{
+		FromAddress: mail.AddressAnna,
+	})
 	flow, err := bpmn.GetFlow(policy, origin, storage)
 	if err != nil {
 		return err
 	}
-	err = flow.Run("acceptance")
-	if err != nil {
-		return err
-	}
+	err = flow.Run("requestApproval")
 
 	log.Println("Handler end -------------------------------------------------")
 

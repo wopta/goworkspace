@@ -30,6 +30,7 @@ var brokerRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
 	},
+	//TODO: why there are two endpoint with same url? Route:   "/policy/reserved/v1/{policyUid}",
 	{
 		Route:   "/policy/reserved/v1",
 		Handler: lib.ResponseLoggerWrapper(DraftRequestApprovalFx),
@@ -84,7 +85,7 @@ var brokerRoutes []lib.Route = []lib.Route{
 	//		Roles:   []string{lib.UserRoleAll},
 	//	},
 	{
-		Route:   "/v1/policy/acceptance/{policyUid}",
+		Route:   "/policy/reserved/v1/{policyUid}",
 		Handler: lib.ResponseLoggerWrapper(DraftAcceptanceFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
