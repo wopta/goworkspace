@@ -152,9 +152,6 @@ func (p *StorageBpnm) GetLocal(name string) (DataBpnm, error) {
 }
 
 func (base *StorageBpnm) setHigherStorage(higher StorageData) error {
-	if base.higherStore != nil {
-		return fmt.Errorf("Higher storage has been already set")
-	}
 	if base == higher {
 		return fmt.Errorf("A storage can't reference itself as Higher-level storage")
 	}

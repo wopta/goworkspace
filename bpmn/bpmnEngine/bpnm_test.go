@@ -239,16 +239,16 @@ func TestBpnmInjection(t *testing.T) {
 	}
 	storage := NewStorageBpnm()
 	storage.AddGlobal("policyPr", &policyMock{Age: 3})
+	err = addDefaultHandlersForTest(g, log)
+	if err != nil {
+		t.Fatal(err)
+	}
 	g.SetStorage(storage)
 	flowCatnat, err := getInjectableFlow(log)
 	if err := g.Inject(flowCatnat); err != nil {
 		t.Fatal(err)
 	}
 
-	err = addDefaultHandlersForTest(g, log)
-	if err != nil {
-		t.Fatal(err)
-	}
 	flow, err := g.Build()
 	if err != nil {
 		t.Fatal(err)

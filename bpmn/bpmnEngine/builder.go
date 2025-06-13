@@ -158,9 +158,6 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 		b.toInject[getKeyInjectProcess(order.InWhatProcessInject, order.InWhatActivityInject, order.Order)] = process.process[p.Name]
 	}
 
-	if err = bpnmToInject.storage.setHigherStorage(b.storage); err != nil {
-		return err
-	}
 	return nil
 }
 

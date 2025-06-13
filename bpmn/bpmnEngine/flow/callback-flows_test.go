@@ -20,7 +20,7 @@ func funcTestWithInfo(message string, log *mockLog, metaData ...string) func(bpm
 
 func getBuilderFlowNode(log *mockLog, store bpmnEngine.StorageData) (*bpmnEngine.BpnmBuilder, error) {
 	os.Setenv("env", env.LocalTest)
-	builder, e := bpmnEngine.NewBpnmBuilderRawPath("../../../../function-data/dev//flows/draft/node_flows.json")
+	builder, e := bpmnEngine.NewBpnmBuilderRawPath("../../../../function-data/dev//flows/draft/callback-flows.json")
 	if e != nil {
 		return nil, e
 	}

@@ -16,7 +16,7 @@ import (
 
 func getNodeFlow(networkNode *models.NetworkNode) (*bpmnEngine.BpnmBuilder, error) {
 	store := bpmnEngine.NewStorageBpnm()
-	builder, err := bpmnEngine.NewBpnmBuilder("flows/draft/node_flows.json")
+	builder, err := bpmnEngine.NewBpnmBuilder("flows/draft/callback-flows.json")
 	if err != nil {
 		return nil, err
 	}

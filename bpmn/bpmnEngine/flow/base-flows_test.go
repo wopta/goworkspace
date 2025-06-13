@@ -30,7 +30,7 @@ func funcTest(message string, log *mockLog) func(bpmnEngine.StorageData) error {
 }
 
 func getBuilderFlowChannel(log *mockLog, store bpmnEngine.StorageData) (*bpmnEngine.BpnmBuilder, error) {
-	builder, e := bpmnEngine.NewBpnmBuilderRawPath("../../../../function-data/dev//flows/draft/channel_flows.json")
+	builder, e := bpmnEngine.NewBpnmBuilderRawPath("../../../../function-data/dev//flows/draft/base-flows.json")
 	if e != nil {
 		return nil, e
 	}
