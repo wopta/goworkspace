@@ -11,7 +11,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func funcTestWithInfo(message string, log *mockLog, metaData ...string) func(*bpmnEngine.StorageBpnm) error {
+func funcTestWithInfo(message string, log *mockLog) func(*bpmnEngine.StorageBpnm) error {
 	return func(st *bpmnEngine.StorageBpnm) error {
 		log.println(message)
 		return st.AddLocal("callbackInfo", &CallbackInfo{base.CallbackInfo{ReqBody: []byte("prova request " + message)}})
