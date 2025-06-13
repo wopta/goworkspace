@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"gitlab.dev.wopta.it/goworkspace/lib"
-	"gitlab.dev.wopta.it/goworkspace/lib/log"
 )
 
 func getKeyInjectProcess(targetPro, targetAct string, order activityOrder) injectionKey {
@@ -135,8 +134,7 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 	for i, p := range bpnmToInject.Processes { //to have a better error
 		order = bpnmToInject.Processes[i].Order
 		if order == nil {
-			log.Println("The 'order' field isn't filled")
-			continue
+			return errors.New("The 'order' field isn't filled")
 		}
 		if order.InWhatActivityInject == "end" {
 			order.InWhatActivityInject = getNameEndActivity(order.InWhatProcessInject)
@@ -153,7 +151,7 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 	for i, p := range bpnmToInject.Processes {
 		order = bpnmToInject.Processes[i].Order
 		if order == nil {
-			continue
+			return errors.New("The 'order' field isn't filled")
 		}
 		b.toInject[getKeyInjectProcess(order.InWhatProcessInject, order.InWhatActivityInject, order.Order)] = process.process[p.Name]
 	}

@@ -32,7 +32,7 @@ func getBuilderFlowNode(log *mockLog, store *bpmnEngine.StorageBpnm) (*bpmnEngin
 		builder.AddHandler("RequestApproval", funcTestWithInfo("RequestApproval", log)),
 		builder.AddHandler("Sign", funcTestWithInfo("Sign", log)),
 		builder.AddHandler("Approved", funcTestWithInfo("Approved", log)),
-		builder.AddHandler("Rejected", funcTestWithInfo("Approved", log)),
+		builder.AddHandler("Rejected", funcTestWithInfo("Rejected", log)),
 		builder.AddHandler("saveAudit", func(sd *bpmnEngine.StorageBpnm) error {
 			d, e := bpmnEngine.GetData[*CallbackInfo]("callbackInfo", sd)
 			if e != nil {
