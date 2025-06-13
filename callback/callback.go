@@ -18,7 +18,7 @@ var callbackRoutes []lib.Route = []lib.Route{
 	//	},
 	{
 		Route:   "/v1/sign",
-		Handler: lib.ResponseLoggerWrapper(DraftSignFx),
+		Handler: lib.ResponseLoggerWrapper(signFx),
 		Method:  http.MethodGet,
 		Roles:   []string{},
 	},

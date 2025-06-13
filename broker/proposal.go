@@ -22,7 +22,7 @@ type ProposalReq struct {
 	SendEmail *bool `json:"sendEmail"`
 }
 
-func DraftProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func proposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err    error
 		policy models.Policy

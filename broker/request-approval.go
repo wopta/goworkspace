@@ -17,7 +17,7 @@ import (
 
 type RequestApprovalReq = BrokerBaseRequest
 
-func DraftRequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func requestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err    error
 		req    RequestApprovalReq

@@ -23,7 +23,7 @@ import (
 
 const fabrickBillPaid string = "PAID"
 
-func DraftPaymentFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
+func paymentFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		responseFormat  string = `{"result":%t,"requestPayload":%s,"locale": "it"}`
 		err             error

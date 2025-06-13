@@ -17,7 +17,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func DraftLeadFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
+func leadFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		err    error
 		policy models.Policy
@@ -56,7 +56,7 @@ func DraftLeadFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 
 	policy.Normalize()
 
-	err = leaddraft(authToken, &policy, origin)
+	err = lead(authToken, &policy, origin)
 	if err != nil {
 		log.ErrorF("error creating lead: %s", err.Error())
 		return "", nil, err
@@ -73,7 +73,7 @@ func DraftLeadFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	return string(resp), &policy, err
 }
 
-func leaddraft(authToken models.AuthToken, policy *models.Policy, origin string) error {
+func lead(authToken models.AuthToken, policy *models.Policy, origin string) error {
 	var err error
 	log.AddPrefix("lead")
 	defer log.PopPrefix()

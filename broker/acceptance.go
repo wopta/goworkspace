@@ -27,7 +27,7 @@ func (*AcceptancePayload) GetType() string {
 	return "acceptanceInfo"
 }
 
-func DraftAcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
+func acceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		err     error
 		payload AcceptancePayload

@@ -51,7 +51,7 @@ type EmitRequest struct {
 	SendEmail   *bool               `json:"sendEmail"`
 }
 
-func DraftEmitFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
+func emitFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		request      EmitRequest
 		err          error

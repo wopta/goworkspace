@@ -33,7 +33,7 @@ var brokerRoutes []lib.Route = []lib.Route{
 	//TODO: why there are two endpoint with same url? Route:   "/policy/reserved/v1/{policyUid}",
 	{
 		Route:   "/policy/reserved/v1",
-		Handler: lib.ResponseLoggerWrapper(DraftRequestApprovalFx),
+		Handler: lib.ResponseLoggerWrapper(requestApprovalFx),
 		Method:  http.MethodPost,
 		Roles: []string{
 			lib.UserRoleAdmin,
@@ -55,7 +55,7 @@ var brokerRoutes []lib.Route = []lib.Route{
 	//	},
 	{
 		Route:   "/v1/policy/emit",
-		Handler: lib.ResponseLoggerWrapper(DraftEmitFx),
+		Handler: lib.ResponseLoggerWrapper(emitFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
@@ -74,7 +74,7 @@ var brokerRoutes []lib.Route = []lib.Route{
 	//	},
 	{
 		Route:   "/v1/policy/lead",
-		Handler: lib.ResponseLoggerWrapper(DraftLeadFx),
+		Handler: lib.ResponseLoggerWrapper(leadFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
@@ -86,7 +86,7 @@ var brokerRoutes []lib.Route = []lib.Route{
 	//	},
 	{
 		Route:   "/policy/reserved/v1/{policyUid}",
-		Handler: lib.ResponseLoggerWrapper(DraftAcceptanceFx),
+		Handler: lib.ResponseLoggerWrapper(acceptanceFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
@@ -98,7 +98,7 @@ var brokerRoutes []lib.Route = []lib.Route{
 	//	},
 	{
 		Route:   "/v1/policy/proposal",
-		Handler: lib.ResponseLoggerWrapper(DraftProposalFx),
+		Handler: lib.ResponseLoggerWrapper(proposalFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
@@ -110,7 +110,7 @@ var brokerRoutes []lib.Route = []lib.Route{
 	//	},
 	{
 		Route:   "/draft/policy/payment",
-		Handler: lib.ResponseLoggerWrapper(DraftPaymentFx),
+		Handler: lib.ResponseLoggerWrapper(paymentFx),
 		Method:  http.MethodPost,
 		Roles:   []string{},
 	},
