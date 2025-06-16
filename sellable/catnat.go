@@ -3,7 +3,10 @@ package sellable
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
+	"slices"
+	"strings"
 
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
@@ -74,6 +77,7 @@ func (fx *fxForCatnat) RemoveGuaranteeGroup(product *models.Product, groupKey st
 		}
 	}
 }
+
 func (fx *fxForCatnat) SetAsSelected(product *models.Product, groupKey string) {
 	for _, value := range product.Companies[0].GuaranteesMap {
 		if value.Group == groupKey {
@@ -130,27 +134,24 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 	alreadyEarthquake := policy.QuoteQuestions["alreadyEarthquake"].(bool)
 	alreadyFlood := policy.QuoteQuestions["alreadyFlood"].(bool)
 	useType := policy.Assets[0].Building.UseType
-	//you must have both SumInsuredTextField(Fabricato) and SumInsuredLimitOfIndemnityTextField(Contenuto)
+	//you must have both 'building' and 'content'
 	//if i have alreadyEarthquake and alreadyflood and tenant, fabricato is mandatory
-	isContenutoAndFabricato := func(value *models.GuaranteValue) bool {
-		if value == nil {
-			return false
-		}
-		val := value.SumInsured
-		if val == 0 {
-			return false
+	isContenutoAndFabricato := func(types []string) error {
+		log.Printf("%+v", types)
+		isContent := slices.Contains(types, "content")
+		isBuilding := slices.Contains(types, "building")
+
+		if !isContent {
+			return errors.New("Contenuto é obbligatorio")
 		}
 		if alreadyEarthquake && alreadyFlood && useType == "tenant" {
-			val := value.SumInsuredLimitOfIndemnity
-			if val == 0 {
-				return false
-			}
+			return nil
 		}
-		val = value.SumInsured
-		if val == 0 {
-			return false
+
+		if !isBuilding {
+			return errors.New("Fabbricato é obbligatorio")
 		}
-		return true
+		return nil
 	}
 	if policy.StartDate.IsZero() {
 		return nil, errors.New("Start date can't be 0")
@@ -158,25 +159,45 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 	if policy.EndDate.IsZero() {
 		return nil, errors.New("End date can't be 0")
 	}
-	if g, err := policy.ExtractGuarantee("landslides"); err == nil {
-		if !isContenutoAndFabricato(g.Value) && g.IsSelected {
-			return nil, errors.New("You need atleast fabricato and contenuto for landSlide")
+
+	guaranteeExist := func(policy *models.Policy, groupName string) (isSelected bool, error error) {
+		var types []string
+		var companyName string
+		for _, guarantee := range policy.Assets[0].Guarantees {
+
+			companyName = guarantee.CompanyName
+			if guarantee.Group == groupName {
+				isSelected = guarantee.IsSelected
+				_, typeName, _ := strings.Cut(guarantee.Slug, "-")
+				if guarantee.Value.SumInsuredLimitOfIndemnity > 0 {
+					types = append(types, typeName)
+				}
+			}
 		}
-	} else {
-		return nil, errors.New("You need to select landslides")
+		err := isContenutoAndFabricato(types)
+		if err != nil {
+			return isSelected, fmt.Errorf("Per %s %w", companyName, err)
+		}
+		return isSelected, nil
 	}
 
-	if g, err := policy.ExtractGuarantee("earthquake"); err == nil {
-		if !isContenutoAndFabricato(g.Value) && g.IsSelected {
-			return nil, errors.New("You need atleast fabricato and contenuto for earthquake")
-		}
+	exist, err := guaranteeExist(policy, "LANDSLIDE")
+	if !exist {
+		return nil, errors.New("You need to have landslide")
+	}
+	if err != nil {
+		return nil, err
 	}
 
-	if g, err := policy.ExtractGuarantee("flood"); err == nil {
-		if !isContenutoAndFabricato(g.Value) && g.IsSelected {
-			return nil, errors.New("You need atleast fabricato and contenuto for flood")
-		}
+	_, err = guaranteeExist(policy, "EARTHQUAKE")
+	if err != nil {
+		return nil, err
 	}
+	_, err = guaranteeExist(policy, "FLOOD")
+	if err != nil {
+		return nil, err
+	}
+
 	out = ruleOutput.(*SellableOutput)
 	return out, nil
 }
