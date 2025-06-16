@@ -63,6 +63,39 @@ func CatnatFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	return string(js), nil, nil
 }
 
+type fxForCatnat struct {
+	*models.Fx
+}
+
+func (fx *fxForCatnat) RemoveGuaranteeGroup(product *models.Product, groupKey string) {
+	for key, value := range product.Companies[0].GuaranteesMap {
+		if value.Group == groupKey {
+			fx.RemoveGuarantee(product.Companies[0].GuaranteesMap, key)
+		}
+	}
+}
+func (fx *fxForCatnat) SetAsSelected(product *models.Product, groupKey string) {
+	for _, value := range product.Companies[0].GuaranteesMap {
+		if value.Group == groupKey {
+			value.IsMandatory = true
+			value.IsSelected = true
+			value.IsSellable = true
+			value.IsConfigurable = false
+		}
+	}
+}
+
+func (fx *fxForCatnat) SetAsNoSelected(product *models.Product, groupKey string) {
+	for _, value := range product.Companies[0].GuaranteesMap {
+		if value.Group == groupKey {
+			value.IsMandatory = false
+			value.IsSelected = false
+			value.IsSellable = false
+			value.IsConfigurable = false
+		}
+	}
+}
+
 func CatnatSellable(policy *models.Policy, product *models.Product, isValidationForQuote bool) (*SellableOutput, error) {
 	log.AddPrefix("CatnatSellalble")
 	defer log.PopPrefix()
@@ -73,7 +106,7 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 	}
 
 	rulesFile := lib.GetRulesFileV2(policy.Name, policy.ProductVersion, rulesFilename)
-	fx := new(models.Fx)
+	fx := new(fxForCatnat)
 	if product == nil {
 		return nil, errors.New("Error getting catnat product")
 	}
