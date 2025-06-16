@@ -9,19 +9,19 @@ require (
 	cloud.google.com/go/firestore v1.15.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
-	gitlab.dev.wopta.it/goworkspace/bpmn v1.0.45
-	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.76
-	gitlab.dev.wopta.it/goworkspace/document v1.1.192
+	gitlab.dev.wopta.it/goworkspace/bpmn v1.0.46
+	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.77
+	gitlab.dev.wopta.it/goworkspace/document v1.1.193
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.167
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.182
-	gitlab.dev.wopta.it/goworkspace/models v1.2.65
-	gitlab.dev.wopta.it/goworkspace/network v1.0.131
-	gitlab.dev.wopta.it/goworkspace/payment v1.0.377
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.236
-	gitlab.dev.wopta.it/goworkspace/product v1.1.63
-	gitlab.dev.wopta.it/goworkspace/question v1.0.117
-	gitlab.dev.wopta.it/goworkspace/reserved v1.0.243
-	gitlab.dev.wopta.it/goworkspace/transaction v1.0.229
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.183
+	gitlab.dev.wopta.it/goworkspace/models v1.2.66
+	gitlab.dev.wopta.it/goworkspace/network v1.0.132
+	gitlab.dev.wopta.it/goworkspace/payment v1.0.378
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.237
+	gitlab.dev.wopta.it/goworkspace/product v1.1.64
+	gitlab.dev.wopta.it/goworkspace/question v1.0.118
+	gitlab.dev.wopta.it/goworkspace/reserved v1.0.244
+	gitlab.dev.wopta.it/goworkspace/transaction v1.0.230
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.9
 )
 

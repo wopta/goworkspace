@@ -9,8 +9,8 @@ require (
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/google/uuid v1.6.0
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.167
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.182
-	gitlab.dev.wopta.it/goworkspace/models v1.2.65
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.183
+	gitlab.dev.wopta.it/goworkspace/models v1.2.66
 )
 
 require (
@@ -65,7 +65,7 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	gitlab.dev.wopta.it/goworkspace/network v1.0.131 // indirect
+	gitlab.dev.wopta.it/goworkspace/network v1.0.132 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect

@@ -10,12 +10,12 @@ require (
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/gomarkdown/markdown v0.0.0-20241205020045-f7e15b2f3e62
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.167
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.182
-	gitlab.dev.wopta.it/goworkspace/models v1.2.65
-	gitlab.dev.wopta.it/goworkspace/network v1.0.131
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.236
-	gitlab.dev.wopta.it/goworkspace/product v1.1.63
-	gitlab.dev.wopta.it/goworkspace/user v1.0.167
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.183
+	gitlab.dev.wopta.it/goworkspace/models v1.2.66
+	gitlab.dev.wopta.it/goworkspace/network v1.0.132
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.237
+	gitlab.dev.wopta.it/goworkspace/product v1.1.64
+	gitlab.dev.wopta.it/goworkspace/user v1.0.168
 )
 
 require (
@@ -77,7 +77,7 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	gitlab.dev.wopta.it/goworkspace/document v1.1.192 // indirect
+	gitlab.dev.wopta.it/goworkspace/document v1.1.193 // indirect
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.9 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
