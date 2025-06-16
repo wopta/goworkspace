@@ -80,7 +80,7 @@ const (
 	PaymentModeRecurrent string = "recurrent"
 )
 
-func GetAllowedMonthlyModes() []string {
+func GetAllowedShortTermInstallmentModes() []string {
 	return []string{PaymentModeRecurrent}
 }
 
