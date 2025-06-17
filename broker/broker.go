@@ -168,8 +168,8 @@ var brokerRoutes []lib.Route = []lib.Route{
 		Roles:   []string{lib.UserRoleAdmin},
 	},
 	{
-		Route:   "/policy/validation/mail",
-		Handler: lib.ResponseLoggerWrapper(MailValidationFx),
+		Route:   "/v1/policy/validation/address",
+		Handler: lib.ResponseLoggerWrapper(AddressValidationFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
