@@ -167,6 +167,12 @@ var brokerRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAdmin},
 	},
+	{
+		Route:   "/policy/validation/mail",
+		Handler: lib.ResponseLoggerWrapper(MailValidationFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
 }
 
 func init() {
