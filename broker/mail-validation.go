@@ -14,7 +14,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func MailValidationFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func MailValidationFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		err    error
 		policy models.Policy
@@ -27,7 +27,7 @@ func MailValidationFx(w http.ResponseWriter, r *http.Request) (string, interface
 
 	err = json.Unmarshal([]byte(body), &policy)
 	if err != nil {
-		log.ErrorF("error unmarshaling policy: %s", err.Error())
+		log.ErrorF("error unmarshalling policy: %s", err.Error())
 		return "", nil, err
 	}
 	err = validateAllAddresses(&policy)
