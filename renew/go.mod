@@ -75,7 +75,7 @@ require (
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
 	gitlab.dev.wopta.it/goworkspace/document v1.1.194 // indirect
 	gitlab.dev.wopta.it/goworkspace/network v1.0.133 // indirect
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.237 // indirect
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.238 // indirect
 	gitlab.dev.wopta.it/goworkspace/product v1.1.65 // indirect
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.9 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
