@@ -11,7 +11,7 @@ require (
 	github.com/gomarkdown/markdown v0.0.0-20241205020045-f7e15b2f3e62
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.167
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.183
-	gitlab.dev.wopta.it/goworkspace/models v1.2.66
+	gitlab.dev.wopta.it/goworkspace/models v1.2.67
 	gitlab.dev.wopta.it/goworkspace/network v1.0.132
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.237
 	gitlab.dev.wopta.it/goworkspace/product v1.1.64
