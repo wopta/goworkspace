@@ -8,7 +8,7 @@ require (
 	cloud.google.com/go/bigquery v1.61.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.167
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.183
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.184
 	github.com/xuri/excelize/v2 v2.7.1
 	google.golang.org/api v0.181.0
 )
