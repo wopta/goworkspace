@@ -57,6 +57,6 @@ func CatnatDownloadCertification(store *bpmnEngine.StorageBpnm) error {
 	if err != nil {
 		return err
 	}
-
+	policy.CodeCompany = numeroPoliza.String
 	return err
 }
