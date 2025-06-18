@@ -39,8 +39,8 @@ func (c *mock_clientCatnat) Quote(dto catnat.QuoteRequest, _ *models.Policy) (re
 	}
 	json.Unmarshal(bytes, &dtoExpected)
 	if !reflect.DeepEqual(dto, dtoExpected) {
-		log.PrintStruct("Expected: ", dtoExpected)
-		log.PrintStruct("Got: ", dto)
+		log.PrintStruct("\nExpected: ", dtoExpected)
+		log.PrintStruct("\nGot: ", dto)
 		return response, errors.New("dto != expected")
 	}
 	return response, nil

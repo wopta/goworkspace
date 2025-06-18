@@ -59,8 +59,7 @@ type Guarante struct {
 	Commissions                *Commissions               `json:"commissions,omitempty" firestore:"commissions,omitempty" bigquery:"-"`
 	IsSelected                 bool                       `json:"isSelected" firestore:"isSelected" bigquery:"-"`
 	IsDeleted                  bool                       `json:"isDeleted" firestore:"isDeleted" bigquery:"-"`
-	//TODO: tochange in : SynchronizeSlug            string                     `json:"synchronizeSlug" firestore:"synchronizeSlug" bigquery:"-"`
-	SyncrhozineFieldSlug string `json:"syncrhozineFieldSlug" firestore:"syncrhozineFieldSlug" bigquery:"-"`
+	SynchronizeSlug            string                     `json:"synchronizeSlug" firestore:"synchronizeSlug" bigquery:"-"`
 }
 
 type GuaranteValue struct {
