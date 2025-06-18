@@ -88,32 +88,37 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 		return nil, errors.New(out.Msg)
 	}
 
-	if !isValidationForQuote {
-		out = ruleOutput.(*SellableOutput)
-		log.InfoF(out.Msg)
-		return out, nil
-	}
+	//	if !isValidationForQuote {
+	//		out = ruleOutput.(*SellableOutput)
+	//		log.InfoF(out.Msg)
+	//		return out, nil
+	//	}
 
 	alreadyEarthquake := policy.QuoteQuestions["alreadyEarthquake"].(bool)
 	alreadyFlood := policy.QuoteQuestions["alreadyFlood"].(bool)
 	useType := policy.Assets[0].Building.UseType
 	//you must have both SumInsuredTextField(Fabricato) and SumInsuredLimitOfIndemnityTextField(Contenuto)
 	//if i have alreadyEarthquake and alreadyflood and tenant, fabricato is mandatory
-	isContenutoAndFabricato := func(value *models.GuaranteValue) bool {
-		if value == nil {
+	log.ErrorF("jklfdsjfd")
+	isContenutoAndFabricato := func(value models.Guarante) bool {
+		if value.Value == nil {
 			return false
 		}
-		val := value.SumInsured
+		val := value.Value.SumInsuredLimitOfIndemnity
+		if val == 0 {
+			return false
+		}
+		val = value.Value.LimitOfIndemnity
 		if val == 0 {
 			return false
 		}
 		if alreadyEarthquake && alreadyFlood && useType == "tenant" {
-			val := value.SumInsuredLimitOfIndemnity
-			if val == 0 {
-				return false
+			for _, guarantee := range product.Companies[0].GuaranteesMap {
+				guarantee.Config.LimitOfIndemnityTextField.Min = 0
 			}
+			return true
 		}
-		val = value.SumInsured
+		val = value.Value.SumInsured
 		if val == 0 {
 			return false
 		}
@@ -126,21 +131,21 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 		return nil, errors.New("End date can't be 0")
 	}
 	if g, err := policy.ExtractGuarantee("landslides"); err == nil {
-		if !isContenutoAndFabricato(g.Value) && g.IsSelected {
+		if !isContenutoAndFabricato(g) && g.IsSelected {
 			return nil, errors.New("Per frane hai bisogno almeno di fabricato e contenuto.")
 		}
 	} else {
-		return nil, errors.New("You need to select landslides")
+		return nil, errors.New("Hai bisogno di frane")
 	}
 
 	if g, err := policy.ExtractGuarantee("earthquake"); err == nil {
-		if !isContenutoAndFabricato(g.Value) && g.IsSelected {
+		if !isContenutoAndFabricato(g) && g.IsSelected {
 			return nil, errors.New("Per terremoto hai bisogno almeno di fabricato e contenuto.")
 		}
 	}
 
 	if g, err := policy.ExtractGuarantee("flood"); err == nil {
-		if !isContenutoAndFabricato(g.Value) && g.IsSelected {
+		if !isContenutoAndFabricato(g) && g.IsSelected {
 			return nil, errors.New("Per alluvione hai bisogno almeno di fabricato e contenuto.")
 		}
 	}
