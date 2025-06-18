@@ -16,8 +16,8 @@ import (
 
 func AddressValidationFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
-		err    error
-		policy models.Policy
+		err     error
+		address models.Address
 	)
 	log.AddPrefix("MailValidation")
 	defer log.PopPrefix()
@@ -25,48 +25,16 @@ func AddressValidationFx(w http.ResponseWriter, r *http.Request) (string, any, e
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
-	err = json.Unmarshal([]byte(body), &policy)
+	err = json.Unmarshal([]byte(body), &address)
 	if err != nil {
 		log.ErrorF("error unmarshalling policy: %s", err.Error())
 		return "", nil, err
 	}
-	err = validateAllAddresses(&policy)
+	err = validateAddress(&address)
 	if err != nil {
 		return "", nil, errors.New("Errore nell'indirizzo")
 	}
 	return "{}", nil, nil
-}
-
-func validateAllAddresses(policy *models.Policy) error {
-	for _, a := range policy.Assets {
-		if a.Building != nil {
-			if err := validateAddress(a.Building.BuildingAddress); err != nil {
-				return err
-			}
-		}
-	}
-
-	for _, contractor := range *policy.Contractors {
-		if err := validateAddress(contractor.Residence); err != nil {
-			return err
-		}
-		if err := validateAddress(contractor.Domicile); err != nil {
-			return err
-		}
-	}
-
-	if err := validateAddress(policy.Contractor.Residence); err != nil {
-		return err
-	}
-
-	if err := validateAddress(policy.Contractor.Domicile); err != nil {
-		return err
-	}
-
-	if err := validateAddress(policy.Contractor.CompanyAddress); err != nil {
-		return err
-	}
-	return nil
 }
 
 func validateAddress(address *models.Address) error {
