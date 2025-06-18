@@ -49,7 +49,7 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		warrant = networkNode.GetWarrant()
 	}
 	product := prd.GetProductV2(reqPolicy.Name, reqPolicy.ProductVersion, reqPolicy.Channel, networkNode, warrant)
-	resp, err := CatnatQuote(reqPolicy, product, sellable.CatnatSellable, client)
+	resp, err := CatnatQuote(reqPolicy, product, sellable.CatnatSellable, client.Quote)
 	if err != nil {
 		return "", nil, err
 	}

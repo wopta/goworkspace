@@ -10,7 +10,9 @@ import (
 
 type sellableCatnat func(policy *models.Policy, product *models.Product, isValidationForQuote bool) (*sellable.SellableOutput, error)
 
-func CatnatQuote(policy *models.Policy, product *models.Product, sellable sellableCatnat, catnatClient catnat.INetClient) (resp catnat.QuoteResponse, err error) {
+type clientQuote func(dto catnat.QuoteRequest, policy *models.Policy) (response catnat.QuoteResponse, err error)
+
+func CatnatQuote(policy *models.Policy, product *models.Product, sellable sellableCatnat, clientQuote clientQuote) (resp catnat.QuoteResponse, err error) {
 	outSellable, err := sellable(policy, product, true)
 	if err != nil {
 		return resp, err
@@ -24,7 +26,7 @@ func CatnatQuote(policy *models.Policy, product *models.Product, sellable sellab
 		return resp, err
 	}
 
-	resp, err = catnatClient.Quote(cnReq, policy)
+	resp, err = clientQuote(cnReq, policy)
 	log.PrintStruct("response quote", resp)
 	if err != nil {
 		return resp, err
