@@ -96,7 +96,7 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 	if alreadyEarthquake && alreadyFlood && useType == "tenant" {
 		isBuildingOptional = true
 		for _, guarantee := range out.Product.Companies[0].GuaranteesMap {
-			guarantee.Config.LimitOfIndemnityTextField.Min = 0
+			guarantee.Config.SumInsuredTextField.Min = 0
 		}
 	}
 
