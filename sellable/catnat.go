@@ -137,7 +137,6 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 	//you must have both 'building' and 'content'
 	//if i have alreadyEarthquake and alreadyflood and tenant, fabricato is mandatory
 	isContenutoAndFabricato := func(types []string) error {
-		log.Printf("%+v", types)
 		isContent := slices.Contains(types, "content")
 		isBuilding := slices.Contains(types, "building")
 
@@ -145,6 +144,11 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 			return errors.New("Contenuto é obbligatorio")
 		}
 		if alreadyEarthquake && alreadyFlood && useType == "tenant" {
+			for _, guarantee := range product.Companies[0].GuaranteesMap {
+				if strings.HasSuffix(guarantee.SynchronizeSlug, "building") {
+					guarantee.Config.SumInsuredLimitOfIndemnityTextField.Min = 0
+				}
+			}
 			return nil
 		}
 
