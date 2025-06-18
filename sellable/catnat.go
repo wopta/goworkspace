@@ -99,7 +99,6 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 	useType := policy.Assets[0].Building.UseType
 	//you must have both SumInsuredTextField(Fabricato) and SumInsuredLimitOfIndemnityTextField(Contenuto)
 	//if i have alreadyEarthquake and alreadyflood and tenant, fabricato is mandatory
-	log.ErrorF("jklfdsjfd")
 	isContenutoAndFabricato := func(value models.Guarante) bool {
 		if value.Value == nil {
 			return false
