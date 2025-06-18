@@ -801,8 +801,10 @@ func (bg *baseGenerator) mupSectionIV() {
 
 	website := "https://www.wopta.it/it/information-sets/"
 	websiteNode := bg.worksForNode
-	if bg.networkNode.Type == models.AgencyNetworkNodeType || bg.networkNode.Type == models.BrokerNetworkNodeType {
-		websiteNode = bg.networkNode
+	if bg.networkNode != nil {
+		if bg.networkNode.Type == models.AgencyNetworkNodeType || bg.networkNode.Type == models.BrokerNetworkNodeType {
+			websiteNode = bg.networkNode
+		}
 	}
 	if websiteNode != nil {
 		website = websiteNode.GetWebsite()
