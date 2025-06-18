@@ -81,7 +81,6 @@ func emitBaseNoSequence(state bpmn.StorageData) error {
 	now := time.Now().UTC()
 
 	policy.CompanyEmit = true
-	policy.CodeCompany = models.CatNatProduct
 	policy.CompanyEmitted = false
 	policy.EmitDate = now
 	policy.BigEmitDate = civil.DateTimeOf(now)
