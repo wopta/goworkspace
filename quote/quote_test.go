@@ -67,7 +67,7 @@ func TestQuoteCatnatWithEverything(t *testing.T) {
 	}
 	client := new(mock_clientCatnat)
 	client.nameFileToCompare = "output_everything_alreadyfalse.json"
-	_, err := CatnatQuote(policy, product, mock_sellable, client.Quote)
+	_, err := catnatQuote(policy, product, mock_sellable, client.Quote)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -85,7 +85,7 @@ func TestQuoteCatnatWithEverythingButEarthquake(t *testing.T) {
 	}
 	client := new(mock_clientCatnat)
 	client.nameFileToCompare = "output_noearthquake.json"
-	_, err := CatnatQuote(policy, product, mock_sellable, client.Quote)
+	_, err := catnatQuote(policy, product, mock_sellable, client.Quote)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -104,7 +104,7 @@ func TestQuoteCatnatWithEverything2(t *testing.T) {
 	client := new(mock_clientCatnat)
 	client.nameFileToCompare = "output_everything_alreadytrue.json"
 
-	_, err := CatnatQuote(policy, product, mock_sellable, client.Quote)
+	_, err := catnatQuote(policy, product, mock_sellable, client.Quote)
 	if err != nil {
 		t.Fatal(err)
 	}
