@@ -800,8 +800,9 @@ func (bg *baseGenerator) mupSectionIV() {
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
 
 	website := "https://www.wopta.it/it/information-sets/"
-	websiteNode := bg.worksForNode
-	if bg.networkNode != nil {
+	var websiteNode *models.NetworkNode
+	if bg.networkNode != nil && !bg.networkNode.IsMgaProponent {
+		websiteNode = bg.worksForNode
 		if bg.networkNode.Type == models.AgencyNetworkNodeType || bg.networkNode.Type == models.BrokerNetworkNodeType {
 			websiteNode = bg.networkNode
 		}
@@ -997,7 +998,7 @@ func (bg *baseGenerator) designationInfo() string {
 	}
 
 	if bg.policy.Channel == lib.NetworkChannel {
-		contactPrefix := ". Contatti Itermediario"
+		contactPrefix := ". Contatti Intermediario"
 		contactPhoneFormat := "- telefono: %s"
 		contactPhone := ""
 		contactMailFormat := "- mail: %s"
@@ -1037,7 +1038,7 @@ func (bg *baseGenerator) mupInfo() (section2Info, section5Info string) {
 			"seguente Impresa di assicurazione: %s"
 		mgaEmitterFormat = "Il contratto viene intermediato da %s, in qualità di soggetto proponente, che opera in " +
 			"virtù della collaborazione con Wopta Assicurazioni Srl (intermediario emittente dell'Impresa di " +
-			"Assicurazione %s, iscritto al RUI sezione A nr A000701923 dal 14.02.2022, ai sensi dell’articolo 22, " +
+			"Assicurazione %s, iscritto al RUI sezione A nr A000701923 dal 14.02.2022), ai sensi dell’articolo 22, " +
 			"comma 10, del decreto legge 18 ottobre 2012, n. 179, convertito nella legge 17 dicembre 2012, n. 221"
 		withoutConsultacy = "Per il prodotto intermediato, è corrisposto all’Intermediario un compenso da parte " +
 			"dell’Impresa di assicurazione, sotto forma di commissione inclusa nel premio assicurativo."
