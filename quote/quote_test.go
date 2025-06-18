@@ -10,8 +10,8 @@ import (
 	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/models/catnat"
 	"gitlab.dev.wopta.it/goworkspace/product"
-	"gitlab.dev.wopta.it/goworkspace/quote/catnat"
 	"gitlab.dev.wopta.it/goworkspace/sellable"
 )
 
@@ -74,7 +74,7 @@ func TestQuoteCatnatWithEverything(t *testing.T) {
 	}
 	client := new(mock_clientCatnat)
 	client.nameFileToCompare = "output_everything_alreadyfalse.json"
-	_, err := catnat.CatnatQuote(policy, product, mock_sellable, client)
+	_, err := CatnatQuote(policy, product, mock_sellable, client)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -92,7 +92,7 @@ func TestQuoteCatnatWithEverythingButEarthquake(t *testing.T) {
 	}
 	client := new(mock_clientCatnat)
 	client.nameFileToCompare = "output_noearthquake.json"
-	_, err := catnat.CatnatQuote(policy, product, mock_sellable, client)
+	_, err := CatnatQuote(policy, product, mock_sellable, client)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -111,7 +111,7 @@ func TestQuoteCatnatWithEverything2(t *testing.T) {
 	client := new(mock_clientCatnat)
 	client.nameFileToCompare = "output_everything_alreadytrue.json"
 
-	_, err := catnat.CatnatQuote(policy, product, mock_sellable, client)
+	_, err := CatnatQuote(policy, product, mock_sellable, client)
 	if err != nil {
 		t.Fatal(err)
 	}

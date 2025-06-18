@@ -19,7 +19,7 @@ func AtecoFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 		enrichByte []byte
 	)
 
-	log.AddPrefix("[AtecoFx] ")
+	log.AddPrefix("AtecoFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")

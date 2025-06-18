@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models/catnat"
 	"gitlab.dev.wopta.it/goworkspace/network"
 	prd "gitlab.dev.wopta.it/goworkspace/product"
-	"gitlab.dev.wopta.it/goworkspace/quote/catnat"
 	"gitlab.dev.wopta.it/goworkspace/sellable"
 
 	"gitlab.dev.wopta.it/goworkspace/lib"
@@ -49,7 +49,7 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		warrant = networkNode.GetWarrant()
 	}
 	product := prd.GetProductV2(reqPolicy.Name, reqPolicy.ProductVersion, reqPolicy.Channel, networkNode, warrant)
-	resp, err := catnat.CatnatQuote(reqPolicy, product, sellable.CatnatSellable, client)
+	resp, err := CatnatQuote(reqPolicy, product, sellable.CatnatSellable, client)
 	if err != nil {
 		return "", nil, err
 	}

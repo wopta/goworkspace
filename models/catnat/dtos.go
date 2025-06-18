@@ -49,7 +49,14 @@ type DownloadResponse struct {
 	Result        string      `json:"esito"`
 	NumeroPolizza string      `json:"numeroPolizza"`
 	Documento     []Documento `json:"documento"`
-	Errors        interface{} `json:"errori"` // or *string if it's always null or a string
+	Errors        interface{} `json:"errori"`
+}
+
+type AtecoResponse struct {
+	Result      string      `json:"esito"`
+	Ateco       string      `json:"codiceAteco"`
+	CompanyName string      `json:"ragioneSociale"`
+	Errors      interface{} `json:"errori"`
 }
 type contractor struct {
 	Name                      string `json:"nome,omitempty"`

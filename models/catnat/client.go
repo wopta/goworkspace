@@ -181,3 +181,27 @@ func (c *NetClient) Download(numeroPolizza string) (response DownloadResponse, e
 	}
 	return response, nil
 }
+func (c *NetClient) EnrichAteco(fiscalCode string) (response AtecoResponse, err error) {
+	url := os.Getenv("NET_BASEURL") + "/OperationsGateway/InformazioniCompagnia/" + fiscalCode
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return response, err
+	}
+	resp, err := c.Client.Do(req)
+	if err != nil {
+		return response, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		errBytes, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return response, err
+		}
+		return response, errors.New(string(errBytes))
+	}
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if response.Result != "OK" {
+		return response, errors.New("Error Enrich ateco")
+	}
+	return response, err
+}

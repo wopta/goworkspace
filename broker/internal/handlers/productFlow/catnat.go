@@ -10,7 +10,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/quote/catnat"
+	"gitlab.dev.wopta.it/goworkspace/models/catnat"
 )
 
 func CatnatIntegration(store bpmn.StorageData) error {
