@@ -179,6 +179,10 @@ func (c *NetClient) Download(numeroPolizza string) (response DownloadResponse, e
 		log.ErrorF("error decoding catnat response")
 		return response, err
 	}
+	if response.Result != "OK" {
+		log.ErrorF("Errore emissione %+v", response.Errors)
+		return response, errors.New("Error download")
+	}
 	return response, nil
 }
 func (c *NetClient) EnrichAteco(fiscalCode string) (response AtecoResponse, err error) {
@@ -200,6 +204,10 @@ func (c *NetClient) EnrichAteco(fiscalCode string) (response AtecoResponse, err 
 		return response, errors.New(string(errBytes))
 	}
 	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		log.ErrorF("error decoding catnat response")
+		return response, err
+	}
 	if response.Result != "OK" {
 		return response, errors.New("Error Enrich ateco")
 	}
