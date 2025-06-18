@@ -88,15 +88,24 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 		return nil, errors.New(out.Msg)
 	}
 
+	alreadyEarthquake := policy.QuoteQuestions["alreadyEarthquake"].(bool)
+	alreadyFlood := policy.QuoteQuestions["alreadyFlood"].(bool)
+	useType := policy.Assets[0].Building.UseType
+	isBuildingOptional := false
+
+	if alreadyEarthquake && alreadyFlood && useType == "tenant" {
+		isBuildingOptional = true
+		for _, guarantee := range out.Product.Companies[0].GuaranteesMap {
+			guarantee.Config.LimitOfIndemnityTextField.Min = 0
+		}
+	}
+
 	if !isValidationForQuote {
 		out = ruleOutput.(*SellableOutput)
 		log.InfoF(out.Msg)
 		return out, nil
 	}
 
-	alreadyEarthquake := policy.QuoteQuestions["alreadyEarthquake"].(bool)
-	alreadyFlood := policy.QuoteQuestions["alreadyFlood"].(bool)
-	useType := policy.Assets[0].Building.UseType
 	//you must have both SumInsuredTextField(Fabricato) and SumInsuredLimitOfIndemnityTextField(Contenuto)
 	//if i have alreadyEarthquake and alreadyflood and tenant, fabricato is mandatory
 	isContenutoAndFabricato := func(value models.Guarante) bool {
@@ -111,10 +120,7 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 		if val == 0 {
 			return false
 		}
-		if alreadyEarthquake && alreadyFlood && useType == "tenant" {
-			for _, guarantee := range product.Companies[0].GuaranteesMap {
-				guarantee.Config.LimitOfIndemnityTextField.Min = 0
-			}
+		if isBuildingOptional {
 			return true
 		}
 		val = value.Value.SumInsured
