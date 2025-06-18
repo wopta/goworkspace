@@ -88,11 +88,11 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 		return nil, errors.New(out.Msg)
 	}
 
-	//	if !isValidationForQuote {
-	//		out = ruleOutput.(*SellableOutput)
-	//		log.InfoF(out.Msg)
-	//		return out, nil
-	//	}
+	if !isValidationForQuote {
+		out = ruleOutput.(*SellableOutput)
+		log.InfoF(out.Msg)
+		return out, nil
+	}
 
 	alreadyEarthquake := policy.QuoteQuestions["alreadyEarthquake"].(bool)
 	alreadyFlood := policy.QuoteQuestions["alreadyFlood"].(bool)
