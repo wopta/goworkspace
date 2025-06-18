@@ -8,9 +8,9 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/sellable"
 )
 
-type sellableCatnat func(policy *models.Policy, product *models.Product, isValidationForQuote bool) (*sellable.SellableOutput, error)
+type sellableCatnat = func(policy *models.Policy, product *models.Product, isValidationForQuote bool) (*sellable.SellableOutput, error)
 
-type clientQuote func(dto catnat.QuoteRequest, policy *models.Policy) (response catnat.QuoteResponse, err error)
+type clientQuote = func(dto catnat.QuoteRequest, policy *models.Policy) (response catnat.QuoteResponse, err error)
 
 func CatnatQuote(policy *models.Policy, product *models.Product, sellable sellableCatnat, clientQuote clientQuote) (resp catnat.QuoteResponse, err error) {
 	outSellable, err := sellable(policy, product, true)
