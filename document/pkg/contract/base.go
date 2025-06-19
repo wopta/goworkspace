@@ -799,26 +799,21 @@ func (bg *baseGenerator) mupSectionIV() {
 		"assicurazioni."
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
 
-	website := "https://www.wopta.it/it/information-sets/"
-	var websiteNode *models.NetworkNode
+	companyListText := "L’elenco delle Imprese con cui l’Intermediario ha rapporti d’affari diretti è"
+	contractorsFacultyDisclaimer := "È facoltà del contraente chiedere la consegna o la trasmissione di tale elenco."
+
 	if bg.networkNode != nil && !bg.networkNode.IsMgaProponent {
-		websiteNode = bg.worksForNode
-		if bg.networkNode.Type == models.AgencyNetworkNodeType || bg.networkNode.Type == models.BrokerNetworkNodeType {
-			websiteNode = bg.networkNode
-		}
-	}
-	if websiteNode != nil {
-		website = websiteNode.GetWebsite()
+		text = companyListText + " affisso nei propri locali. " + contractorsFacultyDisclaimer
+		bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
+		return
 	}
 
-	bg.engine.RawWriteText(
-		bg.engine.GetTableCell("L’elenco delle Imprese con cui l’Intermediario ha rapporti d’affari diretti è "+
-			"pubblicato sul proprio sito internet ", constants.BlackColor),
-	)
+	website := "https://www.wopta.it/it/information-sets/"
+	text = companyListText + " pubblicato sul proprio sito internet "
+	bg.engine.RawWriteText(bg.engine.GetTableCell(text, constants.BlackColor))
 	bg.engine.WriteLink(website, bg.engine.GetTableCell(website, constants.PinkColor))
-	bg.engine.RawWriteText(
-		bg.engine.GetTableCell(". È facoltà del contraente chiedere la consegna o la trasmissione di tale elenco.",
-			constants.BlackColor))
+	text = ". " + contractorsFacultyDisclaimer
+	bg.engine.RawWriteText(bg.engine.GetTableCell(text, constants.BlackColor))
 	bg.engine.NewLine(constants.CellHeight)
 }
 
@@ -998,33 +993,9 @@ func (bg *baseGenerator) designationInfo() string {
 	}
 
 	if bg.policy.Channel == lib.NetworkChannel {
-		contactPrefix := ". Contatti Intermediario"
-		contactPhoneFormat := "- telefono: %s"
-		contactPhone := ""
-		contactMailFormat := "- mail: %s"
-		contactMail := ""
-
-		if bg.networkNode.Type == models.AgencyNetworkNodeType || bg.networkNode.Type == models.BrokerNetworkNodeType {
-			if phone := bg.networkNode.GetManagerPhone(); phone != "" {
-				contactPhone = fmt.Sprintf(contactPhoneFormat, phone)
-			}
-		} else {
-			if phone := bg.networkNode.GetPhone(); phone != "" {
-				contactPhone = fmt.Sprintf(contactPhoneFormat, phone)
-			}
-			contactMail = fmt.Sprintf(contactMailFormat, bg.networkNode.Mail)
-		}
-
-		parts := []string{contactPrefix}
-		if contactMail != "" {
-			parts = append(parts, contactMail)
-		}
-		if contactPhone != "" {
-			parts = append(parts, contactPhone)
-		}
-		agentContact = strings.Join(parts, " ")
-
+		agentContact = fmt.Sprintf(". Contatti Intermediario - mail: %s", bg.networkNode.Mail)
 	}
+
 	designation += agentContact
 
 	log.Printf("designation info: %+v", designation)
