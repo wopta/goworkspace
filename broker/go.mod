@@ -11,17 +11,17 @@ require (
 	github.com/go-chi/chi/v5 v5.0.12
 	gitlab.dev.wopta.it/goworkspace/bpmn v1.0.47
 	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.78
-	gitlab.dev.wopta.it/goworkspace/document v1.1.197
+	gitlab.dev.wopta.it/goworkspace/document v1.1.198
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.167
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.184
 	gitlab.dev.wopta.it/goworkspace/models v1.2.67
 	gitlab.dev.wopta.it/goworkspace/network v1.0.133
-	gitlab.dev.wopta.it/goworkspace/payment v1.0.383
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.241
+	gitlab.dev.wopta.it/goworkspace/payment v1.0.384
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.242
 	gitlab.dev.wopta.it/goworkspace/product v1.1.65
 	gitlab.dev.wopta.it/goworkspace/question v1.0.119
-	gitlab.dev.wopta.it/goworkspace/reserved v1.0.248
-	gitlab.dev.wopta.it/goworkspace/transaction v1.0.234
+	gitlab.dev.wopta.it/goworkspace/reserved v1.0.249
+	gitlab.dev.wopta.it/goworkspace/transaction v1.0.235
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.9
 )
 
