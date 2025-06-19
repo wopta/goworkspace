@@ -17,7 +17,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.187
 	gitlab.dev.wopta.it/goworkspace/models v1.2.70
 	gitlab.dev.wopta.it/goworkspace/network v1.0.136
-	gitlab.dev.wopta.it/goworkspace/product v1.1.68
+	gitlab.dev.wopta.it/goworkspace/product v1.1.69
 	gitlab.dev.wopta.it/goworkspace/user v1.0.172
 	google.golang.org/api v0.206.0
 )
