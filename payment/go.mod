@@ -8,16 +8,16 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/google/uuid v1.6.0
-	gitlab.dev.wopta.it/goworkspace/accounting v1.0.63
-	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.78
-	gitlab.dev.wopta.it/goworkspace/document v1.1.198
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.167
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.184
-	gitlab.dev.wopta.it/goworkspace/models v1.2.67
-	gitlab.dev.wopta.it/goworkspace/network v1.0.133
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.242
-	gitlab.dev.wopta.it/goworkspace/product v1.1.65
-	gitlab.dev.wopta.it/goworkspace/transaction v1.0.235
+	gitlab.dev.wopta.it/goworkspace/accounting v1.0.64
+	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.79
+	gitlab.dev.wopta.it/goworkspace/document v1.1.199
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.168
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.185
+	gitlab.dev.wopta.it/goworkspace/models v1.2.68
+	gitlab.dev.wopta.it/goworkspace/network v1.0.134
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.243
+	gitlab.dev.wopta.it/goworkspace/product v1.1.66
+	gitlab.dev.wopta.it/goworkspace/transaction v1.0.236
 )
 
 require (
@@ -80,7 +80,7 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.9 // indirect
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.10 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect

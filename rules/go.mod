@@ -9,8 +9,8 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-gota/gota v0.12.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.167
-	gitlab.dev.wopta.it/goworkspace/quote v1.0.222
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.168
+	gitlab.dev.wopta.it/goworkspace/quote v1.0.223
 )
 
 require (
@@ -72,13 +72,13 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	gitlab.dev.wopta.it/goworkspace/document v1.1.198 // indirect
-	gitlab.dev.wopta.it/goworkspace/models v1.2.67 // indirect
-	gitlab.dev.wopta.it/goworkspace/network v1.0.133 // indirect
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.242 // indirect
-	gitlab.dev.wopta.it/goworkspace/product v1.1.65 // indirect
-	gitlab.dev.wopta.it/goworkspace/sellable v1.0.173 // indirect
-	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.9 // indirect
+	gitlab.dev.wopta.it/goworkspace/document v1.1.199 // indirect
+	gitlab.dev.wopta.it/goworkspace/models v1.2.68 // indirect
+	gitlab.dev.wopta.it/goworkspace/network v1.0.134 // indirect
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.243 // indirect
+	gitlab.dev.wopta.it/goworkspace/product v1.1.66 // indirect
+	gitlab.dev.wopta.it/goworkspace/sellable v1.0.174 // indirect
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.10 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20231025114914-d1ff6096ae53 // indirect
 	github.com/xuri/excelize/v2 v2.8.1 // indirect
