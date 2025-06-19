@@ -8,10 +8,10 @@ require (
 	firebase.google.com/go/v4 v4.10.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.168
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.185
-	gitlab.dev.wopta.it/goworkspace/models v1.2.68
-	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.10
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.169
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.186
+	gitlab.dev.wopta.it/goworkspace/models v1.2.69
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.11
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
 
 )
@@ -68,7 +68,7 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	gitlab.dev.wopta.it/goworkspace/network v1.0.134 // indirect
+	gitlab.dev.wopta.it/goworkspace/network v1.0.135 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect

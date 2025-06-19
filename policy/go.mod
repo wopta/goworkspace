@@ -7,11 +7,11 @@ replace gitlab.dev.wopta.it/goworkspace/policy => ./
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
-	gitlab.dev.wopta.it/goworkspace/document v1.1.199
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.168
-	gitlab.dev.wopta.it/goworkspace/models v1.2.68
-	gitlab.dev.wopta.it/goworkspace/network v1.0.134
-	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.10
+	gitlab.dev.wopta.it/goworkspace/document v1.1.200
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.169
+	gitlab.dev.wopta.it/goworkspace/models v1.2.69
+	gitlab.dev.wopta.it/goworkspace/network v1.0.135
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.11
 	google.golang.org/grpc v1.63.2
 )
 
@@ -75,7 +75,7 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	gitlab.dev.wopta.it/goworkspace/product v1.1.66 // indirect
+	gitlab.dev.wopta.it/goworkspace/product v1.1.67 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect

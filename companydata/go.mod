@@ -11,13 +11,13 @@ require (
 	github.com/go-gota/gota v0.12.0
 	github.com/google/uuid v1.6.0
 	github.com/oliveagle/jsonpath v0.0.0-20180606110733-2e52cf6e6852
-	gitlab.dev.wopta.it/goworkspace/inclusive v0.0.11
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.168
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.185
-	gitlab.dev.wopta.it/goworkspace/models v1.2.68
-	gitlab.dev.wopta.it/goworkspace/network v1.0.134
-	gitlab.dev.wopta.it/goworkspace/product v1.1.66
-	gitlab.dev.wopta.it/goworkspace/user v1.0.170
+	gitlab.dev.wopta.it/goworkspace/inclusive v0.0.12
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.169
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.186
+	gitlab.dev.wopta.it/goworkspace/models v1.2.69
+	gitlab.dev.wopta.it/goworkspace/network v1.0.135
+	gitlab.dev.wopta.it/goworkspace/product v1.1.67
+	gitlab.dev.wopta.it/goworkspace/user v1.0.171
 	github.com/xuri/excelize/v2 v2.9.0
 	google.golang.org/api v0.206.0
 )
@@ -70,7 +70,7 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.10 // indirect
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.11 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20240408161823-9ad904a10d6d // indirect
 	github.com/xuri/nfp v0.0.0-20240318013403-ab9948c2c4a7 // indirect
