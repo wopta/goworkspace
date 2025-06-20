@@ -14,7 +14,6 @@ func SetLeadData(policy *models.Policy, product models.Product, networkNode *mod
 	log.AddPrefix("SetLeadData")
 	defer log.PopPrefix()
 	log.Println("start -----------------------------------------")
-
 	now := time.Now().UTC()
 
 	if policy.CreationDate.IsZero() {
