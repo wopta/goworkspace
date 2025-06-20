@@ -27,7 +27,7 @@ func (f *FlowBpnm) RunAt(processName, startingActivity string) error {
 		return fmt.Errorf("Process '%v' not found", processName)
 	}
 
-	if e := process.loop(startingActivity); e != nil { //TODO: how to check if there is an infinite loop
+	if e := process.loop(startingActivity); e != nil {
 		return e
 	}
 	log.InfoF("Finished %v", processName)
