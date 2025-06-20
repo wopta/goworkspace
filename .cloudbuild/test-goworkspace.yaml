@@ -1,0 +1,34 @@
+steps:
+  - name: gcr.io/cloud-builders/gcloud
+    args:
+      - '-c'
+      - |
+
+        mkdir -p /tmp/src/    
+        cp -r /workspace/* /tmp/src/
+        mkdir -p /workspace/goworkspace/ 
+        cp -r /tmp/src/* /workspace/goworkspace/
+
+        mkdir -p /workspace/function-data/
+
+        gcloud artifacts generic download\
+          --destination=/workspace/function-data \
+          --package=function-data \
+          --version=${_VERSION} \
+          --project=${PROJECT_ID} \
+          --repository=function-data \
+          --location=${_REGION}
+
+        cd function-data/
+        tar -xvzf function-data.tar.gz
+    entrypoint: bash
+  - name: 'golang:1.21'
+    args:
+      - '-c'
+      - |
+        cd goworkspace
+        go test gitlab.dev.wopta.it/goworkspace/...
+    entrypoint: bash
+options:
+  logging: CLOUD_LOGGING_ONLY
+
