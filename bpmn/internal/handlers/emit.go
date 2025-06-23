@@ -61,7 +61,7 @@ func emitBaseWithSequence(state *bpmnEngine.StorageBpnm) error {
 	policy.Number = tot
 	policy.NumberCompany = numb
 	policy.CodeCompany = company
-	return nil
+	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
 func emitBaseNoSequence(state *bpmnEngine.StorageBpnm) error {
