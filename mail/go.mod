@@ -5,13 +5,14 @@ go 1.21
 replace gitlab.dev.wopta.it/goworkspace/mail => ./
 
 require (
+	cloud.google.com/go/bigquery v1.61.0
 	cloud.google.com/go/firestore v1.15.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/dustin/go-humanize v1.0.1
 	github.com/google/uuid v1.6.0
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.167
-	gitlab.dev.wopta.it/goworkspace/models v1.2.66
-	gitlab.dev.wopta.it/goworkspace/network v1.0.132
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.170
+	gitlab.dev.wopta.it/goworkspace/models v1.2.71
+	gitlab.dev.wopta.it/goworkspace/network v1.0.137
 	google.golang.org/api v0.181.0
 )
 
@@ -19,7 +20,6 @@ require (
 	cloud.google.com/go v0.113.0 // indirect
 	cloud.google.com/go/auth v0.4.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.2 // indirect
-	cloud.google.com/go/bigquery v1.61.0 // indirect
 	cloud.google.com/go/compute/metadata v0.3.0 // indirect
 	cloud.google.com/go/iam v1.1.8 // indirect
 	cloud.google.com/go/longrunning v0.5.7 // indirect

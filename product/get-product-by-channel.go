@@ -352,6 +352,7 @@ func overrideProductInfo(product *models.Product, networkNode *models.NetworkNod
 		}
 		product.Steps = filterProductStepsByFlow(product.Steps, flow)
 	}
+	product.Flow = flow
 }
 
 func filterProductStepsByFlow(steps []models.Step, flowName string) []models.Step {

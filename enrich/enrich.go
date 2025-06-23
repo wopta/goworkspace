@@ -21,6 +21,12 @@ var enrichRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
 	},
+	{
+		Route:   "/cat-nat/ateco/{fiscalCode}",
+		Handler: lib.ResponseLoggerWrapper(CatnatAtecoFx),
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleAll},
+	},
 
 	{
 		Route:   "/cities",

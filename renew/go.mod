@@ -5,11 +5,12 @@ go 1.21
 require (
 	cloud.google.com/go/firestore v1.15.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.167
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.183
-	gitlab.dev.wopta.it/goworkspace/models v1.2.66
-	gitlab.dev.wopta.it/goworkspace/payment v1.0.378
-	gitlab.dev.wopta.it/goworkspace/transaction v1.0.230
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.170
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.188
+	gitlab.dev.wopta.it/goworkspace/models v1.2.71
+	gitlab.dev.wopta.it/goworkspace/network v1.0.137
+	gitlab.dev.wopta.it/goworkspace/payment v1.0.390
+	gitlab.dev.wopta.it/goworkspace/transaction v1.0.241
 	google.golang.org/api v0.181.0
 )
 
@@ -33,6 +34,7 @@ require (
 	github.com/cloudevents/sdk-go/v2 v2.14.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
+	github.com/fattureincloud/fattureincloud-go-sdk/v2 v2.1.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-chi/chi/v5 v5.0.12 // indirect
 	github.com/go-chi/cors v1.2.1 // indirect
@@ -40,7 +42,7 @@ require (
 	github.com/go-jose/go-jose/v4 v4.0.1 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/go-pdf/fpdf v0.6.0 // indirect
+	github.com/go-pdf/fpdf v0.8.0 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
@@ -73,16 +75,17 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	gitlab.dev.wopta.it/goworkspace/document v1.1.193 // indirect
-	gitlab.dev.wopta.it/goworkspace/network v1.0.132 // indirect
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.237 // indirect
-	gitlab.dev.wopta.it/goworkspace/product v1.1.64 // indirect
-	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.9 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
+	gitlab.dev.wopta.it/goworkspace/accounting v1.0.69 // indirect
+	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.82 // indirect
+	gitlab.dev.wopta.it/goworkspace/document v1.1.204 // indirect
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.248 // indirect
+	gitlab.dev.wopta.it/goworkspace/product v1.1.70 // indirect
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.12 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.49.0 // indirect

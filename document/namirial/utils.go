@@ -44,16 +44,14 @@ func handleResponse[T any](r *http.Response, err error) (T, error) {
 		return req, err
 	}
 
-	if r.StatusCode != http.StatusOK {
-		var body []byte
-		r.Body.Read(body)
-		return req, fmt.Errorf("ErrorNamirial: %s", string(body))
-	}
-
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		return *new(T), err
 	}
+	if r.StatusCode != http.StatusOK {
+		return req, fmt.Errorf("ErrorNamirial: %s", string(body))
+	}
+
 	defer r.Body.Close()
 	if err := json.Unmarshal(body, &req); err != nil {
 		return *new(T), err

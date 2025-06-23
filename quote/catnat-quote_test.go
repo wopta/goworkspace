@@ -10,8 +10,8 @@ import (
 	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/models/catnat"
 	"gitlab.dev.wopta.it/goworkspace/product"
-	"gitlab.dev.wopta.it/goworkspace/quote/catnat"
 	"gitlab.dev.wopta.it/goworkspace/sellable"
 )
 
@@ -24,9 +24,6 @@ type mock_clientCatnat struct {
 	nameFileToCompare string
 }
 
-func (c *mock_clientCatnat) Download(_ string) (response catnat.DownloadResponse, err error) {
-	return catnat.DownloadResponse{}, nil
-}
 func (c *mock_clientCatnat) Quote(dto catnat.QuoteRequest, _ *models.Policy) (response catnat.QuoteResponse, err error) {
 	if c.withError {
 		return response, errors.New("quote error")
@@ -43,10 +40,6 @@ func (c *mock_clientCatnat) Quote(dto catnat.QuoteRequest, _ *models.Policy) (re
 		log.PrintStruct("\nGot: ", dto)
 		return response, errors.New("dto != expected")
 	}
-	return response, nil
-}
-
-func (c *mock_clientCatnat) Emit(dto catnat.QuoteRequest, _ *models.Policy) (response catnat.QuoteResponse, err error) {
 	return response, nil
 }
 
@@ -74,7 +67,7 @@ func TestQuoteCatnatWithEverything(t *testing.T) {
 	}
 	client := new(mock_clientCatnat)
 	client.nameFileToCompare = "output_everything_alreadyfalse.json"
-	_, err := catnat.CatnatQuote(policy, product, mock_sellable, client)
+	_, err := catnatQuote(policy, product, mock_sellable, client.Quote)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -92,7 +85,7 @@ func TestQuoteCatnatWithEverythingButEarthquake(t *testing.T) {
 	}
 	client := new(mock_clientCatnat)
 	client.nameFileToCompare = "output_noearthquake.json"
-	_, err := catnat.CatnatQuote(policy, product, mock_sellable, client)
+	_, err := catnatQuote(policy, product, mock_sellable, client.Quote)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -111,7 +104,7 @@ func TestQuoteCatnatWithEverything2(t *testing.T) {
 	client := new(mock_clientCatnat)
 	client.nameFileToCompare = "output_everything_alreadytrue.json"
 
-	_, err := catnat.CatnatQuote(policy, product, mock_sellable, client)
+	_, err := catnatQuote(policy, product, mock_sellable, client.Quote)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -5,16 +5,18 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"gitlab.dev.wopta.it/goworkspace/lib"
-	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
-	"gitlab.dev.wopta.it/goworkspace/lib/log"
-	"gitlab.dev.wopta.it/goworkspace/models"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
+	"time"
+
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 func Sign(input NamirialInput) (response NamirialOutput, err error) {
@@ -154,7 +156,10 @@ func sendDocuments(preSendBody prepareResponse, idFiles []string, policy models.
 		return idEnvelope, err
 	}
 
-	resp, err := handleResponse[responseSendDocuments](lib.RetryDo(req, 5, 30))
+	client := http.Client{
+		Timeout: time.Duration(10) * time.Second,
+	}
+	resp, err := handleResponse[responseSendDocuments](client.Do(req))
 	if err != nil {
 		return idEnvelope, err
 	}
@@ -173,10 +178,10 @@ func buildBodyToSend(prepareteResponse prepareResponse, idFiles []string, callba
 	body.LockFormFieldsOnFinish = true
 
 	body.Activities = prepareteResponse.Activities
-	if env.IsLocal() || env.IsDevelopment() {
-		for i := range body.Activities {
-			body.Activities[i].Action.Sign.RecipientConfiguration.AuthenticationConfiguration.AccessCode.Code = "test"
-		}
+	if !env.IsProduction() {
+		//		for i := range body.Activities {
+		//			//body.Activities[i].Action.Sign.RecipientConfiguration.AuthenticationConfiguration.AccessCode.Code = "test"
+		//		}
 	}
 	body.Documents = make([]documentDescription, len(idFiles))
 	for i := range idFiles {
@@ -196,7 +201,7 @@ func buildBodyToSend(prepareteResponse prepareResponse, idFiles []string, callba
 	body.AgentRedirectConfiguration = agentRedirectConfiguration{
 		Policy:             "None",
 		Allow:              true,
-		IframeWhitelisting: []string{"dev.wopta.it", "wopta.it"},
+		IframeWhitelisting: []string{"dev.wopta.it", "wopta.it", "uat.wopta.it"},
 	}
 	body.ReminderConfiguration = reminderConfiguration{
 		Enabled:                      true,

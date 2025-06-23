@@ -5,15 +5,15 @@ go 1.21
 replace gitlab.dev.wopta.it/goworkspace/callback_out => ./
 
 require (
-	cloud.google.com/go v0.113.0
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.167
-	gitlab.dev.wopta.it/goworkspace/models v1.2.66
+	cloud.google.com/go/bigquery v1.61.0
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.170
+	gitlab.dev.wopta.it/goworkspace/models v1.2.71
 )
 
 require (
+	cloud.google.com/go v0.113.0 // indirect
 	cloud.google.com/go/auth v0.4.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.2 // indirect
-	cloud.google.com/go/bigquery v1.61.0 // indirect
 	cloud.google.com/go/compute/metadata v0.3.0 // indirect
 	cloud.google.com/go/firestore v1.15.0 // indirect
 	cloud.google.com/go/iam v1.1.8 // indirect

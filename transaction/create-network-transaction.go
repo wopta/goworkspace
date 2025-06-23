@@ -183,7 +183,7 @@ func CreateNetworkTransactions(
 			if err != nil {
 				log.ErrorF("error creating network-transaction: %s", err.Error())
 			} else {
-				log.ErrorF("created network-transaction for node: %s", currentNode.Uid)
+				log.Printf("created network-transaction for node: %s", currentNode.Uid)
 			}
 
 			return baseName

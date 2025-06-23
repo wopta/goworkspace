@@ -180,6 +180,12 @@ var brokerRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAdmin},
 	},
+	{
+		Route:   "/v1/policy/validation/address",
+		Handler: lib.ResponseLoggerWrapper(AddressValidationFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
 }
 
 func init() {
