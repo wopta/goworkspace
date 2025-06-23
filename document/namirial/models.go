@@ -166,11 +166,11 @@ type contactInformation struct {
 
 type authenticationConfiguration struct {
 	SmsOneTimePassword smsOneTimePassword `json:"SmsOneTimePassword"`
-	AccessCode         accessCode
+	AccessCode         *accessCode        `json:"AccessCode,omitempty"`
 }
 
 type accessCode struct {
-	Code string
+	Code string `json:"Code,omitempty"`
 }
 
 type smsOneTimePassword struct {
