@@ -11,7 +11,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.172
 	gitlab.dev.wopta.it/goworkspace/models v1.2.73
 	gitlab.dev.wopta.it/goworkspace/network v1.0.139
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.253
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.254
 	gitlab.dev.wopta.it/goworkspace/product v1.1.72
 	google.golang.org/api v0.181.0
 )
@@ -80,7 +80,7 @@ require (
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
-	gitlab.dev.wopta.it/goworkspace/document v1.1.209 // indirect
+	gitlab.dev.wopta.it/goworkspace/document v1.1.210 // indirect
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.14 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
