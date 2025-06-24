@@ -46,7 +46,7 @@ func getLastVersionDocument(rootPath, versioningDirectory string) (string, error
 	bucket := "documents-public-dev"
 	fileList, err := ListGoogleStorageFolderContentWithBucket(rootPath, bucket)
 	fileList = slices.DeleteFunc(fileList, func(path string) bool {
-		return path == "information-sets/life/v1/Precontrattuale/"
+		return path == rootPath
 	})
 	if err != nil {
 		if strings.Contains(err.Error(), "no such file or directory") {
