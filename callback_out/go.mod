@@ -6,8 +6,8 @@ replace gitlab.dev.wopta.it/goworkspace/callback_out => ./
 
 require (
 	cloud.google.com/go/bigquery v1.61.0
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.171
-	gitlab.dev.wopta.it/goworkspace/models v1.2.72
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.172
+	gitlab.dev.wopta.it/goworkspace/models v1.2.73
 )
 
 require (
