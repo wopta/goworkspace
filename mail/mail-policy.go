@@ -134,7 +134,13 @@ func SendMailContract(policy models.Policy, at *[]models.Attachment, from, to, c
 			Name:        strings.ReplaceAll(filename, "_", " "),
 		}}
 	}
-
+	var attachmentToSend []models.Attachment
+	for _, attach := range *at {
+		if !strings.Contains(attach.Name, models.ContractAttachmentName) {
+			continue
+		}
+		attachmentToSend = append(attachmentToSend, attach)
+	}
 	title := policy.NameDesc
 	subtitle := fmt.Sprintf("Contratto n° %s", policy.CodeCompany)
 	subject := fmt.Sprintf("%s %s", title, subtitle)
@@ -155,7 +161,7 @@ func SendMailContract(policy models.Policy, at *[]models.Attachment, from, to, c
 		IsHtml:       true,
 		IsApp:        true,
 		IsAttachment: true,
-		Attachments:  at,
+		Attachments:  &attachmentToSend,
 	})
 	return nil
 }
