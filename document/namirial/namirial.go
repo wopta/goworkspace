@@ -180,7 +180,7 @@ func buildBodyToSend(prepareteResponse prepareResponse, idFiles []string, callba
 	body.Activities = prepareteResponse.Activities
 	if !env.IsProduction() {
 		for i := range body.Activities {
-			body.Activities[i].Action.Sign.RecipientConfiguration.AuthenticationConfiguration.AccessCode.Code = "test"
+			body.Activities[i].Action.Sign.RecipientConfiguration.AuthenticationConfiguration.AccessCode = &accessCode{Code: "test"}
 		}
 	}
 	body.Documents = make([]documentDescription, len(idFiles))
