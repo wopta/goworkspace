@@ -109,8 +109,12 @@ func ReadFileFromGoogleStorageEitherGsOrNot(pathOrGs string) ([]byte, error) {
 }
 
 func ListGoogleStorageFolderContent(folderPath string) ([]string, error) {
-	filesList := make([]string, 0)
 	bucket := os.Getenv("GOOGLE_STORAGE_BUCKET")
+	return ListGoogleStorageFolderContentWithBucket(folderPath, bucket)
+}
+
+func ListGoogleStorageFolderContentWithBucket(folderPath string, bucket string) ([]string, error) {
+	filesList := make([]string, 0)
 	log.AddPrefix("ListGoogleStorageFolderContent")
 	defer log.PopPrefix()
 	log.Println("function start ---------------")

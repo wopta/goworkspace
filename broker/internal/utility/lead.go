@@ -1,7 +1,6 @@
 package utility
 
 import (
-	"fmt"
 	"slices"
 	"time"
 
@@ -10,7 +9,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func SetLeadData(policy *models.Policy, product models.Product, networkNode *models.NetworkNode) {
+func SetLeadData(policy *models.Policy, product models.Product, networkNode *models.NetworkNode) error {
 	log.AddPrefix("SetLeadData")
 	defer log.PopPrefix()
 	log.Println("start -----------------------------------------")
@@ -42,18 +41,17 @@ func SetLeadData(policy *models.Policy, product models.Product, networkNode *mod
 	}
 
 	setRenewInfo(policy, product)
-
+	linkDocument, err := lib.GetLastVersionPrecontrattuale(policy.Name, policy.ProductVersion)
+	if err != nil {
+		return err
+	}
 	log.Println("add information set")
 	informationSet := models.Attachment{
 		Name:        "Precontrattuale",
 		FileName:    "Precontrattuale.pdf",
 		MimeType:    lib.GetContentType("pdf"),
 		ContentType: lib.GetContentType("pdf"),
-		Link: fmt.Sprintf(
-			"gs://documents-public-dev/information-sets/%s/%s/Precontrattuale.pdf",
-			policy.Name,
-			policy.ProductVersion,
-		),
+		Link:        "gs://" + linkDocument,
 	}
 	if policy.Attachments == nil {
 		policy.Attachments = new([]models.Attachment)
@@ -66,6 +64,7 @@ func SetLeadData(policy *models.Policy, product models.Product, networkNode *mod
 	}
 
 	log.Println("end -------------------------------------------")
+	return nil
 }
 
 func setPolicyProducerNode(policy *models.Policy, node *models.NetworkNode) {

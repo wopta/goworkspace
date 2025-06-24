@@ -99,8 +99,7 @@ func addLeadHandlers(state *bpmn.State) {
 
 func setLeadBpmn(state *bpmn.State) error {
 	policy := state.Data
-	utility.SetLeadData(policy, *product, networkNode)
-	return nil
+	return utility.SetLeadData(policy, *product, networkNode)
 }
 
 func sendLeadMail(state *bpmn.State) error {

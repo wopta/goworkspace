@@ -21,7 +21,6 @@ const (
 	reservedApprovedTemplateType = "approved"
 	reservedRejectedTemplateType = "rejected"
 	renewDraftTemplateType       = "renew-draft"
-	linkFormat                   = "https://storage.googleapis.com/documents-public-dev/information-sets/%s/%s/Precontrattuale.pdf"
 )
 
 func SendMailLead(policy models.Policy, from, to, cc Address, flowName string, attachmentNames []string) {

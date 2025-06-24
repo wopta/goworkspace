@@ -29,8 +29,7 @@ func setLead(state bpmn.StorageData) error {
 		return err
 	}
 	mgaProduct := prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
-	utility.SetLeadData(policy.Policy, *mgaProduct, networkNode.NetworkNode)
-	return nil
+	return utility.SetLeadData(policy.Policy, *mgaProduct, networkNode.NetworkNode)
 }
 
 func sendLeadMail(state bpmn.StorageData) error {
