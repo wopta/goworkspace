@@ -629,12 +629,9 @@ func axa2DeclarationsConsentSection(pdf *fpdf.Fpdf, policy *models.Policy, isPro
 	pdf.Cell(0, 3, "DICHIARAZIONI E CONSENSI")
 	pdf.Ln(3)
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Io sottoscritto, dopo aver letto l’Informativa Privacy della compagnia titolare "+
-		"del trattamento redatta ai sensi del Regolamento (UE) 2016/679 (relativo alla protezione delle persone "+
-		"fisiche con riguardo al trattamento dei dati personali), della quale confermo ricezione, PRESTO IL CONSENSO "+
-		"al trattamento dei miei dati personali, ivi inclusi quelli eventualmente da me conferiti in riferimento al "+
-		"mio stato di salute, per le finalità indicate nell’informativa, nonché alla loro comunicazione, per "+
-		"successivo trattamento, da parte dei soggetti indicati nella informativa predetta.", "", "", false)
+	pdf.MultiCell(0, 3, "Io sottoscritto,\n\n"+
+		"• dichiaro di aver ricevuto e preso visione della Informativa Privacy redatta ai sensi del Regolamento (UE) 2016/679 (relativo alla protezione delle persone fisiche con riguardo al trattamento dei dati personali), riportata in calce al Set Informativo del prodotto assicurativo\n\n"+
+		"• PRESTO IL CONSENSO, qualora necessario per finalità assicurative relative al contratto, e come specificato nella Informativa Privacy: (i) al trattamento dei miei dati personali appartenenti a categorie particolari ai sensi dell’art. 9 del GDPR, (ii) al trattamento automatizzato dei miei dati personali\n", "", "", false)
 	pdf.Ln(3)
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(0, 3, "Resta inteso che in caso di negazione del consenso non sarà possibile "+
