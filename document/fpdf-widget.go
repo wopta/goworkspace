@@ -304,6 +304,7 @@ func emptyHeader(pdf *fpdf.Fpdf, isProposal bool) {
 	pdf.SetFooterFunc(func() {})
 }
 
+// Persona widget
 func globalPrivacySection(pdf *fpdf.Fpdf, survey models.Survey) {
 	type row struct {
 		text   string

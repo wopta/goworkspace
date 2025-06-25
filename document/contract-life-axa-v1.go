@@ -543,7 +543,7 @@ func axaDeclarationsConsentSection(pdf *fpdf.Fpdf, policy *models.Policy, isProp
 	pdf.Ln(3)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Io sottoscritto,\n\n"+
-		"• dichiaro di aver ricevuto e preso visione della Informativa Privacy redatta ai sensi del Regolamento (UE) 2016/679 (relativo alla protezione delle persone fisiche con riguardo al trattamento dei dati personali), riportata in calce al Set Informativo del prodotto assicurativo\n\n", "", "", false)
+		"dichiaro di aver ricevuto e preso visione della Informativa Privacy redatta ai sensi del Regolamento (UE) 2016/679 (relativo alla protezione delle persone fisiche con riguardo al trattamento dei dati personali), riportata in calce al Set Informativo del prodotto assicurativo\n\n", "", "", false)
 	pdf.Ln(3)
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(0, 3, "Resta inteso che in caso di negazione del consenso non sarà possibile "+
