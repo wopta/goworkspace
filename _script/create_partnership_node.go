@@ -448,3 +448,42 @@ func createSwitchoNode() error {
 
 	return nn.SaveBigQuery("")
 }
+
+func CreateAdvTestNode() error {
+	var (
+		err error
+		nn  *models.NetworkNode
+	)
+	partnershipModel := models.NetworkNode{
+		Uid:      "adv1",
+		Code:     "adv1",
+		Type:     models.PartnershipNetworkNodeType,
+		IsActive: true,
+		Partnership: &models.PartnershipNode{
+			Name: "adv1",
+		},
+		Products: []models.Product{{
+			Name:         models.LifeProduct,
+			NameDesc:     &nameDesc,
+			Version:      models.ProductV2,
+			NameTitle:    "Wopta per te",
+			NameSubtitle: "Vita",
+			Companies:    []models.Company{{Name: "axa"}},
+			ConsultancyConfig: &models.ConsultancyConfig{
+				Min:            0.05,
+				Max:            0.05,
+				Step:           0,
+				DefaultValue:   0.05,
+				IsActive:       true,
+				IsConfigurable: false,
+			},
+		}},
+	}
+
+	nn, err = network.CreateNode(partnershipModel)
+	if err != nil {
+		return err
+	}
+
+	return nn.SaveBigQuery("")
+}
