@@ -56,3 +56,6 @@ const (
 	MailReportCollection         string = "mailReport"             // only for bigquery
 	NodeConsensAuditsCollencion  string = "nodeConsensAudits"      // firestore and bigquery
 )
+const (
+	BaseStorageGoogleUrl = "https://storage.googleapis.com/"
+)

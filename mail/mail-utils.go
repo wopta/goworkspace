@@ -69,8 +69,8 @@ func setProductBodyData(policy models.Policy, bodyData *BodyData) {
 		bodyData.ProductForm = "gap#contact-us"
 	}
 	link, _ := lib.GetLastVersionPrecontrattuale(policy.Name, policy.ProductVersion)
-	bodyData.InformationSetsUrl = fmt.Sprintf(
-		"https://storage.googleapis.com/%s", link)
+	bodyData.InformationSetsUrl = fmt.Sprint(lib.BaseStorageGoogleUrl, link)
+
 }
 
 func setPolicyReservedBodyData(policy models.Policy, bodyData *BodyData) {
