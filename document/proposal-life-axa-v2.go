@@ -50,7 +50,7 @@ func lifeAxaProposalV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	axaFooter(pdf)
 
-	axaDeclarationsConsentSection(pdf, policy, true)
+	axa2DeclarationsConsentSection(pdf, policy, true)
 
 	_, err := policy.ExtractGuarantee("death")
 	if err == nil {

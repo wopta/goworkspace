@@ -261,7 +261,6 @@ func CreateExcelI(sheet [][]interface{}, filePath string) ([]byte, error) {
 }
 
 func getMailObj(msg string, mailsource string) mail.MailRequest {
-	//link := "https://storage.googleapis.com/documents-public-dev/information-set/information-sets//v1/Precontrattuale.pdf "michele.lomazzi@wopta.it","
 	var obj mail.MailRequest
 	obj.From = "noreply@wopta.it"
 	obj.To = []string{

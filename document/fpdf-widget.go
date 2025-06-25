@@ -176,7 +176,7 @@ func axaFooter(pdf *fpdf.Fpdf) {
 			"Numero Matricola Registre des organismes d'assurance: 5020051. // Indirizzo Rappresentanza Generale "+
 			"per l'Italia: Corso Como n. 17, 20154 Milano - CF, P.IVA e N.Iscr. Reg. Imprese 08875230016 - "+
 			"REA MI-2525395 - Telefono: 02-87103548 - Fax: 02-23331247 - PEC: axafrancevie@legalmail.it - sito "+
-			"internet: www.clp.partners.axa/it. Ammessa ad operare in Italia in regime di stabilimento. Iscritta "+
+			"internet:  www.axapartners.it. Ammessa ad operare in Italia in regime di stabilimento. Iscritta "+
 			"all'Albo delle imprese di assicurazione tenuto dall'IVASS, in appendice Elenco I, nr. I.00149.",
 			"", "", false)
 		pdf.SetY(-7)
@@ -304,6 +304,7 @@ func emptyHeader(pdf *fpdf.Fpdf, isProposal bool) {
 	pdf.SetFooterFunc(func() {})
 }
 
+// Persona widget
 func globalPrivacySection(pdf *fpdf.Fpdf, survey models.Survey) {
 	type row struct {
 		text   string
@@ -780,7 +781,7 @@ func companiesDescriptionSection(pdf *fpdf.Fpdf, companyName string) {
 			"in Francia dalla Autorité de Contrôle Prudentiel et de Résolution (ACPR). Numero Matricola Registre des "+
 			"organismes d’assurance: 5020051. // Indirizzo Rappresentanza Generale per l’Italia: Corso Como n. 17, 20154 "+
 			"Milano - CF, P.IVA e N.Iscr. Reg. Imprese 08875230016 - REA MI-2525395 - Telefono: 02-87103548 - "+
-			"Fax: 02-23331247 - PEC: axafrancevie@legalmail.it – sito internet: www.clp.partners.axa/it. Ammessa ad "+
+			"Fax: 02-23331247 - PEC: axafrancevie@legalmail.it – sito internet: www.axapartners.it. Ammessa ad "+
 			"operare in Italia in regime di stabilimento. Iscritta all’Albo delle imprese di assicurazione tenuto "+
 			"dall’IVASS, in appendice Elenco I, nr. I.00149.", "", "", false)
 	case "global":

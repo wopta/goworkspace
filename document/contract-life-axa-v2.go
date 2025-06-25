@@ -62,7 +62,7 @@ func lifeAxaContractV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	axaFooter(pdf)
 
-	axaDeclarationsConsentSection(pdf, policy, false)
+	axa2DeclarationsConsentSection(pdf, policy, false)
 
 	_, err := policy.ExtractGuarantee("death")
 	if err == nil {
@@ -622,4 +622,26 @@ func lifeEmitResumeSectionV2(pdf *fpdf.Fpdf, policy *models.Policy) {
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, text, "", "", false)
 	pdf.Ln(3)
+}
+
+func axa2DeclarationsConsentSection(pdf *fpdf.Fpdf, policy *models.Policy, isProposal bool) {
+	setBlackBoldFont(pdf, standardTextSize)
+	pdf.Cell(0, 3, "DICHIARAZIONI E CONSENSI")
+	pdf.Ln(3)
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "Io sottoscritto,\n\n"+
+		"• dichiaro di aver ricevuto e preso visione della Informativa Privacy redatta ai sensi del Regolamento (UE) 2016/679 (relativo alla protezione delle persone fisiche con riguardo al trattamento dei dati personali), riportata in calce al Set Informativo del prodotto assicurativo\n\n"+
+		"• PRESTO IL CONSENSO, qualora necessario per finalità assicurative relative al contratto, e come specificato nella Informativa Privacy: (i) al trattamento dei miei dati personali appartenenti a categorie particolari ai sensi dell’art. 9 del GDPR, (ii) al trattamento automatizzato dei miei dati personali\n", "", "", false)
+	pdf.Ln(3)
+	setBlackBoldFont(pdf, standardTextSize)
+	pdf.Cell(0, 3, "Resta inteso che in caso di negazione del consenso non sarà possibile "+
+		"finalizzare il rapporto contrattuale assicurativo.")
+	pdf.Ln(3)
+	setBlackDrawColor(pdf)
+	drawBlackHorizontalLine(pdf, thinLineWidth)
+	pdf.Ln(5)
+	pdf.Cell(0, 3, time.Now().UTC().Format(dateLayout))
+	if !isProposal {
+		drawSignatureForm(pdf)
+	}
 }

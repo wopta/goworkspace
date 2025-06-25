@@ -16,9 +16,10 @@ import (
 )
 
 type GetProductReq struct {
-	ProductName string `json:"name"`
-	CompanyName string `json:"company"` // DEPRECATED
-	Version     string `json:"version"` // DEPRECATED
+	ProductName     string `json:"name"`
+	CompanyName     string `json:"company"` // DEPRECATED
+	Version         string `json:"version"` // DEPRECATED
+	PartnershipName string `json:"partnershipName"`
 }
 
 func GetProductByChannelFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -52,15 +53,18 @@ func GetProductByChannelFx(w http.ResponseWriter, r *http.Request) (string, inte
 	channel := authToken.GetChannelByRoleV2()
 	log.Printf("channel: %s", channel)
 
+	nodeUid := req.PartnershipName
 	if strings.EqualFold(channel, models.NetworkChannel) {
-		networkNode = network.GetNetworkNodeByUid(authToken.UserID)
-		if networkNode != nil {
-			warrant = networkNode.GetWarrant()
-		}
-		if warrant != nil && !networkNode.HasAccessToProduct(req.ProductName, warrant) {
-			log.Printf("network node %s hasn't access to product %s", networkNode.Uid, req.ProductName)
-			return "", nil, fmt.Errorf("network node hasn't access to product")
-		}
+		nodeUid = authToken.UserID
+	}
+
+	networkNode = network.GetNetworkNodeByUid(nodeUid)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+	}
+	if warrant != nil && !networkNode.HasAccessToProduct(req.ProductName, warrant) {
+		log.Printf("network node %s hasn't access to product %s", networkNode.Uid, req.ProductName)
+		return "", nil, fmt.Errorf("network node hasn't access to product")
 	}
 
 	log.Printf("getting last active action for product %s", req.ProductName)
