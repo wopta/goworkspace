@@ -30,20 +30,20 @@ func compareVersions(a, b string) int {
 }
 
 func GetLastVersionPrecontrattuale(productName, version string) (string, error) {
+	bucket := "documents-public-dev"
 	path := fmt.Sprint("information-sets/", productName, "/", version)
-	res, err := getLastVersionDocument(path, "Precontrattuale")
+	res, err := getLastVersionDocument(bucket, path, "Precontrattuale")
 	if err != nil {
 		return "", err
 	}
 	if res == "none" { //return default pdf
-		return fmt.Sprint("documents-public-dev/information-sets", "/", productName, "/", version, "/Precontrattuale.pdf"), err
+		return fmt.Sprint(bucket, "/", path, "/Precontrattuale.pdf"), err
 	}
 	return res, nil
 }
 
-func getLastVersionDocument(rootPath, versioningDirectory string) (string, error) {
+func getLastVersionDocument(bucket, rootPath, versioningDirectory string) (string, error) {
 	rootPath += "/" + versioningDirectory + "/"
-	bucket := "documents-public-dev"
 	fileList, err := ListGoogleStorageFolderContentWithBucket(rootPath, bucket)
 	fileList = slices.DeleteFunc(fileList, func(path string) bool {
 		return path == rootPath
