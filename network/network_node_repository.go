@@ -41,7 +41,7 @@ func initNode(node *models.NetworkNode) error {
 	node.Role = node.Type
 	node.IsActive = true
 
-	if node.Type != models.PartnershipNetworkNodeType && node.Type != models.AreaManagerNetworkNodeType {
+	if node.Type != models.AreaManagerNetworkNodeType {
 		if node.ExternalNetworkCode == "" {
 			node.ExternalNetworkCode = node.Code
 		}
