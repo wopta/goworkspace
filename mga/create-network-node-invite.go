@@ -2,6 +2,7 @@ package mga
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -62,10 +63,13 @@ func CreateNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, 
 
 	log.Printf("getting network node %s from Firestore...", req.NetworkNodeUid)
 
-	networkNode, err = network.GetNodeByUid(req.NetworkNodeUid)
+	networkNode, err = network.GetNodeByUidErr(req.NetworkNodeUid)
 	if err != nil {
 		log.ErrorF("error getting network node %s from Firestore...", req.NetworkNodeUid)
 		return "", "", err
+	}
+	if networkNode == nil {
+		return "", "", fmt.Errorf("error no node found: %s", req.NetworkNodeUid)
 	}
 
 	log.Printf("generating invite for network node %s", req.NetworkNodeUid)

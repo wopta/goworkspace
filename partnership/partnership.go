@@ -17,6 +17,12 @@ var partnershipRoutes []lib.Route = []lib.Route{
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
+		Route:   "/v1/life/{partnershipUid}",
+		Handler: lib.ResponseLoggerWrapper(LifePartnershipFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
 		Route:   "/v1/product/{partnershipUid}",
 		Handler: lib.ResponseLoggerWrapper(GetPartnershipNodeAndProductsFx),
 		Method:  http.MethodGet,

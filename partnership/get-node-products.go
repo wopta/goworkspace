@@ -2,6 +2,7 @@ package partnership
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
@@ -34,9 +35,12 @@ func GetPartnershipNodeAndProductsFx(w http.ResponseWriter, r *http.Request) (st
 	partnershipUid := chi.URLParam(r, "partnershipUid")
 	jwtData := r.URL.Query().Get("jwt")
 
-	if node, err = network.GetNodeByUid(partnershipUid); err != nil {
+	if node, err = network.GetNodeByUidErr(partnershipUid); err != nil {
 		log.ErrorF("error getting node '%s': %s", partnershipUid, err.Error())
 		return "", nil, err
+	}
+	if node == nil {
+		return "", nil, fmt.Errorf("error no node found: %s", partnershipUid)
 	}
 
 	if _, err := node.DecryptJwt(jwtData); err != nil {

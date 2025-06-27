@@ -3,6 +3,7 @@ package mga
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -82,10 +83,13 @@ func consumeNetworkNodeInvite(origin, inviteUid, password string) error {
 
 	log.Printf("getting network node %s from Firestore...", invite.NetworkNodeUid)
 
-	networkNode, err = network.GetNodeByUid(invite.NetworkNodeUid)
+	networkNode, err = network.GetNodeByUidErr(invite.NetworkNodeUid)
 	if err != nil {
 		log.ErrorF("error getting network node %s from Firestore", invite.NetworkNodeUid)
 		return err
+	}
+	if networkNode == nil {
+		return fmt.Errorf("error no node found: %v", invite.NetworkNodeUid)
 	}
 
 	userRecord, err := lib.CreateUserWithEmailAndPassword(networkNode.Mail, password, &networkNode.Uid)
