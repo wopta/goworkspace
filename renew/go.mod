@@ -6,10 +6,10 @@ require (
 	cloud.google.com/go/firestore v1.15.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.174
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.193
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.194
 	gitlab.dev.wopta.it/goworkspace/models v1.2.75
 	gitlab.dev.wopta.it/goworkspace/network v1.0.141
-	gitlab.dev.wopta.it/goworkspace/payment v1.0.402
+	gitlab.dev.wopta.it/goworkspace/payment v1.0.403
 	gitlab.dev.wopta.it/goworkspace/transaction v1.0.252
 	google.golang.org/api v0.181.0
 )
