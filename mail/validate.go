@@ -100,7 +100,6 @@ func ToListData(query *firestore.DocumentIterator) ([]MailValidate, []string) {
 		d, err := query.Next()
 
 		if err != nil {
-			log.ErrorF("error")
 			if err == iterator.Done {
 				log.Println("MailValidate ToListData iterator.Done")
 				break
