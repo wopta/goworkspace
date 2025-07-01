@@ -34,14 +34,8 @@ steps:
     echo "fx_entrypoint: ${fx_entrypoint}"
     echo "tag_version: ${tag_version}"
 
-    # === SWITCH BY ENV ========================================================
-    if [[ "${tag}" == *"prod"* ]]; then
-      chmod +x ./deploy.sh
-      ./deploy.sh ${TAG_NAME} ${fx_name} ${fx_entrypoint} ${tag_version}
-    else
-      chmod +x ./deploy-envs.sh
-      ./deploy-envs.sh ${TAG_NAME}
-    fi
+    chmod +x ./deploy-envs.sh
+    ./deploy-envs.sh ${TAG_NAME}
 
 options:
   logging: CLOUD_LOGGING_ONLY
