@@ -48,6 +48,11 @@ func CreatePartnerhipNodes() {
 	// if err != nil {
 	// 	log.Println(err.Error())
 	// }
+
+	// err := createPartnershipFacileVetrina()
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// }
 }
 
 func createBeprofNode() error {
@@ -478,6 +483,36 @@ func CreateAdvTestNode() error {
 				IsConfigurable: false,
 			},
 		}},
+	}
+
+	nn, err = network.CreateNode(partnershipModel)
+	if err != nil {
+		return err
+	}
+
+	return nn.SaveBigQuery("")
+}
+func createPartnershipFacileVetrina() error {
+	var (
+		err error
+		nn  *models.NetworkNode
+	)
+	name_partnership := "facile_vetrina"
+	partnershipModel := models.NetworkNode{
+		Uid:         name_partnership,
+		Code:        name_partnership,
+		Type:        models.PartnershipNetworkNodeType,
+		IsActive:    true,
+		Partnership: &models.PartnershipNode{Name: name_partnership},
+		Products: []models.Product{{
+			Name:         models.LifeProduct,
+			NameDesc:     &nameDesc,
+			Version:      models.ProductV2,
+			NameTitle:    "Wopta per te",
+			NameSubtitle: "Vita",
+			Companies:    []models.Company{{Name: "axa"}},
+		}},
+		Warrant: "ptns_remunerazione_zero",
 	}
 
 	nn, err = network.CreateNode(partnershipModel)
