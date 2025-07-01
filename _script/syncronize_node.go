@@ -12,6 +12,45 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/product"
 )
 
+func SynchronizeEleads(dryRun bool) {
+	node, err := network.GetNodeByUid("eleads")
+	if err != nil {
+		panic(err)
+	}
+	log.PrintStruct("\nOrigin node\n", node)
+	pr := product.GetLatestActiveProduct("life", models.ECommerceChannel, nil, nil)
+	if err = synchronizeFieldNode(node, *pr, "quotersurvey", "companyPrivacy"); err != nil {
+		panic(err)
+	}
+	if err = synchronizeFieldNode(node, *pr, "guaranteeconfigurationstep->privacyConsent", "consens"); err != nil {
+		panic(err)
+	}
+	log.PrintStruct("Node changed \n\n", node)
+	if dryRun {
+		return
+	}
+	saveNode(node)
+}
+
+func ReorderEleads(dryRun bool) {
+	node, err := network.GetNodeByUid("eleads")
+	if err != nil {
+		panic(err)
+	}
+	log.PrintStruct("\nOrigin node\n", node)
+	allNameStep := getAllStepsName(getProductFromNode(node, "life"))
+	log.PrintStruct("---step\n\n", allNameStep)
+
+	if err = reorderStepsNode(node, "life", []string{"guaranteeconfigurationstep", "quotercontractordata", "quotersurvey", "quoterstatements", "quoterbeneficiary", "quoteruploaddocuments", "quoterrecap", "quotersignpay", "quoterthankyou"}); err != nil {
+		panic(err)
+	}
+	log.PrintStruct("Node changed \n\n", node)
+	if dryRun {
+		return
+	}
+	saveNode(node)
+}
+
 func SynchronizeBeprof(dryRun bool) {
 	node, err := network.GetNodeByUid("beprof")
 	if err != nil {
@@ -29,8 +68,8 @@ func SynchronizeBeprof(dryRun bool) {
 		return
 	}
 	saveNode(node)
-
 }
+
 func ReorderBeProf(dryRun bool) {
 	node, err := network.GetNodeByUid("beprof")
 	if err != nil {
@@ -48,13 +87,14 @@ func ReorderBeProf(dryRun bool) {
 		return
 	}
 	saveNode(node)
-
 }
+
 func SynchronizeFacile(dryRun bool) {
 	node, err := network.GetNodeByUid("facile")
 	if err != nil {
 		panic(err)
 	}
+	log.PrintStruct("\nOrigin node\n", node)
 	pr := product.GetLatestActiveProduct("life", models.ECommerceChannel, nil, nil)
 	if err = synchronizeFieldNode(node, *pr, "quotersurvey", "companyPrivacy"); err != nil {
 		panic(err)
@@ -98,7 +138,6 @@ func saveNode(node *models.NetworkNode) {
 	log.Println("\n\nNode Saved")
 }
 func synchronizeFieldNode(node *models.NetworkNode, product models.Product, widgetPaths string, fieldToChange string) error {
-	log.PrintStruct("\nOrigin node\n", node)
 	err := synchronizeStep(node, product, widgetPaths, fieldToChange)
 	return err
 }
