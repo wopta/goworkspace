@@ -50,8 +50,7 @@ func SignFiles(policy *models.Policy, product *models.Product, networkNode *mode
 	}
 
 	if len(namirialInput.DocumentsFullPath) == 0 {
-		log.ErrorF("nothing to sign")
-		return nil
+		return errors.New("nothing to sign")
 	}
 
 	envelope, err := namirial.Sign(namirialInput)

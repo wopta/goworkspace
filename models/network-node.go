@@ -228,7 +228,7 @@ func (nn *NetworkNode) HasAccessToProduct(productName string, warrant *Warrant) 
 		warrant = nn.GetWarrant()
 	}
 	if warrant == nil {
-		log.ErrorF("no %s warrant found", nn.Warrant)
+		log.WarningF("no %s warrant found", nn.Warrant)
 		return false
 	}
 

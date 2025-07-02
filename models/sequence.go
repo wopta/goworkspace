@@ -28,7 +28,9 @@ func GetFirestoreSequenceLast(name string) string {
 		}}
 
 	node, uid, e := q.FireQueryUid("sequence")
-	log.Error(e)
+	if e != nil {
+		log.Error(e)
+	}
 	if len(node) > 0 {
 		last := node[0].Add()
 		node[0].Last = last

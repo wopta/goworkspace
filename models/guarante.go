@@ -182,7 +182,9 @@ func SetGuaranteBigquery(policy Policy, status string, origin string) error {
 			g.Status = status
 			g.PolicyUid = policy.Uid
 			e = lib.InsertRowsBigQuery(WoptaDataset, origin, g)
-			log.Error(e)
+			if e != nil {
+				log.Error(e)
+			}
 		}
 
 	}

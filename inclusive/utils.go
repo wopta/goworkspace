@@ -24,13 +24,14 @@ func QueryRowsBigQuery[T any](datasetID string, tableID string, query string) ([
 	defer client.Close()
 	queryi := client.Query(query)
 	iter, e = queryi.Read(ctx)
-	log.Error(e)
+	if e != nil {
+		log.Error(e)
+	}
 	for {
 		var row T
 		e := iter.Next(&row)
 
 		if e == iterator.Done {
-			log.Error(e)
 			return res, e
 		}
 		if e != nil {
@@ -56,6 +57,8 @@ func InsertRowsBigQuery(datasetID string, tableID string, value interface{}) err
 	defer client.Close()
 	inserter := client.Dataset(datasetID).Table(tableID).Inserter()
 	e := inserter.Put(context.Background(), value)
-	log.Error(e)
+	if e != nil {
+		log.Error(e)
+	}
 	return e
 }
