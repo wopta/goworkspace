@@ -13,7 +13,7 @@ import (
 )
 
 func SynchronizeEleads(dryRun bool) {
-	node, err := network.GetNodeByUid("eleads")
+	node, err := network.GetNodeByUidErr("eleads")
 	if err != nil {
 		panic(err)
 	}
@@ -33,7 +33,7 @@ func SynchronizeEleads(dryRun bool) {
 }
 
 func ReorderEleads(dryRun bool) {
-	node, err := network.GetNodeByUid("eleads")
+	node, err := network.GetNodeByUidErr("eleads")
 	if err != nil {
 		panic(err)
 	}
@@ -52,7 +52,7 @@ func ReorderEleads(dryRun bool) {
 }
 
 func SynchronizeBeprof(dryRun bool) {
-	node, err := network.GetNodeByUid("beprof")
+	node, err := network.GetNodeByUidErr("beprof")
 	if err != nil {
 		panic(err)
 	}
@@ -71,7 +71,7 @@ func SynchronizeBeprof(dryRun bool) {
 }
 
 func ReorderBeProf(dryRun bool) {
-	node, err := network.GetNodeByUid("beprof")
+	node, err := network.GetNodeByUidErr("beprof")
 	if err != nil {
 		panic(err)
 	}
@@ -90,7 +90,7 @@ func ReorderBeProf(dryRun bool) {
 }
 
 func SynchronizeFacile(dryRun bool) {
-	node, err := network.GetNodeByUid("facile")
+	node, err := network.GetNodeByUidErr("facile")
 	if err != nil {
 		panic(err)
 	}
@@ -110,7 +110,7 @@ func SynchronizeFacile(dryRun bool) {
 
 }
 func ReorderFacile(dryRun bool) {
-	node, err := network.GetNodeByUid("facile")
+	node, err := network.GetNodeByUidErr("facile")
 	if err != nil {
 		panic(err)
 	}
