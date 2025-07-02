@@ -20,9 +20,12 @@ func TraverseWithCallbackNetworkByNodeUid(
 	name := callback(node, lastName)
 
 	if node.ManagerUid != "" {
-		manager, err := GetNodeByUid(node.ManagerUid)
+		manager, err := GetNodeByUidErr(node.ManagerUid)
 		if err != nil {
 			log.Printf("error retrieving manager node from firestore: %s", err.Error())
+			return
+		}
+		if manager == nil {
 			return
 		}
 		log.Printf("executing callback for node %s", manager.Uid)
@@ -30,9 +33,13 @@ func TraverseWithCallbackNetworkByNodeUid(
 	}
 
 	if node.ParentUid != "" {
-		parentNode, err := GetNodeByUid(node.ParentUid)
+		parentNode, err := GetNodeByUidErr(node.ParentUid)
 		if err != nil {
-			log.Printf("error retrieving node from firestore: %s", err.Error())
+			log.ErrorF("error retrieving node from firestore: %s", err.Error())
+			return
+		}
+		if parentNode == nil {
+			log.ErrorF("error no node found: %s", node.ParentUid)
 			return
 		}
 		log.Printf("recursive call for node %s", parentNode.Code)
