@@ -105,7 +105,7 @@ func CheckHypeData(r *http.Request) (BankAccountMovement, error) {
 		}
 	}
 	if obj.MovementType == "delete" || obj.MovementType == "suspended" {
-		res, _ := QueryRowsBigQuery[BankAccountMovement]("wopta",
+		res := QueryRowsBigQuery[BankAccountMovement]("wopta",
 			"inclusive_axa_bank_account",
 			"select * from `wopta."+dataMovement+"` where fiscalCode='"+obj.FiscalCode+"' and guaranteesCode ='"+obj.GuaranteesCode+"'")
 		log.Println(len(res))
@@ -185,7 +185,7 @@ func HypeCount(date string, fiscalCode string, guaranteesCode string) {
 	refdayString := refday.Format("2006-01-02")
 	stringquery := "with Mov AS(SELECT distinct fiscalCode,* from `wopta." + dataMovement + "` where fiscalCode='" + fiscalCode + "' and guaranteesCode ='" + guaranteesCode + "and _PARTITIONTIME ='" + refdayString + "' SELECT Mov.movementType ,count(*)as count FROM Mov group by Mov.movementType"
 	log.Println(len(stringquery))
-	queryWopta, _ := QueryRowsBigQuery[bigquery.Value]("wopta", "inclusive_axa_bank_account", stringquery)
+	queryWopta := QueryRowsBigQuery[bigquery.Value]("wopta", "inclusive_axa_bank_account", stringquery)
 	log.Println(len(queryWopta))
 	for _, mov := range queryWopta {
 		log.Println(mov)
