@@ -1,6 +1,6 @@
 module gitlab.dev.wopta.it/goworkspace/_script
 
-go 1.21
+go 1.23
 
 replace gitlab.dev.wopta.it/goworkspace/_script => ./
 
@@ -64,13 +64,13 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	gitlab.dev.wopta.it/goworkspace/network v1.0.5 // indirect
-	gitlab.dev.wopta.it/goworkspace/product v1.0.54 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
+	gitlab.dev.wopta.it/goworkspace/network v1.0.5 // indirect
+	gitlab.dev.wopta.it/goworkspace/product v1.0.54 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect

@@ -1,6 +1,6 @@
 module gitlab.dev.wopta.it/goworkspace/form
 
-go 1.21
+go 1.23
 
 replace gitlab.dev.wopta.it/goworkspace/form => ./
 

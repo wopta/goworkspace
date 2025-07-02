@@ -1,6 +1,6 @@
 module gitlab.dev.wopta.it/goworkspace/renew
 
-go 1.21
+go 1.23
 
 require (
 	cloud.google.com/go/firestore v1.15.0
