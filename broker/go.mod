@@ -14,11 +14,11 @@ require (
 	github.com/maja42/goval v1.4.0
 	gitlab.dev.wopta.it/goworkspace/bpmn v1.0.57
 	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.88
-	gitlab.dev.wopta.it/goworkspace/document v1.1.218
+	gitlab.dev.wopta.it/goworkspace/document v1.1.219
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.175
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.197
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.198
 	gitlab.dev.wopta.it/goworkspace/models v1.2.77
-	gitlab.dev.wopta.it/goworkspace/network v1.0.144
+	gitlab.dev.wopta.it/goworkspace/network v1.0.145
 	gitlab.dev.wopta.it/goworkspace/payment v1.0.406
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.262
 	gitlab.dev.wopta.it/goworkspace/product v1.1.76

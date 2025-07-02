@@ -10,9 +10,9 @@ require (
 	gitlab.dev.wopta.it/goworkspace/bpmn v1.0.57
 	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.88
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.175
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.197
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.198
 	gitlab.dev.wopta.it/goworkspace/models v1.2.77
-	gitlab.dev.wopta.it/goworkspace/network v1.0.144
+	gitlab.dev.wopta.it/goworkspace/network v1.0.145
 	gitlab.dev.wopta.it/goworkspace/payment v1.0.406
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.262
 	gitlab.dev.wopta.it/goworkspace/product v1.1.76
@@ -88,7 +88,7 @@ require (
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	gitlab.dev.wopta.it/goworkspace/accounting v1.0.83 // indirect
-	gitlab.dev.wopta.it/goworkspace/document v1.1.218 // indirect
+	gitlab.dev.wopta.it/goworkspace/document v1.1.219 // indirect
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.17 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
