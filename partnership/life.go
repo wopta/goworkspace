@@ -61,7 +61,7 @@ func LifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, err
 		log.Printf("no product found")
 		return "", nil, fmt.Errorf("no product found")
 	}
-	policy = setPolicyPartnershipInfo(policy, productLife, partnershipNode)
+	policy = setPolicyPartnershipInfo(policy, productLife, partnershipNode, partnershipUid)
 
 	if claims, err = partnershipNode.DecryptJwtClaims(
 		jwtData, lifeClaimsExtractor(partnershipNode)); err != nil {
@@ -151,7 +151,7 @@ func NewLifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, 
 		return "", nil, fmt.Errorf("no product found")
 	}
 
-	policy = setPolicyPartnershipInfo(policy, productLife, partnershipNode)
+	policy = setPolicyPartnershipInfo(policy, productLife, partnershipNode, partnershipUid)
 
 	if partnershipNode != nil {
 		if !partnershipNode.IsActive {
@@ -171,6 +171,8 @@ func NewLifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, 
 			}
 		}
 		response.Partnership = PartnershipNode{partnershipNode.Partnership.Name, partnershipNode.Partnership.Skin}
+	} else {
+		response.Partnership = PartnershipNode{Name: partnershipUid}
 	}
 
 	if request.BirthDate != nil && policy.Contractor.BirthDate != "" {
@@ -201,15 +203,18 @@ func NewLifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, 
 
 	return string(responseJson), response, err
 }
-func setPolicyPartnershipInfo(policy models.Policy, product *models.Product, node *models.NetworkNode) models.Policy {
+func setPolicyPartnershipInfo(policy models.Policy, product *models.Product, node *models.NetworkNode, partnershipName string) models.Policy {
 	policy.Name = product.Name
 	policy.NameDesc = *product.NameDesc
 	policy.ProductVersion = product.Version
 	policy.Company = product.Companies[0].Name
-	policy.ProducerUid = node.Uid
-	policy.ProducerCode = node.Partnership.Name
-	policy.PartnershipName = node.Partnership.Name
-	policy.ProducerType = node.Type
+	policy.PartnershipName = partnershipName
+	if node != nil {
+		policy.ProducerUid = node.Uid
+		policy.ProducerCode = node.Partnership.Name
+		policy.PartnershipName = node.Partnership.Name
+		policy.ProducerType = node.Type
+	}
 
 	return policy
 }
