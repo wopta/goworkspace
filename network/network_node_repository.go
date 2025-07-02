@@ -14,6 +14,8 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
 	"google.golang.org/api/iterator"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func GetNodeByUidErr(uid string) (*models.NetworkNode, error) {
@@ -21,6 +23,9 @@ func GetNodeByUidErr(uid string) (*models.NetworkNode, error) {
 	docSnapshot, err := lib.GetFirestoreErr(lib.NetworkNodesCollection, uid)
 
 	if err != nil {
+		if status.Code(err) == codes.NotFound {
+			return nil, nil
+		}
 		return nil, fmt.Errorf("could not fetch node: %s", err.Error())
 	}
 	err = docSnapshot.DataTo(&node)

@@ -124,12 +124,7 @@ func NewLifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, 
 	partnershipUid := strings.ToLower(chi.URLParam(r, "partnershipUid"))
 	jwtData := r.URL.Query().Get("jwt")
 
-	var requestByte []byte
-	_, err = r.Body.Read(requestByte)
-	if err != nil {
-		return "", nil, err
-	}
-	if err = json.Unmarshal(requestByte, &request); err != nil {
+	if err = json.NewDecoder(r.Body).Decode(&request); err != nil {
 		return "", nil, err
 	}
 
@@ -169,23 +164,21 @@ func NewLifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, 
 				log.ErrorF("error extracting data from claims: %s", err.Error())
 				return "", nil, err
 			}
+			if policy.Contractor.BirthDate != "" {
+				quotedPolicy, err := quote.Life(policy, models.ECommerceChannel, partnershipNode, warrant, models.ECommerceFlow)
+				if err != nil {
+					log.ErrorF("error quoting for partnership: %s", err.Error())
+					return "", nil, err
+				}
+				policy = quotedPolicy
+			}
 		}
 		response.Partnership = PartnershipNode{partnershipNode.Partnership.Name, partnershipNode.Partnership.Skin}
 	} else {
 		response.Partnership = PartnershipNode{Name: partnershipUid}
-	}
-
-	if request.BirthDate != nil && policy.Contractor.BirthDate != "" {
-		policy.Contractor.BirthDate = *request.BirthDate
-	}
-
-	if policy.Contractor.BirthDate != "" {
-		quotedPolicy, err := quote.Life(policy, models.ECommerceChannel, partnershipNode, warrant, models.ECommerceFlow)
-		if err != nil {
-			log.ErrorF("error quoting for partnership: %s", err.Error())
-			return "", nil, err
+		if request.BirthDate != nil {
+			policy.Contractor.BirthDate = *request.BirthDate
 		}
-		policy = quotedPolicy
 	}
 
 	err = savePartnershipLead(&policy, partnershipNode, "")
