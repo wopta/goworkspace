@@ -12,7 +12,7 @@ func ModifyNode() error {
 }
 
 func modifyNodeFacile(warrant string) error {
-	node, err := network.GetNodeByUid("facile")
+	node, err := network.GetNodeByUidErr("facile")
 	if err != nil {
 		return err
 	}

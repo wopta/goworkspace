@@ -166,7 +166,7 @@ func getQueryParameters(r *http.Request) (policyType, quoteType string, err erro
 
 	quoteType = r.URL.Query().Get("quoteType")
 	if quoteType == "" {
-		log.ErrorF("no quoteType specified")
+		log.Printf("no quoteType specified")
 		return "", "", errors.New("no quoteType specified")
 	}
 	return policyType, quoteType, nil

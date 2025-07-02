@@ -14,18 +14,22 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
 	"google.golang.org/api/iterator"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
-func GetNodeByUid(uid string) (*models.NetworkNode, error) {
+func GetNodeByUidErr(uid string) (*models.NetworkNode, error) {
 	var node *models.NetworkNode
 	docSnapshot, err := lib.GetFirestoreErr(lib.NetworkNodesCollection, uid)
 
 	if err != nil {
+		if status.Code(err) == codes.NotFound {
+			return nil, nil
+		}
 		return nil, fmt.Errorf("could not fetch node: %s", err.Error())
 	}
 	err = docSnapshot.DataTo(&node)
-
-	if node == nil || err != nil {
+	if err != nil {
 		return nil, fmt.Errorf("could not parse node: %s", err.Error())
 	}
 	return node, err
@@ -102,10 +106,14 @@ func UpdateNode(node models.NetworkNode) error {
 
 	log.Printf("fetching network node %s from Firestore...", node.Uid)
 
-	originalNode, err = GetNodeByUid(node.Uid)
+	originalNode, err = GetNodeByUidErr(node.Uid)
 	if err != nil {
 		log.Printf("error fetching network node from firestore: %s", err.Error())
 		return err
+	}
+	if originalNode == nil {
+		return fmt.Errorf("error no node found: %s", node.Uid)
+
 	}
 
 	if originalNode.Code != node.Code {
@@ -264,9 +272,12 @@ func GetNetworkNodeByUid(nodeUid string) *models.NetworkNode {
 		return nil
 	}
 
-	networkNode, err := GetNodeByUid(nodeUid)
+	networkNode, err := GetNodeByUidErr(nodeUid)
 	if err != nil {
 		log.ErrorF("error getting producer %s from Firestore", nodeUid)
+	}
+	if networkNode == nil {
+		log.ErrorF("error no node found: %s", nodeUid)
 	}
 
 	return networkNode

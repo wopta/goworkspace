@@ -12,20 +12,20 @@ require (
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/go-gota/gota v0.12.0
 	github.com/maja42/goval v1.4.0
-	gitlab.dev.wopta.it/goworkspace/bpmn v1.0.55
-	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.86
-	gitlab.dev.wopta.it/goworkspace/document v1.1.214
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.174
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.192
-	gitlab.dev.wopta.it/goworkspace/models v1.2.75
-	gitlab.dev.wopta.it/goworkspace/network v1.0.141
-	gitlab.dev.wopta.it/goworkspace/payment v1.0.400
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.258
-	gitlab.dev.wopta.it/goworkspace/product v1.1.74
-	gitlab.dev.wopta.it/goworkspace/question v1.0.127
-	gitlab.dev.wopta.it/goworkspace/reserved v1.0.265
-	gitlab.dev.wopta.it/goworkspace/transaction v1.0.251
-	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.16
+	gitlab.dev.wopta.it/goworkspace/bpmn v1.0.57
+	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.88
+	gitlab.dev.wopta.it/goworkspace/document v1.1.218
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.175
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.197
+	gitlab.dev.wopta.it/goworkspace/models v1.2.77
+	gitlab.dev.wopta.it/goworkspace/network v1.0.144
+	gitlab.dev.wopta.it/goworkspace/payment v1.0.406
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.262
+	gitlab.dev.wopta.it/goworkspace/product v1.1.76
+	gitlab.dev.wopta.it/goworkspace/question v1.0.129
+	gitlab.dev.wopta.it/goworkspace/reserved v1.0.269
+	gitlab.dev.wopta.it/goworkspace/transaction v1.0.255
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.17
 )
 
 require (
@@ -90,7 +90,7 @@ require (
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
-	gitlab.dev.wopta.it/goworkspace/accounting v1.0.79 // indirect
+	gitlab.dev.wopta.it/goworkspace/accounting v1.0.83 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.49.0 // indirect

@@ -178,8 +178,9 @@ func buildBodyToSend(prepareteResponse prepareResponse, idFiles []string, callba
 	body.LockFormFieldsOnFinish = true
 
 	body.Activities = prepareteResponse.Activities
-	if !env.IsProduction() {
-		for i := range body.Activities {
+	for i := range body.Activities {
+		body.Activities[i].Action.Sign.RecipientConfiguration.AuthenticationConfiguration.SmsOneTimePassword.PhoneNumber = policy.Contractor.Phone
+		if !env.IsProduction() {
 			body.Activities[i].Action.Sign.RecipientConfiguration.AuthenticationConfiguration.AccessCode = &accessCode{Code: "test"}
 		}
 	}

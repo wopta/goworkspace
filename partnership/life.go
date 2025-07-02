@@ -40,7 +40,7 @@ func LifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, err
 
 	log.Printf("partnershipUid: %s jwt: %s", partnershipUid, jwtData)
 
-	if partnershipNode, err = network.GetNodeByUid(partnershipUid); err != nil {
+	if partnershipNode, err = network.GetNodeByUidErr(partnershipUid); err != nil {
 		log.ErrorF("error getting node: %s", err.Error())
 		return "", nil, err
 	}
@@ -61,7 +61,7 @@ func LifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, err
 		log.Printf("no product found")
 		return "", nil, fmt.Errorf("no product found")
 	}
-	policy = setPolicyPartnershipInfo(policy, productLife, partnershipNode)
+	policy = setPolicyPartnershipInfo(policy, productLife, partnershipNode, partnershipUid)
 
 	if claims, err = partnershipNode.DecryptJwtClaims(
 		jwtData, lifeClaimsExtractor(partnershipNode)); err != nil {
@@ -103,15 +103,111 @@ func LifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, err
 	return string(responseJson), response, err
 }
 
-func setPolicyPartnershipInfo(policy models.Policy, product *models.Product, node *models.NetworkNode) models.Policy {
+func NewLifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
+	var (
+		response PartnershipResponse
+		request  struct {
+			BirthDate *string `json:"birthDate,omitempty"`
+		}
+		partnershipNode *models.NetworkNode
+		policy          models.Policy
+		productLife     *models.Product
+		claims          models.LifeClaims
+		err             error
+	)
+
+	log.AddPrefix("LifePartnershipFx")
+	defer log.PopPrefix()
+
+	log.Println("Handler start -----------------------------------------------")
+
+	partnershipUid := strings.ToLower(chi.URLParam(r, "partnershipUid"))
+	jwtData := r.URL.Query().Get("jwt")
+
+	if err = json.NewDecoder(r.Body).Decode(&request); err != nil {
+		return "", nil, err
+	}
+
+	log.Printf("partnershipUid: %s jwt: %s", partnershipUid, jwtData)
+
+	if partnershipNode, err = network.GetNodeByUidErr(partnershipUid); err != nil {
+		log.ErrorF("error getting node: %s", err.Error())
+		return "", nil, err
+	}
+	var warrant *models.Warrant
+	if partnershipNode != nil {
+		warrant = partnershipNode.GetWarrant()
+	}
+
+	log.Printf("loading latest life product")
+	productLife = product.GetLatestActiveProduct(models.LifeProduct, models.ECommerceChannel, partnershipNode, warrant)
+	if productLife == nil {
+		log.Printf("no product found")
+		return "", nil, fmt.Errorf("no product found")
+	}
+
+	policy = setPolicyPartnershipInfo(policy, productLife, partnershipNode, partnershipUid)
+
+	if partnershipNode != nil {
+		if !partnershipNode.IsActive {
+			log.Printf("partnership is not active")
+			return "", nil, err
+		}
+		if claims, err = partnershipNode.DecryptJwtClaims(
+			jwtData, lifeClaimsExtractor(partnershipNode)); err != nil {
+			log.Printf("could not validate partnership JWT - %s", err.Error())
+			return "", nil, err
+		}
+		if !claims.IsEmpty() {
+			policy, err = setClaimsIntoPolicy(policy, productLife, claims)
+			if err != nil {
+				log.ErrorF("error extracting data from claims: %s", err.Error())
+				return "", nil, err
+			}
+			if policy.Contractor.BirthDate != "" {
+				quotedPolicy, err := quote.Life(policy, models.ECommerceChannel, partnershipNode, warrant, models.ECommerceFlow)
+				if err != nil {
+					log.ErrorF("error quoting for partnership: %s", err.Error())
+					return "", nil, err
+				}
+				policy = quotedPolicy
+			}
+		}
+		response.Partnership = PartnershipNode{partnershipNode.Partnership.Name, partnershipNode.Partnership.Skin}
+	} else {
+		response.Partnership = PartnershipNode{Name: partnershipUid}
+		if request.BirthDate != nil {
+			policy.Contractor.BirthDate = *request.BirthDate
+		}
+	}
+
+	err = savePartnershipLead(&policy, partnershipNode, "")
+	if err != nil {
+		log.ErrorF("error saving lead: %s", err.Error())
+		return "", nil, err
+	}
+
+	response.Policy = policy
+	response.Product = *productLife
+
+	responseJson, err := json.Marshal(response)
+
+	log.Println("Handler end -------------------------------------------------")
+
+	return string(responseJson), response, err
+}
+func setPolicyPartnershipInfo(policy models.Policy, product *models.Product, node *models.NetworkNode, partnershipName string) models.Policy {
 	policy.Name = product.Name
 	policy.NameDesc = *product.NameDesc
 	policy.ProductVersion = product.Version
 	policy.Company = product.Companies[0].Name
-	policy.ProducerUid = node.Uid
-	policy.ProducerCode = node.Partnership.Name
-	policy.PartnershipName = node.Partnership.Name
-	policy.ProducerType = node.Type
+	policy.PartnershipName = partnershipName
+	if node != nil {
+		policy.ProducerUid = node.Uid
+		policy.ProducerCode = node.Partnership.Name
+		policy.PartnershipName = node.Partnership.Name
+		policy.ProducerType = node.Type
+	}
 
 	return policy
 }

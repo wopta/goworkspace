@@ -319,7 +319,6 @@ func UsersToListData(query *firestore.DocumentIterator) []User {
 	for {
 		d, err := query.Next()
 		if err != nil {
-			log.ErrorF("error")
 			if err == iterator.Done {
 				log.Println("iterator.Done")
 				break

@@ -53,7 +53,7 @@ if [[ "${TAG}" == *"prod"* ]]; then
     PROJECT=core-350507
     ENV=prod
     GEN_FX=""
-    SERVICE_ACCOUNT=wopta-prod-cloud-function@core-350507.iam.gserviceaccount.com
+    SERVICE_ACCOUNT=wopta-prod-cloudbuild-sa@core-350507.iam.gserviceaccount.com
     TIMEOUT=520
     VPC=functions-connector
 fi

@@ -7,7 +7,7 @@ import (
 )
 
 func UpdateAgentRuiCode(nodeUid, ruiCode string) {
-	networkNode, err := network.GetNodeByUid(nodeUid)
+	networkNode, err := network.GetNodeByUidErr(nodeUid)
 	if err != nil {
 		log.Printf("error: %s", err.Error())
 		return

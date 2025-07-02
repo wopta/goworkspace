@@ -82,8 +82,8 @@ func BankAccountScalapayFx(resp http.ResponseWriter, r *http.Request) (string, i
 
 	}
 
-	log.Error(e)
 	if e != nil {
+		log.Error(e)
 		return "", nil, GetErrorJson(500, "internal server error", "")
 	} else {
 		log.Println(`200 {"woptaUid":"` + obj.Uid + `"}`)
