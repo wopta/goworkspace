@@ -16,6 +16,8 @@ type DocumentResp struct {
 	Filename string `json:"filename"`
 }
 
+// DEPRECATED
+// REMOVE ALL HANDLERS
 var documentRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/v1/proposal",
