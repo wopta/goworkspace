@@ -189,7 +189,7 @@ func NewLifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, 
 	}
 
 	if request.BirthDate != nil {
-		slices.DeleteFunc(productLife.Steps, func(step models.Step) bool { return step.Widget == "guaranteeconfigurationstep" })
+		productLife.Steps = slices.DeleteFunc(productLife.Steps, func(step models.Step) bool { return step.Widget == "guaranteeconfigurationstep" })
 	}
 	response.Policy = policy
 	response.Product = *productLife
