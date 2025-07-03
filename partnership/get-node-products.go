@@ -2,7 +2,6 @@ package partnership
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
@@ -39,8 +38,12 @@ func GetPartnershipNodeAndProductsFx(w http.ResponseWriter, r *http.Request) (st
 		log.ErrorF("error getting node '%s': %s", partnershipUid, err.Error())
 		return "", nil, err
 	}
+
 	if node == nil {
-		return "", nil, fmt.Errorf("error no node found: %s", partnershipUid)
+		response.Partnership.Name = partnershipUid
+		response.Products = product.GetAllProductsByChannel(lib.ECommerceChannel)
+		responseJson, err := json.Marshal(response)
+		return string(responseJson), nil, err
 	}
 
 	if _, err := node.DecryptJwt(jwtData); err != nil {
