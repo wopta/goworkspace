@@ -499,11 +499,18 @@ func createPartnershipFacileVetrina() error {
 	)
 	name_partnership := "facile_vetrina"
 	partnershipModel := models.NetworkNode{
-		Uid:         name_partnership,
-		Code:        name_partnership,
-		Type:        models.PartnershipNetworkNodeType,
-		IsActive:    true,
-		Partnership: &models.PartnershipNode{Name: name_partnership},
+		Uid:      name_partnership,
+		Code:     name_partnership,
+		Type:     models.PartnershipNetworkNodeType,
+		IsActive: true,
+		Partnership: &models.PartnershipNode{
+			Name: name_partnership,
+			Skin: &models.Skin{
+				PrimaryColor:   "",
+				SecondaryColor: "",
+				LogoUrl:        "https://upload.wikimedia.org/wikipedia/commons/7/78/Logo_facile_%28azienda%29.png",
+			},
+		},
 		Products: []models.Product{{
 			Name:         models.LifeProduct,
 			NameDesc:     &nameDesc,
