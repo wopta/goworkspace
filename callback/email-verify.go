@@ -2,6 +2,7 @@ package callback
 
 import (
 	"net/http"
+	"strings"
 
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
@@ -17,6 +18,7 @@ func EmailVerifyFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	log.Println("GET params were:", r.URL.Query())
 	email := r.URL.Query().Get("email")
+	email = strings.ReplaceAll(email, " ", "+")
 	token := r.URL.Query().Get("token")
 	log.Println(token)
 	res := lib.WhereFirestore("mail", "mail", "==", email)
