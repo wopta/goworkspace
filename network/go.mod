@@ -1,6 +1,6 @@
 module gitlab.dev.wopta.it/goworkspace/network
 
-go 1.21
+go 1.23
 
 replace gitlab.dev.wopta.it/goworkspace/network => ./
 
@@ -10,9 +10,10 @@ require (
 	cloud.google.com/go/pubsub v1.38.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.175
-	gitlab.dev.wopta.it/goworkspace/models v1.2.77
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.176
+	gitlab.dev.wopta.it/goworkspace/models v1.2.78
 	google.golang.org/api v0.181.0
+	google.golang.org/grpc v1.63.2
 )
 
 require (
@@ -96,7 +97,6 @@ require (
 	google.golang.org/genproto v0.0.0-20240515191416-fc5f0ca64291 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240509183442-62759503f434 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240513163218-0867130af1f8 // indirect
-	google.golang.org/grpc v1.63.2 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
 	gopkg.in/src-d/go-git.v4 v4.13.1 // indirect

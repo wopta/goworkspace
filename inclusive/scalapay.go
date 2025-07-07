@@ -44,7 +44,7 @@ func BankAccountScalapayFx(resp http.ResponseWriter, r *http.Request) (string, i
 	if obj.MovementType == "insert" {
 		e = lib.InsertRowsBigQuery(dataset, movementTable, obj)
 		log.Println(e)
-		res, _ := QueryRowsBigQuery[BankAccountMovement](dataset,
+		res := QueryRowsBigQuery[BankAccountMovement](dataset,
 			usersTable,
 			"select * from `"+dataset+"."+usersTable+"` where guaranteesCode ='"+obj.GuaranteesCode+"' and id ='"+obj.Id+"'")
 		log.Println(len(res))
@@ -62,7 +62,7 @@ func BankAccountScalapayFx(resp http.ResponseWriter, r *http.Request) (string, i
 	if obj.MovementType == "delete" || obj.MovementType == "suspended" {
 
 		refDay := time.Now()
-		res, _ := QueryRowsBigQuery[BankAccountMovement](dataset,
+		res := QueryRowsBigQuery[BankAccountMovement](dataset,
 			usersTable,
 			"select * from `"+dataset+"."+movementTable+"` where guaranteesCode ='"+obj.GuaranteesCode+"' and id ='"+obj.Id+"' and StartDate ='"+refDay.Format(layoutQuery)+"' and movementType ='insert'")
 		log.Println(len(res))
@@ -124,7 +124,7 @@ func CheckScalapayData(r *http.Request) (BankAccountMovement, error) {
 		}
 	}
 	if obj.MovementType == "delete" || obj.MovementType == "suspended" {
-		res, _ := QueryRowsBigQuery[BankAccountMovement](dataset,
+		res := QueryRowsBigQuery[BankAccountMovement](dataset,
 			usersTable,
 			"select * from `"+dataset+"."+movementTable+"` where guaranteesCode ='"+obj.GuaranteesCode+"' and id ='"+obj.Id+"' and movementType ='insert'")
 		log.Println(len(res))

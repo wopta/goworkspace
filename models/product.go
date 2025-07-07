@@ -15,32 +15,33 @@ func (r *Product) Marshal() ([]byte, error) {
 }
 
 type Product struct {
-	NameTitle          string             `firestore:"nameTitle,omitempty" json:"nameTitle,omitempty"`
-	NameSubtitle       string             `firestore:"nameSubtitle,omitempty" json:"nameSubtitle,omitempty"`
-	NameDesc           *string            `firestore:"nameDesc,omitempty" json:"nameDesc,omitempty"`
-	Companies          []Company          `firestore:"companies,omitempty" json:"companies,omitempty"`
-	ProductUid         string             `firestore:"productUid,omitempty" json:"productUid,omitempty"`
-	ProductVersion     int                `firestore:"productVersion,omitempty" json:"productVersion,omitempty"`
-	Version            string             `firestore:"version,omitempty" json:"version,omitempty"`
-	Number             int                `firestore:"number,omitempty" json:"number,omitempty"`
-	Name               string             `firestore:"name,omitempty" json:"name,omitempty"`
-	Commission         float64            `firestore:"commission,omitempty" json:"commission,omitempty"`
-	CommissionRenew    float64            `firestore:"commissionRenew,omitempty" json:"commissionRenew,omitempty"`
-	Steps              []Step             `firestore:"steps,omitempty" json:"steps"`
-	Offers             map[string]Offer   `firestore:"offers,omitempty" json:"offers,omitempty"`
-	Logo               string             `json:"logo,omitempty" firestore:"logo,omitempty" bigquery:"-"`
-	PaymentProviders   []PaymentProvider  `json:"paymentProviders,omitempty" firestore:"paymentProviders,omitempty" bigquery:"-"`
-	Flow               string             `json:"flow,omitempty" firestore:"flow,omitempty" bigquery:"-"` // the name of the flow file to be used
-	IsActive           bool               `json:"isActive" firestore:"isActive" bigquery:"-"`
-	RenewOffset        int                `json:"renewOffset" firestore:"renewOffset" bigquery:"-"`
-	IsAutoRenew        bool               `json:"isAutoRenew" firestore:"isAutoRenew" bigquery:"-"`
-	IsRenewable        bool               `json:"isRenewable" firestore:"isRenewable" bigquery:"-"`
-	PolicyType         string             `json:"policyType,omitempty" firestore:"policyType,omitempty" bigquery:"-"`
-	QuoteType          string             `json:"quoteType" firestore:"quoteType" bigquery:"-"`
-	EmitMaxElapsedDays uint               `json:"emitMaxElapsedDays" firestore:"-" bigquery:"-"`
-	Categories         []string           `json:"categories" firestore:"-" bigquery:"-"`
-	ConsultancyConfig  *ConsultancyConfig `json:"consultancyConfig" firestore:"consultancyConfig" bigquery:"-"`
-	IsAIAgentEnabled   bool               `json:"isAIAgentEnabled" firestore:"isAIAgentEnabled" bigquery:"-"`
+	NameTitle          string            `firestore:"nameTitle,omitempty" json:"nameTitle,omitempty"`
+	NameSubtitle       string            `firestore:"nameSubtitle,omitempty" json:"nameSubtitle,omitempty"`
+	NameDesc           *string           `firestore:"nameDesc,omitempty" json:"nameDesc,omitempty"`
+	Companies          []Company         `firestore:"companies,omitempty" json:"companies,omitempty"`
+	ProductUid         string            `firestore:"productUid,omitempty" json:"productUid,omitempty"`
+	ProductVersion     int               `firestore:"productVersion,omitempty" json:"productVersion,omitempty"`
+	Version            string            `firestore:"version,omitempty" json:"version,omitempty"`
+	Number             int               `firestore:"number,omitempty" json:"number,omitempty"`
+	Name               string            `firestore:"name,omitempty" json:"name,omitempty"`
+	Commission         float64           `firestore:"commission,omitempty" json:"commission,omitempty"`
+	CommissionRenew    float64           `firestore:"commissionRenew,omitempty" json:"commissionRenew,omitempty"`
+	Steps              []Step            `firestore:"steps,omitempty" json:"steps"`
+	Offers             map[string]Offer  `firestore:"offers,omitempty" json:"offers,omitempty"`
+	Logo               string            `json:"logo,omitempty" firestore:"logo,omitempty" bigquery:"-"`
+	PaymentProviders   []PaymentProvider `json:"paymentProviders,omitempty" firestore:"paymentProviders,omitempty" bigquery:"-"`
+	Flow               string            `json:"flow,omitempty" firestore:"flow,omitempty" bigquery:"-"` // the name of the flow file to be used
+	IsActive           bool              `json:"isActive" firestore:"isActive" bigquery:"-"`
+	RenewOffset        int               `json:"renewOffset" firestore:"renewOffset" bigquery:"-"`
+	IsAutoRenew        bool              `json:"isAutoRenew" firestore:"isAutoRenew" bigquery:"-"`
+	IsRenewable        bool              `json:"isRenewable" firestore:"isRenewable" bigquery:"-"`
+	PolicyType         string            `json:"policyType,omitempty" firestore:"policyType,omitempty" bigquery:"-"`
+	QuoteType          string            `json:"quoteType" firestore:"quoteType" bigquery:"-"`
+	EmitMaxElapsedDays uint              `json:"emitMaxElapsedDays" firestore:"-" bigquery:"-"`
+	Categories         []string          `json:"categories" firestore:"-" bigquery:"-"`
+	//Setting for remunerazione
+	ConsultancyConfig *ConsultancyConfig `json:"consultancyConfig" firestore:"consultancyConfig" bigquery:"-"`
+	IsAIAgentEnabled  bool               `json:"isAIAgentEnabled" firestore:"isAIAgentEnabled" bigquery:"-"`
 
 	// DEPRECATED FIELDS
 
@@ -75,8 +76,9 @@ type Company struct {
 	IsAgencyActive            bool                 `json:"isAgencyActive" firestore:"isAgencyActive" bigquery:"-"`       // DEPRECATED
 	IsAgentActive             bool                 `json:"isAgentActive" firestore:"isAgentActive" bigquery:"-"`         // DEPRECATED
 	AnnulmentCodes            []AnnulmentCode      `json:"annulmentCodes,omitempty" firestore:"annulmentCodes,omitempty" bigquery:"-"`
-	CommissionSetting         *CommissionsSetting  `json:"commissionsSetting,omitempty" firestore:"commissionsSetting,omitempty" bigquery:"-"`
-	ProducerCode              string               `json:"producerCode,omitempty" firestore:"producerCode,omitempty" bigquery:"producerCode"`
+	//Setting for commisioni
+	CommissionSetting *CommissionsSetting `json:"commissionsSetting,omitempty" firestore:"commissionsSetting,omitempty" bigquery:"-"`
+	ProducerCode      string              `json:"producerCode,omitempty" firestore:"producerCode,omitempty" bigquery:"producerCode"`
 	// MaxFreeDiscount           float64              `json:"maxFreeDiscount,omitempty" firestore:"maxFreeDiscount,omitempty" bigquery:"-"`
 	// MaxReservedDiscount       float64              `json:"maxReservedDiscount,omitempty" firestore:"maxReservedDiscount,omitempty" bigquery:"-"`
 }

@@ -49,10 +49,10 @@ func CreatePartnerhipNodes() {
 	// 	log.Println(err.Error())
 	// }
 
-	// err := createPartnershipFacileVetrina()
-	// if err != nil {
-	// 	log.Println(err.Error())
-	// }
+	//err := createPartnershipFacileVetrina()
+	//if err != nil {
+	//	log.Println(err.Error())
+	//}
 }
 
 func createBeprofNode() error {
@@ -185,6 +185,8 @@ func createFacileNode() error {
 					}},
 				Widget: "guaranteeconfigurationstep",
 			}, {
+				Widget: "quotercontractordata",
+			}, {
 				Attributes: map[string]interface{}{
 					"companyPrivacy":      "PRESTO IL CONSENSO al trattamento dei miei dati personali ad AXA France VIE S.A. – Rappresentanza Generale per l’Italia, ivi inclusi quelli eventualmente da me conferiti in riferimento al mio stato di salute, per le finalità indicate nell’informativa, consultabile all’interno dei documenti precontrattuali (ricevuti via mail o consultabili al link nella pagina che precede), nonché alla loro comunicazione, per successivo trattamento, da parte dei soggetti indicati nella informativa predetta.",
 					"companyPrivacyTitle": "Privacy Assicurativa",
@@ -204,8 +206,6 @@ func createFacileNode() error {
 					"thirdPartyReferenceText":      "In caso di specifiche esigenze di riservatezza, potrai indicare il nominativo ed i dati di recapito (inluso email e/o telefono) di un soggetto terno (diverso dal Beneficiario) a cui l'impresa di Assicurazione potrà rivolgersi in caso di decesso dell'Assicurato al fine di contattare il Beneficiario.",
 				},
 				Widget: "quoterbeneficiary",
-			}, {
-				Widget: "quotercontractordata",
 			}, {
 				Attributes: map[string]interface{}{
 					"guaranteeSlug": "death",
@@ -227,6 +227,7 @@ func createFacileNode() error {
 				Widget: "quoterthankyou",
 			}},
 		}},
+		Warrant: "ptns_remunerazione_zero",
 	}
 
 	nn, err := network.CreateNode(partnershipModel)
@@ -499,11 +500,18 @@ func createPartnershipFacileVetrina() error {
 	)
 	name_partnership := "facile_vetrina"
 	partnershipModel := models.NetworkNode{
-		Uid:         name_partnership,
-		Code:        name_partnership,
-		Type:        models.PartnershipNetworkNodeType,
-		IsActive:    true,
-		Partnership: &models.PartnershipNode{Name: name_partnership},
+		Uid:      name_partnership,
+		Code:     name_partnership,
+		Type:     models.PartnershipNetworkNodeType,
+		IsActive: true,
+		Partnership: &models.PartnershipNode{
+			Name: name_partnership,
+			Skin: &models.Skin{
+				PrimaryColor:   "",
+				SecondaryColor: "",
+				LogoUrl:        "https://upload.wikimedia.org/wikipedia/commons/7/78/Logo_facile_%28azienda%29.png",
+			},
+		},
 		Products: []models.Product{{
 			Name:         models.LifeProduct,
 			NameDesc:     &nameDesc,

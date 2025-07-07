@@ -1,6 +1,6 @@
 module gitlab.dev.wopta.it/goworkspace/cmd
 
-go 1.21
+go 1.23
 
 toolchain go1.21.7
 

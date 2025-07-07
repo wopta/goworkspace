@@ -22,7 +22,7 @@ steps:
         cd function-data/
         tar -xvzf function-data.tar.gz
     entrypoint: bash
-  - name: 'golang:1.21'
+  - name: 'golang:1.23'
     args:
       - '-c'
       - |

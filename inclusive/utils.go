@@ -12,7 +12,7 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-func QueryRowsBigQuery[T any](datasetID string, tableID string, query string) ([]T, error) {
+func QueryRowsBigQuery[T any](datasetID string, tableID string, query string) []T {
 	var (
 		res  []T
 		e    error
@@ -32,11 +32,10 @@ func QueryRowsBigQuery[T any](datasetID string, tableID string, query string) ([
 		e := iter.Next(&row)
 
 		if e == iterator.Done {
-			return res, e
+			return res
 		}
 		if e != nil {
-			log.Error(e)
-			return res, e
+			return res
 		}
 
 		res = append(res, row)

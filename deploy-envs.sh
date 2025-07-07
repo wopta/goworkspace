@@ -98,7 +98,7 @@ gcloud functions deploy ${FX_NAME} \
     --allow-unauthenticated \
     --run-service-account=${SERVICE_ACCOUNT} \
     --build-service-account=projects/${PROJECT}/serviceAccounts/${SERVICE_ACCOUNT} \
-    --runtime=go121 \
+    --runtime=go123 \
     --env-vars-file ${ENV}.yaml \
     --timeout=${TIMEOUT} \
     --ingress-settings=${INGRESS} \

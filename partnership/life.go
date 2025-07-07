@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"slices"
 	"strings"
 	"time"
 
@@ -176,9 +177,9 @@ func NewLifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, 
 		response.Partnership = PartnershipNode{partnershipNode.Partnership.Name, partnershipNode.Partnership.Skin}
 	} else {
 		response.Partnership = PartnershipNode{Name: partnershipUid}
-		if request.BirthDate != nil {
-			policy.Contractor.BirthDate = *request.BirthDate
-		}
+	}
+	if request.BirthDate != nil {
+		policy.Contractor.BirthDate = *request.BirthDate
 	}
 
 	err = savePartnershipLead(&policy, partnershipNode, "")
@@ -187,6 +188,9 @@ func NewLifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, 
 		return "", nil, err
 	}
 
+	if policy.Contractor.BirthDate != "" {
+		productLife.Steps = slices.DeleteFunc(productLife.Steps, func(step models.Step) bool { return step.Widget == "quoterhome" })
+	}
 	response.Policy = policy
 	response.Product = *productLife
 

@@ -1,12 +1,12 @@
 module gitlab.dev.wopta.it/goworkspace/wiseproxy
 
-go 1.21
+go 1.23
 
 replace gitlab.dev.wopta.it/goworkspace/wiseproxy => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.175
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.176
 )
 
 require (

@@ -1,6 +1,6 @@
 module gitlab.dev.wopta.it/goworkspace/enrich
 
-go 1.21
+go 1.23
 
 replace gitlab.dev.wopta.it/goworkspace/enrich => ./
 
@@ -8,8 +8,8 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/go-gota/gota v0.12.0
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.175
-	gitlab.dev.wopta.it/goworkspace/models v1.2.77
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.176
+	gitlab.dev.wopta.it/goworkspace/models v1.2.78
 )
 
 require (
