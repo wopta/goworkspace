@@ -12,7 +12,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.90
 	gitlab.dev.wopta.it/goworkspace/document v1.1.221
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.177
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.200
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.201
 	gitlab.dev.wopta.it/goworkspace/models v1.2.79
 	gitlab.dev.wopta.it/goworkspace/network v1.0.147
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.264
