@@ -1,12 +1,39 @@
 package document
 
 import (
-	"bytes"
+	"encoding/json"
+	"io"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"gitlab.dev.wopta.it/goworkspace/document/pkg/contract"
+	lib "gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
+type requestGenerateMup struct {
+	CompanyName      string  `json:"companyName"`
+	ConsultancyPrice float64 `json:"consultancyPrice"`
+}
+
 func GenerateMupFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	return contract.GenerateMup(companyName, consultancyPrice, channel)
+	var (
+		req requestGenerateMup
+	)
+
+	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+
+	err := json.Unmarshal(body, &req)
+	if err != nil {
+		log.ErrorF("error unmarshaling request body")
+		return "", nil, err
+	}
+	nodeUid := chi.URLParam(r, "nodeUid")
+
+	bytes, err := contract.GenerateMup(req.CompanyName, req.ConsultancyPrice, models.NetworkChannel, nodeUid)
+
+	w.Header().Set("Content-type", "application/pdf")
+	return bytes.String(), bytes, err
 }

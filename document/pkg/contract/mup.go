@@ -2,26 +2,49 @@ package contract
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"gitlab.dev.wopta.it/goworkspace/document/internal/constants"
 	"gitlab.dev.wopta.it/goworkspace/document/internal/domain"
+	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
-func GenerateMup(companyName string, consultancyPrice float64, channel string) (out bytes.Buffer, err error) {
-	generator := &baseGenerator{}
-	generator.mup(companyName, consultancyPrice, channel)
+func GenerateMup(companyName string, consultancyPrice float64, channel string, nodeUid string) (out bytes.Buffer, err error) {
+	node := network.GetNetworkNodeByUid(nodeUid)
+	if node == nil {
+		return bytes.Buffer{}, errors.New("node not found")
+	}
+	workFor := network.GetNetworkNodeByUid(node.WorksForUid)
+	if workFor == nil {
+		return bytes.Buffer{}, errors.New("workfor node not found")
+	}
+	mockPolicy := models.Policy{
+		Channel: channel,
+	}
+	generator := &baseGenerator{
+		engine:       engine.NewFpdf(),
+		isProposal:   false,
+		now:          time.Now(),
+		signatureID:  0,
+		networkNode:  node,
+		policy:       &mockPolicy,
+		worksForNode: workFor,
+	}
+	generator.mup(true, companyName, consultancyPrice, channel)
 
 	err = generator.engine.GetPdf().Output(&out)
 	return out, err
 }
 
-func (bg *baseGenerator) mup(companyName string, consultancyPrice float64, channel string) {
-	if bg.networkNode != nil && !bg.networkNode.HasAnnex && bg.networkNode.Type != models.PartnershipNetworkNodeType {
+func (bg *baseGenerator) mup(isManualGenerated bool, companyName string, consultancyPrice float64, channel string) {
+	if !isManualGenerated && (bg.networkNode != nil && !bg.networkNode.HasAnnex && bg.networkNode.Type != models.PartnershipNetworkNodeType) {
 		return
 	}
 
@@ -55,7 +78,9 @@ func (bg *baseGenerator) mup(companyName string, consultancyPrice float64, chann
 	bg.mupSectionV(mupSection5Info)
 	bg.engine.NewLine(3)
 	bg.mupSectionVI()
-	bg.engine.NewPage()
+	if !isManualGenerated {
+		bg.engine.NewPage()
+	}
 	bg.mupSectionVII()
 }
 
@@ -282,7 +307,9 @@ func (bg *baseGenerator) mupInfo(companyName string, consultancyPrice float64, c
 			"e un compenso direttamente dal Contraente, pari ad %s."
 	)
 
-	companyName = constants.CompanyMap[companyName]
+	if tCompanyName := constants.CompanyMap[companyName]; tCompanyName != "" {
+		companyName = tCompanyName
+	}
 
 	if channel != models.NetworkChannel || bg.networkNode == nil || bg.networkNode.IsMgaProponent {
 		section2Info = fmt.Sprintf(
@@ -302,7 +329,7 @@ func (bg *baseGenerator) mupInfo(companyName string, consultancyPrice float64, c
 	}
 
 	section5Info = withoutConsultacy
-	if bg.policy.ConsultancyValue.Price > 0 {
+	if consultancyPrice > 0 {
 		section5Info = fmt.Sprintf(
 			withConsultacyFormat,
 			lib.HumanaizePriceEuro(consultancyPrice),

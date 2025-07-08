@@ -42,7 +42,9 @@ func ResponseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) 
 			}
 			return
 		}
-		log.Printf("Response: %s", str)
+		if w.Header().Get("Content-type") == "application/json" {
+			log.Printf("Response: %s", str)
+		}
 		w.Write([]byte(str))
 	}
 }

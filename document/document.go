@@ -20,10 +20,10 @@ type DocumentResp struct {
 // REMOVE ALL HANDLERS
 var documentRoutes []lib.Route = []lib.Route{
 	{
-		Route:   "/generate/mup",
+		Route:   "/generate/mup/{nodeUid}",
 		Handler: lib.ResponseLoggerWrapper(GenerateMupFx),
 		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAreaManager},
+		Roles:   []string{lib.UserRoleAll},
 	},
 }
 
