@@ -19,7 +19,10 @@ type requestGenerateMup struct {
 
 func GenerateMupFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		req requestGenerateMup
+		req  requestGenerateMup
+		resp struct {
+			bytes []byte
+		}
 	)
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
@@ -35,5 +38,7 @@ func GenerateMupFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	bytes, err := contract.GenerateMup(req.CompanyName, req.ConsultancyPrice, models.NetworkChannel, nodeUid)
 
 	w.Header().Set("Content-type", "application/pdf")
-	return bytes.String(), bytes, err
+	resp.bytes = bytes.Bytes()
+	respBytes, err := json.Marshal(resp)
+	return string(respBytes), bytes, err
 }
