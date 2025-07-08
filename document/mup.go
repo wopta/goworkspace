@@ -21,7 +21,7 @@ func GenerateMupFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	var (
 		req  requestGenerateMup
 		resp struct {
-			bytes []byte
+			Bytes []byte `json:"bytes"`
 		}
 	)
 
@@ -37,7 +37,7 @@ func GenerateMupFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	bytes, err := contract.GenerateMup(req.CompanyName, req.ConsultancyPrice, models.NetworkChannel, nodeUid)
 
-	resp.bytes = bytes.Bytes()
+	resp.Bytes = bytes.Bytes()
 	respBytes, err := json.Marshal(resp)
 	return string(respBytes), bytes, err
 }
