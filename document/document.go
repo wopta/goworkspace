@@ -18,44 +18,7 @@ type DocumentResp struct {
 
 // DEPRECATED
 // REMOVE ALL HANDLERS
-var documentRoutes []lib.Route = []lib.Route{
-	{
-		Route:   "/v1/proposal",
-		Handler: lib.ResponseLoggerWrapper(ContractFx),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
-	},
-	{
-		Route:   "/v1/contract",
-		Handler: lib.ResponseLoggerWrapper(ContractFx),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
-	},
-	{
-		Route:   "/v1/proposal",
-		Handler: lib.ResponseLoggerWrapper(ProposalFx),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
-	},
-	{
-		Route:   "/v1/reserved",
-		Handler: lib.ResponseLoggerWrapper(ReservedFx),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
-	},
-	{ //DEPRECATED
-		Route:   "/v1/sign",
-		Handler: lib.ResponseLoggerWrapper(SignNamirial),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
-	},
-	{ //DEPRECATED
-		Route:   "/v2/sign",
-		Handler: lib.ResponseLoggerWrapper(SignNamirial),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
-	},
-}
+var documentRoutes []lib.Route = []lib.Route{}
 
 func init() {
 	log.Println("INIT Document")
@@ -66,6 +29,8 @@ func Document(w http.ResponseWriter, r *http.Request) {
 	router := lib.GetRouter("document", documentRoutes)
 	router.ServeHTTP(w, r)
 }
+
+var signatureID int
 
 type Kv struct {
 	Key   string `json:"key"`

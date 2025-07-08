@@ -2,55 +2,14 @@ package document
 
 import (
 	"bytes"
-	"encoding/json"
-	"io"
-	"net/http"
 	"strconv"
 	"time"
 
 	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
 	"gitlab.dev.wopta.it/goworkspace/document/pkg/contract"
-	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/network"
-	prd "gitlab.dev.wopta.it/goworkspace/product"
 )
-
-var (
-	signatureID int
-)
-
-func ContractFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.AddPrefix("Contract")
-	defer log.PopPrefix()
-
-	//lib.Files("./serverless_function_source_code")
-	origin := r.Header.Get("Origin")
-	req := lib.ErrorByte(io.ReadAll(r.Body))
-	var data models.Policy
-	defer r.Body.Close()
-	err := json.Unmarshal([]byte(req), &data)
-	lib.CheckError(err)
-
-	var warrant *models.Warrant
-	networkNode := network.GetNetworkNodeByUid(data.ProducerUid)
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
-	}
-
-	product := prd.GetProductV2(data.Name, data.ProductVersion, models.MgaChannel, networkNode, warrant)
-
-	respObj := <-ContractObj(origin, data, networkNode, product) // TODO review product nil
-	response, err := respObj.Save()
-	if err != nil {
-		return "", nil, err
-	}
-	resp, err := json.Marshal(response)
-
-	lib.CheckError(err)
-	return string(resp), respObj, nil
-}
 
 func ContractObj(origin string, data models.Policy, networkNode *models.NetworkNode, product *models.Product) <-chan DocumentGenerated {
 	r := make(chan DocumentGenerated)

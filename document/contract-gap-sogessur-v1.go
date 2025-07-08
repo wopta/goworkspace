@@ -13,7 +13,6 @@ import (
 )
 
 func gapSogessurContractV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode) (DocumentGenerated, error) {
-	signatureID = 0
 
 	gapHeaderV1(pdf, policy, networkNode, false)
 

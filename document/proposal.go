@@ -1,63 +1,13 @@
 package document
 
 import (
-	"encoding/json"
-	"io"
-	"net/http"
-
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"github.com/go-pdf/fpdf"
 	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
 	"gitlab.dev.wopta.it/goworkspace/document/pkg/contract"
-	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/network"
-	prd "gitlab.dev.wopta.it/goworkspace/product"
 )
-
-func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var (
-		err         error
-		policy      *models.Policy
-		warrant     *models.Warrant
-		product     *models.Product
-		networkNode *models.NetworkNode
-	)
-	log.AddPrefix("ProposalFx")
-	defer log.PopPrefix()
-	log.Println("handler start ---------------------------------")
-
-	origin := r.Header.Get("Origin")
-	body := lib.ErrorByte(io.ReadAll(r.Body))
-	defer r.Body.Close()
-
-	log.Printf("body: %s", string(body))
-
-	err = json.Unmarshal(body, &policy)
-	if err != nil {
-		log.ErrorF("error unmarshaling request body: %s", err.Error())
-		return "", nil, err
-	}
-
-	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
-	}
-
-	product = prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, networkNode, warrant)
-
-	result, err := Proposal(origin, policy, networkNode, product)
-	response, err := result.Save()
-	if err != nil {
-		return "", nil, err
-	}
-	respJson, err := json.Marshal(response)
-
-	log.Println("handler end ---------------------------------")
-
-	return string(respJson), result, err
-}
 
 func Proposal(origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (DocumentGenerated, error) {
 	var (
