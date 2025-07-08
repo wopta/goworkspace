@@ -36,7 +36,9 @@ func GenerateMupFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	nodeUid := chi.URLParam(r, "nodeUid")
 
 	bytes, err := contract.GenerateMup(req.CompanyName, req.ConsultancyPrice, models.NetworkChannel, nodeUid)
-
+	if err != nil {
+		return "", nil, err
+	}
 	resp.Bytes = bytes.Bytes()
 	respBytes, err := json.Marshal(resp)
 	return string(respBytes), bytes, err

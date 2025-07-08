@@ -23,7 +23,7 @@ func GenerateMup(companyName string, consultancyPrice float64, channel string, n
 	}
 	workFor := network.GetNetworkNodeByUid(node.WorksForUid)
 	if workFor == nil {
-		return bytes.Buffer{}, errors.New("workfor node not found")
+		log.WarningF("workfor %s node not found", node.WorksForUid)
 	}
 	mockPolicy := models.Policy{
 		Channel: channel,
