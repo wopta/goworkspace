@@ -18,7 +18,14 @@ type DocumentResp struct {
 
 // DEPRECATED
 // REMOVE ALL HANDLERS
-var documentRoutes []lib.Route = []lib.Route{}
+var documentRoutes []lib.Route = []lib.Route{
+	{
+		Route:   "/generate/mup",
+		Handler: lib.ResponseLoggerWrapper(GenerateMupFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAreaManager},
+	},
+}
 
 func init() {
 	log.Println("INIT Document")
