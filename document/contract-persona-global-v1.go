@@ -16,6 +16,7 @@ type keyValue struct {
 }
 
 func personaGlobalContractV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) {
+	signatureID = 0
 
 	personaMainHeaderV1(pdf, policy, networkNode, false)
 
