@@ -37,7 +37,6 @@ func GenerateMupFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	bytes, err := contract.GenerateMup(req.CompanyName, req.ConsultancyPrice, models.NetworkChannel, nodeUid)
 
-	w.Header().Set("Content-type", "application/pdf")
 	resp.bytes = bytes.Bytes()
 	respBytes, err := json.Marshal(resp)
 	return string(respBytes), bytes, err
