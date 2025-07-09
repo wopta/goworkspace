@@ -1,7 +1,9 @@
 package mga
 
 import (
+	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"time"
 
@@ -21,6 +23,14 @@ func refundPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	var req requestRefund
 	policyUid := chi.URLParam(r, "policyUid")
 	transactionUid := chi.URLParam(r, "transactionUid")
+
+	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+
+	err := json.Unmarshal(body, &req)
+	if err != nil {
+		return "", nil, err
+	}
 
 	//POLICY UPDATE
 	policy, err := policy.GetPolicy(policyUid, "")
