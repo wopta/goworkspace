@@ -37,6 +37,9 @@ func refundPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	if err != nil {
 		return "", nil, err
 	}
+	if !policy.IsPay {
+		return "", nil, errors.New("policy isn't paid")
+	}
 	policy.Status = models.PolicyStatusRefund
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 	policy.Updated = time.Now().UTC()
@@ -48,6 +51,10 @@ func refundPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	if tr == nil {
 		return "", nil, errors.New("No transaction found")
 	}
+	if !tr.IsPay {
+		return "", nil, errors.New("transaction isn't paid")
+	}
+	tr.IsPay = false
 	tr.PaymentNote = req.Note
 	tr.UpdateDate = time.Now().UTC()
 	tr.PayUrl = ""
