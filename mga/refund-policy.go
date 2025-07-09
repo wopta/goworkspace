@@ -40,10 +40,10 @@ func refundPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	if !policy.IsPay {
 		return "", nil, errors.New("policy isn't paid")
 	}
-	if policy.Status == models.PolicyStatusRefund {
-		return "", nil, errors.New("policy is already been refund")
+	if policy.Status == models.PolicyStatusRefunded {
+		return "", nil, errors.New("policy is already in refunded state")
 	}
-	policy.Status = models.PolicyStatusRefund
+	policy.Status = models.PolicyStatusRefunded
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 	policy.Updated = time.Now().UTC()
 	policy.IsPay = false
@@ -61,8 +61,8 @@ func refundPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	tr.PaymentNote = req.Note
 	tr.UpdateDate = time.Now().UTC()
 	tr.PayUrl = ""
-	tr.Status = models.TransactionStatusRefund
-	tr.StatusHistory = append(tr.StatusHistory, models.TransactionStatusRefund)
+	tr.Status = models.TransactionStatusRefunded
+	tr.StatusHistory = append(tr.StatusHistory, models.TransactionStatusRefunded)
 
 	err = transaction.SaveTransaction(tr, models.TransactionsCollection)
 	if err != nil {
