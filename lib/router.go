@@ -42,7 +42,9 @@ func ResponseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) 
 			}
 			return
 		}
-		log.Printf("Response: %s", str)
+		if w.Header().Get("Content-type") == "application/json" {
+			log.Printf("Response: %s", str)
+		}
 		w.Write([]byte(str))
 	}
 }
@@ -282,7 +284,7 @@ func checkEntitlement(next http.Handler) http.Handler {
 		}
 
 		if !slices.Contains(roles, userRole) {
-			log.ErrorF("userRole '%s' not allowed", userRole)
+			log.WarningF("userRole '%s' not allowed", userRole)
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}

@@ -86,7 +86,7 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	tr.DeleteTransaction(transaction, "Cancellata manualmente")
 
-	err = saveTransaction(transaction, collection)
+	err = tr.SaveTransaction(transaction, collection)
 	if err != nil {
 		log.Printf("%s", err.Error())
 		return "", nil, err
@@ -99,25 +99,6 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 	}
 
 	return "{}", nil, err
-}
-
-func saveTransaction(transaction *models.Transaction, collection string) error {
-	var (
-		err error
-	)
-
-	transaction.BigQueryParse()
-	err = lib.SetFirestoreErr(collection, transaction.Uid, transaction)
-	if err != nil {
-		return fmt.Errorf("error saving transaction %s in Firestore: %v", transaction.Uid, err.Error())
-	}
-
-	err = lib.InsertRowsBigQuery(lib.WoptaDataset, collection, transaction)
-	if err != nil {
-		log.ErrorF("error saving transaction %s in BigQuery: %v", transaction.Uid, err.Error())
-		return err
-	}
-	return nil
 }
 
 func sendMail(authToken lib.AuthToken, policy models.Policy, transaction models.Transaction) {

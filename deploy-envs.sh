@@ -23,6 +23,7 @@ echo "TAG_VERSION: ${TAG_VERSION}"
 if [[ "${TAG}" == *"dev"* ]]; then
     echo "Setting DEV environment variables..."
     BUCKET=function-data
+	GOVERSION=go123
     REGION=europe-west1
     PROJECT=positive-apex-350507
     ENV=dev
@@ -36,6 +37,7 @@ fi
 if [[ "${TAG}" == *"uat"* ]]; then
     echo "Setting UAT environment variables..."
     BUCKET=core-452909-function-data
+	GOVERSION=go123
     REGION=europe-west1
     PROJECT=core-452909
     ENV=uat
@@ -49,6 +51,7 @@ fi
 if [[ "${TAG}" == *"prod"* ]]; then
     echo "Setting PROD environment variables..."
     BUCKET=core-350507-function-data
+	GOVERSION=go121
     REGION=europe-west1
     PROJECT=core-350507
     ENV=prod
@@ -98,7 +101,7 @@ gcloud functions deploy ${FX_NAME} \
     --allow-unauthenticated \
     --run-service-account=${SERVICE_ACCOUNT} \
     --build-service-account=projects/${PROJECT}/serviceAccounts/${SERVICE_ACCOUNT} \
-    --runtime=go123 \
+    --runtime=${GOVERSION} \
     --env-vars-file ${ENV}.yaml \
     --timeout=${TIMEOUT} \
     --ingress-settings=${INGRESS} \

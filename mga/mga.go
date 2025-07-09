@@ -102,6 +102,12 @@ var mgaRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleManager, lib.UserRoleAgency, lib.UserRoleAgent},
 	},
+	{
+		Route:   "/refund/policy/{policyUid}/{transactionUid}",
+		Handler: lib.ResponseLoggerWrapper(refundPolicy),
+		Method:  http.MethodPut,
+		Roles:   []string{lib.UserRoleAdmin},
+	},
 }
 
 func init() {

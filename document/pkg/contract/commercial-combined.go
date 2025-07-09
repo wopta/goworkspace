@@ -145,8 +145,6 @@ func (ccg *CommercialCombinedGenerator) Contract() (directoryParent string, file
 
 	ccg.commercialConsentSection()
 
-	ccg.mup()
-
 	ccg.woptaHeader()
 
 	ccg.woptaFooter()

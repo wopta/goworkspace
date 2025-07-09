@@ -317,7 +317,6 @@ func FireToListData[T interface{}](query *firestore.DocumentIterator) []T {
 	var _struct T
 	for {
 		d, err := query.Next()
-		log.Println("for")
 		if err != nil {
 			if err == iterator.Done {
 				log.Println("iterator.Done")

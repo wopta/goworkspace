@@ -16,42 +16,10 @@ type DocumentResp struct {
 	Filename string `json:"filename"`
 }
 
-// DEPRECATED
-// REMOVE ALL HANDLERS
 var documentRoutes []lib.Route = []lib.Route{
 	{
-		Route:   "/v1/proposal",
-		Handler: lib.ResponseLoggerWrapper(ContractFx),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
-	},
-	{
-		Route:   "/v1/contract",
-		Handler: lib.ResponseLoggerWrapper(ContractFx),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
-	},
-	{
-		Route:   "/v1/proposal",
-		Handler: lib.ResponseLoggerWrapper(ProposalFx),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
-	},
-	{
-		Route:   "/v1/reserved",
-		Handler: lib.ResponseLoggerWrapper(ReservedFx),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
-	},
-	{ //DEPRECATED
-		Route:   "/v1/sign",
-		Handler: lib.ResponseLoggerWrapper(SignNamirial),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAll},
-	},
-	{ //DEPRECATED
-		Route:   "/v2/sign",
-		Handler: lib.ResponseLoggerWrapper(SignNamirial),
+		Route:   "/generate/mup/{nodeUid}",
+		Handler: lib.ResponseLoggerWrapper(GenerateMupFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
@@ -66,6 +34,8 @@ func Document(w http.ResponseWriter, r *http.Request) {
 	router := lib.GetRouter("document", documentRoutes)
 	router.ServeHTTP(w, r)
 }
+
+var signatureID int
 
 type Kv struct {
 	Key   string `json:"key"`
