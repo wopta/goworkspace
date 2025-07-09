@@ -31,6 +31,7 @@ func refundPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 	policy.Updated = time.Now().UTC()
 	policy.IsPay = false
+	policy.PayUrl = ""
 
 	//TRANSACTION UPDATE
 	tr := transaction.GetTransactionByUid(transactionUid, "")
