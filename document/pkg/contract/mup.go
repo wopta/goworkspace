@@ -78,9 +78,7 @@ func (bg *baseGenerator) mup(isManualGenerated bool, companyName string, consult
 	bg.mupSectionV(mupSection5Info)
 	bg.engine.NewLine(3)
 	bg.mupSectionVI()
-	if !isManualGenerated {
-		bg.engine.NewPage()
-	}
+	bg.engine.NewPage()
 	bg.mupSectionVII()
 }
 
