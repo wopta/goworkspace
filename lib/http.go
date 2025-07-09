@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
-	"net"
 	"net/http"
 	"time"
 
@@ -54,18 +53,6 @@ func RetryDo(req *http.Request, retry int, timeoutSeconds float64) (*http.Respon
 	}
 
 	return resp, err
-}
-
-func getIP(req *http.Request) net.IP {
-
-	ip, _, err := net.SplitHostPort(req.RemoteAddr)
-	if err != nil {
-		log.Error(err)
-
-	}
-
-	userIP := net.ParseIP(ip)
-	return userIP
 }
 
 func CheckPayload[T any](body []byte, payload *T, fields []string) error {

@@ -30,6 +30,7 @@ func Files(path string) []string {
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		log.Error(err)
+		return res
 	}
 
 	for _, f := range files {
@@ -55,19 +56,6 @@ func readCsvFile(filePath string) [][]string {
 	}
 
 	return records
-}
-
-func ReadDir() {
-	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		log.Error(err)
-	}
-	fmt.Println(dir)
-	dir, err = os.Getwd()
-	if err != nil {
-		log.Error(err)
-	}
-	fmt.Println(dir)
 }
 
 func ReadLocalDirContent(folderPath string) [][]byte {

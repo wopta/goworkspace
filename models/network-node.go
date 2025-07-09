@@ -85,8 +85,6 @@ func NetworkNodeToListData(query *firestore.DocumentIterator) []NetworkNode {
 	for {
 		d, err := query.Next()
 		if err != nil {
-		}
-		if err != nil {
 			if err == iterator.Done {
 				break
 			}

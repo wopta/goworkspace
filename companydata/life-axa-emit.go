@@ -199,10 +199,7 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 	log.Println("LifeAxalEmit: filtered row", fil.Nrow())
 	if policy.ProducerUid != "" && policy.Channel == "network" {
 		var node *models.NetworkNode
-		snap, e := lib.GetFirestoreErr("networkNodes", policy.ProducerUid)
-		if e != nil {
-			log.Error(e)
-		}
+		snap, _ := lib.GetFirestoreErr("networkNodes", policy.ProducerUid)
 		snap.DataTo(&node)
 		log.Println("LifeAxalEmit: node.Code", node.Code)
 		networkCode = node.Code
@@ -731,8 +728,6 @@ func TransactionToListData(query *firestore.DocumentIterator) []models.Transacti
 	log.Println("TransactionToListDatam start")
 	for {
 		d, err := query.Next()
-		if err != nil {
-		}
 		if err != nil {
 			if err == iterator.Done {
 				break

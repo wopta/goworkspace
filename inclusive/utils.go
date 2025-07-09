@@ -15,7 +15,6 @@ import (
 func QueryRowsBigQuery[T any](datasetID string, tableID string, query string) []T {
 	var (
 		res  []T
-		e    error
 		iter *bigquery.RowIterator
 	)
 	log.Println(query)
@@ -23,10 +22,7 @@ func QueryRowsBigQuery[T any](datasetID string, tableID string, query string) []
 	ctx := context.Background()
 	defer client.Close()
 	queryi := client.Query(query)
-	iter, e = queryi.Read(ctx)
-	if e != nil {
-		log.Error(e)
-	}
+	iter, _ = queryi.Read(ctx)
 	for {
 		var row T
 		e := iter.Next(&row)
