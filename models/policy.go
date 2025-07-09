@@ -21,7 +21,6 @@ func (r *Policy) Marshal() ([]byte, error) {
 type Policy struct {
 	ID                string                       `firestore:"id,omitempty" json:"id,omitempty" bigquery:"id"`
 	IdSign            string                       `firestore:"idSign,omitempty" json:"idSign,omitempty" bigquery:"idSign"`
-	IdPay             string                       `firestore:"idPay,omitempty" json:"idPay,omitempty" bigquery:"idPay"`
 	QuoteQuestions    map[string]interface{}       `firestore:"quoteQuestions,omitempty" json:"quoteQuestions,omitempty" bigquery:"-"`
 	Uid               string                       `firestore:"uid,omitempty" json:"uid,omitempty" bigquery:"uid"`
 	ProductUid        string                       `firestore:"productUid,omitempty" json:"productUid,omitempty" bigquery:"productUid"`
@@ -36,9 +35,6 @@ type Policy struct {
 	Status            string                       `firestore:"status,omitempty" json:"status,omitempty" bigquery:"status"`
 	StatusHistory     []string                     `firestore:"statusHistory,omitempty" json:"statusHistory,omitempty" bigquery:"-"`
 	BigStatusHistory  string                       `firestore:"-" json:"-" bigquery:"statusHistory"`
-	RenewHistory      *[]RenewHistory              `firestore:"renewHistory,omitempty" json:"renewHistory,omitempty" bigquery:"-"`
-	Transactions      *[]Transaction               `firestore:"transactions,omitempty" json:"transactions,omitempty" bigquery:"-"`
-	TransactionsUid   *[]string                    `firestore:"transactionsUid,omitempty" json:"transactionsUid,omitempty" bigquery:"-"`
 	Company           string                       `firestore:"company,omitempty" json:"company,omitempty" bigquery:"company"`
 	Name              string                       `firestore:"name,omitempty" json:"name,omitempty" bigquery:"name"`
 	NameDesc          string                       `firestore:"nameDesc,omitempty" json:"nameDesc,omitempty" bigquery:"nameDesc"`
@@ -119,10 +115,15 @@ type Policy struct {
 	PaymentComponents PaymentComponents            `json:"paymentComponents" firestore:"paymentComponents" bigquery:"-"`
 
 	// DEPRECATED FIELDS
-	ContractFileId string `firestore:"contractFileId,omitempty" json:"contractFileId,omitempty" bigquery:"contractFileId"`
-	RejectReasons  string `json:"rejectReasons,omitempty" firestore:"rejectReasons,omitempty" bigquery:"-"` // DEPRECATED
-	AgentUid       string `json:"agentUid,omitempty" firestore:"agentUid,omitempty" bigquery:"agentUid"`    // DEPRECATED
-	AgencyUid      string `json:"agencyUid,omitempty" firestore:"agencyUid,omitempty" bigquery:"agencyUid"` // DEPRECATED
+	ContractFileId  string          `firestore:"contractFileId,omitempty" json:"contractFileId,omitempty" bigquery:"contractFileId"`
+	RejectReasons   string          `json:"rejectReasons,omitempty" firestore:"rejectReasons,omitempty" bigquery:"-"`     // DEPRECATED
+	AgentUid        string          `json:"agentUid,omitempty" firestore:"agentUid,omitempty" bigquery:"agentUid"`        // DEPRECATED
+	AgencyUid       string          `json:"agencyUid,omitempty" firestore:"agencyUid,omitempty" bigquery:"agencyUid"`     // DEPRECATED
+	RenewHistory    *[]RenewHistory `firestore:"renewHistory,omitempty" json:"renewHistory,omitempty" bigquery:"-"`       //is this used?
+	Transactions    *[]Transaction  `firestore:"transactions,omitempty" json:"transactions,omitempty" bigquery:"-"`       //is this used?
+	TransactionsUid *[]string       `firestore:"transactionsUid,omitempty" json:"transactionsUid,omitempty" bigquery:"-"` //is this used?
+	IdPay           string          `firestore:"idPay,omitempty" json:"idPay,omitempty" bigquery:"idPay"`                 //is this used?
+
 }
 
 type DeclaredClaims struct {

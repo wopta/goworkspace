@@ -2,6 +2,7 @@ package transaction
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"gitlab.dev.wopta.it/goworkspace/lib"
@@ -65,5 +66,23 @@ func SaveTransactionsToDB(transactions []models.Transaction, collection string) 
 		return err
 	}
 
+	return nil
+}
+func SaveTransaction(transaction *models.Transaction, collection string) error {
+	var (
+		err error
+	)
+
+	transaction.BigQueryParse()
+	err = lib.SetFirestoreErr(collection, transaction.Uid, transaction)
+	if err != nil {
+		return fmt.Errorf("error saving transaction %s in Firestore: %v", transaction.Uid, err.Error())
+	}
+
+	err = lib.InsertRowsBigQuery(lib.WoptaDataset, collection, transaction)
+	if err != nil {
+		log.ErrorF("error saving transaction %s in BigQuery: %v", transaction.Uid, err.Error())
+		return err
+	}
 	return nil
 }

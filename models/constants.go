@@ -31,6 +31,7 @@ const (
 	PolicyStatusRenewed            = "Renewed"
 	PolicyStatusUnsolved           = "Unsolved"
 	PolicyStatusManualSigned       = "ManualSigned"
+	PolicyStatusRefund             = "Refund"
 )
 
 func GetWaitForApprovalStatusList() []string {
@@ -45,6 +46,7 @@ const (
 	TransactionStatusPay         = "Paid"
 	TransactionStatusCompanyEmit = "CompanyEmited"
 	TransactionStatusDeleted     = "Deleted"
+	TransactionStatusRefund      = "Refund"
 )
 
 type PaySplit string
