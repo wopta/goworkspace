@@ -40,6 +40,9 @@ func refundPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	if !policy.IsPay {
 		return "", nil, errors.New("policy isn't paid")
 	}
+	if policy.Status == models.PolicyStatusRefund {
+		return "", nil, errors.New("policy is already been refund")
+	}
 	policy.Status = models.PolicyStatusRefund
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 	policy.Updated = time.Now().UTC()
