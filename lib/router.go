@@ -284,7 +284,7 @@ func checkEntitlement(next http.Handler) http.Handler {
 		}
 
 		if !slices.Contains(roles, userRole) {
-			log.ErrorF("userRole '%s' not allowed", userRole)
+			log.WarningF("userRole '%s' not allowed", userRole)
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}

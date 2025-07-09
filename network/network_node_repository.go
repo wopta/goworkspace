@@ -274,10 +274,10 @@ func GetNetworkNodeByUid(nodeUid string) *models.NetworkNode {
 
 	networkNode, err := GetNodeByUidErr(nodeUid)
 	if err != nil {
-		log.ErrorF("error getting producer %s from Firestore", nodeUid)
+		log.WarningF("error getting producer %s from Firestore", nodeUid)
 	}
 	if networkNode == nil {
-		log.ErrorF("error no node found: %s", nodeUid)
+		log.WarningF("error no node found: %s", nodeUid)
 	}
 
 	return networkNode
