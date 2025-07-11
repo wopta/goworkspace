@@ -2,7 +2,6 @@ package models
 
 import (
 	"encoding/json"
-	"fmt"
 	"strings"
 	"time"
 
@@ -86,8 +85,6 @@ func TransactionToListData(query *firestore.DocumentIterator) []Transaction {
 		value.Uid = d.Ref.ID
 		lib.CheckError(e)
 		result = append(result, value)
-
-		log.Println(fmt.Sprint(len(result)))
 	}
 	return result
 }
