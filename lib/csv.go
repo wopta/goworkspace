@@ -31,7 +31,7 @@ func WriteCsvByte(path string, table [][]string, delimiter rune) error {
 func GetCsvByte(table [][]string, delimiter rune) ([]byte, error) {
 	var res bytes.Buffer
 	for _, row := range table {
-		res.WriteString(strings.Join(row, ",") + string(delimiter))
+		res.WriteString(strings.Join(row, string(delimiter)))
 	}
 	return res.Bytes(), nil
 }
