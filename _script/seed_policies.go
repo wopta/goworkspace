@@ -56,7 +56,7 @@ func getFakePerson() models.User {
 		BirthProvince: "MI",
 	}
 
-	_, u, _ = user.CalculateFiscalCode(u)
+	_, u, _ = user.CalculateFiscalCodeInUser(u)
 
 	return u
 }
