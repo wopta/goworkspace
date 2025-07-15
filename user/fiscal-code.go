@@ -79,17 +79,13 @@ func FiscalCodeCheckFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	if err != nil {
 		return "", nil, err
 	}
-	res := struct {
-		IsValid bool `json:"isValid"`
-	}{
-		IsValid: isValid,
+	if !isValid {
+		return "{}", nil, errors.New("Codice fiscale non valido")
 	}
 
-	outJson, err := json.Marshal(res)
-	lib.CheckError(err)
 	log.Println("Handler end -------------------------------------------------")
 
-	return string(outJson), res, err
+	return "{}", nil, err
 }
 
 func checkFiscalCode(user models.User, fiscalCodeToCheck string) (isValid bool, err error) {
