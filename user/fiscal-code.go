@@ -98,6 +98,8 @@ func checkFiscalCode(user models.User, fiscalCodeToCheck string) (isValid bool, 
 		return false, err
 	}
 	maxLevel := 7.0
+	//return the position of the fiscalCode's char given the position of a omocodiaCombination's char
+	//abcdefg (omocodiaCombination bit) =>  ______ab_cd_efg_ (fiscalcode)
 	getOffsetIndex := func(bitPosition int) int {
 		offset := map[int]int{
 			6: 14,
@@ -110,32 +112,7 @@ func checkFiscalCode(user models.User, fiscalCodeToCheck string) (isValid bool, 
 		}
 		return offset[bitPosition]
 	}
-	for i := range int(math.Pow(2.0, maxLevel)) {
-		numbersToChange := fmt.Sprintf("%07b", i)
-		baseFiscalCode := []rune(_fiscalCode)
-		for indexToChange, toChange := range numbersToChange {
-			if toChange == '0' {
-				continue
-			}
-			index := getOffsetIndex(indexToChange)
-			char, ok := getCharToSubstituteNumber(baseFiscalCode[index])
-			if !ok {
-				return false, fmt.Errorf("impossible calculate omocodia %s is not a number", string(baseFiscalCode[index]))
-			}
-			baseFiscalCode[index] = char
-			if fiscalCodeToCheck == string(baseFiscalCode) {
-				break
-			}
-		}
-		if fiscalCodeToCheck == string(baseFiscalCode) {
-			return true, nil
-		}
-	}
-	return false, nil
-}
-
-func getCharToSubstituteNumber(number rune) (rune, bool) {
-	table := map[rune]rune{
+	charConvert := map[rune]rune{
 		'0': 'L',
 		'1': 'M',
 		'2': 'N',
@@ -147,8 +124,28 @@ func getCharToSubstituteNumber(number rune) (rune, bool) {
 		'8': 'U',
 		'9': 'V',
 	}
-	rs, ok := table[number]
-	return rs, ok
+	for _omocodiaCombination := range int(math.Pow(2.0, maxLevel)) {
+		_omocodiaCombination := fmt.Sprintf("%07b", _omocodiaCombination)
+		baseFiscalCode := []rune(_fiscalCode)
+		for indexToChange, toChange := range _omocodiaCombination {
+			if toChange == '0' {
+				continue
+			}
+			index := getOffsetIndex(indexToChange)
+			char, ok := charConvert[baseFiscalCode[index]]
+			if !ok {
+				return false, fmt.Errorf("impossible to perform omocodia %s is not a number", string(baseFiscalCode[index]))
+			}
+			baseFiscalCode[index] = char
+			if fiscalCodeToCheck == string(baseFiscalCode) {
+				break
+			}
+		}
+		if fiscalCodeToCheck == string(baseFiscalCode) {
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
 func CalculateFiscalCode(user models.User) (string, error) {
