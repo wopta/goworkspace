@@ -67,7 +67,9 @@ func GenerateTrackFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	if err != nil {
 		return "", nil, err
 	}
-	res := struct{ Bytes []byte }{
+	res := struct {
+		Bytes []byte `json:"bytes"`
+	}{
 		Bytes: bytes,
 	}
 	respBytes, err := json.Marshal(res)
