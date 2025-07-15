@@ -98,7 +98,6 @@ func checkFiscalCode(user models.User, fiscalCodeToCheck string) (isValid bool, 
 		return false, err
 	}
 	maxLevel := 7.0
-
 	getOffsetIndex := func(bitPosition int) int {
 		offset := map[int]int{
 			6: 14,
@@ -118,11 +117,12 @@ func checkFiscalCode(user models.User, fiscalCodeToCheck string) (isValid bool, 
 			if toChange == '0' {
 				continue
 			}
-			char, ok := getCharToSubstituteNumber(baseFiscalCode[getOffsetIndex(indexToChange)])
+			index := getOffsetIndex(indexToChange)
+			char, ok := getCharToSubstituteNumber(baseFiscalCode[index])
 			if !ok {
-				return false, fmt.Errorf("impossible calculate omocodia %s is not a number", string(baseFiscalCode[getOffsetIndex(indexToChange)]))
+				return false, fmt.Errorf("impossible calculate omocodia %s is not a number", string(baseFiscalCode[index]))
 			}
-			baseFiscalCode[getOffsetIndex(indexToChange)] = char
+			baseFiscalCode[index] = char
 			if fiscalCodeToCheck == string(baseFiscalCode) {
 				break
 			}
