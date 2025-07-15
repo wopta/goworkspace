@@ -93,13 +93,13 @@ func FiscalCodeCheckFx(w http.ResponseWriter, r *http.Request) (string, interfac
 }
 
 func checkFiscalCode(user models.User, fiscalCodeToCheck string) (isValid bool, err error) {
-	_fiscalCode, err := CalculateFiscalCode(user)
+	baseFiscalCode, err := CalculateFiscalCode(user)
 	if err != nil {
 		return false, err
 	}
 	maxLevel := 7.0
 	//return the position of the fiscalCode's char given the position of a omocodiaCombination's char
-	//abcdefg (omocodiaCombination bit) =>  ______ab_cd_efg_ (fiscalcode)
+	//"abcdefg" (omocodiaCombination bit) =>  "______ab_cd_efg_" (fiscalcode)
 	getOffsetIndex := func(bitPosition int) int {
 		offset := map[int]int{
 			6: 14,
@@ -125,18 +125,18 @@ func checkFiscalCode(user models.User, fiscalCodeToCheck string) (isValid bool, 
 		'9': 'V',
 	}
 	for _omocodiaCombination := range int(math.Pow(2.0, maxLevel)) {
-		_omocodiaCombination := fmt.Sprintf("%07b", _omocodiaCombination)
-		baseFiscalCode := []rune(_fiscalCode)
-		for indexToChange, toChange := range _omocodiaCombination {
+		omocodiaCombination := fmt.Sprintf("%07b", _omocodiaCombination)
+		fiscalCode := []rune(baseFiscalCode)
+		for indexToChange, toChange := range omocodiaCombination {
 			if toChange == '0' {
 				continue
 			}
 			index := getOffsetIndex(indexToChange)
-			char, ok := charConvert[baseFiscalCode[index]]
+			char, ok := charConvert[fiscalCode[index]]
 			if !ok {
 				return false, fmt.Errorf("impossible to perform omocodia %s is not a number", string(baseFiscalCode[index]))
 			}
-			baseFiscalCode[index] = char
+			fiscalCode[index] = char
 			if fiscalCodeToCheck == string(baseFiscalCode) {
 				break
 			}
