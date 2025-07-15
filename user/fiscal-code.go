@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"net/http"
 	"strconv"
 	"strings"
@@ -44,7 +45,7 @@ func FiscalCodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	switch operation {
 	case "encode":
-		outJson, user, err = CalculateFiscalCode(user)
+		outJson, user, err = CalculateFiscalCodeInUser(user)
 	case "decode":
 		outJson, user, err = ExtractUserDataFromFiscalCode(user)
 	}
@@ -54,7 +55,103 @@ func FiscalCodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	return outJson, user, err
 }
 
-func CalculateFiscalCode(user models.User) (string, models.User, error) {
+func FiscalCodeCheckFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	var (
+		user models.User
+	)
+
+	log.AddPrefix("FiscalCodeCheckFx")
+	defer log.PopPrefix()
+
+	log.Println("Handler start -----------------------------------------------")
+
+	fiscalCode := chi.URLParam(r, "fiscalCode")
+
+	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+	err := json.Unmarshal(body, &user)
+	if err != nil {
+		return "", nil, err
+	}
+
+	user.Normalize()
+	isValid, err := checkFiscalCode(user, fiscalCode)
+	if err != nil {
+		return "", nil, err
+	}
+	res := struct {
+		IsValid bool `json:"isValid"`
+	}{
+		IsValid: isValid,
+	}
+
+	outJson, err := json.Marshal(res)
+	lib.CheckError(err)
+	log.Println("Handler end -------------------------------------------------")
+
+	return string(outJson), res, err
+}
+
+func checkFiscalCode(user models.User, fiscalCodeToCheck string) (isValid bool, err error) {
+	_fiscalCode, err := CalculateFiscalCode(user)
+	if err != nil {
+		return false, err
+	}
+	maxLevel := 7.0
+
+	getOffsetIndex := func(bitPosition int) int {
+		offset := map[int]int{
+			6: 14,
+			5: 13,
+			4: 12,
+			3: 10,
+			2: 9,
+			1: 7,
+			0: 6,
+		}
+		return offset[bitPosition]
+	}
+	for i := range int(math.Pow(2.0, maxLevel)) {
+		numbersToChange := fmt.Sprintf("%07b", i)
+		baseFiscalCode := []rune(_fiscalCode)
+		for indexToChange, toChange := range numbersToChange {
+			if toChange == '0' {
+				continue
+			}
+			char, ok := getCharToSubstituteNumber(baseFiscalCode[getOffsetIndex(indexToChange)])
+			if !ok {
+				return false, fmt.Errorf("impossible calculate omocodia %s is not a number", string(baseFiscalCode[getOffsetIndex(indexToChange)]))
+			}
+			baseFiscalCode[getOffsetIndex(indexToChange)] = char
+			if fiscalCodeToCheck == string(baseFiscalCode) {
+				break
+			}
+		}
+		if fiscalCodeToCheck == string(baseFiscalCode) {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func getCharToSubstituteNumber(number rune) (rune, bool) {
+	table := map[rune]rune{
+		'0': 'L',
+		'1': 'M',
+		'2': 'N',
+		'3': 'P',
+		'4': 'Q',
+		'5': 'R',
+		'6': 'S',
+		'7': 'T',
+		'8': 'U',
+		'9': 'V',
+	}
+	rs, ok := table[number]
+	return rs, ok
+}
+
+func CalculateFiscalCode(user models.User) (string, error) {
 	log.Println("Encode")
 	name := strings.ToUpper(strings.ReplaceAll(user.Name, " ", ""))
 	surname := strings.ToUpper(strings.ReplaceAll(user.Surname, " ", ""))
@@ -70,31 +167,38 @@ func CalculateFiscalCode(user models.User) (string, models.User, error) {
 
 	surnameCode, err := calculateSurnameCode(surname, consonants, vowels)
 	if err != nil {
-		return "", models.User{}, err
+		return "", err
 	}
 
 	nameCode, err := calculateNameCode(name, consonants, vowels)
 	if err != nil {
-		return "", models.User{}, err
+		return "", err
 	}
 
 	birthDateCode, err := calculateBirthDateCode(dateOfBirth, user.Gender)
 	if err != nil {
-		return "", models.User{}, err
+		return "", err
 	}
 
 	birthPlaceCode, err := calculateBirthPlaceCode(user.BirthCity, user.BirthProvince)
 	if err != nil {
-		return "", models.User{}, err
+		return "", err
 	}
 
 	controlCharacter, err := calculateControlCharacter(surnameCode, nameCode, birthDateCode, birthPlaceCode)
 	if err != nil {
-		return "", models.User{}, err
+		return "", err
 	}
 
-	user.FiscalCode = fmt.Sprintf("%s%s%s%s%s", surnameCode, nameCode, birthDateCode, birthPlaceCode, controlCharacter)
+	return fmt.Sprintf("%s%s%s%s%s", surnameCode, nameCode, birthDateCode, birthPlaceCode, controlCharacter), nil
 
+}
+func CalculateFiscalCodeInUser(user models.User) (string, models.User, error) {
+	fiscalCode, err := CalculateFiscalCode(user)
+	if err != nil {
+		return "", models.User{}, err
+	}
+	user.FiscalCode = fiscalCode
 	outJson, err := json.Marshal(&user)
 	lib.CheckError(err)
 
@@ -356,7 +460,7 @@ func CheckFiscalCode(user models.User) error {
 	}
 	normalizedFiscalCode += controlCharacter
 
-	_, computedUser, err := CalculateFiscalCode(user)
+	_, computedUser, err := CalculateFiscalCodeInUser(user)
 	if err != nil {
 		log.ErrorF("error computing user %s fiscalCode: %s", user.Uid, err.Error())
 		return err
