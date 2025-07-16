@@ -74,12 +74,9 @@ func FiscalCodeCheckFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	}
 
 	user.Normalize()
-	isValid, err := checkFiscalCode(user, fiscalCode)
+	err = checkFiscalCode(user, fiscalCode)
 	if err != nil {
 		return "", nil, err
-	}
-	if !isValid {
-		return "{}", nil, errors.New("Codice fiscale non valido")
 	}
 
 	log.Println("Handler end -------------------------------------------------")
@@ -87,14 +84,14 @@ func FiscalCodeCheckFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	return "{}", nil, err
 }
 
-func checkFiscalCode(user models.User, fiscalCodeToCheck string) (isValid bool, err error) {
+func checkFiscalCode(user models.User, fiscalCodeToCheck string) (err error) {
 	fiscalCodeToMatch, err := CalculateFiscalCode(user)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	fiscalCode := []rune(fiscalCodeToCheck)
-	numbersPosition := []int{
+	numbersPositionInFiscalCode := []int{
 		14,
 		13,
 		12,
@@ -116,17 +113,17 @@ func checkFiscalCode(user models.User, fiscalCodeToCheck string) (isValid bool, 
 		'V': '9',
 	}
 	//clean fiscal code from omocodia
-	for _, numberPositionToClean := range numbersPosition {
+	for _, numberPositionToClean := range numbersPositionInFiscalCode {
 		char := fiscalCode[numberPositionToClean]
 		if toUse, ok := charConvert[char]; ok {
 			fiscalCode[numberPositionToClean] = toUse
 		}
 	}
 	if fiscalCodeToMatch == string(fiscalCode) {
-		return true, nil
+		return nil
 	}
 
-	checkSegmentFiscalCodes := func(fiscalCodeA, fiscalCodeB string, startIndex, endIndex int) bool {
+	areSegmentEqual := func(fiscalCodeA, fiscalCodeB string, startIndex, endIndex int) bool {
 		for i := startIndex; i <= endIndex; i++ {
 			if fiscalCodeA[i] != fiscalCodeB[i] {
 				return false
@@ -135,28 +132,25 @@ func checkFiscalCode(user models.User, fiscalCodeToCheck string) (isValid bool, 
 		return true
 	}
 
-	if !checkSegmentFiscalCodes(fiscalCodeToMatch, string(fiscalCode), 0, 2) {
-		return false, errors.New("Errore codice fiscale: sezione cognome")
+	if !areSegmentEqual(fiscalCodeToMatch, string(fiscalCode), 0, 2) {
+		return errors.New("Errore codice fiscale: sezione cognome")
 	}
-	if !checkSegmentFiscalCodes(fiscalCodeToMatch, string(fiscalCode), 3, 5) {
-		return false, errors.New("Errore codice fiscale: sezione nome")
+	if !areSegmentEqual(fiscalCodeToMatch, string(fiscalCode), 3, 5) {
+		return errors.New("Errore codice fiscale: sezione nome")
 	}
-	if !checkSegmentFiscalCodes(fiscalCodeToMatch, string(fiscalCode), 6, 7) {
-		return false, errors.New("Errore codice fiscale: sezione anno")
+	if !areSegmentEqual(fiscalCodeToMatch, string(fiscalCode), 6, 7) {
+		return errors.New("Errore codice fiscale: sezione anno")
 	}
-	if !checkSegmentFiscalCodes(fiscalCodeToMatch, string(fiscalCode), 8, 8) {
-		return false, errors.New("Errore codice fiscale: sezione mese")
+	if !areSegmentEqual(fiscalCodeToMatch, string(fiscalCode), 8, 8) {
+		return errors.New("Errore codice fiscale: sezione mese")
 	}
-	if !checkSegmentFiscalCodes(fiscalCodeToMatch, string(fiscalCode), 9, 10) {
-		return false, errors.New("Errore codice fiscale: sezione giorno")
+	if !areSegmentEqual(fiscalCodeToMatch, string(fiscalCode), 9, 10) {
+		return errors.New("Errore codice fiscale: sezione giorno")
 	}
-	if !checkSegmentFiscalCodes(fiscalCodeToMatch, string(fiscalCode), 11, 15) {
-		return false, errors.New("Errore codice fiscale: sezione comune")
+	if !areSegmentEqual(fiscalCodeToMatch, string(fiscalCode), 11, 15) {
+		return errors.New("Errore codice fiscale: sezione comune")
 	}
-	if !checkSegmentFiscalCodes(fiscalCodeToMatch, string(fiscalCode), 16, 16) {
-		return false, errors.New("Errore codice fiscale: sezione codice controllo")
-	}
-	return false, nil
+	return errors.New("Errore codice fiscale")
 }
 
 func CalculateFiscalCode(user models.User) (string, error) {
