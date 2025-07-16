@@ -90,7 +90,7 @@ func leaddraft(authToken models.AuthToken, policy *models.Policy) error {
 		log.Printf("setting policy channel to '%s'", policy.Channel)
 	}
 
-	networkNode = network.GetNetworkNodeByUid(authToken.UserID)
+	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
 	if networkNode != nil {
 		warrant = networkNode.GetWarrant()
 	}

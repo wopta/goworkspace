@@ -39,7 +39,7 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	lib.CheckError(err)
 
 	log.Println("loading network node")
-	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
+	networkNode := network.GetNetworkNodeByUid(policy.ProducerUid)
 	if networkNode != nil {
 		warrant = networkNode.GetWarrant()
 	}
