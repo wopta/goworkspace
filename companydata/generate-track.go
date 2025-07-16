@@ -20,10 +20,12 @@ type GeneratorTrack interface {
 }
 type GeneratorAxaTrack struct{}
 
-func (_ GeneratorAxaTrack) Emit(policy models.Policy, trans *models.Transaction) [][]string {
+func (_ GeneratorAxaTrack) Emit(policy models.Policy, trans *models.Transaction) (result [][]string) {
 	cabCsv := lib.GetFilesByEnv("data/cab-cap-istat.csv")
 	df := lib.CsvToDataframe(cabCsv)
-	return setRowLifeEmit(policy, df, *trans, time.Now())
+	result = append(result, getHeader())
+	result = append(result, setRowLifeEmit(policy, df, *trans, time.Now())...)
+	return result
 }
 func (_ GeneratorAxaTrack) Payment(policy models.Policy, trans *models.Transaction) [][]string {
 	return [][]string{}
