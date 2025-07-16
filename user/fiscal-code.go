@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"math"
 	"net/http"
 	"strconv"
 	"strings"
@@ -89,57 +88,73 @@ func FiscalCodeCheckFx(w http.ResponseWriter, r *http.Request) (string, interfac
 }
 
 func checkFiscalCode(user models.User, fiscalCodeToCheck string) (isValid bool, err error) {
-	baseFiscalCode, err := CalculateFiscalCode(user)
+	fiscalCodeToMatch, err := CalculateFiscalCode(user)
 	if err != nil {
 		return false, err
 	}
-	maxLevel := 7.0
-	//return the position of the fiscalCode's char given the position of a omocodiaCombination's char
-	//"abcdefg" (omocodiaCombination bit) =>  "______ab_cd_efg_" (fiscalcode)
-	getOffsetIndex := func(bitPosition int) int {
-		offset := map[int]int{
-			6: 14,
-			5: 13,
-			4: 12,
-			3: 10,
-			2: 9,
-			1: 7,
-			0: 6,
-		}
-		return offset[bitPosition]
+
+	fiscalCode := []rune(fiscalCodeToCheck)
+	numbersPosition := []int{
+		14,
+		13,
+		12,
+		10,
+		9,
+		7,
+		6,
 	}
 	charConvert := map[rune]rune{
-		'0': 'L',
-		'1': 'M',
-		'2': 'N',
-		'3': 'P',
-		'4': 'Q',
-		'5': 'R',
-		'6': 'S',
-		'7': 'T',
-		'8': 'U',
-		'9': 'V',
+		'L': '0',
+		'M': '1',
+		'N': '2',
+		'P': '3',
+		'Q': '4',
+		'R': '5',
+		'S': '6',
+		'T': '7',
+		'U': '8',
+		'V': '9',
 	}
-	for _omocodiaCombination := range int(math.Pow(2.0, maxLevel)) {
-		omocodiaCombination := fmt.Sprintf("%07b", _omocodiaCombination)
-		fiscalCode := []rune(baseFiscalCode)
-		for indexToChange, toChange := range omocodiaCombination {
-			if toChange == '0' {
-				continue
-			}
-			index := getOffsetIndex(indexToChange)
-			char, ok := charConvert[fiscalCode[index]]
-			if !ok {
-				return false, fmt.Errorf("impossible to perform omocodia %s is not a number", string(baseFiscalCode[index]))
-			}
-			fiscalCode[index] = char
-			if fiscalCodeToCheck == string(baseFiscalCode) {
-				break
+	//clean fiscal code from omocodia
+	for _, numberPositionToClean := range numbersPosition {
+		char := fiscalCode[numberPositionToClean]
+		if toUse, ok := charConvert[char]; ok {
+			fiscalCode[numberPositionToClean] = toUse
+		}
+	}
+	if fiscalCodeToMatch == string(fiscalCode) {
+		return true, nil
+	}
+
+	checkSegmentFiscalCodes := func(fiscalCodeA, fiscalCodeB string, startIndex, endIndex int) bool {
+		for i := startIndex; i <= endIndex; i++ {
+			if fiscalCodeA[i] != fiscalCodeB[i] {
+				return false
 			}
 		}
-		if fiscalCodeToCheck == string(baseFiscalCode) {
-			return true, nil
-		}
+		return true
+	}
+
+	if !checkSegmentFiscalCodes(fiscalCodeToMatch, string(fiscalCode), 0, 2) {
+		return false, errors.New("Errore codice fiscale: sezione cognome")
+	}
+	if !checkSegmentFiscalCodes(fiscalCodeToMatch, string(fiscalCode), 3, 5) {
+		return false, errors.New("Errore codice fiscale: sezione nome")
+	}
+	if !checkSegmentFiscalCodes(fiscalCodeToMatch, string(fiscalCode), 6, 7) {
+		return false, errors.New("Errore codice fiscale: sezione anno")
+	}
+	if !checkSegmentFiscalCodes(fiscalCodeToMatch, string(fiscalCode), 8, 8) {
+		return false, errors.New("Errore codice fiscale: sezione mese")
+	}
+	if !checkSegmentFiscalCodes(fiscalCodeToMatch, string(fiscalCode), 9, 10) {
+		return false, errors.New("Errore codice fiscale: sezione giorno")
+	}
+	if !checkSegmentFiscalCodes(fiscalCodeToMatch, string(fiscalCode), 11, 15) {
+		return false, errors.New("Errore codice fiscale: sezione comune")
+	}
+	if !checkSegmentFiscalCodes(fiscalCodeToMatch, string(fiscalCode), 16, 16) {
+		return false, errors.New("Errore codice fiscale: sezione codice controllo")
 	}
 	return false, nil
 }
