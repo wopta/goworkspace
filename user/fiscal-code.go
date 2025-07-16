@@ -123,7 +123,7 @@ func checkFiscalCode(user models.User, fiscalCodeToCheck string) (err error) {
 		return nil
 	}
 
-	areSegmentEqual := func(fiscalCodeA, fiscalCodeB string, startIndex, endIndex int) bool {
+	areSegmentsEqual := func(fiscalCodeA, fiscalCodeB string, startIndex, endIndex int) bool {
 		for i := startIndex; i <= endIndex; i++ {
 			if fiscalCodeA[i] != fiscalCodeB[i] {
 				return false
@@ -132,22 +132,22 @@ func checkFiscalCode(user models.User, fiscalCodeToCheck string) (err error) {
 		return true
 	}
 
-	if !areSegmentEqual(fiscalCodeToMatch, string(fiscalCode), 0, 2) {
+	if !areSegmentsEqual(fiscalCodeToMatch, string(fiscalCode), 0, 2) {
 		return errors.New("Errore codice fiscale: sezione cognome")
 	}
-	if !areSegmentEqual(fiscalCodeToMatch, string(fiscalCode), 3, 5) {
+	if !areSegmentsEqual(fiscalCodeToMatch, string(fiscalCode), 3, 5) {
 		return errors.New("Errore codice fiscale: sezione nome")
 	}
-	if !areSegmentEqual(fiscalCodeToMatch, string(fiscalCode), 6, 7) {
+	if !areSegmentsEqual(fiscalCodeToMatch, string(fiscalCode), 6, 7) {
 		return errors.New("Errore codice fiscale: sezione anno")
 	}
-	if !areSegmentEqual(fiscalCodeToMatch, string(fiscalCode), 8, 8) {
+	if !areSegmentsEqual(fiscalCodeToMatch, string(fiscalCode), 8, 8) {
 		return errors.New("Errore codice fiscale: sezione mese")
 	}
-	if !areSegmentEqual(fiscalCodeToMatch, string(fiscalCode), 9, 10) {
+	if !areSegmentsEqual(fiscalCodeToMatch, string(fiscalCode), 9, 10) {
 		return errors.New("Errore codice fiscale: sezione giorno")
 	}
-	if !areSegmentEqual(fiscalCodeToMatch, string(fiscalCode), 11, 15) {
+	if !areSegmentsEqual(fiscalCodeToMatch, string(fiscalCode), 11, 15) {
 		return errors.New("Errore codice fiscale: sezione comune")
 	}
 	return errors.New("Errore codice fiscale")
