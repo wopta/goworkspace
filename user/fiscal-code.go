@@ -90,7 +90,6 @@ func checkFiscalCode(user models.User, fiscalCodeToCheck string) (err error) {
 		return err
 	}
 
-	fiscalCode := []rune(fiscalCodeToCheck)
 	numbersPositionInFiscalCode := []int{
 		14,
 		13,
@@ -112,6 +111,8 @@ func checkFiscalCode(user models.User, fiscalCodeToCheck string) (err error) {
 		'U': '8',
 		'V': '9',
 	}
+
+	fiscalCode := []rune(fiscalCodeToCheck)
 	//clean fiscal code from omocodia
 	for _, numberPositionToClean := range numbersPositionInFiscalCode {
 		char := fiscalCode[numberPositionToClean]
