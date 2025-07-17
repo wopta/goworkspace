@@ -12,9 +12,9 @@ require (
 	github.com/johnfercher/maroto v1.0.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/ttacon/libphonenumber v1.2.1
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.189
-	gitlab.dev.wopta.it/goworkspace/models v1.2.91
-	gitlab.dev.wopta.it/goworkspace/network v1.0.159
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.190
+	gitlab.dev.wopta.it/goworkspace/models v1.2.92
+	gitlab.dev.wopta.it/goworkspace/network v1.0.160
 )
 
 require (

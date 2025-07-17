@@ -13,15 +13,15 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/oliveagle/jsonpath v0.0.0-20180606110733-2e52cf6e6852
 	github.com/xuri/excelize/v2 v2.9.0
-	gitlab.dev.wopta.it/goworkspace/inclusive v0.0.32
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.189
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.213
-	gitlab.dev.wopta.it/goworkspace/models v1.2.91
-	gitlab.dev.wopta.it/goworkspace/network v1.0.159
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.280
-	gitlab.dev.wopta.it/goworkspace/product v1.1.90
-	gitlab.dev.wopta.it/goworkspace/transaction v1.0.273
-	gitlab.dev.wopta.it/goworkspace/user v1.0.197
+	gitlab.dev.wopta.it/goworkspace/inclusive v0.0.33
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.190
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.214
+	gitlab.dev.wopta.it/goworkspace/models v1.2.92
+	gitlab.dev.wopta.it/goworkspace/network v1.0.160
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.281
+	gitlab.dev.wopta.it/goworkspace/product v1.1.91
+	gitlab.dev.wopta.it/goworkspace/transaction v1.0.274
+	gitlab.dev.wopta.it/goworkspace/user v1.0.198
 	google.golang.org/api v0.206.0
 )
 
@@ -83,8 +83,8 @@ require (
 	github.com/xuri/efp v0.0.0-20240408161823-9ad904a10d6d // indirect
 	github.com/xuri/nfp v0.0.0-20240318013403-ab9948c2c4a7 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
-	gitlab.dev.wopta.it/goworkspace/document v1.1.237 // indirect
-	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.31 // indirect
+	gitlab.dev.wopta.it/goworkspace/document v1.1.238 // indirect
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.32 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.54.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.54.0 // indirect
