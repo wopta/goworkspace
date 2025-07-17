@@ -50,6 +50,12 @@ var userRoutes []lib.Route = []lib.Route{
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
+		Route:   "/fiscalcode/v2/check/{fiscalCode}",
+		Handler: lib.ResponseLoggerWrapper(FiscalCodeCheckFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
 		Route:   "/invite/v1/create",
 		Handler: lib.ResponseLoggerWrapper(CreateInviteFx),
 		Method:  http.MethodPost,

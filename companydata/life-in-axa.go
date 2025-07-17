@@ -788,7 +788,7 @@ func parseIndividualContractor(codeCompany string, row []string, codes map[strin
 	}
 
 	var usr models.User
-	_, usr, err := user.CalculateFiscalCode(*contractor.ToUser())
+	_, usr, err := user.CalculateFiscalCodeInUser(*contractor.ToUser())
 	if err != nil {
 		if strings.ToLower(err.Error()) == "invalid birth city" {
 			_, extractedUser, _ := ExtractUserDataFromFiscalCode(contractor.FiscalCode, codes)
@@ -796,7 +796,7 @@ func parseIndividualContractor(codeCompany string, row []string, codes map[strin
 			contractor.BirthCity = extractedUser.BirthCity
 			contractor.BirthProvince = extractedUser.BirthProvince
 
-			_, usr, err = user.CalculateFiscalCode(*contractor.ToUser())
+			_, usr, err = user.CalculateFiscalCodeInUser(*contractor.ToUser())
 
 			missingContractorBirthCityPolicies = append(missingContractorBirthCityPolicies, codeCompany)
 		} else {
@@ -890,7 +890,7 @@ func parseInsured(codeCompany string, row []string, codes map[string]map[string]
 
 	// check fiscalcode
 
-	_, usr, err := user.CalculateFiscalCode(*insured)
+	_, usr, err := user.CalculateFiscalCodeInUser(*insured)
 	if err != nil {
 		if strings.ToLower(err.Error()) == "invalid birth city" {
 			_, extractedUser, _ := ExtractUserDataFromFiscalCode(insured.FiscalCode, codes)
@@ -898,7 +898,7 @@ func parseInsured(codeCompany string, row []string, codes map[string]map[string]
 			insured.BirthCity = extractedUser.BirthCity
 			insured.BirthProvince = extractedUser.BirthProvince
 
-			_, usr, err = user.CalculateFiscalCode(*insured)
+			_, usr, err = user.CalculateFiscalCodeInUser(*insured)
 
 			missingInsuredBirthCityPolicies = append(missingInsuredBirthCityPolicies, codeCompany)
 		} else {

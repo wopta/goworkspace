@@ -61,7 +61,7 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	flow := channel
 
 	log.Println("loading network node")
-	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
+	networkNode := network.GetNetworkNodeByUid(data.ProducerUid)
 	if networkNode != nil {
 		warrant = networkNode.GetWarrant()
 		if warrant != nil {

@@ -18,6 +18,12 @@ var companydataRoutes []lib.Route = []lib.Route{
 		Roles:   []string{},
 	},
 	{
+		Route:   "/v1/generate/track/{operation}/{transactionUid}",
+		Handler: lib.ResponseLoggerWrapper(GenerateTrackFx),
+		Method:  http.MethodGet,
+		Roles:   []string{},
+	},
+	{
 		Route:   "/v1/global/pmi/emit",
 		Handler: lib.ResponseLoggerWrapper(PmiGlobalEmit),
 		Method:  http.MethodGet,

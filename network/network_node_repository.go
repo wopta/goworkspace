@@ -264,6 +264,8 @@ func updateNodeTreeRelations(node models.NetworkNode) error {
 	return nil
 }
 
+// Get GetNetworkNode
+// If possible use policy.ProducerID instead of auth.UserID
 func GetNetworkNodeByUid(nodeUid string) *models.NetworkNode {
 	log.AddPrefix("GetNetworkNodeByUid")
 	defer log.PopPrefix()

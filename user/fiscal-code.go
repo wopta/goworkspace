@@ -44,7 +44,7 @@ func FiscalCodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	switch operation {
 	case "encode":
-		outJson, user, err = CalculateFiscalCode(user)
+		outJson, user, err = CalculateFiscalCodeInUser(user)
 	case "decode":
 		outJson, user, err = ExtractUserDataFromFiscalCode(user)
 	}
@@ -54,7 +54,107 @@ func FiscalCodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	return outJson, user, err
 }
 
-func CalculateFiscalCode(user models.User) (string, models.User, error) {
+func FiscalCodeCheckFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	var (
+		user models.User
+	)
+
+	log.AddPrefix("FiscalCodeCheckFx")
+	defer log.PopPrefix()
+
+	log.Println("Handler start -----------------------------------------------")
+
+	fiscalCode := chi.URLParam(r, "fiscalCode")
+
+	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+	err := json.Unmarshal(body, &user)
+	if err != nil {
+		return "", nil, err
+	}
+
+	user.Normalize()
+	err = checkFiscalCode(user, fiscalCode)
+	if err != nil {
+		return "", nil, err
+	}
+
+	log.Println("Handler end -------------------------------------------------")
+
+	return "{}", nil, err
+}
+
+func checkFiscalCode(user models.User, fiscalCodeToCheck string) (err error) {
+	fiscalCodeToMatch, err := CalculateFiscalCode(user)
+	if err != nil {
+		return err
+	}
+
+	numbersPositionInFiscalCode := []int{
+		14,
+		13,
+		12,
+		10,
+		9,
+		7,
+		6,
+	}
+	charConvert := map[rune]rune{
+		'L': '0',
+		'M': '1',
+		'N': '2',
+		'P': '3',
+		'Q': '4',
+		'R': '5',
+		'S': '6',
+		'T': '7',
+		'U': '8',
+		'V': '9',
+	}
+
+	fiscalCode := []rune(fiscalCodeToCheck)
+	//clean fiscal code from omocodia
+	for _, numberPositionToClean := range numbersPositionInFiscalCode {
+		char := fiscalCode[numberPositionToClean]
+		if toUse, ok := charConvert[char]; ok {
+			fiscalCode[numberPositionToClean] = toUse
+		}
+	}
+	if fiscalCodeToMatch == string(fiscalCode) {
+		return nil
+	}
+
+	areSegmentsEqual := func(fiscalCodeA, fiscalCodeB string, startIndex, endIndex int) bool {
+		for i := startIndex; i <= endIndex; i++ {
+			if fiscalCodeA[i] != fiscalCodeB[i] {
+				return false
+			}
+		}
+		return true
+	}
+
+	if !areSegmentsEqual(fiscalCodeToMatch, string(fiscalCode), 0, 2) {
+		return errors.New("Errore codice fiscale: sezione cognome")
+	}
+	if !areSegmentsEqual(fiscalCodeToMatch, string(fiscalCode), 3, 5) {
+		return errors.New("Errore codice fiscale: sezione nome")
+	}
+	if !areSegmentsEqual(fiscalCodeToMatch, string(fiscalCode), 6, 7) {
+		return errors.New("Errore codice fiscale: sezione anno")
+	}
+	if !areSegmentsEqual(fiscalCodeToMatch, string(fiscalCode), 8, 8) {
+		return errors.New("Errore codice fiscale: sezione mese")
+	}
+	if !areSegmentsEqual(fiscalCodeToMatch, string(fiscalCode), 9, 10) {
+		return errors.New("Errore codice fiscale: sezione giorno")
+	}
+	if !areSegmentsEqual(fiscalCodeToMatch, string(fiscalCode), 11, 15) {
+		return errors.New("Errore codice fiscale: sezione comune")
+	}
+	return errors.New("Errore codice fiscale")
+}
+
+func CalculateFiscalCode(user models.User) (string, error) {
 	log.Println("Encode")
 	name := strings.ToUpper(strings.ReplaceAll(user.Name, " ", ""))
 	surname := strings.ToUpper(strings.ReplaceAll(user.Surname, " ", ""))
@@ -70,31 +170,38 @@ func CalculateFiscalCode(user models.User) (string, models.User, error) {
 
 	surnameCode, err := calculateSurnameCode(surname, consonants, vowels)
 	if err != nil {
-		return "", models.User{}, err
+		return "", err
 	}
 
 	nameCode, err := calculateNameCode(name, consonants, vowels)
 	if err != nil {
-		return "", models.User{}, err
+		return "", err
 	}
 
 	birthDateCode, err := calculateBirthDateCode(dateOfBirth, user.Gender)
 	if err != nil {
-		return "", models.User{}, err
+		return "", err
 	}
 
 	birthPlaceCode, err := calculateBirthPlaceCode(user.BirthCity, user.BirthProvince)
 	if err != nil {
-		return "", models.User{}, err
+		return "", err
 	}
 
 	controlCharacter, err := calculateControlCharacter(surnameCode, nameCode, birthDateCode, birthPlaceCode)
 	if err != nil {
-		return "", models.User{}, err
+		return "", err
 	}
 
-	user.FiscalCode = fmt.Sprintf("%s%s%s%s%s", surnameCode, nameCode, birthDateCode, birthPlaceCode, controlCharacter)
+	return fmt.Sprintf("%s%s%s%s%s", surnameCode, nameCode, birthDateCode, birthPlaceCode, controlCharacter), nil
 
+}
+func CalculateFiscalCodeInUser(user models.User) (string, models.User, error) {
+	fiscalCode, err := CalculateFiscalCode(user)
+	if err != nil {
+		return "", models.User{}, err
+	}
+	user.FiscalCode = fiscalCode
 	outJson, err := json.Marshal(&user)
 	lib.CheckError(err)
 
@@ -356,7 +463,7 @@ func CheckFiscalCode(user models.User) error {
 	}
 	normalizedFiscalCode += controlCharacter
 
-	_, computedUser, err := CalculateFiscalCode(user)
+	_, computedUser, err := CalculateFiscalCodeInUser(user)
 	if err != nil {
 		log.ErrorF("error computing user %s fiscalCode: %s", user.Uid, err.Error())
 		return err

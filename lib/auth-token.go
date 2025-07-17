@@ -3,8 +3,9 @@ package lib
 import "gitlab.dev.wopta.it/goworkspace/lib/log"
 
 type AuthToken struct {
-	Role          string `json:"role"`
-	Type          string `json:"type"`
+	Role string `json:"role"`
+	Type string `json:"type"`
+	//if possible use policy.ProducrID to get networkNode
 	UserID        string `json:"userId"`
 	Email         string `json:"email"`
 	IsNetworkNode bool   `json:"isNetworkNode"`

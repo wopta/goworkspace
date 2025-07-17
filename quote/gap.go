@@ -43,7 +43,7 @@ func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 	flow := authToken.GetChannelByRoleV2()
 
 	log.Println("load network node")
-	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
+	networkNode := network.GetNetworkNodeByUid(policy.ProducerUid)
 	if networkNode != nil {
 		warrant = networkNode.GetWarrant()
 		if warrant != nil {

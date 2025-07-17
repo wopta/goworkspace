@@ -46,8 +46,7 @@ func CatnatFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	policy.Normalize()
 
 	var warrant *models.Warrant
-	authToken, err := lib.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
-	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
+	networkNode := network.GetNetworkNodeByUid(policy.ProducerUid)
 
 	if networkNode != nil {
 		warrant = networkNode.GetWarrant()
