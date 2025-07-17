@@ -50,7 +50,6 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		authToken.Email,
 	)
 
-	origin = r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
@@ -67,7 +66,7 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 			sendEmail = *req.SendEmail
 		}
 
-		policy, err = plc.GetPolicy(req.PolicyUid, origin)
+		policy, err = plc.GetPolicy(req.PolicyUid)
 		if err != nil {
 			log.ErrorF("error fetching policy %s from Firestore...: %s", req.PolicyUid, err.Error())
 			return "", nil, err
@@ -135,7 +134,7 @@ func proposal(policy *models.Policy) error {
 	*policy = *state.Data
 
 	log.Printf("saving proposal n. %d to bigquery...", policy.ProposalNumber)
-	policy.BigquerySave(origin)
+	policy.BigquerySave()
 
 	if !policy.IsReserved {
 		callback_out.Execute(networkNode, *policy, callback_out.Proposal)

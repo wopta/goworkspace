@@ -37,11 +37,14 @@ func (_ GeneratorAxaTrack) Deleted(policy models.Policy, trans *models.Transacti
 func GenerateTrackFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	transactionUid := chi.URLParam(r, "transactionUid")
 	operation := chi.URLParam(r, "operation")
-	tr := transaction.GetTransactionByUid(transactionUid, "")
+	tr := transaction.GetTransactionByUid(transactionUid)
 	if tr == nil {
 		return "", nil, errors.New("Transaction not found")
 	}
-	policy := policy.GetPolicyByUid(tr.PolicyUid, "")
+	policy, err := policy.GetPolicy(tr.PolicyUid)
+	if err != nil {
+		return "", nil, err
+	}
 	var generator GeneratorTrack
 
 	switch policy.Name {

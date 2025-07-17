@@ -69,7 +69,7 @@ func DynamicJwtFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 					log.ErrorF("error updating node %s in Firestore: %s", node[0].Uid, err.Error())
 					return "", nil, err
 				}
-				err = node[0].SaveBigQuery("")
+				err = node[0].SaveBigQuery()
 				if err != nil {
 					log.ErrorF("error updating node %s in BigQuery: %s", node[0].Uid, err.Error())
 					return "", nil, err

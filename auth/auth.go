@@ -36,8 +36,6 @@ var authRoutes []lib.Route = []lib.Route{
 	},
 }
 
-var origin string
-
 func init() {
 	log.Println("INIT Auth")
 	functions.HTTP("Auth", Auth)

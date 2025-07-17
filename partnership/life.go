@@ -87,7 +87,7 @@ func LifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, err
 		}
 	}
 
-	err = savePartnershipLead(&policy, partnershipNode, "")
+	err = savePartnershipLead(&policy, partnershipNode)
 	if err != nil {
 		log.ErrorF("error saving lead: %s", err.Error())
 		return "", nil, err
@@ -182,7 +182,7 @@ func NewLifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, 
 		policy.Contractor.BirthDate = *request.BirthDate
 	}
 
-	err = savePartnershipLead(&policy, partnershipNode, "")
+	err = savePartnershipLead(&policy, partnershipNode)
 	if err != nil {
 		log.ErrorF("error saving lead: %s", err.Error())
 		return "", nil, err
@@ -356,7 +356,7 @@ func removeUnselectedGuarantees(policy *models.Policy) models.Policy {
 	return policyCopy
 }
 
-func savePartnershipLead(policy *models.Policy, node *models.NetworkNode, origin string) error {
+func savePartnershipLead(policy *models.Policy, node *models.NetworkNode) error {
 	var err error
 	log.AddPrefix("SavePartnershipLead")
 	defer log.PopPrefix()
@@ -388,7 +388,7 @@ func savePartnershipLead(policy *models.Policy, node *models.NetworkNode, origin
 	}
 
 	log.Println("saving lead to bigquery...")
-	policyToSave.BigquerySave(origin)
+	policyToSave.BigquerySave()
 
 	log.Println("end ----------------------------------------------")
 	return err

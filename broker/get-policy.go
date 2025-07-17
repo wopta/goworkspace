@@ -29,7 +29,7 @@ func GetPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		return "", nil, err
 	}
 
-	policy, err := plc.GetPolicy(policyUid, lib.PolicyCollection)
+	policy, err := plc.GetPolicy(policyUid)
 	if err != nil {
 		log.ErrorF("error fetching policy: %s", err.Error())
 		return "", nil, err

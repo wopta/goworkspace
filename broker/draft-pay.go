@@ -35,7 +35,6 @@ func DraftPaymentFx(w http.ResponseWriter, r *http.Request) (string, any, error)
 	log.Println("Handler start -----------------------------------------------")
 
 	policyUid := r.URL.Query().Get("uid")
-	origin = r.URL.Query().Get("origin")
 
 	request := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
@@ -53,19 +52,21 @@ func DraftPaymentFx(w http.ResponseWriter, r *http.Request) (string, any, error)
 
 	log.Printf("uid %s, providerId %s", policyUid, providerId)
 
-	if policyUid == "" || origin == "" {
+	if policyUid == "" {
 		ext := strings.Split(fabrickCallback.ExternalID, "_")
 		policyUid = ext[0]
 		paymentInfo.Schedule = ext[1]
-		origin = ext[3]
 	}
 
-	policy := plc.GetPolicyByUid(policyUid, origin)
+	policy, err := plc.GetPolicy(policyUid)
+	if err != nil {
+		return "", nil, err
+	}
 
 	switch fabrickCallback.Bill.Status {
 	case fabrickBillPaid:
 		paymentInfo.PaymentMethod = strings.ToLower(*fabrickCallback.Bill.Transactions[0].PaymentMethod)
-		err = fabrickPayment(origin, providerId, &policy, paymentInfo)
+		err = fabrickPayment(providerId, &policy, paymentInfo)
 	default:
 	}
 
@@ -80,7 +81,7 @@ func DraftPaymentFx(w http.ResponseWriter, r *http.Request) (string, any, error)
 	return response, nil, nil
 }
 
-func fabrickPayment(origin, providerId string, policy *models.Policy, paymentInfo flow.PaymentInfoBpmn) error {
+func fabrickPayment(providerId string, policy *models.Policy, paymentInfo flow.PaymentInfoBpmn) error {
 	log.AddPrefix("fabrickPayment")
 	defer log.PopPrefix()
 	log.Printf("Policy %s", policy.Uid)
@@ -102,7 +103,7 @@ func fabrickPayment(origin, providerId string, policy *models.Policy, paymentInf
 	storage.AddGlobal("addresses", &flow.Addresses{
 		FromAddress: mail.AddressAnna,
 	})
-	flowPayment, err := getFlow(policy, origin, storage)
+	flowPayment, err := getFlow(policy, storage)
 	if err != nil {
 		return err
 	}

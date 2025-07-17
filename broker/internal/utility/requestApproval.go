@@ -10,7 +10,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/reserved"
 )
 
-func SetRequestApprovalData(policy *models.Policy, networkNode *models.NetworkNode, mgaProduct *models.Product, origin string) {
+func SetRequestApprovalData(policy *models.Policy, networkNode *models.NetworkNode, mgaProduct *models.Product) {
 	log.AddPrefix("setRequestApprovalData")
 	defer log.PopPrefix()
 	log.Printf("policy uid %s: reserved flow", policy.Uid)
@@ -18,7 +18,7 @@ func SetRequestApprovalData(policy *models.Policy, networkNode *models.NetworkNo
 	SetProposalNumber(policy)
 
 	if policy.Status == models.PolicyStatusInitLead {
-		plc.AddProposalDoc(origin, policy, networkNode, mgaProduct)
+		plc.AddProposalDoc(policy, networkNode, mgaProduct)
 
 		for _, reason := range policy.ReservedInfo.Reasons {
 			// TODO: add key/id for reasons so we do not have to check string equallity

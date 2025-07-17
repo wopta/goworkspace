@@ -22,23 +22,20 @@ func AddRequestApprovaHandlers(builder *bpmn.BpnmBuilder) error {
 func setRequestApprova(state bpmn.StorageData) error {
 	var policy *flow.Policy
 	var networkNode *flow.Network
-	var origin *flow.String
 	var mgaProduct *flow.Product
 	err := bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
 		bpmn.GetDataRef("networkNode", &networkNode, state),
-		bpmn.GetDataRef("origin", &origin, state),
 		bpmn.GetDataRef("mgaProduct", &mgaProduct, state),
 	)
 	if err != nil {
 		return err
 	}
-	firePolicy := lib.GetDatasetByEnv(origin.String, lib.PolicyCollection)
 
-	utility.SetRequestApprovalData(policy.Policy, networkNode.NetworkNode, mgaProduct.Product, origin.String)
+	utility.SetRequestApprovalData(policy.Policy, networkNode.NetworkNode, mgaProduct.Product)
 
 	log.Printf("saving policy with uid %s to Firestore....", policy.Uid)
-	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
+	return lib.SetFirestoreErr(lib.PolicyCollection, policy.Uid, policy)
 }
 
 func sendRequestApprovalMail(state bpmn.StorageData) error {

@@ -6,7 +6,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func GetTransactionByUid(transactionUid, origin string) *models.Transaction {
+func GetTransactionByUid(transactionUid string) *models.Transaction {
 	log.AddPrefix("GetTransactionByUid")
 	defer log.PopPrefix()
 	log.Printf("uid %s", transactionUid)

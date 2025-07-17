@@ -27,18 +27,17 @@ func SetCoverageReservedFx(w http.ResponseWriter, r *http.Request) (string, inte
 
 	log.Println("Handler start -----------------------------------------------")
 
-	origin := r.Header.Get("Origin")
 	policyUid := chi.URLParam(r, "policyUid")
 	firePolicy := models.PolicyCollection
 
 	log.Printf("getting policy %s from firestore...", policyUid)
-	originalPolicy, err := plc.GetPolicy(policyUid, origin)
+	originalPolicy, err := plc.GetPolicy(policyUid)
 	if err != nil {
 		log.ErrorF("error unable to retrieve original policy: %s", err.Error())
 		return "", nil, err
 	}
 
-	input, err := UpdatePolicyReservedCoverage(&originalPolicy, origin)
+	input, err := UpdatePolicyReservedCoverage(&originalPolicy)
 	if err != nil {
 		log.ErrorF("error calculating reserved coverage: %s", err.Error())
 		return "", nil, err
@@ -51,7 +50,7 @@ func SetCoverageReservedFx(w http.ResponseWriter, r *http.Request) (string, inte
 	}
 
 	// TODO: improve me
-	updatedPolicy, err := plc.GetPolicy(policyUid, origin)
+	updatedPolicy, err := plc.GetPolicy(policyUid)
 	if err != nil {
 		log.ErrorF("error unable to retrieve updated policy: %s", err.Error())
 		return "", nil, err

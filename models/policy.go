@@ -304,7 +304,7 @@ func (policy *Policy) BigQueryParse() {
 	}
 }
 
-func (policy *Policy) BigquerySave(origin string) {
+func (policy *Policy) BigquerySave() {
 	log.AddPrefix("policy.BigquerySave")
 	defer log.PopPrefix()
 	log.Printf("parsing data for policy %s", policy.Uid)

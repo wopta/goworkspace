@@ -45,7 +45,6 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		authToken.Email,
 	)
 
-	origin = r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
@@ -56,7 +55,7 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	}
 
 	log.Printf("fetching policy %s from Firestore...", req.PolicyUid)
-	policy, err = plc.GetPolicy(req.PolicyUid, origin)
+	policy, err = plc.GetPolicy(req.PolicyUid)
 	if err != nil {
 		log.ErrorF("error fetching policy %s from Firestore...", req.PolicyUid)
 		return "", nil, err
@@ -119,7 +118,7 @@ func requestApproval(policy *models.Policy) error {
 	*policy = *state.Data
 
 	log.Printf("saving policy with uid %s to bigquery...", policy.Uid)
-	policy.BigquerySave(origin)
+	policy.BigquerySave()
 
 	callback_out.Execute(networkNode, *policy, callback_out.RequestApproval)
 

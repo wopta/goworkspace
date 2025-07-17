@@ -45,7 +45,6 @@ func getFabrickRequestBody(
 	createMandate, scheduleFirstRate, isFirstRate bool,
 	scheduleDate, expireDate, customerId string,
 	amount float64,
-	origin string,
 	paymentMethods []string,
 ) string {
 	var (
@@ -79,7 +78,7 @@ func getFabrickRequestBody(
 		policy.Uid,
 		requestScheduleDate,
 		policy.CodeCompany,
-		strings.ReplaceAll(origin, "https://", ""),
+		strings.ReplaceAll("", "https://", ""),
 		strconv.FormatInt(now.UnixNano(), 10),
 	}, "_")
 
@@ -89,7 +88,7 @@ func getFabrickRequestBody(
 		policy.Uid,
 		requestScheduleDate,
 		os.Getenv("WOPTA_TOKEN_API"),
-		origin,
+		"",
 	)
 	callbackUrl = strings.Replace(callbackUrl, `\u0026`, `&`, 1)
 
@@ -194,7 +193,7 @@ func createFabrickTransaction(
 		defer close(r)
 
 		body := getFabrickRequestBody(policy, createMandate, scheduleFirstRate, isFirstRate, transaction.ScheduleDate, transaction.ExpirationDate,
-			customerId, transaction.Amount, "", paymentMethods)
+			customerId, transaction.Amount, paymentMethods)
 		if body == "" {
 			return
 		}

@@ -5,7 +5,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func lifeAxaProposalV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (DocumentGenerated, error) {
+func lifeAxaProposalV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (DocumentGenerated, error) {
 	mainHeader(pdf, policy, true)
 
 	mainFooter(pdf, policy.Name)
@@ -66,7 +66,7 @@ func lifeAxaProposalV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	axaTablePart3Section(pdf)
 
-	generatePolicyAnnex(pdf, origin, networkNode, policy, setAnnexHeaderFooter(pdf, networkNode, true))
+	generatePolicyAnnex(pdf, networkNode, policy, setAnnexHeaderFooter(pdf, networkNode, true))
 
 	woptaHeader(pdf, true)
 

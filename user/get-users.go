@@ -96,7 +96,7 @@ func GetUserByAuthIdFx(resp http.ResponseWriter, r *http.Request) (string, inter
 	authId := chi.URLParam(r, "authId")
 	log.Println(authId)
 
-	user, e := GetUserByAuthId(r.Header.Get("Origin"), authId)
+	user, e := GetUserByAuthId(authId)
 	jsonString, e := user.Marshal()
 
 	log.Println("Handler end -------------------------------------------------")
@@ -104,7 +104,7 @@ func GetUserByAuthIdFx(resp http.ResponseWriter, r *http.Request) (string, inter
 	return string(jsonString), user, e
 }
 
-func GetUserByAuthId(origin, authId string) (models.User, error) {
+func GetUserByAuthId(authId string) (models.User, error) {
 	fireUsers := lib.UserCollection
 	userFirebase := lib.WhereLimitFirestore(fireUsers, "authId", "==", authId, 1)
 	return models.FirestoreDocumentToUser(userFirebase)
@@ -154,7 +154,7 @@ func GetUserByMail(mail string) (models.User, error) {
 	return models.FirestoreDocumentToUser(userFirebase)
 }
 
-func GetAuthUserByMail(origin, mail string) (models.User, error) {
+func GetAuthUserByMail(mail string) (models.User, error) {
 	var user models.User
 
 	authId, err := lib.GetAuthUserIdByEmail(mail)
@@ -162,7 +162,7 @@ func GetAuthUserByMail(origin, mail string) (models.User, error) {
 		return user, err
 	}
 
-	return GetUserByAuthId(origin, authId)
+	return GetUserByAuthId(authId)
 }
 
 type getUserResp struct {

@@ -1295,9 +1295,9 @@ func allegato4TerSection(pdf *fpdf.Fpdf, producerInfo, proponentInfo map[string]
 		"", "", false)
 }
 
-func generatePolicyAnnex(pdf *fpdf.Fpdf, origin string, networkNode *models.NetworkNode, policy *models.Policy, headerFunc func()) {
+func generatePolicyAnnex(pdf *fpdf.Fpdf, networkNode *models.NetworkNode, policy *models.Policy, headerFunc func()) {
 	if networkNode == nil || networkNode.HasAnnex || networkNode.Type == models.PartnershipNetworkNodeType {
-		producerInfo := loadProducerInfo(origin, networkNode)
+		producerInfo := loadProducerInfo(networkNode)
 		proponentInfo := loadProponentInfo(networkNode)
 		designation := loadDesignation(networkNode)
 		annex4Section1Info := loadAnnex4Section1Info(policy, networkNode)

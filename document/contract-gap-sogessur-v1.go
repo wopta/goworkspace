@@ -12,7 +12,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func gapSogessurContractV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode) (DocumentGenerated, error) {
+func gapSogessurContractV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode) (DocumentGenerated, error) {
 
 	gapHeaderV1(pdf, policy, networkNode, false)
 
@@ -53,7 +53,7 @@ func gapSogessurContractV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy,
 
 	printStatement(pdf, statements[len(statements)-1], policy.Company, false)
 
-	generatePolicyAnnex(pdf, origin, networkNode, policy, setAnnexHeaderFooter(pdf, networkNode, false))
+	generatePolicyAnnex(pdf, networkNode, policy, setAnnexHeaderFooter(pdf, networkNode, false))
 
 	woptaHeader(pdf, false)
 

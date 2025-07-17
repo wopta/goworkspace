@@ -52,7 +52,6 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		authToken.Email,
 	)
 
-	origin := r.Header.Get("origin")
 	policyUid := chi.URLParam(r, "policyUid")
 	firePolicy := lib.PolicyCollection
 
@@ -67,7 +66,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		return "", nil, err
 	}
 
-	policy, err = plc.GetPolicy(policyUid, origin)
+	policy, err = plc.GetPolicy(policyUid)
 	if err != nil {
 		log.ErrorF("error retrieving policy %s from Firestore: %s", policyUid, err.Error())
 		return "", nil, err
@@ -100,7 +99,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	}
 	log.Println("firestore saved!")
 
-	policy.BigquerySave(origin)
+	policy.BigquerySave()
 
 	policyJsonLog, err := policy.Marshal()
 	if err != nil {

@@ -28,7 +28,6 @@ func GetTokenForExternalIntegrationFx(w http.ResponseWriter, r *http.Request) (s
 
 	log.Println("Handler start -----------------------------------------------")
 
-	origin = r.Header.Get("Origin")
 	productName := chi.URLParam(r, "productName")
 	token := r.Header.Get("Authorization")
 	authToken, e := lib.GetAuthTokenFromIdToken(token)

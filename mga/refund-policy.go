@@ -33,7 +33,7 @@ func refundPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	}
 
 	//POLICY UPDATE
-	policy, err := policy.GetPolicy(policyUid, "")
+	policy, err := policy.GetPolicy(policyUid)
 	if err != nil {
 		return "", nil, err
 	}
@@ -50,7 +50,7 @@ func refundPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	policy.PayUrl = ""
 
 	//TRANSACTION UPDATE
-	tr := transaction.GetTransactionByUid(transactionUid, "")
+	tr := transaction.GetTransactionByUid(transactionUid)
 	if tr == nil {
 		return "", nil, errors.New("No transaction found")
 	}
@@ -72,7 +72,7 @@ func refundPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	err = lib.SetFirestoreErr(lib.PolicyCollection, policy.Uid, policy)
 	log.Printf("policy %s saved into Firestore", policy.Uid)
 	log.Printf("saving policy %s to BigQuery...", policy.Uid)
-	policy.BigquerySave("")
+	policy.BigquerySave()
 
 	return "{}", nil, nil
 }

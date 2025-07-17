@@ -112,14 +112,14 @@ func paymentReceiptBuilder(transactionUID string, authToken lib.AuthToken, isRen
 			return "", "", err
 		}
 	} else {
-		transaction = trx.GetTransactionByUid(transactionUID, "")
+		transaction = trx.GetTransactionByUid(transactionUID)
 		if transaction == nil {
 			return "", "", errTransactionNotFound
 		}
 		if transaction.IsDelete {
 			return "", "", errTransactionDeleted
 		}
-		policy, err = plc.GetPolicy(transaction.PolicyUid, "")
+		policy, err = plc.GetPolicy(transaction.PolicyUid)
 		if err != nil {
 			return "", "", err
 		}

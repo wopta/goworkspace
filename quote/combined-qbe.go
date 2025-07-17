@@ -57,7 +57,7 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		return "", nil, err
 	}
 
-	if dbPolicy, err = plc.GetPolicy(reqPolicy.Uid, ""); err != nil {
+	if dbPolicy, err = plc.GetPolicy(reqPolicy.Uid); err != nil {
 		log.ErrorF("error getting policy from DB")
 		return "", nil, err
 	}
@@ -94,7 +94,7 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		log.ErrorF("error saving quote in policy")
 		return "", nil, err
 	}
-	dbPolicy.BigquerySave("")
+	dbPolicy.BigquerySave()
 
 	policyJson, err := dbPolicy.Marshal()
 

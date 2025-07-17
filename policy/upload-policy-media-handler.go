@@ -136,7 +136,7 @@ func putAttachment(policy *models.Policy, req UploadPolicyMediaReq) error {
 
 	log.Printf("saving policy %s to BigQuery...", policy.Uid)
 
-	policy.BigquerySave("")
+	policy.BigquerySave()
 
 	return err
 }

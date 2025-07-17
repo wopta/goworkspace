@@ -106,7 +106,7 @@ func PolicyTransactionsUpdate() {
 			p.Updated = time.Now().UTC()
 			m[models.PolicyCollection][p.Uid] = p
 
-			transactions := transaction.GetPolicyTransactions("", p.Uid)
+			transactions := transaction.GetPolicyTransactions(p.Uid)
 			for _, t := range transactions {
 				t.Annuity = 0
 				t.UpdateDate = time.Now().UTC()
@@ -121,7 +121,7 @@ func PolicyTransactionsUpdate() {
 				return
 			}
 
-			p.BigquerySave("")
+			p.BigquerySave()
 
 			err = lib.InsertRowsBigQuery(lib.WoptaDataset, lib.TransactionsCollection, transactionsList)
 			if err != nil {

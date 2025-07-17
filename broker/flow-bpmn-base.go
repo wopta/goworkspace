@@ -10,7 +10,7 @@ import (
 	prd "gitlab.dev.wopta.it/goworkspace/product"
 )
 
-func getFlow(policy *models.Policy, originStr string, storage bpmn.StorageData) (*bpmn.FlowBpnm, error) {
+func getFlow(policy *models.Policy, storage bpmn.StorageData) (*bpmn.FlowBpnm, error) {
 	builder, err := bpmn.NewBpnmBuilder("flows/draft/channel_flows.json")
 	if err != nil {
 		return nil, err
@@ -38,7 +38,6 @@ func getFlow(policy *models.Policy, originStr string, storage bpmn.StorageData) 
 	storage.AddGlobal("networkNode", &flow.Network{NetworkNode: networkNode})
 	storage.AddGlobal("mgaProduct", &mgaProduct)
 	storage.AddGlobal("flowName", &flow.String{String: flowNameStr})
-	storage.AddGlobal("origin", &flow.String{String: originStr})
 	builder.SetStorage(storage)
 
 	if networkNode != nil && networkNode.CallbackConfig != nil {

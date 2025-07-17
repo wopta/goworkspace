@@ -32,7 +32,7 @@ func UpdateNetworkNodeInfoSimplo() {
 				continue
 			}
 
-			err = nn.SaveBigQuery("")
+			err = nn.SaveBigQuery()
 			if err != nil {
 				log.Printf("error updating network node %s in BigQuery: %s", nn.Code, err.Error())
 				continue

@@ -9,7 +9,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func Proposal(origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (DocumentGenerated, error) {
+func Proposal(policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (DocumentGenerated, error) {
 	var (
 		pdf      *fpdf.Fpdf
 		err      error
@@ -29,10 +29,10 @@ func Proposal(origin string, policy *models.Policy, networkNode *models.NetworkN
 	switch policy.Name {
 	case models.LifeProduct:
 		log.Println("call lifeProposal...")
-		document, err = lifeProposal(pdf, origin, policy, networkNode, product)
+		document, err = lifeProposal(pdf, policy, networkNode, product)
 	case models.GapProduct:
 		log.Println("call gapProposal...")
-		document, err = gapSogessurProposalV1(pdf, origin, policy, networkNode)
+		document, err = gapSogessurProposalV1(pdf, policy, networkNode)
 	case models.PersonaProduct:
 		log.Println("call personaProposal...")
 		pdf := engine.NewFpdf()
@@ -53,7 +53,7 @@ func Proposal(origin string, policy *models.Policy, networkNode *models.NetworkN
 	return document, err
 }
 
-func lifeProposal(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (DocumentGenerated, error) {
+func lifeProposal(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (DocumentGenerated, error) {
 	var (
 		document DocumentGenerated
 		err      error
@@ -65,13 +65,13 @@ func lifeProposal(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkN
 	switch policy.ProductVersion {
 	case models.ProductV1:
 		log.Println("life v1")
-		document, err = lifeAxaProposalV1(pdf, origin, policy, networkNode, product)
+		document, err = lifeAxaProposalV1(pdf, policy, networkNode, product)
 	case models.ProductV2:
 		log.Println("life v2")
 		pdf := engine.NewFpdf()
 		gen := contract.NewLifeGenerator(pdf, policy, networkNode, *product, true)
 		gen.Generate()
-		lifeAxaProposalV2(pdf.GetPdf(), origin, policy, networkNode, product)
+		lifeAxaProposalV2(pdf.GetPdf(), policy, networkNode, product)
 		gen.AddMup()
 		document, err = generateProposalDocument(pdf.GetPdf(), policy)
 	}

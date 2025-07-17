@@ -32,10 +32,8 @@ func AddEmitHandlers(builder *bpmn.BpnmBuilder) error {
 }
 
 func emitBaseWithSequence(state bpmn.StorageData) error {
-	var origin *flow.String
 	var policy *flow.Policy
 	var err = bpmn.IsError(
-		bpmn.GetDataRef("origin", &origin, state),
 		bpmn.GetDataRef("policy", &policy, state),
 	)
 	if err != nil {
@@ -45,7 +43,6 @@ func emitBaseWithSequence(state bpmn.StorageData) error {
 	defer log.PopPrefix()
 
 	log.Printf("Policy Uid %s", policy.Uid)
-	firePolicy := lib.GetDatasetByEnv(origin.String, lib.PolicyCollection)
 	now := time.Now().UTC()
 
 	policy.CompanyEmit = true
@@ -54,21 +51,19 @@ func emitBaseWithSequence(state bpmn.StorageData) error {
 	policy.BigEmitDate = civil.DateTimeOf(now)
 	policy.RenewDate = policy.StartDate.AddDate(1, 0, 0)
 	policy.BigRenewDate = civil.DateTimeOf(policy.RenewDate)
-	company, numb, tot := utility.GetSequenceByCompany(strings.ToLower(policy.Company), firePolicy)
+	company, numb, tot := utility.GetSequenceByCompany(strings.ToLower(policy.Company), lib.PolicyCollection)
 	log.Printf("codeCompany: %s", company)
 	log.Printf("numberCompany: %d", numb)
 	log.Printf("number: %d", tot)
 	policy.Number = tot
 	policy.NumberCompany = numb
 	policy.CodeCompany = company
-	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
+	return lib.SetFirestoreErr(lib.PolicyCollection, policy.Uid, policy)
 }
 
 func emitBaseNoSequence(state bpmn.StorageData) error {
-	var origin *flow.String
 	var policy *flow.Policy
 	var err = bpmn.IsError(
-		bpmn.GetDataRef("origin", &origin, state),
 		bpmn.GetDataRef("policy", &policy, state),
 	)
 	if err != nil {
@@ -134,10 +129,8 @@ func sign(state bpmn.StorageData) error {
 	var addresses *flow.Addresses
 	var flowName *flow.String
 	var sendEmail *flow.BoolBpmn
-	var origin *flow.String
 	var err = bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("origin", &origin, state),
 		bpmn.GetDataRef("product", &product, state),
 		bpmn.GetDataRef("networkNode", &networkNode, state),
 		bpmn.GetDataRef("addresses", &addresses, state),
@@ -147,7 +140,7 @@ func sign(state bpmn.StorageData) error {
 	if err != nil {
 		return err
 	}
-	err = utility.SignFiles(policy.Policy, product.Product, networkNode.NetworkNode, true, origin.String)
+	err = utility.SignFiles(policy.Policy, product.Product, networkNode.NetworkNode, true)
 	if err != nil {
 		return err
 	}
@@ -159,10 +152,8 @@ func pay(state bpmn.StorageData) error {
 	var product *flow.Product
 	var mgaProduct *flow.Product
 	var networkNode *flow.Network
-	var origin *flow.String
 	var err = bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("origin", &origin, state),
 		bpmn.GetDataRef("product", &product, state),
 		bpmn.GetDataRef("mgaProduct", &mgaProduct, state),
 		bpmn.GetDataRef("networkNode", &networkNode, state),
@@ -171,7 +162,7 @@ func pay(state bpmn.StorageData) error {
 		return err
 	}
 
-	utility.EmitPay(policy.Policy, origin.String, product.Product, mgaProduct.Product, networkNode.NetworkNode)
+	utility.EmitPay(policy.Policy, product.Product, mgaProduct.Product, networkNode.NetworkNode)
 	if policy.PayUrl == "" {
 		return fmt.Errorf("missing payment url")
 	}
@@ -183,12 +174,10 @@ func setAdvance(state bpmn.StorageData) error {
 	var product *flow.Product
 	var mgaProduct *flow.Product
 	var networkNode *flow.Network
-	var origin *flow.String
 	var paymentSplit *flow.String
 	var paymentMode *flow.String
 	var err = bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("origin", &origin, state),
 		bpmn.GetDataRef("paymentSplit", &paymentSplit, state),
 		bpmn.GetDataRef("paymentMode", &paymentMode, state),
 		bpmn.GetDataRef("product", &product, state),
@@ -198,40 +187,36 @@ func setAdvance(state bpmn.StorageData) error {
 	if err != nil {
 		return err
 	}
-	utility.SetAdvance(policy.Policy, origin.String, product.Product, mgaProduct.Product, networkNode.NetworkNode, paymentSplit.String, paymentMode.String)
+	utility.SetAdvance(policy.Policy, product.Product, mgaProduct.Product, networkNode.NetworkNode, paymentSplit.String, paymentMode.String)
 	return nil
 }
 
 func updateUserAndNetworkNode(state bpmn.StorageData) error {
 	var policy *flow.Policy
 	var networkNode *flow.Network
-	var origin *flow.String
 	var err = bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("origin", &origin, state),
 		bpmn.GetDataRef("networkNode", &networkNode, state),
 	)
 	if err != nil {
 		return err
 	}
 	// promote documents from temp bucket to user and connect it to policy
-	err = plc.SetUserIntoPolicyContractor(policy.Policy, origin.String)
+	err = plc.SetUserIntoPolicyContractor(policy.Policy)
 	if err != nil {
 		log.ErrorF("[putUser] ERROR SetUserIntoPolicyContractor %s", err.Error())
 		return err
 	}
-	return network.UpdateNetworkNodePortfolio(origin.String, policy.Policy, networkNode.NetworkNode)
+	return network.UpdateNetworkNodePortfolio(policy.Policy, networkNode.NetworkNode)
 }
 
 func sendEmitProposalMail(state bpmn.StorageData) error {
 	var policy *flow.Policy
 	var networkNode *flow.Network
-	var origin *flow.String
 	var addresses *flow.Addresses
 	var flowName *flow.String
 	var err = bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("origin", &origin, state),
 		bpmn.GetDataRef("networkNode", &networkNode, state),
 		bpmn.GetDataRef("flowName", &flowName, state),
 		bpmn.GetDataRef("addresses", &addresses, state),

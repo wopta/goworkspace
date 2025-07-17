@@ -22,7 +22,6 @@ func GetPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	log.Println("Handler start -----------------------------------------------")
 
-	firePolicy := lib.PolicyCollection
 	uid := chi.URLParam(r, "uid")
 	log.Println(uid)
 
@@ -31,7 +30,7 @@ func GetPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	json.Unmarshal(request, &result)
 
-	policy, _ := GetPolicy(uid, firePolicy)
+	policy, _ := GetPolicy(uid)
 	res, _ := json.Marshal(policy)
 
 	log.Println("Handler end -------------------------------------------------")
@@ -39,7 +38,7 @@ func GetPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	return string(res), policy, nil
 }
 
-func GetPolicy(uid string, origin string) (models.Policy, error) {
+func GetPolicy(uid string) (models.Policy, error) {
 	var (
 		policy models.Policy
 		err    error
@@ -51,16 +50,4 @@ func GetPolicy(uid string, origin string) (models.Policy, error) {
 	}
 	err = docsnap.DataTo(&policy)
 	return policy, err
-}
-
-// TODO: keep only one: GetPolicy or GetPolicyByUid
-func GetPolicyByUid(policyUid string, origin string) models.Policy {
-	firePolicy := "policy"
-	policyF := lib.GetFirestore(firePolicy, policyUid)
-	var policy models.Policy
-	policyF.DataTo(&policy)
-	policyM, _ := policy.Marshal()
-	log.Println("GetPolicyByUid: Policy "+policyUid+" found: ", string(policyM))
-
-	return policy
 }

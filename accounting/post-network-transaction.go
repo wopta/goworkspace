@@ -20,17 +20,16 @@ func CreateNetworkTransactionFx(w http.ResponseWriter, r *http.Request) (string,
 
 	log.Println("Handler start -----------------------------------------------")
 
-	origin := r.Header.Get("Origin")
 	transactionUid := chi.URLParam(r, "transactionUid")
 	log.Printf("transactionUid %s", transactionUid)
 
-	transaction := tr.GetTransactionByUid(transactionUid, origin)
+	transaction := tr.GetTransactionByUid(transactionUid)
 	if transaction == nil {
 		log.ErrorF("could not retrieve transaction")
 		return "", "", fmt.Errorf("error transaction %s not found", transactionUid)
 	}
 
-	err := CreateNetworkTransaction(transaction, origin)
+	err := CreateNetworkTransaction(transaction)
 	if err != nil {
 		log.ErrorF("error creating network transactions: %s", err.Error())
 	}
@@ -40,8 +39,11 @@ func CreateNetworkTransactionFx(w http.ResponseWriter, r *http.Request) (string,
 	return "{}", "", err
 }
 
-func CreateNetworkTransaction(transaction *models.Transaction, origin string) error {
-	policy := plc.GetPolicyByUid(transaction.PolicyUid, origin)
+func CreateNetworkTransaction(transaction *models.Transaction) error {
+	policy, err := plc.GetPolicy(transaction.PolicyUid)
+	if err != nil {
+		return err
+	}
 	producerNode := network.GetNetworkNodeByUid(policy.ProducerUid)
 	mgaProduct := prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 

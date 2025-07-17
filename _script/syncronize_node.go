@@ -132,7 +132,7 @@ func saveNode(node *models.NetworkNode) {
 	if err != nil {
 		panic(err)
 	}
-	if err = node.SaveBigQuery(""); err != nil {
+	if err = node.SaveBigQuery(); err != nil {
 		panic(err)
 	}
 	log.Println("\n\nNode Saved")

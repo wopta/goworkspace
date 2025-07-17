@@ -31,7 +31,6 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	log.Println("Handler start -----------------------------------------------")
 
-	origin := r.Header.Get("Origin")
 	policyUid := chi.URLParam(r, "uid")
 	firePolicy := lib.PolicyCollection
 
@@ -45,7 +44,7 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	inputPolicy.Normalize()
 
-	originalPolicy, err := plc.GetPolicy(policyUid, origin)
+	originalPolicy, err := plc.GetPolicy(policyUid)
 	if err != nil {
 		log.ErrorF("error unable to retrieve original policy: %s", err.Error())
 		return "", nil, err
@@ -81,7 +80,7 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	}
 
 	// TODO: improve me
-	updatedPolicy, err := plc.GetPolicy(policyUid, origin)
+	updatedPolicy, err := plc.GetPolicy(policyUid)
 	if err != nil {
 		log.ErrorF("error unable to retrieve updated policy: %s", err.Error())
 		return "", nil, err
@@ -89,7 +88,7 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	response.Policy = &updatedPolicy
 	responseJson, err := json.Marshal(&response)
 
-	updatedPolicy.BigquerySave(origin)
+	updatedPolicy.BigquerySave()
 
 	log.Println("Handler end -------------------------------------------------")
 
@@ -172,7 +171,7 @@ func DeletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	policy.Status = models.PolicyStatusDeleted
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusDeleted)
 	lib.SetFirestore(firePolicy, policyUID, policy)
-	policy.BigquerySave(r.Header.Get("Origin"))
+	policy.BigquerySave()
 	models.SetGuaranteBigquery(policy, "delete", guaranteFire)
 
 	log.Println("Handler end -------------------------------------------------")

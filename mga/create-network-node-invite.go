@@ -40,8 +40,6 @@ func CreateNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, 
 
 	log.Println("Handler start -----------------------------------------------")
 
-	origin := r.Header.Get("Origin")
-
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
@@ -74,7 +72,7 @@ func CreateNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, 
 
 	log.Printf("generating invite for network node %s", req.NetworkNodeUid)
 
-	inviteUid, err := createNetworkNodeInvite(origin, networkNode.Uid, authToken.UserID)
+	inviteUid, err := createNetworkNodeInvite(networkNode.Uid, authToken.UserID)
 	if err != nil {
 		log.ErrorF("error generating invite for network node %s", req.NetworkNodeUid)
 		return "", "", err
@@ -90,7 +88,7 @@ func CreateNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, 
 	return "{}", nil, nil
 }
 
-func createNetworkNodeInvite(origin, networkNodeUid, creatorUid string) (string, error) {
+func createNetworkNodeInvite(networkNodeUid, creatorUid string) (string, error) {
 	fireInvite := models.InvitesCollection
 	inviteUid := lib.NewDoc(fireInvite)
 

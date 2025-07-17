@@ -14,7 +14,7 @@ func UpdateContractorName(policyUid, contractorName string) {
 		policy models.Policy
 	)
 
-	policy, err = plc.GetPolicy(policyUid, "")
+	policy, err = plc.GetPolicy(policyUid)
 	if err != nil {
 		log.Printf("error fetching policy %s from Firestore: %s", policyUid, err.Error())
 		return
@@ -29,7 +29,7 @@ func UpdateContractorName(policyUid, contractorName string) {
 		return
 	}
 
-	policy.BigquerySave("")
+	policy.BigquerySave()
 
 	return
 }

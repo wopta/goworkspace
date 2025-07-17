@@ -60,7 +60,7 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	inputPolicy.Normalize()
 
 	log.Printf("fetching policy %s from Firestore...", inputPolicy.Uid)
-	originalPolicy, err := plc.GetPolicy(inputPolicy.Uid, "")
+	originalPolicy, err := plc.GetPolicy(inputPolicy.Uid)
 	if err != nil {
 		log.ErrorF("error fetching policy from Firestore: %s", err.Error())
 		return "", nil, err
@@ -523,7 +523,7 @@ func writePolicyToDb(modifiedPolicy models.Policy) error {
 		return err
 	}
 
-	modifiedPolicy.BigquerySave("")
+	modifiedPolicy.BigquerySave()
 
 	log.Printf("policy %s written into DBs", modifiedPolicy.Uid)
 
@@ -547,7 +547,7 @@ func writeUserToDB(user models.User) error {
 		return err
 	}
 
-	err = user.BigquerySave("")
+	err = user.BigquerySave()
 	if err != nil {
 		log.ErrorF("error writing modified user to BigQuery: %s", err.Error())
 		return err

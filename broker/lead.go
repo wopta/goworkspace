@@ -40,7 +40,6 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		authToken.Email,
 	)
 
-	origin = r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
@@ -106,7 +105,7 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 	lib.CheckError(err)
 
 	log.Println("saving lead to bigquery...")
-	policy.BigquerySave(origin)
+	policy.BigquerySave()
 
 	log.Println("saving guarantees to bigquery...")
 	models.SetGuaranteBigquery(*policy, "lead", lib.GuaranteeCollection)

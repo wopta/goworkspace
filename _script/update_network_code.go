@@ -25,7 +25,7 @@ func UpdateAgentRuiCode(nodeUid, ruiCode string) {
 		return
 	}
 
-	err = networkNode.SaveBigQuery("")
+	err = networkNode.SaveBigQuery()
 	if err != nil {
 		log.Printf("error: %s", err.Error())
 		return

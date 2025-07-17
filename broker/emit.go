@@ -72,7 +72,6 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		authToken.Email,
 	)
 
-	origin = r.Header.Get("origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
@@ -91,7 +90,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	paymentMode = request.PaymentMode
 	log.Printf("paymentMode: %s", paymentMode)
 
-	policy, err = plc.GetPolicy(uid, origin)
+	policy, err = plc.GetPolicy(uid)
 	lib.CheckError(err)
 	if policy.Channel == models.NetworkChannel && policy.ProducerUid != authToken.UserID {
 		log.Printf("user %s cannot emit policy %s because producer not equal to request user", authToken.UserID, policy.Uid)
@@ -122,7 +121,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	//Only for test!!!!!
 	if policy.Name == models.CatNatProduct {
 		log.Println("Using emitCatnat")
-		responseEmit, err = emitDraft(&policy, request, origin)
+		responseEmit, err = emitDraft(&policy, request)
 		if err != nil {
 			return "", nil, err
 		}
@@ -142,7 +141,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		log.Printf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
 		return "", nil, fmt.Errorf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
 	}
-	responseEmit = emit(&policy, request, origin)
+	responseEmit = emit(&policy, request)
 
 	b, e := json.Marshal(responseEmit)
 	log.Println("Handler end -------------------------------------------------")
@@ -150,7 +149,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 }
 
-func emit(policy *models.Policy, request EmitRequest, origin string) EmitResponse {
+func emit(policy *models.Policy, request EmitRequest) EmitResponse {
 	log.AddPrefix("Emit")
 	defer log.PopPrefix()
 	log.Println("start ------------------------------------------------")
@@ -185,7 +184,7 @@ func emit(policy *models.Policy, request EmitRequest, origin string) EmitRespons
 	lib.CheckError(err)
 
 	log.Println("saving policy to bigquery...")
-	policy.BigquerySave(origin)
+	policy.BigquerySave()
 
 	log.Println("saving guarantees to bigquery...")
 	models.SetGuaranteBigquery(*policy, "emit", fireGuarantee)
@@ -254,7 +253,7 @@ func brokerUpdatePolicy(policy *models.Policy, request BrokerBaseRequest) {
 	log.Println("end --------------------------------------")
 }
 
-func emitBase(policy *models.Policy, origin string) {
+func emitBase(policy *models.Policy) {
 	log.AddPrefix("emitBase")
 	defer log.PopPrefix()
 	log.Printf("Policy Uid %s", policy.Uid)

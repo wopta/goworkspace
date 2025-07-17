@@ -136,16 +136,16 @@ func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod string) e
 
 	if policy.Annuity == 0 {
 
-		if err = plc.AddSignedDocumentsInPolicy(&policy, ""); err != nil {
+		if err = plc.AddSignedDocumentsInPolicy(&policy); err != nil {
 			return err
 		}
 
 		// TODO: all methods save the data, they shouldn't to avoid data corruption
-		if err = plc.SetUserIntoPolicyContractor(&policy, ""); err != nil {
+		if err = plc.SetUserIntoPolicyContractor(&policy); err != nil {
 			return err
 		}
 
-		if err = network.UpdateNetworkNodePortfolio("", &policy, networkNode); err != nil {
+		if err = network.UpdateNetworkNodePortfolio(&policy, networkNode); err != nil {
 			return err
 		}
 

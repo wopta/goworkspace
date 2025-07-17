@@ -48,7 +48,6 @@ func DraftAcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, err
 		authToken.Email,
 	)
 
-	origin := r.Header.Get("origin")
 	policyUid := chi.URLParam(r, "policyUid")
 
 	log.Printf("Policy Uid %s", policyUid)
@@ -62,7 +61,7 @@ func DraftAcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, err
 		return "", nil, err
 	}
 
-	policy, err = plc.GetPolicy(policyUid, origin)
+	policy, err = plc.GetPolicy(policyUid)
 	if err != nil {
 		log.ErrorF("error retrieving policy %s from Firestore: %s", policyUid, err.Error())
 		return "", nil, err
@@ -87,7 +86,7 @@ func DraftAcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, err
 	storage.AddGlobal("addresses", addresses)
 	storage.AddGlobal("action", &flow.String{String: payload.Action})
 
-	flow, err := getFlow(&policy, origin, storage)
+	flow, err := getFlow(&policy, storage)
 	if err != nil {
 		return "", nil, err
 	}

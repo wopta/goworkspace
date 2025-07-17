@@ -189,7 +189,7 @@ func (u *User) initBigqueryData() error {
 	return nil
 }
 
-func (u *User) BigquerySave(origin string) error {
+func (u *User) BigquerySave() error {
 	table := UserCollection
 
 	if err := u.initBigqueryData(); err != nil {
@@ -240,7 +240,7 @@ func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
 	return result, e
 }
 
-func GetUserUIDByFiscalCode(origin string, fiscalCode string) (string, bool, error) {
+func GetUserUIDByFiscalCode(fiscalCode string) (string, bool, error) {
 	usersFire := "users"
 	docSnap := lib.WhereFirestore(usersFire, "fiscalCode", "==", fiscalCode)
 	retrievedUser, err := FirestoreDocumentToUser(docSnap)
@@ -253,7 +253,7 @@ func GetUserUIDByFiscalCode(origin string, fiscalCode string) (string, bool, err
 	return lib.NewDoc(usersFire), true, nil
 }
 
-func UpdateUserByFiscalCode(origin string, user User) (string, error) {
+func UpdateUserByFiscalCode(user User) (string, error) {
 	var err error
 	fireUser := UserCollection
 	docSnap := lib.WhereFirestore(fireUser, "fiscalCode", "==", user.FiscalCode)
@@ -285,7 +285,7 @@ func UpdateUserByFiscalCode(origin string, user User) (string, error) {
 				err.Error())
 		}
 
-		err = retrievedUser.BigquerySave(origin)
+		err = retrievedUser.BigquerySave()
 		return retrievedUser.Uid, err
 	}
 	return "", fmt.Errorf("no user found with this fiscal code")

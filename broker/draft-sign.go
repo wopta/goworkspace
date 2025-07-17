@@ -28,7 +28,6 @@ func DraftSignFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	policyUid := r.URL.Query().Get("uid")
 	envelope := r.URL.Query().Get("envelope")
 	action := r.URL.Query().Get("action")
-	origin = r.URL.Query().Get("origin")
 	sendEmailParam := r.URL.Query().Get("sendEmail")
 	log.Printf("Uid: '%s', Envelope: '%s', Action: '%s', SendEmailParam: '%s'", policyUid, envelope, action, sendEmailParam)
 
@@ -41,7 +40,7 @@ func DraftSignFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 
 	switch action {
 	case namirialFinished:
-		if e := namirialStepFinished(origin, policyUid, sendEmail); e != nil {
+		if e := namirialStepFinished(policyUid, sendEmail); e != nil {
 			return "", nil, e
 		}
 
@@ -53,7 +52,7 @@ func DraftSignFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	return "", nil, nil
 }
 
-func namirialStepFinished(origin, policyUid string, sendEmail bool) error {
+func namirialStepFinished(policyUid string, sendEmail bool) error {
 	log.AddPrefix("namirialStepFinished")
 	defer log.PopPrefix()
 	log.Printf("Policy: %s", policyUid)
@@ -62,9 +61,7 @@ func namirialStepFinished(origin, policyUid string, sendEmail bool) error {
 		err    error
 	)
 
-	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
-
-	docSnap, err := lib.GetFirestoreErr(firePolicy, policyUid)
+	docSnap, err := lib.GetFirestoreErr(lib.PolicyCollection, policyUid)
 	if err != nil {
 		return err
 	}
@@ -89,7 +86,7 @@ func namirialStepFinished(origin, policyUid string, sendEmail bool) error {
 		Bool: sendEmail,
 	})
 	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-	flow, err := getFlow(&policy, origin, storage)
+	flow, err := getFlow(&policy, storage)
 	if err != nil {
 		return err
 	}
@@ -98,7 +95,7 @@ func namirialStepFinished(origin, policyUid string, sendEmail bool) error {
 		return err
 	}
 
-	policy.BigquerySave(origin)
+	policy.BigquerySave()
 
 	return nil
 }

@@ -273,7 +273,6 @@ func getCallbackUrl(input NamirialInput) string {
 	var url string = os.Getenv("WOPTA_BASEURL")
 	url += "callback/v1/sign?envelope=##EnvelopeId##&action=##Action##&uid=" + input.Policy.Uid
 	url += "&token=" + os.Getenv("WOPTA_TOKEN_API")
-	url += "&origin=" + input.Origin
 	url += "&sendEmail=" + strconv.FormatBool(input.SendEmail)
 	return url
 }
