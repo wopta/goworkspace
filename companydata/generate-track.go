@@ -14,23 +14,23 @@ import (
 )
 
 type GeneratorTrack interface {
-	Emit(policy models.Policy, trans *models.Transaction) [][]string
-	Delete(policy models.Policy, trans *models.Transaction) [][]string
-	Payment(policy models.Policy, trans *models.Transaction) [][]string
+	Emitted(policy models.Policy, trans *models.Transaction) [][]string
+	Deleted(policy models.Policy, trans *models.Transaction) [][]string
+	Paid(policy models.Policy, trans *models.Transaction) [][]string
 }
 type GeneratorAxaTrack struct{}
 
-func (_ GeneratorAxaTrack) Emit(policy models.Policy, trans *models.Transaction) (result [][]string) {
+func (_ GeneratorAxaTrack) Emitted(policy models.Policy, trans *models.Transaction) (result [][]string) {
+	return [][]string{}
+}
+func (_ GeneratorAxaTrack) Paid(policy models.Policy, trans *models.Transaction) (result [][]string) {
 	cabCsv := lib.GetFilesByEnv("data/cab-cap-istat.csv")
 	df := lib.CsvToDataframe(cabCsv)
 	result = append(result, getHeader())
 	result = append(result, setRowLifeEmit(policy, df, *trans, time.Now())...)
 	return result
 }
-func (_ GeneratorAxaTrack) Payment(policy models.Policy, trans *models.Transaction) [][]string {
-	return [][]string{}
-}
-func (_ GeneratorAxaTrack) Delete(policy models.Policy, trans *models.Transaction) [][]string {
+func (_ GeneratorAxaTrack) Deleted(policy models.Policy, trans *models.Transaction) [][]string {
 	return [][]string{}
 }
 
@@ -52,12 +52,12 @@ func GenerateTrackFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	}
 	var track [][]string
 	switch operation {
-	case "emit":
-		track = generator.Emit(policy, tr)
-	case "delete":
-		track = generator.Delete(policy, tr)
-	case "Payment":
-		track = generator.Payment(policy, tr)
+	case "emitted":
+		track = generator.Emitted(policy, tr)
+	case "deleted":
+		track = generator.Deleted(policy, tr)
+	case "paid":
+		track = generator.Paid(policy, tr)
 	default:
 		return "", nil, errors.New("Generator track not implement for " + operation)
 	}
