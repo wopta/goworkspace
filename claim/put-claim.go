@@ -28,10 +28,10 @@ func PutClaimFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	claim, err := models.UnmarshalClaim(body)
 	lib.CheckError(err)
 
-	return PutClaim(r.Header.Get("Authorization"), r.Header.Get("Origin"), &claim)
+	return PutClaim(r.Header.Get("Authorization"), &claim)
 }
 
-func PutClaim(idToken string, origin string, claim *models.Claim) (string, interface{}, error) {
+func PutClaim(idToken string, claim *models.Claim) (string, interface{}, error) {
 	var (
 		user models.User
 		obj  mail.MailRequest
@@ -119,7 +119,7 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 
 	mail.SendMail(obj)
 
-	err = claim.BigquerySave(origin)
+	err = claim.BigquerySave()
 	if err != nil {
 		log.ErrorF("error bigquery save claim %s", claim.ClaimUid)
 	}

@@ -77,7 +77,7 @@ func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		return "", nil, err
 	}
 
-	inviteUid, err := CreateInvite(createInviteRequest, r.Header.Get("Origin"), creatorUid)
+	inviteUid, err := CreateInvite(createInviteRequest, creatorUid)
 	if err != nil {
 		log.ErrorF("error: %s", err.Error())
 		return "", nil, err
@@ -90,7 +90,7 @@ func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	return "{}", nil, nil
 }
 
-func CreateInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) (string, error) {
+func CreateInvite(inviteRequest CreateInviteRequest, creatorUid string) (string, error) {
 	log.AddPrefix("CreateInvite")
 	defer log.PopPrefix()
 	log.Printf("Creating invite for user %s with role %s", inviteRequest.Email, inviteRequest.Role)
@@ -133,7 +133,7 @@ func CreateInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) 
 	}
 
 	// check if user exists
-	_, err := GetAuthUserByMail(origin, inviteRequest.Email)
+	_, err := GetAuthUserByMail(inviteRequest.Email)
 	if err == nil {
 		log.ErrorF("user %s already exists", inviteRequest.Email)
 		return "", errors.New("user already exists")

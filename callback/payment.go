@@ -33,7 +33,6 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	log.Println("Handler start -----------------------------------------------")
 
 	policyUid := r.URL.Query().Get("uid")
-	origin = r.URL.Query().Get("origin")
 	trSchedule = r.URL.Query().Get("schedule")
 
 	request := lib.ErrorByte(io.ReadAll(r.Body))
@@ -52,19 +51,21 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 
 	log.Printf("uid %s, providerId %s", policyUid, providerId)
 
-	if policyUid == "" || origin == "" {
+	if policyUid == "" {
 		ext := strings.Split(fabrickCallback.ExternalID, "_")
 		policyUid = ext[0]
 		trSchedule = ext[1]
-		origin = ext[3]
 	}
 
-	policy := plc.GetPolicyByUid(policyUid, origin)
+	policy, err := plc.GetPolicy(policyUid)
+	if err != nil {
+		return "", nil, err
+	}
 
 	switch fabrickCallback.Bill.Status {
 	case fabrickBillPaid:
 		paymentMethod = strings.ToLower(*fabrickCallback.Bill.Transactions[0].PaymentMethod)
-		err = fabrickPayment(origin, providerId, &policy)
+		err = fabrickPayment(providerId, &policy)
 	default:
 	}
 
@@ -82,7 +83,7 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	return response, nil, nil
 }
 
-func fabrickPayment(origin, providerId string, policy *models.Policy) error {
+func fabrickPayment(providerId string, policy *models.Policy) error {
 	log.AddPrefix("fabrickPayment")
 	defer log.PopPrefix()
 	log.Printf("Policy %s", policy.Uid)

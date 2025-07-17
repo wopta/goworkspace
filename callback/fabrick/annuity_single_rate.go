@@ -91,7 +91,10 @@ func annuitySingleRate(policyUid, providerId, trSchedule, paymentMethod string) 
 		err         error
 	)
 
-	policy = plc.GetPolicyByUid(policyUid, "")
+	policy, err = plc.GetPolicy(policyUid)
+	if err != nil {
+		return err
+	}
 	if policy.Uid == "" {
 		return ErrPolicyNotFound
 	}
@@ -110,7 +113,7 @@ func annuitySingleRate(policyUid, providerId, trSchedule, paymentMethod string) 
 	if err = lib.SetBatchFirestoreErr(firestoreBatch); err != nil {
 		return err
 	}
-	transaction.BigQuerySave("")
+	transaction.BigQuerySave()
 
 	mgaProduct = prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 

@@ -44,11 +44,11 @@ func RestoreTransactionFx(w http.ResponseWriter, r *http.Request) (string, inter
 	}
 
 	if !isRenew {
-		if transaction = GetTransactionByUid(transactionUid, ""); transaction == nil {
+		if transaction = GetTransactionByUid(transactionUid); transaction == nil {
 			log.ErrorF("no transaction found with uid: %s", transactionUid)
 			return "", nil, errors.New("no transaction found")
 		}
-		if policy, err = plc.GetPolicy(transaction.PolicyUid, ""); err != nil {
+		if policy, err = plc.GetPolicy(transaction.PolicyUid); err != nil {
 			log.ErrorF("error fetching policy %s from Firestore: %s", transaction.PolicyUid, err)
 			return "", nil, err
 		}

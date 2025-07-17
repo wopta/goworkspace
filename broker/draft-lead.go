@@ -42,7 +42,6 @@ func DraftLeadFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		authToken.Email,
 	)
 
-	origin = r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
@@ -100,7 +99,7 @@ func leaddraft(authToken models.AuthToken, policy *models.Policy) error {
 	storage.AddGlobal("addresses", &flow.Addresses{
 		FromAddress: mail.AddressAnna,
 	})
-	flowLead, e := getFlow(policy, origin, storage)
+	flowLead, e := getFlow(policy, storage)
 	if e != nil {
 		return e
 	}

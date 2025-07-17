@@ -32,7 +32,6 @@ func UpdateUserRoleFx(w http.ResponseWriter, r *http.Request) (string, interface
 	log.Println("Handler start -----------------------------------------------")
 
 	userUid = chi.URLParam(r, "userUid")
-	origin := r.Header.Get("Origin")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
@@ -73,7 +72,7 @@ func UpdateUserRoleFx(w http.ResponseWriter, r *http.Request) (string, interface
 		return "", nil, err
 	}
 
-	err = user.BigquerySave(origin)
+	err = user.BigquerySave()
 
 	log.Println("Handler end -------------------------------------------------")
 

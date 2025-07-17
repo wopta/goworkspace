@@ -20,19 +20,6 @@ func GetDatasetByContractorName(name string, dataset string) string {
 	return result
 }
 
-// DEPRECATED
-func GetDatasetByEnv(origin string, dataset string) string {
-	var result string
-	if strings.Contains(origin, "uat") {
-		result = "uat_" + dataset
-	} else {
-		result = dataset
-	}
-	log.Println("GetDatasetByEnv: name:", origin)
-	log.Println("GetDatasetByEnv result: ", result)
-	return result
-}
-
 func GetBoolEnv(key string) bool {
 	flag, err := strconv.ParseBool(os.Getenv(key))
 	if err != nil {

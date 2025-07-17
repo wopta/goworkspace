@@ -142,7 +142,7 @@ func createBeprofNode() error {
 		return err
 	}
 
-	return nn.SaveBigQuery("")
+	return nn.SaveBigQuery()
 }
 
 func createFacileNode() error {
@@ -235,7 +235,7 @@ func createFacileNode() error {
 		return err
 	}
 
-	return nn.SaveBigQuery("")
+	return nn.SaveBigQuery()
 }
 
 func createFpinsuranceNode() error {
@@ -264,7 +264,7 @@ func createFpinsuranceNode() error {
 		return err
 	}
 
-	return nn.SaveBigQuery("")
+	return nn.SaveBigQuery()
 }
 
 func createSegugioNode() error {
@@ -293,7 +293,7 @@ func createSegugioNode() error {
 		return err
 	}
 
-	return nn.SaveBigQuery("")
+	return nn.SaveBigQuery()
 }
 
 func createMultiTestNode() error {
@@ -331,7 +331,7 @@ func createMultiTestNode() error {
 		return err
 	}
 
-	return nn.SaveBigQuery("")
+	return nn.SaveBigQuery()
 }
 
 func createELeadsNode() error {
@@ -418,7 +418,7 @@ func createELeadsNode() error {
 		return err
 	}
 
-	return nn.SaveBigQuery("")
+	return nn.SaveBigQuery()
 }
 
 func createSwitchoNode() error {
@@ -452,7 +452,7 @@ func createSwitchoNode() error {
 		return err
 	}
 
-	return nn.SaveBigQuery("")
+	return nn.SaveBigQuery()
 }
 
 func CreateAdvTestNode() error {
@@ -491,7 +491,7 @@ func CreateAdvTestNode() error {
 		return err
 	}
 
-	return nn.SaveBigQuery("")
+	return nn.SaveBigQuery()
 }
 func createPartnershipFacileVetrina() error {
 	var (
@@ -528,5 +528,5 @@ func createPartnershipFacileVetrina() error {
 		return err
 	}
 
-	return nn.SaveBigQuery("")
+	return nn.SaveBigQuery()
 }

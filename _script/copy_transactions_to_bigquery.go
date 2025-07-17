@@ -15,7 +15,7 @@ import (
 
 func CopyTransactionsToBigQuery() {
 	//transactions := transaction.GetPolicyTransactions("", "wT6LRDMwSHViSbTCj5GM") DEV
-	transactions := transaction.GetPolicyTransactions("", "6tztJcR7KwqBT7JHwnwI")
+	transactions := transaction.GetPolicyTransactions("6tztJcR7KwqBT7JHwnwI")
 
 	for index, tr := range transactions {
 		if tr.IsPay {
@@ -27,9 +27,9 @@ func CopyTransactionsToBigQuery() {
 			t.UpdateDate = t.CreationDate
 			t.PayDate = time.Time{}
 			t.TransactionDate = time.Time{}
-			t.BigQuerySave("")
+			t.BigQuerySave()
 		}
-		transactions[index].BigQuerySave("")
+		transactions[index].BigQuerySave()
 	}
 }
 

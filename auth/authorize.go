@@ -28,7 +28,6 @@ func AuthorizeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	log.Println("Handler start -----------------------------------------------")
 
-	origin = r.Header.Get("Origin")
 	rBody := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
@@ -62,7 +61,6 @@ func TokenFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 
 	log.Println("Handler start -----------------------------------------------")
 
-	origin = r.Header.Get("Origin")
 	tokenreq := r.Header.Get("Auth")
 
 	token, v, e := Token(tokenreq)

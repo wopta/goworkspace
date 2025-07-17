@@ -59,7 +59,7 @@ func UpdateTransactions() {
 		}
 		modifiedTransactions = append(modifiedTransactions, tr.Uid)
 		// save to bigquery
-		tr.BigQuerySave("")
+		tr.BigQuerySave()
 	}
 
 	fmt.Printf("Modified %d transactions: %v/n", len(modifiedTransactions), modifiedTransactions)
@@ -107,11 +107,15 @@ func UpdateTransactionsCommission() {
 	policyMap := make(map[string]*models.Policy)
 
 	for _, t := range transactionUids {
-		tr := transaction.GetTransactionByUid(t.Uid, "")
+		tr := transaction.GetTransactionByUid(t.Uid)
 		var plc = policyMap[tr.PolicyUid]
 
 		if plc == nil {
-			temp := policy.GetPolicyByUid(tr.PolicyUid, "")
+			temp, err := policy.GetPolicy(tr.PolicyUid)
+			if err != nil {
+				log.Error(err)
+				return
+			}
 			policyMap[tr.PolicyUid] = plc
 			plc = &temp
 		}
@@ -141,7 +145,7 @@ func updateTransactionCommission(tr *models.Transaction, policy *models.Policy, 
 		fmt.Printf("error saving transaction to firestore: %s", err.Error())
 		return err
 	}
-	tr.BigQuerySave("")
+	tr.BigQuerySave()
 
 	return nil
 }

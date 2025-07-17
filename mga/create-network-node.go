@@ -24,7 +24,6 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	log.Println("Handler start -----------------------------------------------")
 
-	origin := r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
@@ -51,7 +50,7 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 	}
 	log.Printf("network node created with uid %s", node.Uid)
 
-	node.SaveBigQuery(origin)
+	node.SaveBigQuery()
 
 	err = createNodeRelation(*node)
 	if err != nil {

@@ -48,7 +48,7 @@ func GetClaimDocumentFx(w http.ResponseWriter, r *http.Request) (string, interfa
 		return "", "", err
 	}
 
-	res, err := getClaimDocument(r.Header.Get("Origin"), authToken.UID, chi.URLParam(r, "claimUid"), request.DocumentName)
+	res, err := getClaimDocument(authToken.UID, chi.URLParam(r, "claimUid"), request.DocumentName)
 	if err != nil {
 		log.ErrorF("error getting document, error %s", err.Error())
 		return "", "", err
@@ -63,7 +63,7 @@ func GetClaimDocumentFx(w http.ResponseWriter, r *http.Request) (string, interfa
 	return string(jsonResponse), response, err
 }
 
-func getClaimDocument(origin, userUid, claimUid, fileName string) (string, error) {
+func getClaimDocument(userUid, claimUid, fileName string) (string, error) {
 	var user models.User
 	log.AddPrefix("getClaimDocument")
 	defer log.PopPrefix()

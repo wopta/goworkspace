@@ -31,7 +31,6 @@ func SignFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	policyUid := r.URL.Query().Get("uid")
 	envelope := r.URL.Query().Get("envelope")
 	action := r.URL.Query().Get("action")
-	origin = r.URL.Query().Get("origin")
 	sendEmailParam := r.URL.Query().Get("sendEmail")
 	log.Printf("Uid: '%s', Envelope: '%s', Action: '%s', SendEmailParam: '%s'", policyUid, envelope, action, sendEmailParam)
 
@@ -44,7 +43,7 @@ func SignFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	switch action {
 	case namirialFinished:
-		namirialStepFinished(origin, policyUid)
+		namirialStepFinished(policyUid)
 	default:
 	}
 
@@ -53,7 +52,7 @@ func SignFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	return "", nil, nil
 }
 
-func namirialStepFinished(origin, policyUid string) {
+func namirialStepFinished(policyUid string) {
 	log.AddPrefix("namirialStepFinished")
 	defer log.PopPrefix()
 	log.Printf("Policy: %s", policyUid)
@@ -95,7 +94,7 @@ func namirialStepFinished(origin, policyUid string) {
 	}
 	policy = *state.Data
 
-	policy.BigquerySave(origin)
+	policy.BigquerySave()
 
 	callback_out.Execute(networkNode, policy, callback_out.Signed)
 }

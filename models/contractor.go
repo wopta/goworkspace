@@ -171,7 +171,7 @@ func (c *Contractor) initBigqueryData() error {
 	return nil
 }
 
-func (c *Contractor) BigquerySave(origin string) error {
+func (c *Contractor) BigquerySave() error {
 	table := UserCollection
 
 	if err := c.initBigqueryData(); err != nil {

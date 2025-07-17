@@ -120,7 +120,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		log.ErrorF("error saving networkNode in firestore")
 		return "", nil, err
 	}
-	if err := networkNode.SaveBigQuery(""); err != nil {
+	if err := networkNode.SaveBigQuery(); err != nil {
 		log.ErrorF("error saving networkNode in bigquery")
 		return "", nil, err
 	}

@@ -54,7 +54,7 @@ func Transaction(w http.ResponseWriter, r *http.Request) {
 	router.ServeHTTP(w, r)
 }
 
-func SetPolicyFirstTransactionPaid(policyUid string, scheduleDate string, origin string) {
+func SetPolicyFirstTransactionPaid(policyUid string, scheduleDate string) {
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{
 			{
@@ -81,7 +81,7 @@ func SetPolicyFirstTransactionPaid(policyUid string, scheduleDate string, origin
 	transaction.PayDate = time.Now().UTC()
 	transaction.TransactionDate = time.Now().UTC()
 	lib.SetFirestore(fireTransactions, transaction.Uid, transaction)
-	transaction.BigQuerySave(origin)
+	transaction.BigQuerySave()
 }
 
 func GetTransactionToBePaid(policyUid, providerId, scheduleDate, collection string) (models.Transaction, error) {
@@ -171,7 +171,7 @@ func getTransactionByPolicyUidAndScheduleDate(policyUid, scheduleDate, collectio
 	return models.TransactionToListData(query), nil
 }
 
-func Pay(transaction *models.Transaction, origin, paymentMethod string) error {
+func Pay(transaction *models.Transaction, paymentMethod string) error {
 	fireTransactions := models.TransactionsCollection
 
 	transaction.IsDelete = false

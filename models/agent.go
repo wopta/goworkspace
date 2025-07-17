@@ -63,7 +63,7 @@ type Agent struct {
 	BigUpdatedDate           bigquery.NullDateTime  `json:"-" firestore:"-" bigquery:"updatedDate"`
 }
 
-func (agent *Agent) BigquerySave(origin string) error {
+func (agent *Agent) BigquerySave() error {
 	agent.BigRuiRegistration = lib.GetBigQueryNullDateTime(agent.RuiRegistration)
 	agent.BigCreationDate = lib.GetBigQueryNullDateTime(agent.CreationDate)
 	agent.BigUpdatedDate = lib.GetBigQueryNullDateTime(agent.UpdatedDate)
@@ -130,7 +130,7 @@ func FirestoreDocumentToAgent(query *firestore.DocumentIterator) (*Agent, error)
 	return &result, e
 }
 
-func UpdateAgentPortfolio(policy *Policy, origin string) error {
+func UpdateAgentPortfolio(policy *Policy) error {
 	log.AddPrefix("UpdateAgentPortfolio")
 	defer log.PopPrefix()
 	log.Printf("Policy %s", policy.Uid)
@@ -164,7 +164,7 @@ func UpdateAgentPortfolio(policy *Policy, origin string) error {
 		return err
 	}
 
-	err = agent.BigquerySave(origin)
+	err = agent.BigquerySave()
 
 	return err
 }

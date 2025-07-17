@@ -46,7 +46,6 @@ func DraftEmitWithPolicyFx(w http.ResponseWriter, r *http.Request) (string, any,
 		authToken.Email,
 	)
 
-	origin = r.Header.Get("origin")
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		return "", nil, err
@@ -73,7 +72,7 @@ func DraftEmitWithPolicyFx(w http.ResponseWriter, r *http.Request) (string, any,
 		log.Printf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
 		return "", nil, fmt.Errorf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
 	}
-	responseEmit, err = emitDraftWithPolicy(&policy, origin)
+	responseEmit, err = emitDraftWithPolicy(&policy)
 	if err != nil {
 		return "", nil, err
 	}
@@ -87,11 +86,9 @@ func DraftEmitWithPolicyFx(w http.ResponseWriter, r *http.Request) (string, any,
 	return string(b), responseEmit, err
 }
 
-func emitDraftWithPolicy(policy *models.Policy, origin string) (EmitResponse, error) {
+func emitDraftWithPolicy(policy *models.Policy) (EmitResponse, error) {
 	log.Println("start ------------------------------------------------")
 	var responseEmit EmitResponse
-
-	fireGuarantee := lib.GetDatasetByEnv(origin, lib.GuaranteeCollection)
 
 	log.Printf("Emitting - Policy Uid %s", policy.Uid)
 	log.Println("starting bpmn flow...")
@@ -106,7 +103,7 @@ func emitDraftWithPolicy(policy *models.Policy, origin string) (EmitResponse, er
 	storage.AddGlobal("addresses", &flow.Addresses{FromAddress: mail.AddressAnna})
 
 	log.Printf("paymentMode: %s", paymentMode)
-	flow, err := getFlow(policy, origin, storage)
+	flow, err := getFlow(policy, storage)
 	if err != nil {
 		return responseEmit, err
 	}
@@ -128,7 +125,7 @@ func emitDraftWithPolicy(policy *models.Policy, origin string) (EmitResponse, er
 	log.Printf("Policy %s: %s", policy.Uid, string(policyJson))
 
 	log.Println("saving guarantees to bigquery...")
-	models.SetGuaranteBigquery(*policy, "emit", fireGuarantee)
+	models.SetGuaranteBigquery(*policy, "emit", lib.GuaranteeCollection)
 
 	log.Println("end --------------------------------------------------")
 	return responseEmit, nil

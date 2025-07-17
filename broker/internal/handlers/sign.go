@@ -22,16 +22,14 @@ func AddSignHandlers(builder *bpmn.BpnmBuilder) error {
 
 func setSign(state bpmn.StorageData) error {
 	var policy *flow.Policy
-	var origin *flow.String
 	err := bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("origin", &origin, state),
 	)
 	if err != nil {
 		return err
 	}
 
-	err = plc.Sign(policy.Policy, origin.String)
+	err = plc.Sign(policy.Policy)
 	if err != nil {
 		log.Error(err)
 		return err
@@ -41,16 +39,14 @@ func setSign(state bpmn.StorageData) error {
 }
 func addContract(state bpmn.StorageData) error {
 	var policy *flow.Policy
-	var origin *flow.String
 	err := bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("origin", &origin, state),
 	)
 	if err != nil {
 		return err
 	}
 
-	plc.AddSignedDocumentsInPolicy(policy.Policy, origin.String)
+	plc.AddSignedDocumentsInPolicy(policy.Policy)
 
 	return nil
 }
@@ -58,12 +54,10 @@ func sendMailContract(state bpmn.StorageData) error {
 	var policy *flow.Policy
 	var networkNode *flow.Network
 	var flowName *flow.String
-	var origin *flow.String
 	var sendEmail *flow.BoolBpmn
 	var addresses *flow.Addresses
 	err := bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("origin", &origin, state),
 		bpmn.GetDataRef("flowName", &flowName, state),
 		bpmn.GetDataRef("networkNode", &networkNode, state),
 		bpmn.GetDataRef("addresses", &addresses, state),
@@ -90,15 +84,13 @@ func sendMailContract(state bpmn.StorageData) error {
 
 func fillAttachments(state bpmn.StorageData) error {
 	var policy *flow.Policy
-	var origin *flow.String
 	err := bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("origin", &origin, state),
 	)
 	if err != nil {
 		return err
 	}
-	err = plc.FillAttachments(policy.Policy, origin.String)
+	err = plc.FillAttachments(policy.Policy)
 	if err != nil {
 		log.Error(err)
 		return err
@@ -109,15 +101,13 @@ func fillAttachments(state bpmn.StorageData) error {
 
 func setToPay(state bpmn.StorageData) error {
 	var policy *flow.Policy
-	var origin *flow.String
 	err := bpmn.IsError(
 		bpmn.GetDataRef("policy", &policy, state),
-		bpmn.GetDataRef("origin", &origin, state),
 	)
 	if err != nil {
 		return err
 	}
-	err = plc.SetToPay(policy.Policy, origin.String)
+	err = plc.SetToPay(policy.Policy)
 	if err != nil {
 		log.Error(err)
 		return err

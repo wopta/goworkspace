@@ -50,7 +50,7 @@ type Skin struct {
 	LogoUrl        string `json:"logoUrl"        firestore:"logoUrl"        bigquery:"-"`
 }
 
-func (agency *Agency) BigquerySave(origin string) error {
+func (agency *Agency) BigquerySave() error {
 	log.AddPrefix("Agency")
 	defer log.PopPrefix()
 
@@ -103,7 +103,7 @@ func FirestoreDocumentToAgency(query *firestore.DocumentIterator) (*Agency, erro
 	return &result, e
 }
 
-func UpdateAgencyPortfolio(policy *Policy, origin string) error {
+func UpdateAgencyPortfolio(policy *Policy) error {
 	log.AddPrefix("updateAgencyPortfolio")
 	defer log.PopPrefix()
 
@@ -138,7 +138,7 @@ func UpdateAgencyPortfolio(policy *Policy, origin string) error {
 		return err
 	}
 
-	err = agency.BigquerySave(origin)
+	err = agency.BigquerySave()
 
 	return err
 }

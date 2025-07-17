@@ -57,7 +57,7 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 		return "{}", nil, err
 	}
 
-	policy, err = plc.GetPolicy(req.PolicyUid, "")
+	policy, err = plc.GetPolicy(req.PolicyUid)
 	if err != nil {
 		log.Printf("no policy found with uid %s: %s", req.PolicyUid, err.Error())
 		return "{}", nil, err
@@ -107,7 +107,7 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 		return "{}", nil, err
 	}
 
-	policy.BigquerySave("")
+	policy.BigquerySave()
 
 	resp.Policy = policy
 	resp.Transactions = responseTransactions

@@ -18,12 +18,10 @@ func AddProposalHandlers(builder *bpmn.BpnmBuilder) error {
 }
 
 func setProposalData(state bpmn.StorageData) error {
-	var origin *flow.String
 	var policy *flow.Policy
 	var networkNode *flow.Network
 	var mgaProduct *flow.Product
 	var err = bpmn.IsError(
-		bpmn.GetDataRef("origin", &origin, state),
 		bpmn.GetDataRef("policy", &policy, state),
 		bpmn.GetDataRef("networkNode", &networkNode, state),
 		bpmn.GetDataRef("mgaProduct", &mgaProduct, state),
@@ -41,12 +39,11 @@ func setProposalData(state bpmn.StorageData) error {
 		return nil
 	}
 
-	utility.SetProposalData(policy.Policy, origin.String, networkNode.NetworkNode, mgaProduct.Product)
+	utility.SetProposalData(policy.Policy, networkNode.NetworkNode, mgaProduct.Product)
 
 	log.Printf("saving proposal n. %d to firestore...", policy.ProposalNumber)
 
-	firePolicy := lib.GetDatasetByEnv(origin.String, lib.PolicyCollection)
-	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
+	return lib.SetFirestoreErr(lib.PolicyCollection, policy.Uid, policy)
 }
 
 func sendProposalMail(state bpmn.StorageData) error {

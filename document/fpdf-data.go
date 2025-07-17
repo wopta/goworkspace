@@ -132,7 +132,7 @@ func loadProponentInfo(networkNode *models.NetworkNode) map[string]string {
 	return policyProponent
 }
 
-func loadProducerInfo(origin string, networkNode *models.NetworkNode) map[string]string {
+func loadProducerInfo(networkNode *models.NetworkNode) map[string]string {
 	policyProducer := map[string]string{
 		"name":            "LOMAZZI MICHELE",
 		"ruiSection":      "A",

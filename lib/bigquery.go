@@ -23,6 +23,7 @@ func getBigqueryClient() *bigquery.Client {
 	return client
 }
 func InsertRowsBigQuery(datasetID string, tableID string, value interface{}) error {
+
 	client := getBigqueryClient()
 	defer client.Close()
 	inserter := client.Dataset(datasetID).Table(tableID).Inserter()

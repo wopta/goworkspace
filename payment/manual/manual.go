@@ -171,14 +171,14 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		policy.SanitizePaymentData()
 
 		// Add contract to policy
-		err = plc.AddSignedDocumentsInPolicy(&policy, "")
+		err = plc.AddSignedDocumentsInPolicy(&policy)
 		if err != nil {
 			log.ErrorF("error add contract to policy: %s", err.Error())
 			return "", nil, err
 		}
 
 		// Create/Update document on user collection based on contractor fiscalCode
-		err = plc.SetUserIntoPolicyContractor(&policy, "")
+		err = plc.SetUserIntoPolicyContractor(&policy)
 		if err != nil {
 			log.ErrorF("error set user into policy contractor: %s", err.Error())
 			return "", nil, err
@@ -191,20 +191,20 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 			}
 		}
 
-		err = plc.Pay(&policy, "")
+		err = plc.Pay(&policy)
 		if err != nil {
 			log.ErrorF("error policy pay: %s", err.Error())
 			return "", nil, err
 		}
 
 		// Update NetworkNode Portfolio
-		err = network.UpdateNetworkNodePortfolio("", &policy, networkNode)
+		err = network.UpdateNetworkNodePortfolio(&policy, networkNode)
 		if err != nil {
 			log.ErrorF("error updating %s portfolio %s", networkNode.Type, err.Error())
 			return "", nil, err
 		}
 
-		policy.BigquerySave("")
+		policy.BigquerySave()
 
 		callback_out.Execute(networkNode, policy, callback_out.Paid)
 
@@ -238,7 +238,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 			log.ErrorF("error saving policy %s to Firestore: %s", policy.Uid, err.Error())
 			return "", nil, err
 		}
-		policy.BigquerySave("")
+		policy.BigquerySave()
 	}
 
 	return "{}", nil, err

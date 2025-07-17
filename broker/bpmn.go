@@ -18,12 +18,12 @@ import (
 )
 
 var (
-	origin, flowName, paymentSplit, paymentMode string
-	ccAddress, toAddress, fromAddress           mail.Address
-	networkNode                                 *models.NetworkNode
-	product, mgaProduct                         *models.Product
-	warrant                                     *models.Warrant
-	sendEmail                                   bool
+	flowName, paymentSplit, paymentMode string
+	ccAddress, toAddress, fromAddress   mail.Address
+	networkNode                         *models.NetworkNode
+	product, mgaProduct                 *models.Product
+	warrant                             *models.Warrant
+	sendEmail                           bool
 )
 
 const (
@@ -146,7 +146,7 @@ func setProposalBpm(state *bpmn.State) error {
 		return nil
 	}
 
-	utility.SetProposalData(policy, origin, networkNode, mgaProduct)
+	utility.SetProposalData(policy, networkNode, mgaProduct)
 
 	log.Printf("saving proposal n. %d to firestore...", policy.ProposalNumber)
 
@@ -200,7 +200,7 @@ func setRequestApprovalBpmn(state *bpmn.State) error {
 	defer log.PopPrefix()
 	firePolicy := lib.PolicyCollection
 
-	utility.SetRequestApprovalData(policy, networkNode, mgaProduct, origin)
+	utility.SetRequestApprovalData(policy, networkNode, mgaProduct)
 
 	log.Printf("saving policy with uid %s to Firestore....", policy.Uid)
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
@@ -252,7 +252,7 @@ func addEmitHandlers(state *bpmn.State) {
 func emitData(state *bpmn.State) error {
 	firePolicy := lib.PolicyCollection
 	policy := state.Data
-	emitBase(policy, origin)
+	emitBase(policy)
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
@@ -286,13 +286,13 @@ func sendMailSign(state *bpmn.State) error {
 
 func sign(state *bpmn.State) error {
 	policy := state.Data
-	err := utility.SignFiles(policy, product, networkNode, true, origin)
+	err := utility.SignFiles(policy, product, networkNode, true)
 	return err
 }
 
 func pay(state *bpmn.State) error {
 	policy := state.Data
-	utility.EmitPay(policy, origin, product, mgaProduct, networkNode)
+	utility.EmitPay(policy, product, mgaProduct, networkNode)
 	if policy.PayUrl == "" {
 		return fmt.Errorf("missing payment url")
 	}
@@ -301,7 +301,7 @@ func pay(state *bpmn.State) error {
 
 func setAdvanceBpm(state *bpmn.State) error {
 	policy := state.Data
-	utility.SetAdvance(policy, origin, product, mgaProduct, networkNode, paymentSplit, paymentMode)
+	utility.SetAdvance(policy, product, mgaProduct, networkNode, paymentSplit, paymentMode)
 	return nil
 }
 
@@ -310,12 +310,12 @@ func updateUserAndNetworkNode(state *bpmn.State) error {
 	log.AddPrefix("PutUser")
 	defer log.PopPrefix()
 	// promote documents from temp bucket to user and connect it to policy
-	err := plc.SetUserIntoPolicyContractor(policy, origin)
+	err := plc.SetUserIntoPolicyContractor(policy)
 	if err != nil {
 		log.ErrorF("error SetUserIntoPolicyContractor %s", err.Error())
 		return err
 	}
-	return network.UpdateNetworkNodePortfolio(origin, policy, networkNode)
+	return network.UpdateNetworkNodePortfolio(policy, networkNode)
 }
 
 func sendEmitProposalMail(state *bpmn.State) error {

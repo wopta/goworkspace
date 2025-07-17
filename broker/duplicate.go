@@ -40,7 +40,7 @@ func DuplicateFx(_ http.ResponseWriter, r *http.Request) (string, any, error) {
 
 	policyUid := chi.URLParam(r, "uid")
 
-	if policy, err = plc.GetPolicy(policyUid, ""); err != nil {
+	if policy, err = plc.GetPolicy(policyUid); err != nil {
 		log.Println("could not retrieve policy from DB")
 		return "", nil, err
 	}
@@ -65,7 +65,7 @@ func DuplicateFx(_ http.ResponseWriter, r *http.Request) (string, any, error) {
 		log.ErrorF("error updating duplicated policy")
 		return "", nil, err
 	}
-	policy.BigquerySave("")
+	policy.BigquerySave()
 
 	if responseBytes, err = policy.Marshal(); err != nil {
 		log.ErrorF("error marshalling response")

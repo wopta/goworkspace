@@ -27,7 +27,7 @@ func GetPolicyAttachmentsFx(w http.ResponseWriter, r *http.Request) (string, int
 
 	log.Println("Handler start -----------------------------------------------")
 
-	attachments, err := GetPolicyAttachments(chi.URLParam(r, "uid"), r.Header.Get("Origin"))
+	attachments, err := GetPolicyAttachments(chi.URLParam(r, "uid"))
 	if err != nil {
 		log.Println("GetPolicyAttachments Error: " + err.Error())
 		return "{}", nil, nil
@@ -44,7 +44,7 @@ func GetPolicyAttachmentsFx(w http.ResponseWriter, r *http.Request) (string, int
 	return string(res), nil, nil
 }
 
-func GetPolicyAttachments(policyUid string, origin string) ([]models.Attachment, error) {
+func GetPolicyAttachments(policyUid string) ([]models.Attachment, error) {
 	var (
 		err         error
 		wiseToken   *string = nil
@@ -93,7 +93,7 @@ func GetPolicyAttachments(policyUid string, origin string) ([]models.Attachment,
 	var policy models.Policy
 
 	log.Println("Getting attachments for policy saved in Wopta")
-	if policy, err = GetPolicy(policyUid, origin); err != nil {
+	if policy, err = GetPolicy(policyUid); err != nil {
 		log.Println("Error when getting policy: " + err.Error())
 		return make([]models.Attachment, 0), err
 	}
