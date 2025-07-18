@@ -113,6 +113,9 @@ func checkFiscalCode(user models.User, fiscalCodeToCheck string) (err error) {
 	}
 
 	fiscalCode := []rune(fiscalCodeToCheck)
+	if len(fiscalCodeToCheck) != 16 {
+		return errors.New("Errore codice fiscale")
+	}
 	//clean fiscal code from omocodia
 	for _, numberPositionToClean := range numbersPositionInFiscalCode {
 		char := fiscalCode[numberPositionToClean]
@@ -132,6 +135,13 @@ func checkFiscalCode(user models.User, fiscalCodeToCheck string) (err error) {
 		}
 		return true
 	}
+	getSegment := func(fiscalCode string, startIndex, endIndex int) string {
+		res := strings.Builder{}
+		for i := startIndex; i <= endIndex; i++ {
+			res.WriteByte(fiscalCode[i])
+		}
+		return res.String()
+	}
 
 	if !areSegmentsEqual(fiscalCodeToMatch, string(fiscalCode), 0, 2) {
 		return errors.New("Errore codice fiscale: sezione cognome")
@@ -146,6 +156,10 @@ func checkFiscalCode(user models.User, fiscalCodeToCheck string) (err error) {
 		return errors.New("Errore codice fiscale: sezione mese")
 	}
 	if !areSegmentsEqual(fiscalCodeToMatch, string(fiscalCode), 9, 10) {
+		day, _ := strconv.Atoi(getSegment(string(fiscalCode), 9, 10))
+		if day > 40 && user.Gender == "M" || day < 40 && user.Gender == "F" {
+			return errors.New("Errore codice fiscale: sesso sbagliato")
+		}
 		return errors.New("Errore codice fiscale: sezione giorno")
 	}
 	if !areSegmentsEqual(fiscalCodeToMatch, string(fiscalCode), 11, 15) {
