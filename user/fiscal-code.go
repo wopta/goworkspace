@@ -162,7 +162,7 @@ func checkFiscalCode(user models.User, fiscalCodeToCheck string) (err error) {
 		}
 		return errors.New("Errore codice fiscale: sezione giorno")
 	}
-	if !areSegmentsEqual(fiscalCodeToMatch, string(fiscalCode), 11, 15) {
+	if !areSegmentsEqual(fiscalCodeToMatch, string(fiscalCode), 11, 14) {
 		return errors.New("Errore codice fiscale: sezione comune")
 	}
 	return errors.New("Errore codice fiscale")
