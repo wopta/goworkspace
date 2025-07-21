@@ -152,7 +152,7 @@ func (bg *baseGenerator) priceSummary() {
 	})
 }
 
-func (bg *baseGenerator) whoWeAre() {
+func (bg *baseGenerator) WhoWeAre() {
 	bg.engine.WriteText(domain.TableCell{
 		Text:      "Chi siamo",
 		Height:    constants.CellHeight,
