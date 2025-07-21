@@ -48,7 +48,7 @@ func GetPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interface
 
 	log.Printf("retrieving policy %s from Firestore...", req.PolicyUid)
 
-	policy, err = GetPolicy(req.PolicyUid, "")
+	policy, err = GetPolicy(req.PolicyUid)
 	if err != nil {
 		log.ErrorF("error retrieving policy %s from Firestore: %s", req.PolicyUid, err.Error())
 		return "", nil, err

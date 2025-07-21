@@ -23,7 +23,6 @@ func UpdateCompanyNetworkTransactions() {
 		transaction     *models.Transaction
 		err             error
 		originalAmount  float64
-		origin          = ""
 		modifiedCounter = make([]string, 0)
 	)
 	log.AddPrefix("UpdateNetworkTransactions")
@@ -44,14 +43,18 @@ func UpdateCompanyNetworkTransactions() {
 	// loop nt
 	for _, nt := range netTransactions {
 		// for each nt get its parent transaction (t)
-		transaction = tr.GetTransactionByUid(nt.TransactionUid, origin)
+		transaction = tr.GetTransactionByUid(nt.TransactionUid)
 		// update the nt.Amount and nt.AmountNet with t.Amount - nt.Amount
 		if transaction == nil {
 			fmt.Printf("error getting transaction '%s': %s", nt.TransactionUid, err.Error())
 			return
 		}
 
-		policy := plc.GetPolicyByUid(transaction.PolicyUid, origin)
+		policy, err := plc.GetPolicy(transaction.PolicyUid)
+		if err != nil {
+			log.Error(err)
+			return
+		}
 		mgaProduct := product.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 		commissionMga := product.GetCommissionByProduct(&policy, mgaProduct, false)
 
@@ -176,7 +179,11 @@ func UpdateManualPaymentNetworkTransactions(policyUids ...string) {
 		originalNetTransaction := netTransactions[0]
 		modifiedNetTransaction := deepcopy.Copy(originalNetTransaction).(models.NetworkTransaction)
 
-		policy := plc.GetPolicyByUid(originalNetTransaction.PolicyUid, "")
+		policy, err := plc.GetPolicy(originalNetTransaction.PolicyUid)
+		if err != nil {
+			log.Error(err)
+			return
+		}
 		networkNode := network.GetNetworkNodeByUid(policy.ProducerUid)
 		if networkNode == nil {
 			fmt.Println("error getting network node")

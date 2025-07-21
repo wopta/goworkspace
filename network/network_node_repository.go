@@ -218,7 +218,7 @@ func UpdateNode(node models.NetworkNode) error {
 
 	log.Printf("writing network node %s in BigQuery...", originalNode.Uid)
 
-	return originalNode.SaveBigQuery("")
+	return originalNode.SaveBigQuery()
 }
 
 func updateNodeTreeRelations(node models.NetworkNode) error {
@@ -310,7 +310,7 @@ func GetAllNetworkNodes() ([]models.NetworkNode, error) {
 	return nodes, nil
 }
 
-func DeleteNetworkNodeByUid(origin, nodeUid string) error {
+func DeleteNetworkNodeByUid(nodeUid string) error {
 	log.AddPrefix("DeleteNetworkNodeByUid")
 	defer log.PopPrefix()
 	if nodeUid == "" {
@@ -323,7 +323,7 @@ func DeleteNetworkNodeByUid(origin, nodeUid string) error {
 	return err
 }
 
-func UpdateNetworkNodePortfolio(origin string, policy *models.Policy, networkNode *models.NetworkNode) error {
+func UpdateNetworkNodePortfolio(policy *models.Policy, networkNode *models.NetworkNode) error {
 	log.AddPrefix("UpdateNetworkNodePortfolio")
 	defer log.PopPrefix()
 	if networkNode == nil {
@@ -351,7 +351,7 @@ func UpdateNetworkNodePortfolio(origin string, policy *models.Policy, networkNod
 	}
 
 	log.Printf("saving networkNode %s to BigQuery...", networkNode.Uid)
-	err = networkNode.SaveBigQuery(origin)
+	err = networkNode.SaveBigQuery()
 
 	return err
 }

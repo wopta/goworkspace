@@ -18,16 +18,7 @@ import (
 	plc "gitlab.dev.wopta.it/goworkspace/policy"
 )
 
-type AcceptancePayload struct {
-	Action  string `json:"action"` // models.PolicyStatusRejected (Rejected) | models.PolicyStatusApproved (Approved)
-	Reasons string `json:"reasons"`
-}
-
-func (*AcceptancePayload) GetType() string {
-	return "acceptanceInfo"
-}
-
-func acceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
+func DraftAcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		err     error
 		payload AcceptancePayload
@@ -77,8 +68,8 @@ func acceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		log.Printf("policy Uid %s: wrong status %s", policy.Uid, policy.Status)
 		return "", nil, fmt.Errorf("policy uid '%s': wrong status '%s'", policy.Uid, policy.Status)
 	}
-	networkNode := network.GetNetworkNodeByUid(policy.ProducerUid)
 	addresses := &flow.Addresses{}
+	networkNode := network.GetNetworkNodeByUid(policy.ProducerUid)
 	switch policy.Channel {
 	case models.MgaChannel:
 		addresses.ToAddress = mail.Address{

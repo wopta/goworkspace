@@ -33,8 +33,6 @@ func ConsumeNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string,
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
-	origin := r.Header.Get("Origin")
-
 	err := json.Unmarshal(body, &req)
 	if err != nil {
 		log.ErrorF("error unmarshaling request body")
@@ -43,7 +41,7 @@ func ConsumeNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string,
 
 	log.Printf("Consuming invite %s...", req.InviteUid)
 
-	err = consumeNetworkNodeInvite(origin, req.InviteUid, req.Password)
+	err = consumeNetworkNodeInvite(req.InviteUid, req.Password)
 	if err != nil {
 		log.ErrorF("error consuming invite %s: %s", req.InviteUid, err.Error())
 		return "", "", err
@@ -54,7 +52,7 @@ func ConsumeNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string,
 	return "{}", "", nil
 }
 
-func consumeNetworkNodeInvite(origin, inviteUid, password string) error {
+func consumeNetworkNodeInvite(inviteUid, password string) error {
 	var (
 		invite      NetworkNodeInvite
 		networkNode *models.NetworkNode
@@ -112,7 +110,7 @@ func consumeNetworkNodeInvite(origin, inviteUid, password string) error {
 
 	log.Printf("updating network node %s in BigQuery...", networkNode.Uid)
 
-	networkNode.SaveBigQuery(origin)
+	networkNode.SaveBigQuery()
 
 	invite.Consumed = true
 	invite.ConsumeDate = time.Now().UTC()

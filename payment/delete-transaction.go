@@ -53,12 +53,12 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 	}
 
 	if !isRenew {
-		transaction = tr.GetTransactionByUid(uid, "")
+		transaction = tr.GetTransactionByUid(uid)
 		if transaction == nil {
 			log.Printf("transaction '%s' not found", uid)
 			return "", nil, fmt.Errorf("transaction '%s' not found", uid)
 		}
-		policy, err = plc.GetPolicy(transaction.PolicyUid, "")
+		policy, err = plc.GetPolicy(transaction.PolicyUid)
 	} else {
 		collection = lib.RenewTransactionCollection
 		transaction = trxRenew.GetRenewTransactionByUid(uid)

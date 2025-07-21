@@ -37,7 +37,7 @@ func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, int
 
 	policyUid := chi.URLParam(r, "uid")
 
-	policy, err = plc.GetPolicy(policyUid, "")
+	policy, err = plc.GetPolicy(policyUid)
 	if err != nil {
 		return "", nil, err
 	}
@@ -127,7 +127,7 @@ func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, int
 		return "", nil, err
 	}
 
-	policy.BigquerySave("")
+	policy.BigquerySave()
 
 	return "{}", "", nil
 }

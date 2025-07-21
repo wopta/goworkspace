@@ -13,7 +13,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/reserved"
 )
 
-func SetProposalData(policy *models.Policy, origin string, networkNode *models.NetworkNode, mgaProduct *models.Product) {
+func SetProposalData(policy *models.Policy, networkNode *models.NetworkNode, mgaProduct *models.Product) {
 	log.AddPrefix("setProposalData")
 	defer log.PopPrefix()
 	SetProposalNumber(policy)
@@ -46,7 +46,7 @@ func SetProposalData(policy *models.Policy, origin string, networkNode *models.N
 
 	}
 
-	plc.AddProposalDoc(origin, policy, networkNode, mgaProduct)
+	plc.AddProposalDoc(policy, networkNode, mgaProduct)
 
 	log.Printf("policy status %s", policy.Status)
 

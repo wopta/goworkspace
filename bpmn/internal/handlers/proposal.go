@@ -21,13 +21,11 @@ func AddProposalHandlers(builder *bpmnEngine.BpnmBuilder) error {
 func endProposal(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var isProposal *flow.BoolBpmn
-	var origin *flow.String
 	var networkNode *flow.Network
 	var mgaProduct *flow.Product
 	err := bpmnEngine.IsError(
 		bpmnEngine.GetDataRef("policy", &policy, state),
 		bpmnEngine.GetDataRef("is_PROPOSAL_V2", &isProposal, state),
-		bpmnEngine.GetDataRef("origin", &origin, state),
 		bpmnEngine.GetDataRef("networkNode", &networkNode, state),
 		bpmnEngine.GetDataRef("mgaProduct", &mgaProduct, state),
 	)
@@ -42,12 +40,10 @@ func endProposal(state *bpmnEngine.StorageBpnm) error {
 }
 
 func setProposalData(state *bpmnEngine.StorageBpnm) error {
-	var origin *flow.String
 	var policy *flow.Policy
 	var networkNode *flow.Network
 	var mgaProduct *flow.Product
 	var err = bpmnEngine.IsError(
-		bpmnEngine.GetDataRef("origin", &origin, state),
 		bpmnEngine.GetDataRef("policy", &policy, state),
 		bpmnEngine.GetDataRef("networkNode", &networkNode, state),
 		bpmnEngine.GetDataRef("mgaProduct", &mgaProduct, state),
@@ -65,12 +61,11 @@ func setProposalData(state *bpmnEngine.StorageBpnm) error {
 		return nil
 	}
 
-	utility.SetProposalData(policy.Policy, origin.String, networkNode.NetworkNode, mgaProduct.Product)
+	utility.SetProposalData(policy.Policy, networkNode.NetworkNode, mgaProduct.Product)
 
 	log.Printf("saving proposal n. %d to firestore...", policy.ProposalNumber)
 
-	firePolicy := lib.GetDatasetByEnv(origin.String, lib.PolicyCollection)
-	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
+	return lib.SetFirestoreErr(lib.PolicyCollection, policy.Uid, policy)
 }
 
 func sendProposalMail(state *bpmnEngine.StorageBpnm) error {

@@ -137,16 +137,16 @@ func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod, origin s
 
 	if policy.Annuity == 0 {
 
-		if err = plc.AddSignedDocumentsInPolicy(&policy, ""); err != nil {
+		if err = plc.AddSignedDocumentsInPolicy(&policy); err != nil {
 			return err
 		}
 
 		// TODO: all methods save the data, they shouldn't to avoid data corruption
-		if err = plc.SetUserIntoPolicyContractor(&policy, ""); err != nil {
+		if err = plc.SetUserIntoPolicyContractor(&policy); err != nil {
 			return err
 		}
 
-		if err = network.UpdateNetworkNodePortfolio("", &policy, networkNode); err != nil {
+		if err = network.UpdateNetworkNodePortfolio(&policy, networkNode); err != nil {
 			return err
 		}
 
@@ -165,7 +165,7 @@ func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod, origin s
 			return err
 		}
 		storage := bpmnEngine.NewStorageBpnm()
-		flow, err := bpmn.GetFlow(&policy, origin, storage)
+		flow, err := bpmn.GetFlow(&policy, storage)
 		if err != nil {
 			return err
 		}

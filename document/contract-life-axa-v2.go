@@ -11,7 +11,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func lifeAxaContractV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) {
+func lifeAxaContractV2(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) {
 	signatureID = 0
 
 	lifeMainHeaderV2(pdf, policy, networkNode, false)

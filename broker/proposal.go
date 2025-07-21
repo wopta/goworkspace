@@ -50,7 +50,6 @@ func proposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		authToken.Email,
 	)
 
-	origin := r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
@@ -60,7 +59,7 @@ func proposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		return "", nil, err
 	}
 
-	policy, err = plc.GetPolicy(req.PolicyUid, origin)
+	policy, err = plc.GetPolicy(req.PolicyUid)
 	if err != nil {
 		log.ErrorF("error fetching policy %s from Firestore...: %s", req.PolicyUid, err.Error())
 		return "", nil, err
@@ -73,7 +72,7 @@ func proposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	brokerUpdatePolicy(&policy, req.BrokerBaseRequest)
 
-	err = proposal(&policy, origin, *req.SendEmail)
+	err = proposal(&policy, *req.SendEmail)
 	if err != nil {
 		log.ErrorF("error creating proposal: %s", err.Error())
 		return "", nil, err
@@ -89,7 +88,7 @@ func proposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	return string(resp), &policy, err
 }
-func proposal(policy *models.Policy, origin string, sendEmail bool) error {
+func proposal(policy *models.Policy, sendEmail bool) error {
 	log.AddPrefix("proposal")
 	defer log.PopPrefix()
 	log.Println("starting bpmn flow...")
@@ -101,7 +100,7 @@ func proposal(policy *models.Policy, origin string, sendEmail bool) error {
 	storage.AddGlobal("sendEmail", &flow.BoolBpmn{
 		Bool: sendEmail,
 	})
-	flow, err := bpmn.GetFlow(policy, origin, storage)
+	flow, err := bpmn.GetFlow(policy, storage)
 	if err != nil {
 		return err
 	}
@@ -110,7 +109,7 @@ func proposal(policy *models.Policy, origin string, sendEmail bool) error {
 		return err
 	}
 
-	policy.BigquerySave(origin)
+	policy.BigquerySave()
 
 	return nil
 }

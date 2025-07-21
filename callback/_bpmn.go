@@ -16,12 +16,12 @@ import (
 )
 
 var (
-	origin, providerId, paymentMethod, flowName, trSchedule string
-	ccAddress, toAddress, fromAddress                       mail.Address
-	networkNode                                             *models.NetworkNode
-	mgaProduct                                              *models.Product
-	warrant                                                 *models.Warrant
-	sendEmail                                               bool
+	providerId, paymentMethod, flowName, trSchedule string
+	ccAddress, toAddress, fromAddress               mail.Address
+	networkNode                                     *models.NetworkNode
+	mgaProduct                                      *models.Product
+	warrant                                         *models.Warrant
+	sendEmail                                       bool
 )
 
 const (
@@ -102,7 +102,7 @@ func setSign(state *bpmn.State) error {
 	defer log.PopPrefix()
 
 	policy := state.Data
-	err := plc.Sign(policy, origin)
+	err := plc.Sign(policy)
 	if err != nil {
 		log.Error(err)
 		return err
@@ -113,7 +113,7 @@ func setSign(state *bpmn.State) error {
 
 func addContract(state *bpmn.State) error {
 	policy := state.Data
-	plc.AddSignedDocumentsInPolicy(policy, origin)
+	plc.AddSignedDocumentsInPolicy(policy)
 
 	return nil
 }
@@ -141,7 +141,7 @@ func sendMailContract(state *bpmn.State) error {
 func fillAttachments(state *bpmn.State) error {
 	policy := state.Data
 	log.AddPrefix("FillAttachments")
-	err := plc.FillAttachments(policy, origin)
+	err := plc.FillAttachments(policy)
 	if err != nil {
 		log.Error(err)
 		return err
@@ -154,7 +154,7 @@ func setToPay(state *bpmn.State) error {
 	log.AddPrefix("setToPay")
 	defer log.PopPrefix()
 	policy := state.Data
-	err := plc.SetToPay(policy, origin)
+	err := plc.SetToPay(policy)
 	if err != nil {
 		log.Error(err)
 		return err
@@ -202,33 +202,33 @@ func updatePolicy(state *bpmn.State) error {
 	}
 
 	// Add Policy contract
-	err = plc.AddSignedDocumentsInPolicy(policy, origin)
+	err = plc.AddSignedDocumentsInPolicy(policy)
 	if err != nil {
 		log.ErrorF("error AddContract %s", err.Error())
 		return err
 	}
 
 	// promote documents from temp bucket to user and connect it to policy
-	err = plc.SetUserIntoPolicyContractor(policy, origin)
+	err = plc.SetUserIntoPolicyContractor(policy)
 	if err != nil {
 		log.ErrorF("error SetUserIntoPolicyContractor %s", err.Error())
 		return err
 	}
 
 	// Update Policy as paid
-	err = plc.Pay(policy, origin)
+	err = plc.Pay(policy)
 	if err != nil {
 		log.ErrorF("error Policy Pay %s", err.Error())
 		return err
 	}
 
-	err = network.UpdateNetworkNodePortfolio(origin, policy, networkNode)
+	err = network.UpdateNetworkNodePortfolio(policy, networkNode)
 	if err != nil {
 		log.ErrorF("error updating %s portfolio %s", networkNode.Type, err.Error())
 		return err
 	}
 
-	policy.BigquerySave(origin)
+	policy.BigquerySave()
 
 	toAddress = mail.GetContractorEmail(policy)
 	switch flowName {
@@ -252,13 +252,13 @@ func payTransaction(state *bpmn.State) error {
 	defer log.PopPrefix()
 	policy := state.Data
 	transaction, _ := tr.GetTransactionToBePaid(policy.Uid, providerId, trSchedule, lib.TransactionsCollection)
-	err := tr.Pay(&transaction, origin, paymentMethod)
+	err := tr.Pay(&transaction, paymentMethod)
 	if err != nil {
 		log.ErrorF("error Transaction Pay %s", err.Error())
 		return err
 	}
 
-	transaction.BigQuerySave(origin)
+	transaction.BigQuerySave()
 
 	return tr.CreateNetworkTransactions(policy, &transaction, networkNode, mgaProduct)
 }

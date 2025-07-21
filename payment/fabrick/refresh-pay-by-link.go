@@ -66,7 +66,10 @@ func RefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, interfa
 			return "", nil, err
 		}
 	} else {
-		policy = plc.GetPolicyByUid(request.PolicyUid, "")
+		policy, err = plc.GetPolicy(request.PolicyUid)
+		if err != nil {
+			return "", nil, err
+		}
 	}
 
 	if transactions, err = getTransactionsList(policy, isRenew); err != nil {
@@ -142,7 +145,7 @@ func getTransactionsList(policy models.Policy, isRenew bool) ([]models.Transacti
 			return nil, err
 		}
 	} else {
-		transactions = transaction.GetPolicyTransactions("", policy.Uid)
+		transactions = transaction.GetPolicyTransactions(policy.Uid)
 	}
 
 	transactions = lib.SliceFilter(transactions, func(tr models.Transaction) bool {

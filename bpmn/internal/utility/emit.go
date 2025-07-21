@@ -15,7 +15,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/transaction"
 )
 
-func SignFiles(policy *models.Policy, product *models.Product, networkNode *models.NetworkNode, sendEmail bool, origin string) error {
+func SignFiles(policy *models.Policy, product *models.Product, networkNode *models.NetworkNode, sendEmail bool) error {
 	log.AddPrefix("emitSign")
 	defer log.PopPrefix()
 	log.Printf("Policy Uid %s", policy.Uid)
@@ -28,7 +28,6 @@ func SignFiles(policy *models.Policy, product *models.Product, networkNode *mode
 		Policy:            *policy,
 		DocumentsFullPath: make([]string, 0),
 		SendEmail:         sendEmail,
-		Origin:            origin,
 	}
 	//Preparing dto for namirial
 	basePathForDocument := strings.ReplaceAll(fmt.Sprintf("temp/%s/namirial/", policy.Uid), " ", "_")
@@ -38,7 +37,7 @@ func SignFiles(policy *models.Policy, product *models.Product, networkNode *mode
 	}
 	//TODO: remove this 'if' after catnat document is done
 	if policy.Name != models.CatNatProduct {
-		p := <-document.ContractObj(origin, *policy, networkNode, product)
+		p := <-document.ContractObj(*policy, networkNode, product)
 		document, err := p.SaveWithName(fmt.Sprint(policy.NameDesc, " Polizza"))
 		if err != nil {
 			return err
@@ -65,7 +64,7 @@ func SignFiles(policy *models.Policy, product *models.Product, networkNode *mode
 	return nil
 }
 
-func EmitPay(policy *models.Policy, origin string, productP, mgaProductP *models.Product, networkNode *models.NetworkNode) {
+func EmitPay(policy *models.Policy, productP, mgaProductP *models.Product, networkNode *models.NetworkNode) {
 	log.AddPrefix("emitPay")
 	defer log.PopPrefix()
 	log.Printf("Policy Uid %s", policy.Uid)
@@ -99,7 +98,7 @@ func CreatePolicyTransactions(policy *models.Policy, product *models.Product, mg
 			log.ErrorF("error saving transaction %s to firestore: %s", tr.Uid, err.Error())
 			return "", err
 		}
-		tr.BigQuerySave("")
+		tr.BigQuerySave()
 
 		if tr.IsPay {
 			err = transaction.CreateNetworkTransactions(policy, &updatedTransactions[index], networkNode, mgaProduct)
@@ -115,7 +114,7 @@ func CreatePolicyTransactions(policy *models.Policy, product *models.Product, mg
 	return payUrl, err
 }
 
-func SetAdvance(policy *models.Policy, origin string, product *models.Product, mgaProduct *models.Product, networkNode *models.NetworkNode, paymentSplit string, paymentMode string) {
+func SetAdvance(policy *models.Policy, product *models.Product, mgaProduct *models.Product, networkNode *models.NetworkNode, paymentSplit string, paymentMode string) {
 	policy.Payment = models.ManualPaymentProvider
 	policy.IsPay = true
 	policy.Status = models.PolicyStatusPay

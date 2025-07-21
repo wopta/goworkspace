@@ -128,7 +128,7 @@ func (t *Transaction) BigQueryParse() {
 	t.BigEffectiveDate = lib.GetBigQueryNullDateTime(t.EffectiveDate)
 }
 
-func (t *Transaction) BigQuerySave(origin string) {
+func (t *Transaction) BigQuerySave() {
 	t.BigQueryParse()
 	log.Println("Transaction save BigQuery: " + t.Uid)
 

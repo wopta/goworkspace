@@ -8,7 +8,6 @@ type NamirialInput struct {
 	DocumentsFullPath []string
 	Policy            models.Policy
 	SendEmail         bool
-	Origin            string
 }
 
 type NamirialOutput struct {

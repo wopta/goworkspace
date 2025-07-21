@@ -29,7 +29,6 @@ func DeletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	log.Println("Handler start -----------------------------------------------")
 
-	origin := r.Header.Get("Origin")
 	policyUid := chi.URLParam(r, "uid")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
@@ -40,7 +39,10 @@ func DeletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		return "", nil, err
 	}
 
-	policy := GetPolicyByUid(policyUid, origin)
+	policy, err := GetPolicy(policyUid)
+	if err != nil {
+		return "", nil, err
+	}
 
 	deletePolicy(&policy, request)
 
@@ -55,7 +57,7 @@ func DeletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	log.Println("policy set to deleted in firestore")
 
 	log.Println("setting policy to delete in bigquery...")
-	policy.BigquerySave(origin)
+	policy.BigquerySave()
 
 	guaranteFire := lib.GuaranteeCollection
 	log.Println("updating policy's guarantees to delete in bigquery...")

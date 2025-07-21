@@ -37,7 +37,6 @@ func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface
 	onboardUserRequest.Email = lib.ToUpper(onboardUserRequest.Email)
 	onboardUserRequest.FiscalCode = lib.ToUpper(onboardUserRequest.FiscalCode)
 
-	origin := r.Header.Get("Origin")
 	fireUser := lib.UserCollection
 
 	canRegister, user, userId, email := CanUserRegisterUseCase(onboardUserRequest.FiscalCode)
@@ -87,7 +86,7 @@ func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface
 		lib.SetFirestore(fireUser, dbUser.UID, user)
 	}
 
-	err := user.BigquerySave(origin)
+	err := user.BigquerySave()
 	if err != nil {
 		log.ErrorF("error save user %s bigquery: %s", user.Uid, err.Error())
 	}

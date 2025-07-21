@@ -17,7 +17,7 @@ func DeletePolicy(policyUid string) {
 		transactions []models.Transaction
 	)
 
-	policy, err = plc.GetPolicy(policyUid, "")
+	policy, err = plc.GetPolicy(policyUid)
 	if err != nil {
 		log.Printf("error retrieving policy from Firestore: %s", err.Error())
 		return
@@ -36,9 +36,9 @@ func DeletePolicy(policyUid string) {
 	}
 
 	// save policy in BigQuery
-	policy.BigquerySave("")
+	policy.BigquerySave()
 
-	transactions = tr.GetPolicyTransactions("", policyUid)
+	transactions = tr.GetPolicyTransactions(policyUid)
 	for index, _ := range transactions {
 		transactions[index].IsDelete = true
 		transactions[index].Status = models.TransactionStatusDeleted
@@ -53,15 +53,15 @@ func DeletePolicy(policyUid string) {
 		}
 
 		// save transaction in BigQuery
-		transactions[index].BigQuerySave("")
+		transactions[index].BigQuerySave()
 	}
 
 }
 
 func SaveTransactionBigQuery(policyUid string) {
-	transactions := tr.GetPolicyTransactions("", policyUid)
+	transactions := tr.GetPolicyTransactions(policyUid)
 	for index, _ := range transactions {
 		// save transaction in BigQuery
-		transactions[index].BigQuerySave("")
+		transactions[index].BigQuerySave()
 	}
 }

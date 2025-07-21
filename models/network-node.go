@@ -132,7 +132,7 @@ func (nn *NetworkNode) SaveFirestore() error {
 	return err
 }
 
-func (nn *NetworkNode) SaveBigQuery(origin string) error {
+func (nn *NetworkNode) SaveBigQuery() error {
 	log.AddPrefix("NetworkNode.SaveBigQuery")
 	defer log.PopPrefix()
 

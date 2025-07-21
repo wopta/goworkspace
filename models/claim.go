@@ -48,7 +48,7 @@ type Claim struct {
 	Data              string                `firestore:"-"                           json:"-"                           bigquery:"data"`
 }
 
-func (claim *Claim) BigquerySave(origin string) error {
+func (claim *Claim) BigquerySave() error {
 	claim.BigCreationDate = lib.GetBigQueryNullDateTime(claim.CreationDate)
 	claim.BigDate = lib.GetBigQueryNullDateTime(claim.Date)
 	claim.BigUpdated = lib.GetBigQueryNullDateTime(claim.Updated)

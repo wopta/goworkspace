@@ -20,12 +20,11 @@ func DeleteNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	log.Println("Handler start -----------------------------------------------")
 
-	origin := r.Header.Get("Origin")
 	nodeUid := chi.URLParam(r, "uid")
 
 	log.Printf("deleting node %s from firestore...", nodeUid)
 
-	err = network.DeleteNetworkNodeByUid(origin, nodeUid)
+	err = network.DeleteNetworkNodeByUid(nodeUid)
 	if err != nil {
 		log.ErrorF("error deleting node %s from firestore", nodeUid)
 		return "", "", err

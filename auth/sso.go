@@ -27,7 +27,6 @@ func JwtAuaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 	log.Println("Handler start -----------------------------------------------")
 
-	origin = r.Header.Get("Origin")
 	tokenReq := r.URL.Query().Get("jwt")
 
 	log.Println("JwtFx request token:", tokenReq)
@@ -54,7 +53,7 @@ func JwtAuaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 					log.ErrorF("error updating node %s in Firestore: %s", node[0].Uid, e.Error())
 					return "", nil, e
 				}
-				e = node[0].SaveBigQuery("")
+				e = node[0].SaveBigQuery()
 				if e != nil {
 					log.ErrorF("error updating node %s in BigQuery: %s", node[0].Uid, e.Error())
 					return "", nil, e

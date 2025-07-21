@@ -81,11 +81,7 @@ func emitFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		authToken.Email,
 	)
 
-	origin := r.Header.Get("origin")
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		return "", nil, err
-	}
+	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
 	err = json.Unmarshal([]byte(body), &request)
@@ -100,7 +96,7 @@ func emitFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	paymentMode := request.PaymentMode
 	log.Printf("paymentMode: %s", paymentMode)
 
-	policy, err = plc.GetPolicy(uid, origin)
+	policy, err = plc.GetPolicy(uid)
 	lib.CheckError(err)
 	if policy.Channel == models.NetworkChannel && policy.ProducerUid != authToken.UserID {
 		log.Printf("user %s cannot emit policy %s because producer not equal to request user", authToken.UserID, policy.Uid)
@@ -125,7 +121,7 @@ func emitFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		log.Printf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
 		return "", nil, fmt.Errorf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
 	}
-	responseEmit, err = emitDraft(&policy, request, origin)
+	responseEmit, err = emitDraft(&policy, request)
 	if err != nil {
 		return "", nil, err
 	}
@@ -137,11 +133,9 @@ func emitFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	return string(b), responseEmit, err
 }
 
-func emitDraft(policy *models.Policy, request EmitRequest, origin string) (EmitResponse, error) {
+func emitDraft(policy *models.Policy, request EmitRequest) (EmitResponse, error) {
 	log.Println("start ------------------------------------------------")
 	var responseEmit EmitResponse
-
-	fireGuarantee := lib.GetDatasetByEnv(origin, lib.GuaranteeCollection)
 
 	log.Printf("Emitting - Policy Uid %s", policy.Uid)
 	log.Println("starting bpmn flow...")
@@ -159,7 +153,7 @@ func emitDraft(policy *models.Policy, request EmitRequest, origin string) (EmitR
 	storage.AddGlobal("paymentMode", &flow.String{String: request.PaymentMode})
 	storage.AddGlobal("addresses", &flow.Addresses{FromAddress: mail.AddressAnna})
 
-	flow, err := bpmn.GetFlow(policy, origin, storage)
+	flow, err := bpmn.GetFlow(policy, storage)
 	if err != nil {
 		return responseEmit, err
 	}
@@ -181,7 +175,7 @@ func emitDraft(policy *models.Policy, request EmitRequest, origin string) (EmitR
 	log.Printf("Policy %s: %s", request.Uid, string(policyJson))
 
 	log.Println("saving guarantees to bigquery...")
-	models.SetGuaranteBigquery(*policy, "emit", fireGuarantee)
+	models.SetGuaranteBigquery(*policy, "emit", lib.GuaranteeCollection)
 
 	log.Println("end --------------------------------------------------")
 	return responseEmit, nil

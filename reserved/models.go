@@ -17,7 +17,6 @@ type PolicyReservedWrapper struct {
 	Policy         *models.Policy
 	AlreadyCovered AlreadyCoveredAlgorithm
 	Evaluate       func(*PolicyReservedWrapper) (bool, *models.ReservedInfo, error)
-	Origin         string
 }
 
 func (w *PolicyReservedWrapper) evaluate() (bool, *models.ReservedInfo, error) {
@@ -28,12 +27,10 @@ func initWrapper(
 	p *models.Policy,
 	c AlreadyCoveredAlgorithm,
 	e func(*PolicyReservedWrapper) (bool, *models.ReservedInfo, error),
-	origin string,
 ) *PolicyReservedWrapper {
 	return &PolicyReservedWrapper{
 		Policy:         p,
 		AlreadyCovered: c,
 		Evaluate:       e,
-		Origin:         origin,
 	}
 }

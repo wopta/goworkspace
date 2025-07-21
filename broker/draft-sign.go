@@ -1,4 +1,4 @@
-package callback
+package broker
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	bpmn "gitlab.dev.wopta.it/goworkspace/bpmn"
+	"gitlab.dev.wopta.it/goworkspace/bpmn"
 	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
 	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib"
@@ -19,8 +19,8 @@ const (
 	namirialFinished string = "workstepFinished" // when the workstep was finished
 )
 
-func signFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
-	log.AddPrefix("SignFx")
+func DraftSignFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
+	log.AddPrefix("DraftSignFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")

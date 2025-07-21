@@ -14,10 +14,10 @@ func UpdatePolicyReserved(policy *models.Policy) map[string]interface{} {
 	return input
 }
 
-func UpdatePolicyReservedCoverage(policy *models.Policy, origin string) (map[string]interface{}, error) {
+func UpdatePolicyReservedCoverage(policy *models.Policy) (map[string]interface{}, error) {
 	input := make(map[string]interface{}, 0)
 
-	isReserved, reservedInfo, err := GetReservedInfoByCoverage(policy, origin)
+	isReserved, reservedInfo, err := GetReservedInfoByCoverage(policy)
 	input["isReserved"] = isReserved
 	input["reservedInfo"] = reservedInfo
 

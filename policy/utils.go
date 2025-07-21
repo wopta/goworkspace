@@ -15,7 +15,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func FillAttachments(policy *models.Policy, origin string) error {
+func FillAttachments(policy *models.Policy) error {
 	firePolicy := lib.PolicyCollection
 
 	if policy.Attachments == nil {
@@ -26,7 +26,7 @@ func FillAttachments(policy *models.Policy, origin string) error {
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
-func Sign(policy *models.Policy, origin string) error {
+func Sign(policy *models.Policy) error {
 	if !lib.SliceContains(policy.StatusHistory, models.PolicyStatusToSign) {
 		return errors.New("policy has not been set to be signed")
 	}
@@ -41,7 +41,7 @@ func Sign(policy *models.Policy, origin string) error {
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
-func SetToPay(policy *models.Policy, origin string) error {
+func SetToPay(policy *models.Policy) error {
 	firePolicy := lib.PolicyCollection
 
 	policy.Status = models.PolicyStatusToPay
@@ -51,7 +51,7 @@ func SetToPay(policy *models.Policy, origin string) error {
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
-func promoteContractorDocumentsToUser(policy *models.Policy, origin string) error {
+func promoteContractorDocumentsToUser(policy *models.Policy) error {
 	var (
 		tempPathFormat = "temp/%s/%s"
 		userPathFormat = "assets/users/%s/%s"
@@ -89,30 +89,30 @@ func promoteContractorDocumentsToUser(policy *models.Policy, origin string) erro
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
-func SetUserIntoPolicyContractor(policy *models.Policy, origin string) error {
+func SetUserIntoPolicyContractor(policy *models.Policy) error {
 	log.AddPrefix("setUserIntoPolicyContractor")
 	defer log.PopPrefix()
 	log.Printf("Policy %s", policy.Uid)
-	userUid, newUser, err := models.GetUserUIDByFiscalCode(origin, policy.Contractor.FiscalCode)
+	userUid, newUser, err := models.GetUserUIDByFiscalCode(policy.Contractor.FiscalCode)
 	if err != nil {
 		log.ErrorF("error finding user: %s", err.Error())
 		return err
 	}
 
 	policy.Contractor.Uid = userUid
-	err = promoteContractorDocumentsToUser(policy, origin)
+	err = promoteContractorDocumentsToUser(policy)
 	if err != nil {
 		log.ErrorF("error updating documents: %s", err.Error())
 		return err
 	}
 
-	err = promotePolicyAttachments(policy, origin)
+	err = promotePolicyAttachments(policy)
 	if err != nil {
 		log.ErrorF("error updating attachments: %s", err.Error())
 		return err
 	}
 
-	err = promoteNamirialDirectory(policy, origin)
+	err = promoteNamirialDirectory(policy)
 	if err != nil {
 		log.ErrorF("error promoting namirial documents: %s", err.Error())
 		return err
@@ -127,20 +127,20 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) error {
 			log.ErrorF("error creating/updating user %s: %s", policy.Contractor.Uid, err.Error())
 			return err
 		}
-		return policy.Contractor.BigquerySave(origin)
+		return policy.Contractor.BigquerySave()
 	}
 
 	user := policy.Contractor.ToUser()
 	if user == nil {
 		return fmt.Errorf("invalid user")
 	}
-	_, err = models.UpdateUserByFiscalCode(origin, *user)
+	_, err = models.UpdateUserByFiscalCode(*user)
 	return err
 }
 
 // Download the signed file from the envelope, add them inside the policy's attachments and save the policy.
 // The name of the attachment is given by file's name sent to namirial(with the extension removed)
-func AddSignedDocumentsInPolicy(policy *models.Policy, origin string) error {
+func AddSignedDocumentsInPolicy(policy *models.Policy) error {
 	log.AddPrefix("AddDocumentsInPolicy")
 	defer log.PopPrefix()
 	if slices.Contains(policy.StatusHistory, models.PolicyStatusManualSigned) {
@@ -199,7 +199,7 @@ func AddSignedDocumentsInPolicy(policy *models.Policy, origin string) error {
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
-func Pay(policy *models.Policy, origin string) error {
+func Pay(policy *models.Policy) error {
 	firePolicy := lib.PolicyCollection
 
 	policy.IsPay = true
@@ -210,7 +210,7 @@ func Pay(policy *models.Policy, origin string) error {
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
-func promotePolicyAttachments(policy *models.Policy, origin string) error {
+func promotePolicyAttachments(policy *models.Policy) error {
 	const (
 		tempPathFormat string = "temp/%s/%s"
 		userPathFormat string = "assets/users/%s/%s"
@@ -240,7 +240,7 @@ func promotePolicyAttachments(policy *models.Policy, origin string) error {
 	return nil
 }
 
-func promoteNamirialDirectory(policy *models.Policy, origin string) error {
+func promoteNamirialDirectory(policy *models.Policy) error {
 	const (
 		tempPathFormat string = "temp/%s/namirial"
 		userPathFormat string = "assets/users/%s/namirial/%v"
@@ -264,8 +264,8 @@ func promoteNamirialDirectory(policy *models.Policy, origin string) error {
 	return err
 }
 
-func AddProposalDoc(origin string, policy *models.Policy, networkNode *models.NetworkNode, mgaProduct *models.Product) error {
-	fileGenerated, err := document.Proposal(origin, policy, networkNode, mgaProduct)
+func AddProposalDoc(policy *models.Policy, networkNode *models.NetworkNode, mgaProduct *models.Product) error {
+	fileGenerated, err := document.Proposal(policy, networkNode, mgaProduct)
 	if err != nil {
 		log.Error(err)
 		return err

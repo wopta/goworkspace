@@ -45,7 +45,6 @@ func requestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		authToken.Email,
 	)
 
-	origin := r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
@@ -56,7 +55,7 @@ func requestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	}
 
 	log.Printf("fetching policy %s from Firestore...", req.PolicyUid)
-	policy, err = plc.GetPolicy(req.PolicyUid, origin)
+	policy, err = plc.GetPolicy(req.PolicyUid)
 	if err != nil {
 		log.ErrorF("error fetching policy %s from Firestore...", req.PolicyUid)
 		return "", nil, err
@@ -77,7 +76,7 @@ func requestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	brokerUpdatePolicy(&policy, req)
 
-	err = requestApproval(&policy, origin)
+	err = requestApproval(&policy)
 	if err != nil {
 		log.ErrorF("error request approval: %s", err.Error())
 		return "", nil, err
@@ -90,7 +89,7 @@ func requestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	return string(jsonOut), policy, err
 }
 
-func requestApproval(policy *models.Policy, origin string) error {
+func requestApproval(policy *models.Policy) error {
 	var (
 		err error
 	)
@@ -106,7 +105,7 @@ func requestApproval(policy *models.Policy, origin string) error {
 	storage.AddGlobal("addresses", &flow.Addresses{
 		FromAddress: mail.AddressAnna,
 	})
-	flow, err := bpmn.GetFlow(policy, origin, storage)
+	flow, err := bpmn.GetFlow(policy, storage)
 	if err != nil {
 		return err
 	}
@@ -114,6 +113,6 @@ func requestApproval(policy *models.Policy, origin string) error {
 
 	log.Println("Handler end -------------------------------------------------")
 
-	policy.BigquerySave(origin)
+	policy.BigquerySave()
 	return err
 }

@@ -55,7 +55,11 @@ func RestoreTransactions(inputStatus string) {
 
 		if policyMap[tr.PolicyUid] == nil {
 			policyMap[tr.PolicyUid] = new(models.Policy)
-			*policyMap[tr.PolicyUid] = policy.GetPolicyByUid(tr.PolicyUid, "")
+			*policyMap[tr.PolicyUid], err = policy.GetPolicy(tr.PolicyUid)
+			if err != nil {
+				log.Error(err)
+				return
+			}
 		}
 
 		plc := *policyMap[tr.PolicyUid]
@@ -77,7 +81,7 @@ func RestoreTransactions(inputStatus string) {
 			log.ErrorF("error saving transaction to firestore: %s", err.Error())
 			return
 		}
-		tr.BigQuerySave("")
+		tr.BigQuerySave()
 	}
 
 	rawOutput, err := json.Marshal(outputTransactions)

@@ -5,7 +5,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func gapSogessurProposalV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode) (DocumentGenerated, error) {
+func gapSogessurProposalV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode) (DocumentGenerated, error) {
 	gapHeaderV1(pdf, policy, networkNode, true)
 
 	gapFooterV1(pdf, policy.NameDesc)
@@ -45,7 +45,7 @@ func gapSogessurProposalV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy,
 
 	printStatement(pdf, statements[len(statements)-1], policy.Company, true)
 
-	generatePolicyAnnex(pdf, origin, networkNode, policy, setAnnexHeaderFooter(pdf, networkNode, true))
+	generatePolicyAnnex(pdf, networkNode, policy, setAnnexHeaderFooter(pdf, networkNode, true))
 
 	woptaHeader(pdf, true)
 

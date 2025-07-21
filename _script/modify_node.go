@@ -23,5 +23,5 @@ func modifyNodeFacile(warrant string) error {
 	if err != nil {
 		return err
 	}
-	return node.SaveBigQuery("")
+	return node.SaveBigQuery()
 }

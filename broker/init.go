@@ -93,7 +93,7 @@ func InitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		return "", nil, err
 	}
 
-	policy.BigquerySave("")
+	policy.BigquerySave()
 
 	rawPolicy, err := json.Marshal(policy)
 

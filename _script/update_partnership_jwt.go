@@ -41,7 +41,7 @@ func UpdatePartnershipNodeJwt() {
 			if err != nil {
 				log.Println(err.Error())
 			}
-			err = node.SaveBigQuery("")
+			err = node.SaveBigQuery()
 			if err != nil {
 				log.Println(node.Uid + " error: " + err.Error())
 			}

@@ -50,7 +50,7 @@ func GetTransactionsByPolicyUidFx(w http.ResponseWriter, r *http.Request) (strin
 		}
 	}
 
-	transactions := GetPolicyTransactions(r.Header.Get("origin"), policyUid)
+	transactions := GetPolicyTransactions(policyUid)
 
 	response.Transactions = transactions
 
@@ -59,7 +59,7 @@ func GetTransactionsByPolicyUidFx(w http.ResponseWriter, r *http.Request) (strin
 	return string(jsonOut), response, err
 }
 
-func GetPolicyTransactions(origin string, policyUid string) []models.Transaction {
+func GetPolicyTransactions(policyUid string) []models.Transaction {
 	var transactions Transactions
 
 	fireTransactions := models.TransactionsCollection

@@ -22,13 +22,11 @@ func AddPayHandlers(builder *bpmnEngine.BpnmBuilder) error {
 
 func updatePolicy(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
-	var origin *flow.String
 	var networkNode *flow.Network
 	var flowName *flow.String
 	var addresses *flow.Addresses
 	err := bpmnEngine.IsError(
 		bpmnEngine.GetDataRef("policy", &policy, state),
-		bpmnEngine.GetDataRef("origin", &origin, state),
 		bpmnEngine.GetDataRef("networkNode", &networkNode, state),
 		bpmnEngine.GetDataRef("flowName", &flowName, state),
 		bpmnEngine.GetDataRef("addresses", &addresses, state),
@@ -43,33 +41,33 @@ func updatePolicy(state *bpmnEngine.StorageBpnm) error {
 	}
 
 	// Add Policy contract
-	err = plc.AddSignedDocumentsInPolicy(policy.Policy, origin.String)
+	err = plc.AddSignedDocumentsInPolicy(policy.Policy)
 	if err != nil {
 		log.ErrorF("ERROR AddContract %s", err.Error())
 		return err
 	}
 
 	// promote documents from temp bucket to user and connect it to policy
-	err = plc.SetUserIntoPolicyContractor(policy.Policy, origin.String)
+	err = plc.SetUserIntoPolicyContractor(policy.Policy)
 	if err != nil {
 		log.ErrorF("ERROR SetUserIntoPolicyContractor %s", err.Error())
 		return err
 	}
 
 	// Update Policy as paid
-	err = plc.Pay(policy.Policy, origin.String)
+	err = plc.Pay(policy.Policy)
 	if err != nil {
 		log.ErrorF("ERROR Policy Pay %s", err.Error())
 		return err
 	}
 
-	err = network.UpdateNetworkNodePortfolio(origin.String, policy.Policy, networkNode.NetworkNode)
+	err = network.UpdateNetworkNodePortfolio(policy.Policy, networkNode.NetworkNode)
 	if err != nil {
 		log.ErrorF("error updating %s portfolio %s", networkNode.Type, err.Error())
 		return err
 	}
 
-	policy.BigquerySave(origin.String)
+	policy.BigquerySave()
 
 	addresses.ToAddress = mail.GetContractorEmail(policy.Policy)
 	switch flowName.String {
@@ -90,12 +88,10 @@ func updatePolicy(state *bpmnEngine.StorageBpnm) error {
 func payTransaction(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var paymentInfo *flow.PaymentInfoBpmn
-	var origin *flow.String
 	var networkNode *flow.Network
 	err := bpmnEngine.IsError(
 		bpmnEngine.GetDataRef("policy", &policy, state),
 		bpmnEngine.GetDataRef("paymentInfo", &paymentInfo, state),
-		bpmnEngine.GetDataRef("origin", &origin, state),
 		bpmnEngine.GetDataRef("networkNode", &networkNode, state),
 	)
 	if err != nil {
@@ -104,13 +100,13 @@ func payTransaction(state *bpmnEngine.StorageBpnm) error {
 
 	providerId := paymentInfo.FabrickCallback.PaymentID
 	transaction, _ := tr.GetTransactionToBePaid(policy.Uid, *providerId, paymentInfo.Schedule, lib.TransactionsCollection)
-	err = tr.Pay(&transaction, origin.String, paymentInfo.PaymentMethod)
+	err = tr.Pay(&transaction, paymentInfo.PaymentMethod)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
 
-	transaction.BigQuerySave(origin.String)
+	transaction.BigQuerySave()
 
 	mgaProduct := prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 	return tr.CreateNetworkTransactions(policy.Policy, &transaction, networkNode.NetworkNode, mgaProduct)

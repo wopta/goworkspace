@@ -39,8 +39,7 @@ func GetPolicyTransactionsFx(w http.ResponseWriter, r *http.Request) (string, in
 		return "", nil, err
 	}
 
-	origin := r.Header.Get("origin")
-	policy, err := plc.GetPolicy(policyUid, origin)
+	policy, err := plc.GetPolicy(policyUid)
 	if err != nil {
 		log.ErrorF("error fetching policy %s from Firestore: %s", policyUid, err.Error())
 		return "", nil, err
@@ -53,7 +52,7 @@ func GetPolicyTransactionsFx(w http.ResponseWriter, r *http.Request) (string, in
 		return "", response, fmt.Errorf("%s %s unauthorized for policy %s", authToken.Role, userUid, policyUid)
 	}
 
-	transactions := transaction.GetPolicyTransactions(r.Header.Get("Origin"), policyUid)
+	transactions := transaction.GetPolicyTransactions(policyUid)
 
 	response.Transactions = transactions
 

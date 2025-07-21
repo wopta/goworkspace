@@ -40,7 +40,7 @@ func UpdateNetworkNodesCodes() {
 		if nn.Type == models.PartnershipNetworkNodeType {
 			notUpdatedNodes++
 			log.Printf("Partnership Uid: %s", nn.Uid)
-			nn.SaveBigQuery("")
+			nn.SaveBigQuery()
 			continue
 		} else if nn.Type != models.AgencyNetworkNodeType && nn.Type != models.AgentNetworkNodeType {
 			log.Printf("Network Node %s Not Updated", nn.Code)
@@ -103,7 +103,7 @@ func UpdateNetworkNodesCodes() {
 		if err != nil {
 			log.Println(err.Error())
 		}
-		err = nn.SaveBigQuery("")
+		err = nn.SaveBigQuery()
 		if err != nil {
 			log.Println(nn.Uid + " error: " + err.Error())
 		}

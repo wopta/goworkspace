@@ -443,6 +443,6 @@ func setCompanyEmitted(policies []models.Policy) {
 		policy.CompanyEmitted = true
 		policy.Updated = time.Now().UTC()
 		lib.SetFirestore(lib.PolicyCollection, policy.Uid, policy)
-		policy.BigquerySave("")
+		policy.BigquerySave()
 	}
 }

@@ -97,7 +97,7 @@ func lead(authToken models.AuthToken, policy *models.Policy, origin string) erro
 	storage.AddGlobal("addresses", &flow.Addresses{
 		FromAddress: mail.AddressAnna,
 	})
-	flowLead, e := bpmn.GetFlow(policy, origin, storage)
+	flowLead, e := bpmn.GetFlow(policy, storage)
 	if e != nil {
 		return e
 	}

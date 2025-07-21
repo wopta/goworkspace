@@ -100,10 +100,10 @@ func User(w http.ResponseWriter, r *http.Request) {
 
 // Consider moving into policy, as User is a dependency of Policy
 // and User does not need to know what a Policy is.
-func SetUserIntoPolicyContractor(policy *models.Policy, origin string) {
+func SetUserIntoPolicyContractor(policy *models.Policy) {
 	log.AddPrefix("SetUserIntoPolicyContractor")
 	defer log.PopPrefix()
-	userUID, newUser, err := models.GetUserUIDByFiscalCode(origin, policy.Contractor.FiscalCode)
+	userUID, newUser, err := models.GetUserUIDByFiscalCode(policy.Contractor.FiscalCode)
 	lib.CheckError(err)
 
 	policy.Contractor.Uid = userUID
@@ -136,7 +136,7 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) {
 		policy.Contractor.UpdatedDate = policy.Contractor.CreationDate
 		fireUsers := lib.UserCollection
 		lib.SetFirestore(fireUsers, userUID, policy.Contractor)
-		err = policy.Contractor.BigquerySave(origin)
+		err = policy.Contractor.BigquerySave()
 		if err != nil {
 			log.ErrorF("error save user %s bigquery\n", policy.Contractor.Uid)
 		}
@@ -148,6 +148,6 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) {
 		return
 	}
 
-	_, err = models.UpdateUserByFiscalCode(origin, *user)
+	_, err = models.UpdateUserByFiscalCode(*user)
 	lib.CheckError(err)
 }
