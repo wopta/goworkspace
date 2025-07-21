@@ -235,10 +235,10 @@ func (c *CatnatGenerator) addTableGuarantee() {
 		return result
 	}
 	guaranteeData := [][]string{
-		{"Garanzie", "Somma Assicurata Fabricato$", "Somma Assicurata Contenuto", "Somma Assicurata Merci", "Importo Annuo"},
-		{"Terremoto", "100.000", "50.000", "====", "150,94"},
-		{"Alluvione", "100.000", "50.000", "====", "150,94"},
-		{"Frane", "100.000", "50.000", "====", "150,94"},
+		{"Garanzie", "Somma Assicurata Fabricato €", "Somma Assicurata Contenuto €", "Somma Assicurata Merci €", "Importo Annuo €"},
+		{"Terremoto", "100.000 €", "50.000 €", "====", "150,94 €"},
+		{"Alluvione", "100.000 €", "50.000 €", "====", "150,94 €"},
+		{"Frane", "100.000 €", "50.000 €", "====", "150,94 €"},
 	}
 	c.engine.DrawTable(guranteeTable(guaranteeData))
 }

@@ -98,7 +98,6 @@ type Policy struct {
 	BigAcceptanceDate bigquery.NullDateTime        `json:"-" firestore:"-" bigquery:"acceptanceDate"`
 	Step              string                       `json:"step,omitempty" firestore:"step,omitempty" bigquery:"step"`
 	ProducerCode      string                       `json:"producerCode,omitempty" firestore:"producerCode,omitempty" bigquery:"producerCode"`
-	NetworkUid        string                       `json:"networkUid" firestore:"networkUid" bigquery:"networkUid"`
 	ProducerUid       string                       `json:"producerUid" firestore:"producerUid" bigquery:"producerUid"`
 	ProducerType      string                       `json:"producerType" firestore:"producerType" bigquery:"producerType"`
 	Annuity           int                          `json:"annuity" firestore:"annuity" bigquery:"annuity"`
@@ -115,6 +114,7 @@ type Policy struct {
 	PaymentComponents PaymentComponents            `json:"paymentComponents" firestore:"paymentComponents" bigquery:"-"`
 
 	// DEPRECATED FIELDS
+	NetworkUid      string          `json:"networkUid" firestore:"networkUid" bigquery:"networkUid"`
 	ContractFileId  string          `firestore:"contractFileId,omitempty" json:"contractFileId,omitempty" bigquery:"contractFileId"`
 	RejectReasons   string          `json:"rejectReasons,omitempty" firestore:"rejectReasons,omitempty" bigquery:"-"`     // DEPRECATED
 	AgentUid        string          `json:"agentUid,omitempty" firestore:"agentUid,omitempty" bigquery:"agentUid"`        // DEPRECATED
