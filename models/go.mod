@@ -9,7 +9,7 @@ require (
 	cloud.google.com/go/bigquery v1.61.0
 	cloud.google.com/go/firestore v1.15.0
 	github.com/golang-jwt/jwt/v4 v4.5.0
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.190
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.191
 	golang.org/x/oauth2 v0.20.0
 	google.golang.org/api v0.181.0
 	google.golang.org/genproto v0.0.0-20240515191416-fc5f0ca64291

@@ -9,8 +9,8 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-gota/gota v0.12.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.190
-	gitlab.dev.wopta.it/goworkspace/quote v1.0.261
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.191
+	gitlab.dev.wopta.it/goworkspace/quote v1.0.262
 )
 
 require (
@@ -77,13 +77,13 @@ require (
 	github.com/xuri/excelize/v2 v2.8.1 // indirect
 	github.com/xuri/nfp v0.0.0-20230919160717-d98342af3f05 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
-	gitlab.dev.wopta.it/goworkspace/document v1.1.238 // indirect
-	gitlab.dev.wopta.it/goworkspace/models v1.2.92 // indirect
-	gitlab.dev.wopta.it/goworkspace/network v1.0.160 // indirect
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.281 // indirect
-	gitlab.dev.wopta.it/goworkspace/product v1.1.91 // indirect
-	gitlab.dev.wopta.it/goworkspace/sellable v1.0.201 // indirect
-	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.32 // indirect
+	gitlab.dev.wopta.it/goworkspace/document v1.1.239 // indirect
+	gitlab.dev.wopta.it/goworkspace/models v1.2.93 // indirect
+	gitlab.dev.wopta.it/goworkspace/network v1.0.161 // indirect
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.282 // indirect
+	gitlab.dev.wopta.it/goworkspace/product v1.1.92 // indirect
+	gitlab.dev.wopta.it/goworkspace/sellable v1.0.202 // indirect
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.33 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.54.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.54.0 // indirect
