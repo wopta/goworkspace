@@ -399,7 +399,12 @@ func mappingQuoteResponseToGuarantee(quoteResponse QuoteResponse, policy *models
 	for i := range policy.Assets[0].Guarantees {
 		policy.Assets[0].Guarantees[i].Value.PremiumGrossYearly = 0
 	}
-	rates := float64(models.PaySplitRateMap[models.PaySplit(policy.PaymentSplit)])
+	split := policy.PaymentSplit
+	if split == "" {
+		log.Printf("split isnt inserted, use default '%s'", models.PaySplitYearly)
+		split = string(models.PaySplitYearly)
+	}
+	rates := float64(models.PaySplitRateMap[models.PaySplit(split)])
 	if rates == 0 {
 		return errors.New("Rates is 0")
 	}
@@ -429,14 +434,13 @@ func mappingQuoteResponseToPolicy(quoteResponse QuoteResponse, policy *models.Po
 	if split == "" {
 		log.Printf("split isnt inserted, use default '%s'", models.PaySplitYearly)
 		split = string(models.PaySplitYearly)
-
 	}
 	policy.OffersPrices = map[string]map[string]*models.Price{
 		"default": {
 			split: &models.Price{},
 		},
 	}
-	rates := float64(models.PaySplitRateMap[models.PaySplit(policy.PaymentSplit)])
+	rates := float64(models.PaySplitRateMap[models.PaySplit(split)])
 	if rates == 0 {
 		return errors.New("Rates is 0")
 	}
