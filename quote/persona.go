@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"slices"
 	"strconv"
+	"strings"
 	"time"
 
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
@@ -49,7 +50,11 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	flow := authToken.GetChannelByRoleV2()
 
 	log.Println("loading network node")
-	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
+	nodeUid := policy.PartnershipName
+	if strings.EqualFold(policy.Channel, models.NetworkChannel) {
+		nodeUid = authToken.UserID
+	}
+	networkNode := network.GetNetworkNodeByUid(nodeUid)
 	if networkNode != nil {
 		warrant = networkNode.GetWarrant()
 		if warrant != nil {

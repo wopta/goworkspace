@@ -61,7 +61,11 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	flow := channel
 
 	log.Println("loading network node")
-	networkNode := network.GetNetworkNodeByUid(data.ProducerUid)
+	nodeUid := data.PartnershipName
+	if strings.EqualFold(channel, models.NetworkChannel) {
+		nodeUid = authToken.UserID
+	}
+	networkNode := network.GetNetworkNodeByUid(nodeUid)
 	if networkNode != nil {
 		warrant = networkNode.GetWarrant()
 		if warrant != nil {
@@ -188,6 +192,7 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 	}
 
 	log.Println("check monthly limit")
+	log.PrintStruct("-----", data)
 
 	monthlyToBeRemoved := !ruleProduct.Companies[0].IsMonthlyPaymentAvailable ||
 		data.OffersPrices["default"]["monthly"].Gross < ruleProduct.Companies[0].MinimumMonthlyPrice
