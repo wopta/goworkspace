@@ -1,7 +1,6 @@
 package contract
 
 import (
-	"strings"
 	"time"
 
 	"gitlab.dev.wopta.it/goworkspace/document/internal/constants"
@@ -119,7 +118,6 @@ func (c *CatnatGenerator) addCatnatHeader() {
 		return result
 	}
 	c.engine.SetHeader(func() {
-		c.engine.WriteText(c.engine.GetTableCell(""))
 		c.engine.DrawTable(parseLogos([]string{"				Wopta per te", "Catastrofali Azienda"}))
 		c.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_vita.png", 10, 15, 13, 13)
 		c.engine.NewLine(4)
@@ -132,27 +130,77 @@ func (c *CatnatGenerator) addCatnatHeading() {
 	c.engine.WriteText(c.engine.GetTableCell("DATI DEL PREVENIVO", constants.BoldFontStyle, constants.PinkColor, domain.FontSize(10)))
 	c.engine.NewLine(5)
 	c.engine.WriteText(c.engine.GetTableCell("DATI SEDE DA ASSICURARE", constants.BoldFontStyle, domain.FontSize(12)))
-	c.engine.DrawLine(10, c.engine.GetY(), 200, c.engine.GetY(), 0.25, constants.PinkColor)
+	c.engine.SetDrawColor(constants.PinkColor)
 	c.engine.NewLine(2)
 	const (
-		firstColumnWidth  = 35
-		secondColumnWidth = 95
-		thirdColumnWidth  = 25
+		firstColumnWidth  = 65
+		secondColumnWidth = 45
+		thirdColumnWidth  = 40
 		fourthColumnWidth = 35
 	)
+	parserTableSede := func(lines [][]string) [][]domain.TableCell {
+		result := make([][]domain.TableCell, 0, len(lines))
+		for _, texts := range lines {
+			result = append(result, []domain.TableCell{
+				{
+					Text:      texts[0],
+					Height:    constants.CellHeight,
+					Width:     firstColumnWidth,
+					FontStyle: constants.BoldFontStyle,
+					FontColor: constants.BlackColor,
+					Fill:      false,
+					FontSize:  constants.RegularFontSize,
+					FillColor: domain.Color{},
+					Align:     constants.LeftAlign,
+					Border:    "T",
+				},
+				{
+					Text:      texts[1],
+					Height:    constants.CellHeight,
+					FontStyle: constants.RegularFontStyle,
+					Width:     secondColumnWidth,
+					FontColor: constants.BlackColor,
+					FontSize:  constants.RegularFontSize,
+					Fill:      false,
+					FillColor: domain.Color{},
+					Align:     constants.LeftAlign,
+					Border:    "T",
+				},
+				{
+					Text:      texts[2],
+					Height:    constants.CellHeight,
+					FontStyle: constants.BoldFontStyle,
+					FontColor: constants.BlackColor,
+					Width:     thirdColumnWidth,
+					FontSize:  constants.RegularFontSize,
+					Fill:      false,
+					FillColor: domain.Color{},
+					Align:     constants.LeftAlign,
+					Border:    "T",
+				}, {
+					Text:      texts[3],
+					Height:    constants.CellHeight,
+					FontStyle: constants.RegularFontStyle,
+					FontColor: constants.BlackColor,
+					Width:     thirdColumnWidth,
+					FontSize:  constants.RegularFontSize,
+					Fill:      false,
+					FillColor: domain.Color{},
+					Align:     constants.LeftAlign,
+					Border:    "T",
+				},
+			})
+		}
+
+		return result
+	}
 	dataSede := [][]string{
-		{"Indirizzo", "bla bla indirizzo", "Tipo Utilizzo Sede", "conduttore"},
-		{"Anno di costruzione", "bla bla costruzione", "Materiale di costruzione", "materiale"},
-		{"Numero di piani edificio oltre il piano terra", "bla bla numero", "", ""},
+		{"Indirizzo:", c.dto.Sede.Address, "Tipo Utilizzo Sede:", c.dto.Sede.Type},
+		{"Anno di costruzione:", c.dto.Sede.BuildingYear, "Materiale di costruzione:", c.dto.Sede.BuildingMaterial},
+		{"Numero di piani edificio oltre il piano terra:", c.dto.Sede.Floor, "", ""},
 	}
-	spaces := []int{
-		100, 72, 0,
-	}
-	for i, line := range dataSede {
-		space := strings.Repeat(" ", int(spaces[i]))
-		c.baseGenerator.engine.WriteTexts(c.engine.GetTableCell(line[0]+"  ", constants.BoldFontStyle), c.engine.GetTableCell(line[1]), c.engine.GetTableCell(space+line[2]+"  ", constants.BoldFontStyle), c.engine.GetTableCell(line[3]))
-		c.engine.DrawLine(10, c.engine.GetY(), 200, c.engine.GetY(), 0.25, constants.PinkColor)
-	}
+	c.engine.DrawTable(parserTableSede(dataSede))
+	c.engine.DrawLine(10, c.engine.GetY()-3, 200, c.engine.GetY()-3, 0.25, constants.PinkColor)
 }
 
 func (c *CatnatGenerator) addTableGuarantee() {
@@ -236,21 +284,21 @@ func (c *CatnatGenerator) addTableGuarantee() {
 	}
 	guaranteeData := [][]string{
 		{"Garanzie", "Somma Assicurata Fabricato €", "Somma Assicurata Contenuto €", "Somma Assicurata Merci €", "Importo Annuo €"},
-		{"Terremoto", "100.000 €", "50.000 €", "====", "150,94 €"},
-		{"Alluvione", "100.000 €", "50.000 €", "====", "150,94 €"},
-		{"Frane", "100.000 €", "50.000 €", "====", "150,94 €"},
+		{"Terremoto", c.dto.EarthquakeGuarantee.Building, c.dto.EarthquakeGuarantee.Content, c.dto.EarthquakeGuarantee.Stock, c.dto.EarthquakeGuarantee.Total},
+		{"Alluvione", c.dto.FloodGuarantee.Building, c.dto.FloodGuarantee.Content, c.dto.FloodGuarantee.Stock, c.dto.FloodGuarantee.Total},
+		{"Frane", c.dto.LandslideGuarantee.Building, c.dto.LandslideGuarantee.Content, c.dto.LandslideGuarantee.Stock, c.dto.LandslideGuarantee.Total},
 	}
 	c.engine.DrawTable(guranteeTable(guaranteeData))
 }
 
 func (c *CatnatGenerator) addFrazionamento() {
-	c.engine.WriteText(c.engine.GetTableCell("Frazionamento: "+"pippo", constants.BoldFontStyle))
+	c.engine.WriteText(c.engine.GetTableCell("Frazionamento: "+c.dto.PaymentSplit, constants.BoldFontStyle))
 	c.engine.NewLine(8)
-	c.engine.WriteTexts(c.engine.GetTableCell("Premio di polizza ", constants.BoldFontStyle), c.engine.GetTableCell("wwee"))
-	c.engine.WriteTexts(c.engine.GetTableCell("Contributo servizi di intermediazione annuale ", constants.BoldFontStyle), c.engine.GetTableCell("fjdsklfds"))
-	c.engine.WriteTexts(c.engine.GetTableCell("Totale da pagare ", constants.BoldFontStyle), c.engine.GetTableCell("fjdsklfds"))
+	c.engine.WriteTexts(c.engine.GetTableCell("Premio di polizza ", constants.BoldFontStyle), c.engine.GetTableCell(c.dto.Prize.Gross.Text))
+	c.engine.WriteTexts(c.engine.GetTableCell("Contributo servizi di intermediazione annuale ", constants.BoldFontStyle), c.engine.GetTableCell(c.dto.Prize.Consultancy.Text))
+	c.engine.WriteTexts(c.engine.GetTableCell("Totale da pagare ", constants.BoldFontStyle), c.engine.GetTableCell(c.dto.Prize.Total.Text))
 	c.engine.NewLine(4)
-	c.engine.WriteText(c.engine.GetTableCell("Milano, il pippo/pippo/pippo", constants.BoldFontStyle))
+	c.engine.WriteText(c.engine.GetTableCell("Milano, "+c.now.Format(constants.DayMonthYearFormat), constants.BoldFontStyle))
 }
 
 func (c *CatnatGenerator) addSetInformativoInfo() {

@@ -1,6 +1,8 @@
 package dto
 
 import (
+	"strings"
+
 	"gitlab.dev.wopta.it/goworkspace/document/internal/constants"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
@@ -8,6 +10,7 @@ import (
 type buildingDTO struct {
 	StreetName       string
 	StreetNumber     string
+	Address          string
 	City             string
 	PostalCode       string
 	CityCode         string
@@ -79,6 +82,9 @@ func (b *buildingDTO) fromPolicy(building models.Building, guarantees []models.G
 	}
 
 	for _, guarantee := range guarantees {
-		b.Guarantees[guarantee.Slug].fromPolicy(guarantee)
+		if _, ok := b.Guarantees[guarantee.Slug]; ok {
+			b.Guarantees[guarantee.Slug].fromPolicy(guarantee)
+		}
 	}
+	b.Address = strings.ToUpper(b.StreetName + ", " + b.StreetNumber + "\n" + b.PostalCode + " " + b.City + " (" + b.CityCode + ")\n")
 }
