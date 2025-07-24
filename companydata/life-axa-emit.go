@@ -161,15 +161,15 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	}
 	return "", nil, e
 }
-func mapContractorTypeAxaPLife(policy models.Policy) (models.Contractor, string) {
-	contractor := policy.Contractor
+func mapContractorTypeAxaPLife(policy *models.Policy) string {
 	typeContractorAxa := ""
 	if policy.Contractor.Type == "legalEntity" {
 		typeContractorAxa = "PG"
+		policy.Contractor.Residence = policy.Contractor.CompanyAddress
 	} else {
 		typeContractorAxa = "PF"
 	}
-	return contractor, typeContractorAxa
+	return typeContractorAxa
 }
 func fixImportedId(policy models.Policy) string {
 	result := policy.CodeCompany
@@ -186,6 +186,7 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 	)
 
 	log.Println("LifeAxalEmit:  policy.Uid: ", policy.Uid)
+	typeContractorAxa := mapContractorTypeAxaPLife(&policy)
 	fil := df.Filter(
 		dataframe.F{Colidx: 4, Colname: "CAP", Comparator: series.Eq, Comparando: policy.Contractor.Residence.PostalCode},
 	)
@@ -219,6 +220,7 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 
 			beneficiary1, beneficiary1S, beneficiary1T = mapBeneficiary(g, 0) //Codice Fiscale Beneficiario
 			beneficiary2, beneficiary2S, _ = mapBeneficiary(g, 0)
+			log.PrintStruct("-----------", beneficiary1S)
 			if policy.PaymentSplit == string(models.PaySplitMonthly) {
 				price = g.Value.PremiumGrossMonthly
 			} else {
@@ -259,7 +261,7 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 				"",                                              //Stato occupazionale dell'Assicurato
 				"1",                                             //Tipo aderente
 				channel,                                         //Canale di vendita
-				"PF",                                            //Tipo contraente / Contraente
+				typeContractorAxa,                               //Tipo contraente / Contraente
 				policy.Contractor.Surname,                       //Denominazione Sociale o Cognome contraente
 				policy.Contractor.Name,                          //campo vuoto o nome
 				policy.Contractor.Gender,                        //Sesso
@@ -696,6 +698,9 @@ func mapBeneficiary(g models.Guarante, b int) (string, models.Beneficiary, strin
 			}
 
 		}
+	}
+	if resulStruct.Residence == nil {
+		resulStruct.Residence = resulStruct.CompanyAddress
 	}
 	return result, resulStruct, result2
 }
