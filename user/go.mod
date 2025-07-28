@@ -8,10 +8,10 @@ require (
 	firebase.google.com/go/v4 v4.10.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.192
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.216
-	gitlab.dev.wopta.it/goworkspace/models v1.2.94
-	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.34
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.193
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.217
+	gitlab.dev.wopta.it/goworkspace/models v1.2.95
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.35
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
 
 )
@@ -73,7 +73,7 @@ require (
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
-	gitlab.dev.wopta.it/goworkspace/network v1.0.162 // indirect
+	gitlab.dev.wopta.it/goworkspace/network v1.0.163 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.49.0 // indirect
