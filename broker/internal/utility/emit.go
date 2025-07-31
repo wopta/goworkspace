@@ -45,6 +45,7 @@ func SignFiles(policy *models.Policy, product *models.Product, networkNode *mode
 		}
 		namirialInput.DocumentsFullPath = append(namirialInput.DocumentsFullPath, document.FullPath)
 	}
+	//}
 	for _, path := range fullPathDocumentToSign {
 		namirialInput.DocumentsFullPath = append(namirialInput.DocumentsFullPath, path)
 	}

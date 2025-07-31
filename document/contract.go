@@ -51,8 +51,10 @@ func ContractObj(data models.Policy, networkNode *models.NetworkNode, product *m
 			pdf := engine.NewFpdf()
 			document, err = lifeContract(pdf, &data, networkNode, product)
 		case models.CatNatProduct:
-			//TODO: to change
-			//filename, out = "prova catnat contratto", []byte{}
+			//			pdf := engine.NewFpdf()
+			//			generator := contract.NewCatnatGenerator(pdf, &data, networkNode, *product, false)
+			//			generator.Generate()
+			//			document, err = generateContractDocument(pdf.GetPdf(), &data)
 		case models.PersonaProduct:
 			pdf := engine.NewFpdf()
 			generator := contract.NewPersonaGenerator(pdf, &data, networkNode, *product, false)
