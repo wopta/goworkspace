@@ -142,13 +142,13 @@ type Documento struct {
 	DatiDocumento        string `json:"datiDocumento"`
 }
 
-const buildingCode = "/00"
-const contentCode = "/01"
-const stockCode = "/02"
-
 const earthquakeSlug = "earthquake"
 const floodSlug = "flood"
-const landslideSlug = "landslides"
+const landlideSlug = "landslide"
+
+const buildingType = "building"
+const contentType = "content"
+const stockType = "stock"
 
 const catNatProductCode = "007"
 const catNatDistributorCode = "0168"
@@ -160,16 +160,30 @@ const yes = "si"
 const no = "no"
 
 // TODO: use companyCodec instead
-var guaranteeSlugToCode = map[string]string{
+var guaranteeSlugToCodes = map[string]string{
 	earthquakeSlug: "211",
 	floodSlug:      "212",
-	landslideSlug:  "209",
+	landlideSlug:   "209",
 }
+
+var guaranteeTypeToCodes = map[string]string{
+	buildingType: "/00",
+	contentType:  "/01",
+	stockType:    "/02",
+}
+
 var guaranteeCodeToSlug = map[string]string{
 	"211": earthquakeSlug,
 	"212": floodSlug,
-	"209": landslideSlug,
+	"209": landlideSlug,
 }
+
+var guaranteeTypeCodeToType = map[string]string{
+	"/00": buildingType,
+	"/01": contentType,
+	"/02": stockType,
+}
+
 var useTypeMap = map[string]string{
 	"owner-tenant": "si",
 	"tenant":       "no",
@@ -357,34 +371,28 @@ func (d *QuoteRequest) FromPolicyForQuote(policy *models.Policy) error {
 	log.Println("Managing slug guarantees")
 	for _, g := range baseAsset.Guarantees {
 		if g.IsSelected {
-			setGuaranteeValue(&asset, g, guaranteeSlugToCode[g.Slug])
+			setGuaranteeValue(&asset, g, g.Slug)
 		}
 	}
 	d.Asset = asset
 	return nil
 }
 
-func setGuaranteeValue(asset *assetRequest, guarantee models.Guarante, code string) {
+func setGuaranteeValue(asset *assetRequest, guarantee models.Guarante, slug string) error {
 	var gL guaranteeList
+	guaranteeName, guaranteeType, ok := strings.Cut(slug, "-")
+	if !ok || guaranteeName == "" || guaranteeType == "" {
+		return fmt.Errorf("Error format in guarantee slug")
+	}
 	if guarantee.Value.SumInsuredLimitOfIndemnity != 0 {
-		gL.GuaranteeCode = code + contentCode
+		gL.GuaranteeCode = guaranteeSlugToCodes[guaranteeName] + guaranteeTypeToCodes[guaranteeType]
 		gL.CapitalAmount = int(guarantee.Value.SumInsuredLimitOfIndemnity)
 		asset.GuaranteeList = append(asset.GuaranteeList, gL)
 	}
-	if guarantee.Value.SumInsured != 0 {
-		gL.GuaranteeCode = code + buildingCode
-		gL.CapitalAmount = int(guarantee.Value.SumInsured)
-		asset.GuaranteeList = append(asset.GuaranteeList, gL)
-	}
-	if guarantee.Value.LimitOfIndemnity != 0 {
-		gL.GuaranteeCode = code + stockCode
-		gL.CapitalAmount = int(guarantee.Value.LimitOfIndemnity)
-		asset.GuaranteeList = append(asset.GuaranteeList, gL)
-	}
+	return nil
 }
 
-func getGuarantee(policy *models.Policy, codeGuarantees string) (*models.Guarante, error) {
-	slug := guaranteeCodeToSlug[codeGuarantees]
+func getGuarantee(policy *models.Policy, slug string) (*models.Guarante, error) {
 	for i := range policy.Assets[0].Guarantees {
 		if policy.Assets[0].Guarantees[i].Slug == slug {
 			return &policy.Assets[0].Guarantees[i], nil
@@ -393,9 +401,8 @@ func getGuarantee(policy *models.Policy, codeGuarantees string) (*models.Guarant
 	return nil, errors.New("No guarantees found")
 }
 
-// Given a quoteResponse of catnat sum and assign the assentDailt to each guarantees
+// Given a quoteResponse of catnat, sum and assign the assentDailt to each guarantees
 func mappingQuoteResponseToGuarantee(quoteResponse QuoteResponse, policy *models.Policy) error {
-	var currentGuaranteeCode string
 	for i := range policy.Assets[0].Guarantees {
 		policy.Assets[0].Guarantees[i].Value.PremiumGrossYearly = 0
 	}
@@ -410,14 +417,18 @@ func mappingQuoteResponseToGuarantee(quoteResponse QuoteResponse, policy *models
 	}
 	for _, assetDetailCatnat := range quoteResponse.AssetsDetail {
 		for _, guaranteeDetailCatnat := range assetDetailCatnat.GuaranteesDetail {
-			guaranteeCodes := strings.Split(guaranteeDetailCatnat.GuaranteeCode, "/")
-			currentGuaranteeCode = guaranteeCodes[0]
-			guarantee, err := getGuarantee(policy, currentGuaranteeCode)
+			guaranteeCode, guaranteeTypeCode, _ := strings.Cut(guaranteeDetailCatnat.GuaranteeCode, "/")
+			guaranteeName := guaranteeCodeToSlug[guaranteeCode]
+			guaranteeType := guaranteeTypeCodeToType["/"+guaranteeTypeCode]
+			if guaranteeName == "" || guaranteeType == "" {
+				return fmt.Errorf("Error parsing guarantee codes: %v", guaranteeDetailCatnat.GuaranteeCode)
+			}
+
+			guarantee, err := getGuarantee(policy, guaranteeName+"-"+guaranteeType)
 			if err != nil {
 				return err
 			}
-			value := guaranteeDetailCatnat.GuaranteeGross
-			guarantee.Value.PremiumGrossYearly += value
+			guarantee.Value.PremiumGrossYearly = guaranteeDetailCatnat.GuaranteeGross
 		}
 	}
 	for i := range policy.Assets[0].Guarantees {
