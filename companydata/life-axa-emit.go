@@ -144,7 +144,7 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 		docsnap := lib.GetFirestore("policy", transaction.PolicyUid)
 		docsnap.DataTo(&policy)
-		if policy.Contractor.Type != "legalEntity" {
+		if policy.Contractor.Type != models.UserLegalEntity {
 			result = append(result, setRowLifeEmit(policy, df, transaction, now)...)
 			transaction.IsEmit = true
 			lib.SetFirestore("transactions", transaction.Uid, transaction)

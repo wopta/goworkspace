@@ -13,7 +13,7 @@ import (
 
 type CatnatGenerator struct {
 	*baseGenerator
-	dto dto.CatnatDTO
+	dto dto.QuoteCatnatDTO
 }
 
 func NewCatnatGenerator(engine *engine.Fpdf, policy *models.Policy, product models.Product) *CatnatGenerator {

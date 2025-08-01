@@ -50,7 +50,7 @@ type guaranteeCatnatDto struct {
 	Stock    string
 	Total    string
 }
-type CatnatDTO struct {
+type QuoteCatnatDTO struct {
 	Sede                buildingCatnatDto
 	EarthquakeGuarantee guaranteeCatnatDto
 	FloodGuarantee      guaranteeCatnatDto
@@ -59,11 +59,11 @@ type CatnatDTO struct {
 	Prize               priceDTO
 }
 
-func NewCatnatDto() CatnatDTO {
-	return CatnatDTO{}
+func NewCatnatDto() QuoteCatnatDTO {
+	return QuoteCatnatDTO{}
 }
 
-func (dto *CatnatDTO) FromPolicy(policy *models.Policy) {
+func (dto *QuoteCatnatDTO) FromPolicy(policy *models.Policy) {
 	dto.Sede = buildingCatnatDto{}
 	dto.Sede.buildingDTO = *newBuildingDTO()
 	dto.Sede.buildingDTO.fromPolicy(*policy.Assets[0].Building, policy.Assets[0].Guarantees)
