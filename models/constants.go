@@ -263,8 +263,8 @@ const (
 )
 
 const (
-	UserIndividual  = "individual"
-	UserLegalEntity = "legalEntity"
+	UserIndividual  = "individual"  //ditta individuale
+	UserLegalEntity = "legalEntity" //persona giuridica
 )
 
 const (
