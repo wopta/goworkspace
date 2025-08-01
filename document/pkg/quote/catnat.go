@@ -1,4 +1,4 @@
-package contract
+package quote
 
 import (
 	"time"
@@ -9,7 +9,6 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
 type CatnatGenerator struct {
@@ -17,30 +16,20 @@ type CatnatGenerator struct {
 	dto dto.CatnatDTO
 }
 
-func NewCatnatGenerator(engine *engine.Fpdf, policy *models.Policy, node *models.NetworkNode, product models.Product, isProposal bool) *CatnatGenerator {
+func NewCatnatGenerator(engine *engine.Fpdf, policy *models.Policy, product models.Product) *CatnatGenerator {
 	dto := dto.NewCatnatDto()
-	dto.FromPolicy(policy, node)
-
-	var worksForNode *models.NetworkNode
-	if node != nil && node.WorksForUid != "" {
-		worksForNode = network.GetNetworkNodeByUid(node.WorksForUid)
-	}
 
 	return &CatnatGenerator{
 		baseGenerator: &baseGenerator{
-			engine:       engine,
-			isProposal:   isProposal,
-			now:          time.Now(),
-			signatureID:  0,
-			networkNode:  node,
-			policy:       policy,
-			worksForNode: worksForNode,
+			engine: engine,
+			now:    time.Now(),
+			policy: policy,
 		},
 		dto: dto,
 	}
 }
 
-func (c *CatnatGenerator) Generate() {
+func (c *CatnatGenerator) Exec() ([]byte, error) {
 	c.addCatnatHeader()
 	c.engine.NewPage()
 	c.engine.NewLine(5)
@@ -54,6 +43,7 @@ func (c *CatnatGenerator) Generate() {
 	c.engine.NewLine(4)
 	c.addWhoAreWeCatnat()
 
+	return c.engine.RawDoc()
 }
 
 func (c *CatnatGenerator) addCatnatHeader() {
@@ -307,7 +297,7 @@ func (c *CatnatGenerator) addSetInformativoInfo() {
 	c.engine.WriteText(c.engine.GetTableCell("Prima della sottoscrizione leggere il set informativo.", constants.BoldFontStyle))
 }
 func (c *CatnatGenerator) addWhoAreWeCatnat() {
-	c.whoWeAre()
+	c.WhoWeAre()
 	c.engine.NewLine(5)
 	c.engine.WriteTexts(c.engine.GetTableCell("Net Insurance S.p.a ", constants.BoldFontStyle), c.engine.GetTableCell("compagnia assicurativa, Sede Legale e Direzione Generale via Giuseppe Antonio Guattani, 4 00161 Roma"))
 }

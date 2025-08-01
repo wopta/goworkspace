@@ -11,17 +11,13 @@ import (
 	_ "gitlab.dev.wopta.it/goworkspace/callback"
 	_ "gitlab.dev.wopta.it/goworkspace/claim"
 	_ "gitlab.dev.wopta.it/goworkspace/companydata"
-	"gitlab.dev.wopta.it/goworkspace/document"
 	_ "gitlab.dev.wopta.it/goworkspace/document"
 	_ "gitlab.dev.wopta.it/goworkspace/enrich"
 	_ "gitlab.dev.wopta.it/goworkspace/form"
 	_ "gitlab.dev.wopta.it/goworkspace/mail"
 	_ "gitlab.dev.wopta.it/goworkspace/mga"
-	"gitlab.dev.wopta.it/goworkspace/network"
 	_ "gitlab.dev.wopta.it/goworkspace/partnership"
-	"gitlab.dev.wopta.it/goworkspace/policy"
 	_ "gitlab.dev.wopta.it/goworkspace/policy"
-	"gitlab.dev.wopta.it/goworkspace/product"
 	_ "gitlab.dev.wopta.it/goworkspace/question"
 	_ "gitlab.dev.wopta.it/goworkspace/quote"
 	_ "gitlab.dev.wopta.it/goworkspace/renew"
@@ -38,13 +34,6 @@ func main() {
 		log.Fatalf("Error loading .env file: %s", err)
 	}
 
-	// Use PORT environment variable, or default to 8080.
-	pol, _ := policy.GetPolicy("rB3IkvHaFxVfPCNQ8gnG")
-	node := network.GetNetworkNodeByUid(pol.NetworkUid)
-	pr := product.GetLatestActiveProduct("cat-nat", "e-commerce", node, nil)
-	p := <-document.ContractObj(pol, node, pr)
-	os.WriteFile("prova.pdf", p.Bytes, os.ModeTemporary)
-	return
 	port := "8080"
 	if envPort := os.Getenv("PORT"); envPort != "" {
 		port = envPort

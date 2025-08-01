@@ -217,18 +217,16 @@ func buildBodyToSend(prepareteResponse prepareResponse, idFiles []string, callba
 
 // adjust the request to insert information regard the contractor
 func setContractorDataInSendBody(bodySend *sendNamirialRequest, policy models.Policy) error {
-	var signer *models.User
-	if policy.Contractor.Type == models.UserLegalEntity { //for legalentity who pay is between contractors
+	var signer *models.User = policy.Contractor.ToUser()
+
+	if policy.Contractor.Type == models.UserLegalEntity { // i need to use only the phone of the signer
 		for _, contractor := range *policy.Contractors {
 			if contractor.IsSignatory {
-				signer = &contractor
+				signer.Phone = contractor.Phone
 				break
 			}
 		}
-	} else {
-		signer = policy.Contractor.ToUser()
 	}
-
 	if signer == nil {
 		return errors.New("You need to populate contractors to sign")
 	}
@@ -238,7 +236,6 @@ func setContractorDataInSendBody(bodySend *sendNamirialRequest, policy models.Po
 		contactInfo.Surname = signer.Surname
 		contactInfo.GivenName = signer.Name
 		contactInfo.Email = signer.Mail
-		contactInfo.PhoneNumber = signer.Phone
 		contactInfo.PhoneNumber = signer.Phone
 	}
 	return nil

@@ -63,7 +63,7 @@ func NewCatnatDto() CatnatDTO {
 	return CatnatDTO{}
 }
 
-func (dto *CatnatDTO) FromPolicy(policy *models.Policy, node *models.NetworkNode) {
+func (dto *CatnatDTO) FromPolicy(policy *models.Policy) {
 	dto.Sede = buildingCatnatDto{}
 	dto.Sede.buildingDTO = *newBuildingDTO()
 	dto.Sede.buildingDTO.fromPolicy(*policy.Assets[0].Building, policy.Assets[0].Guarantees)
