@@ -223,6 +223,8 @@ func setContractorDataInSendBody(bodySend *sendNamirialRequest, policy models.Po
 		for _, contractor := range *policy.Contractors {
 			if contractor.IsSignatory {
 				signer.Phone = contractor.Phone
+				signer.Surname = contractor.Surname
+				signer.Name = contractor.Name
 				break
 			}
 		}
