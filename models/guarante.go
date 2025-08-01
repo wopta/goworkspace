@@ -60,7 +60,6 @@ type Guarante struct {
 	IsSelected                 bool                       `json:"isSelected" firestore:"isSelected" bigquery:"-"`
 	IsDeleted                  bool                       `json:"isDeleted" firestore:"isDeleted" bigquery:"-"`
 	SynchronizeSlug            string                     `json:"synchronizeSlug" firestore:"synchronizeSlug" bigquery:"-"`
-	IsBeneficiaryMandatory     bool                       `json:"isBeneficiaryMandatory" firestore:"isBeneficiaryMandatory" bigquery:"-"`
 }
 
 type GuaranteValue struct {
