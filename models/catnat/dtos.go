@@ -185,8 +185,8 @@ var guaranteeTypeCodeToType = map[string]string{
 }
 
 var useTypeMap = map[string]string{
-	"owner-tenant": "si",
-	"tenant":       "no",
+	"owner-tenant": "si", //chi possiede
+	"tenant":       "no", //che è in affitto
 }
 var buildingYearMap = map[string]int{
 	"before_1950":       1,

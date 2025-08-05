@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
@@ -100,8 +101,11 @@ func (c *NetClient) quote(dto QuoteRequest) (response QuoteResponse, err error) 
 	if response.Result != "OK" {
 		log.ErrorF("Errore quotazione %+v", response.Errors)
 		for i := range response.Errors {
-			if response.Errors[i].Code == "Errore calcolo premio" {
+			if strings.Contains(response.Errors[i].Description, "Importo premio inferiore al premio minimo consentito") {
 				return response, errors.New("Il premio non può essere inferiore a 100 euro annui, aumenta le somme assicurate per raggiungere il premio minimo.")
+			}
+			if strings.Contains(response.Errors[i].Description, "Indirizzo immobile non valido") || strings.Contains(response.Errors[i].Description, "Provincia bene assicurato non trovata") {
+				return response, errors.New("Indirizzo immobile non valido")
 			}
 		}
 		return response, errors.New("Errore quotazione")
