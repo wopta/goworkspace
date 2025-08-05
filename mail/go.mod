@@ -11,8 +11,8 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/google/uuid v1.6.0
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.194
-	gitlab.dev.wopta.it/goworkspace/models v1.2.96
-	gitlab.dev.wopta.it/goworkspace/network v1.0.164
+	gitlab.dev.wopta.it/goworkspace/models v1.2.97
+	gitlab.dev.wopta.it/goworkspace/network v1.0.165
 	google.golang.org/api v0.181.0
 )
 
