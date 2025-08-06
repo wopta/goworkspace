@@ -13,7 +13,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/models v1.2.97
 	gitlab.dev.wopta.it/goworkspace/network v1.0.165
 	gitlab.dev.wopta.it/goworkspace/product v1.1.96
-	gitlab.dev.wopta.it/goworkspace/quote v1.0.267
+	gitlab.dev.wopta.it/goworkspace/quote v1.0.268
 	gitlab.dev.wopta.it/goworkspace/user v1.0.203
 )
 
@@ -84,7 +84,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/document v1.1.243 // indirect
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.219 // indirect
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.286 // indirect
-	gitlab.dev.wopta.it/goworkspace/sellable v1.0.206 // indirect
+	gitlab.dev.wopta.it/goworkspace/sellable v1.0.207 // indirect
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.36 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.54.0 // indirect
