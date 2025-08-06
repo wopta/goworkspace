@@ -67,6 +67,9 @@ func setProductBodyData(policy models.Policy, bodyData *BodyData) {
 	case models.GapProduct:
 		bodyData.ProductName = "Auto Valore Protetto"
 		bodyData.ProductForm = "gap#contact-us"
+	case models.CatNatProduct:
+		bodyData.ProductName = "Catastrofali azienda"
+		bodyData.ProductForm = "cat-nat#contact-us"
 	}
 	link, _ := lib.GetLastVersionPrecontrattuale(policy.Name, policy.ProductVersion)
 	bodyData.InformationSetsUrl = fmt.Sprint(lib.BaseStorageGoogleUrl, link)
