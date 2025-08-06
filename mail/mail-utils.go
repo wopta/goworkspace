@@ -233,3 +233,11 @@ func getMailAttachments(policy models.Policy, attachmentNames []string) []models
 
 	return at
 }
+
+func getTemplateEmail(flowName, templateType string, policy models.Policy) (string, error) {
+	bodyData := getBodyData(policy)
+
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, payTemplateType))
+
+	return fillTemplate(templateFile, &bodyData), nil
+}

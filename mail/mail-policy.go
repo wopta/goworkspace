@@ -24,13 +24,8 @@ const (
 )
 
 func SendMailLead(policy models.Policy, from, to, cc Address, flowName string, attachmentNames []string) {
-	var bodyData BodyData
 
-	bodyData = getBodyData(policy)
-
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, leadTemplateType))
-
-	messageBody := fillTemplate(templateFile, &bodyData)
+	messageBody, _ := getTemplateEmail(flowName, leadTemplateType, policy)
 
 	title := policy.NameDesc
 	subtitle := "Documenti precontrattuali"
@@ -53,13 +48,8 @@ func SendMailLead(policy models.Policy, from, to, cc Address, flowName string, a
 }
 
 func SendMailPay(policy models.Policy, from, to, cc Address, flowName string) {
-	var bodyData BodyData
 
-	bodyData = getBodyData(policy)
-
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, payTemplateType))
-
-	messageBody := fillTemplate(templateFile, &bodyData)
+	messageBody, _ := getTemplateEmail(flowName, payTemplateType, policy)
 
 	title := policy.NameDesc
 	subtitle := fmt.Sprintf("Paga la tua polizza n° %s", policy.CodeCompany)
@@ -78,13 +68,8 @@ func SendMailPay(policy models.Policy, from, to, cc Address, flowName string) {
 }
 
 func SendMailSign(policy models.Policy, from, to, cc Address, flowName string) {
-	var bodyData BodyData
 
-	bodyData = getBodyData(policy)
-
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, signTemplateType))
-
-	messageBody := fillTemplate(templateFile, &bodyData)
+	messageBody, _ := getTemplateEmail(flowName, signTemplateType, policy)
 
 	title := policy.NameDesc
 	subtitle := fmt.Sprintf("Firma la tua polizza n° %s", policy.CodeCompany)
@@ -104,16 +89,10 @@ func SendMailSign(policy models.Policy, from, to, cc Address, flowName string) {
 
 func SendMailContract(policy models.Policy, at *[]models.Attachment, from, to, cc Address, flowName string) error {
 	var (
-		bodyData BodyData
-		bcc      string
+		bcc string
 	)
 
-	bodyData = getBodyData(policy)
-
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, contractTemplateType))
-
-	messageBody := fillTemplate(templateFile, &bodyData)
-
+	messageBody, _ := getTemplateEmail(flowName, contractTemplateType, policy)
 	// retrocompatibility - the new use extracts the contract from the policy
 	if at == nil {
 		var contractbyte []byte
@@ -225,19 +204,19 @@ func SendMailReserved(policy models.Policy, from, to, cc Address, flowName strin
 
 func SendMailReservedResult(policy models.Policy, from, to, cc Address, flowName string) {
 	var (
-		bodyData BodyData
-		template string
+		bodyData     BodyData
+		templateType string
 	)
 
 	if policy.Status == models.PolicyStatusApproved {
-		template = reservedApprovedTemplateType
+		templateType = reservedApprovedTemplateType
 	} else {
-		template = reservedRejectedTemplateType
+		templateType = reservedRejectedTemplateType
 	}
 
-	bodyData = getBodyData(policy)
+	messageBody, _ := getTemplateEmail(flowName, templateType, policy)
 
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, template))
+	bodyData = getBodyData(policy)
 
 	title := fmt.Sprintf(
 		"Wopta per te %s - Proposta %d di %s",
@@ -248,8 +227,6 @@ func SendMailReservedResult(policy models.Policy, from, to, cc Address, flowName
 	// TODO: handle multiple products reserved subtitle
 	subtitle := "Esito valutazione medica assuntiva"
 	subject := fmt.Sprintf("%s - %s", title, subtitle)
-
-	messageBody := fillTemplate(templateFile, &bodyData)
 
 	SendMail(MailRequest{
 		FromAddress: from,
@@ -265,16 +242,10 @@ func SendMailReservedResult(policy models.Policy, from, to, cc Address, flowName
 
 func SendMailProposal(policy models.Policy, from, to, cc Address, flowName string, attachmentNames []string) {
 	var (
-		at       []models.Attachment
-		bodyData BodyData
+		at []models.Attachment
 	)
 
-	bodyData = getBodyData(policy)
-
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, proposalTemplateType))
-
-	messageBody := fillTemplate(templateFile, &bodyData)
-
+	messageBody, _ := getTemplateEmail(flowName, proposalTemplateType, policy)
 	at = append(at, getMailAttachments(policy, attachmentNames)...)
 
 	title := policy.NameDesc
@@ -296,13 +267,10 @@ func SendMailProposal(policy models.Policy, from, to, cc Address, flowName strin
 }
 
 func SendMailRenewDraft(policy models.Policy, from, to, cc Address, flowName string, hasMandate bool) {
-	var bodyData BodyData
 
-	bodyData = getPolicyRenewDraftBodyData(policy)
+	messageBody, _ := getTemplateEmail(flowName, renewDraftTemplateType, policy)
 
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, renewDraftTemplateType))
-
-	messageBody := fillTemplate(templateFile, &bodyData)
+	bodyData := getPolicyRenewDraftBodyData(policy)
 
 	title := policy.NameDesc
 	subtitle := fmt.Sprintf("La tua polizza n° %s si rinnova il %s, provvedi al pagamento.", policy.CodeCompany,
