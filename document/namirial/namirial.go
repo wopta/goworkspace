@@ -131,8 +131,6 @@ func prepareDocuments(idsDocument ...string) (resp prepareResponse, err error) {
 		sign := &resp.UnassignedElements.Signatures[i]
 		sign.FieldDefinition.Size.Width = 100
 		sign.FieldDefinition.Size.Height = 50
-
-		sign.FieldDefinition.Position.Y -= 25
 	}
 	resp.Activities[0].Action.Sign.Elements.Signatures = append(resp.Activities[0].Action.Sign.Elements.Signatures, resp.UnassignedElements.Signatures...)
 	for i := range resp.Activities[0].Action.Sign.Elements.Signatures {
