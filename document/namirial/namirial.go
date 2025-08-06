@@ -129,13 +129,10 @@ func prepareDocuments(idsDocument ...string) (resp prepareResponse, err error) {
 	//The signatures that dont use the default place holder are put inside Unassigned,so you need to iterate them and fix their size and position
 	for i := range resp.UnassignedElements.Signatures {
 		sign := &resp.UnassignedElements.Signatures[i]
-		if sign.FieldDefinition.Size.Height < sign.FieldDefinition.Size.Width {
-			continue
-		}
+		sign.FieldDefinition.Size.Width = 100
 		sign.FieldDefinition.Size.Height = 50
-		sign.FieldDefinition.Position.X -= 25
-		sign.FieldDefinition.Position.Y -= 10
-		sign.FieldDefinition.Size.Width = 150
+
+		sign.FieldDefinition.Position.Y -= 25
 	}
 	resp.Activities[0].Action.Sign.Elements.Signatures = append(resp.Activities[0].Action.Sign.Elements.Signatures, resp.UnassignedElements.Signatures...)
 	for i := range resp.Activities[0].Action.Sign.Elements.Signatures {
