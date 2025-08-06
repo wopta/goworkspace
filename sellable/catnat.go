@@ -183,6 +183,9 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 			}
 		}
 		err := isContenutoAndFabricato(types)
+		if len(types) == 0 {
+			return false, nil
+		}
 		if err != nil {
 			return isSelected, fmt.Errorf("Per %s %w", companyName, err)
 		}
