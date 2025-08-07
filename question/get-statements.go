@@ -14,7 +14,7 @@ type Statements struct {
 }
 type inputRuleSettings struct {
 	*models.Policy
-	IncludeCompanyStatements bool `json:"includeCompanyStatements"`
+	IncludeExternalCompanyStatements bool `json:"includeExternalCompanyStatements"`
 }
 
 func GetStatements(policy *models.Policy, includeCompanyStatements bool) ([]models.Statement, error) {
@@ -23,8 +23,8 @@ func GetStatements(policy *models.Policy, includeCompanyStatements bool) ([]mode
 	defer log.PopPrefix()
 	log.Println("function start ----------------")
 	inputRuleStruct := inputRuleSettings{
-		Policy:                   policy,
-		IncludeCompanyStatements: includeCompanyStatements,
+		Policy:                           policy,
+		IncludeExternalCompanyStatements: includeCompanyStatements,
 	}
 	inputRuleStr, err := json.Marshal(inputRuleStruct)
 	log.Printf("-------------prova %s\n\n", string(inputRuleStr))
