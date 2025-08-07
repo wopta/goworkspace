@@ -47,7 +47,6 @@ func WiseProxyObj(path string, request []byte, method string) io.ReadCloser {
 	var token string
 	var urlstring = os.Getenv("wiseBaseUrl") + substring
 	var req *http.Request
-	log.Println("urlstring: " + urlstring)
 	if strings.Contains(path, "WebApiProduct") {
 		token = GetToken(false)
 		req, _ = http.NewRequest(method, urlstring, bytes.NewBuffer(request))
@@ -60,7 +59,10 @@ func WiseProxyObj(path string, request []byte, method string) io.ReadCloser {
 		req.Header.Set("Authorization", "Bearer "+token)
 	}
 	req.Header.Set("Content-Type", "application/json")
+	log.Println("urlstring: " + urlstring)
+	log.Println("req: ", string(request))
 	log.Println("call: request")
+	log.ErrorF("tokennn: %v", token)
 	res, err := client.Do(req)
 	lib.CheckError(err)
 	if res != nil {

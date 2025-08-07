@@ -211,7 +211,7 @@ func emitUpdatePolicy(policy *models.Policy, request EmitRequest) {
 		} else {
 			log.Println("inject policy statements from question module")
 			policy.Statements = new([]models.Statement)
-			*policy.Statements, _ = question.GetStatements(policy)
+			*policy.Statements, _ = question.GetStatements(policy, false)
 		}
 	}
 	brokerUpdatePolicy(policy, request.BrokerBaseRequest)

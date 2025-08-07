@@ -51,7 +51,6 @@ func userHasDataInWise(fiscalCode string, wiseResponse *models.WiseUserRegistryR
 		"cdFiscale": "` + fiscalCode + `",
 		"cdLingua": "it"
 	}`)
-
 	responseReader := wiseproxy.WiseProxyObj("WebApiProduct/Api/RicercaAnagSemplice", request, "POST")
 	jsonData, e := io.ReadAll(responseReader)
 
@@ -79,6 +78,7 @@ func userHasDataInWise(fiscalCode string, wiseResponse *models.WiseUserRegistryR
 		"cdLingua": "it"
 	}`)
 	responseReader = wiseproxy.WiseProxyObj("WebApiProduct/Api/RicercaAnagCompleta", request, "POST")
+
 	jsonData, e = io.ReadAll(responseReader)
 	e = json.Unmarshal(jsonData, &wiseResponse)
 	lib.CheckError(e)

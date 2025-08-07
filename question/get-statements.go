@@ -1,6 +1,8 @@
 package question
 
 import (
+	"encoding/json"
+
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
@@ -10,13 +12,22 @@ type Statements struct {
 	Statements []*models.Statement
 	Text       string
 }
+type inputRuleSettings struct {
+	*models.Policy
+	IncludeCompanyStatements bool `json:"includeCompanyStatements"`
+}
 
-func GetStatements(policy *models.Policy) ([]models.Statement, error) {
+func GetStatements(policy *models.Policy, includeCompanyStatements bool) ([]models.Statement, error) {
+
 	log.AddPrefix("GetStatements")
 	defer log.PopPrefix()
 	log.Println("function start ----------------")
-
-	policyJson, err := policy.Marshal()
+	inputRuleStruct := inputRuleSettings{
+		Policy:                   policy,
+		IncludeCompanyStatements: includeCompanyStatements,
+	}
+	inputRuleStr, err := json.Marshal(inputRuleStruct)
+	log.Printf("-------------prova %s\n\n", string(inputRuleStr))
 	if err != nil {
 		log.ErrorF("error marshaling policy: %s", err.Error())
 		return nil, err
@@ -35,7 +46,7 @@ func GetStatements(policy *models.Policy) ([]models.Statement, error) {
 
 	log.Println("executing rules")
 
-	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, rulesStatements, policyJson, data)
+	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, rulesStatements, inputRuleStr, data)
 
 	result := make([]models.Statement, 0)
 	for _, statement := range ruleOutput.(*Statements).Statements {

@@ -68,7 +68,7 @@ func GetQuestionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	switch questionType {
 	case statements:
 		log.Printf("loading statements for %s product", policy.Name)
-		result, err = GetStatements(policy)
+		result, err = GetStatements(policy, true)
 	case surveys:
 		log.Printf("loading surveys for %s product", policy.Name)
 		result, err = GetSurveys(policy)
