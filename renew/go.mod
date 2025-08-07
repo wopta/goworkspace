@@ -5,12 +5,12 @@ go 1.23
 require (
 	cloud.google.com/go/firestore v1.15.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.194
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.220
-	gitlab.dev.wopta.it/goworkspace/models v1.2.98
-	gitlab.dev.wopta.it/goworkspace/network v1.0.166
-	gitlab.dev.wopta.it/goworkspace/payment v1.0.434
-	gitlab.dev.wopta.it/goworkspace/transaction v1.0.282
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.195
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.221
+	gitlab.dev.wopta.it/goworkspace/models v1.2.99
+	gitlab.dev.wopta.it/goworkspace/network v1.0.167
+	gitlab.dev.wopta.it/goworkspace/payment v1.0.435
+	gitlab.dev.wopta.it/goworkspace/transaction v1.0.283
 	google.golang.org/api v0.181.0
 )
 
@@ -80,12 +80,12 @@ require (
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
-	gitlab.dev.wopta.it/goworkspace/accounting v1.0.110 // indirect
-	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.109 // indirect
-	gitlab.dev.wopta.it/goworkspace/document v1.1.246 // indirect
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.289 // indirect
-	gitlab.dev.wopta.it/goworkspace/product v1.1.97 // indirect
-	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.36 // indirect
+	gitlab.dev.wopta.it/goworkspace/accounting v1.0.111 // indirect
+	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.110 // indirect
+	gitlab.dev.wopta.it/goworkspace/document v1.1.247 // indirect
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.290 // indirect
+	gitlab.dev.wopta.it/goworkspace/product v1.1.98 // indirect
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.37 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.49.0 // indirect
