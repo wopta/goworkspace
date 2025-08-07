@@ -241,12 +241,13 @@ func (d *QuoteRequest) FromPolicyForEmit(policy *models.Policy) error {
 	if policy.Contractor.VatCode == "" {
 		return errors.New("You need to compile Contractor.VatCode")
 	}
+	fiscalCode := policy.Contractor.FiscalCode
 	if policy.Contractor.Type == "legalEntity" { //persona giuridica
 		dt = catNatLegalPerson
 		if policy.Contractor.CompanyName == "" {
 			return errors.New("You need to compile Contractor.CompanyName")
 		}
-		policy.Contractor.FiscalCode = policy.Contractor.VatCode
+		fiscalCode = policy.Contractor.VatCode
 	} else { //ditta individuale i need all date
 		dt = catNatSoleProp
 		if policy.Contractor.Name == "" {
@@ -265,7 +266,7 @@ func (d *QuoteRequest) FromPolicyForEmit(policy *models.Policy) error {
 		Surname:                   policy.Contractor.Surname,
 		CompanyName:               policy.Contractor.CompanyName,
 		VatNumber:                 policy.Contractor.VatCode,
-		FiscalCode:                policy.Contractor.FiscalCode,
+		FiscalCode:                fiscalCode,
 		AtecoCode:                 policy.Contractor.Ateco,
 		Phone:                     policy.Contractor.Phone,
 		Email:                     policy.Contractor.Mail,
