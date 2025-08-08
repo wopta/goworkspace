@@ -71,7 +71,7 @@ func (c *NetClient) Emit(dto QuoteRequest, policy *models.Policy) (response Quot
 	return response, err
 }
 func (c *NetClient) quote(dto QuoteRequest) (response QuoteResponse, err error) {
-	url := os.Getenv("NET_BASEURL") + "/PolizzeGateway24/emettiPolizza/441-029-007"
+	url := os.Getenv("NET_BASEURL") + "/PolizzeGateway24/emettiPolizza/441-029-009"
 	rBuff := new(bytes.Buffer)
 	log.PrintStruct("request: ", dto)
 	err = json.NewEncoder(rBuff).Encode(dto)
@@ -115,7 +115,7 @@ func (c *NetClient) quote(dto QuoteRequest) (response QuoteResponse, err error) 
 
 func (c *NetClient) emit(dto QuoteRequest) (response QuoteResponse, err error) {
 	dto.Emission = "si"
-	url := os.Getenv("NET_BASEURL") + "/PolizzeGateway24/emettiPolizza/441-029-007"
+	url := os.Getenv("NET_BASEURL") + "/PolizzeGateway24/emettiPolizza/441-029-009"
 	rBuff := new(bytes.Buffer)
 	log.PrintStruct("request interagration api netensurance", dto)
 	err = json.NewEncoder(rBuff).Encode(dto)
