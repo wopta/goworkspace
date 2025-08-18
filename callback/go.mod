@@ -7,16 +7,16 @@ replace gitlab.dev.wopta.it/goworkspace/callback => ./
 require (
 	cloud.google.com/go/firestore v1.15.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
-	gitlab.dev.wopta.it/goworkspace/bpmn v1.0.89
-	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.120
+	gitlab.dev.wopta.it/goworkspace/bpmn v1.0.90
+	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.121
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.195
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.231
-	gitlab.dev.wopta.it/goworkspace/models v1.2.109
-	gitlab.dev.wopta.it/goworkspace/network v1.0.177
-	gitlab.dev.wopta.it/goworkspace/payment v1.0.447
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.302
-	gitlab.dev.wopta.it/goworkspace/product v1.1.108
-	gitlab.dev.wopta.it/goworkspace/transaction v1.0.295
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.232
+	gitlab.dev.wopta.it/goworkspace/models v1.2.110
+	gitlab.dev.wopta.it/goworkspace/network v1.0.178
+	gitlab.dev.wopta.it/goworkspace/payment v1.0.448
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.303
+	gitlab.dev.wopta.it/goworkspace/product v1.1.109
+	gitlab.dev.wopta.it/goworkspace/transaction v1.0.296
 	google.golang.org/api v0.181.0
 )
 
@@ -87,8 +87,8 @@ require (
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
-	gitlab.dev.wopta.it/goworkspace/accounting v1.0.123 // indirect
-	gitlab.dev.wopta.it/goworkspace/document v1.1.259 // indirect
+	gitlab.dev.wopta.it/goworkspace/accounting v1.0.124 // indirect
+	gitlab.dev.wopta.it/goworkspace/document v1.1.260 // indirect
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.37 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
