@@ -150,7 +150,7 @@ const buildingType = "building"
 const contentType = "content"
 const stockType = "stock"
 
-const catNatProductCode = "007"
+const catNatProductCode = "009"
 const catNatDistributorCode = "0168"
 const catNatLegalPerson = "2"
 const catNatSalesChannel = "3"
@@ -167,9 +167,9 @@ var guaranteeSlugToCodes = map[string]string{
 }
 
 var guaranteeTypeToCodes = map[string]string{
-	buildingType: "/00",
 	contentType:  "/01",
 	stockType:    "/02",
+	buildingType: "/03",
 }
 
 var guaranteeCodeToSlug = map[string]string{
@@ -179,9 +179,9 @@ var guaranteeCodeToSlug = map[string]string{
 }
 
 var guaranteeTypeCodeToType = map[string]string{
-	"/00": buildingType,
 	"/01": contentType,
 	"/02": stockType,
+	"/03": buildingType,
 }
 
 var useTypeMap = map[string]string{
