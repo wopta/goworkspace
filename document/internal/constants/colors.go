@@ -33,5 +33,10 @@ var (
 		G: 216,
 		B: 232,
 	}
+	YellowColor = domain.Color{
+		R: 255,
+		G: 255,
+		B: 0,
+	}
 	NoColor = domain.Color{}
 )
