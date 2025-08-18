@@ -343,7 +343,7 @@ func (d *QuoteRequest) FromPolicyForQuote(policy *models.Policy) error {
 		LowestFloor:          lowestFloorMap[baseAsset.Building.LowestFloor],
 		GuaranteeList:        make([]guaranteeList, 0),
 	}
-	if policy.Assets[0].Building.UseType == "owner-tenant" {
+	if policy.Assets[0].Building.UseType == "tenant" {
 		var alreadyEarthquake any
 		var alreadyFlood any
 		var wantEarthquake any

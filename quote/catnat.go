@@ -83,6 +83,7 @@ func catnatQuote(policy *models.Policy, product *models.Product, sellable sellab
 	if err != nil {
 		return resp, err
 	}
+	log.PrintStruct("---policy after sellable:", policy)
 	internal.AddGuaranteesSettingsFromProduct(policy, outSellable.Product)
 
 	var cnReq catnat.QuoteRequest

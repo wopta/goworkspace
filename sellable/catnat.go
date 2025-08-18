@@ -3,7 +3,6 @@ package sellable
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"slices"
 	"strings"
@@ -126,54 +125,49 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 
 	alreadyEarthquake := policy.QuoteQuestions["alreadyEarthquake"].(bool)
 	alreadyFlood := policy.QuoteQuestions["alreadyFlood"].(bool)
-	useType := policy.Assets[0].Building.UseType
+
+	wantEarthquake := policy.QuoteQuestions["wantEarthquake"]
+	if wantEarthquake == nil {
+		wantEarthquake = false
+	}
+	wantFlood := policy.QuoteQuestions["wantFlood"]
+	if wantFlood == nil {
+		wantFlood = false
+	}
+	//	useType := policy.Assets[0].Building.UseType
 	isBuildingOptional := false
 
-	if alreadyEarthquake && alreadyFlood && useType == "tenant" {
-		for _, guarantee := range out.Product.Companies[0].GuaranteesMap {
-			if strings.HasSuffix(guarantee.SynchronizeSlug, "building") {
-				guarantee.Config.SumInsuredLimitOfIndemnityTextField.Min = 0
-				isBuildingOptional = true
-			}
-		}
-	}
+	//	if alreadyEarthquake && alreadyFlood && useType == "tenant" {
+	//		for _, guarantee := range out.Product.Companies[0].GuaranteesMap {
+	//			if strings.HasSuffix(guarantee.SynchronizeSlug, "building") {
+	//				guarantee.Config.SumInsuredLimitOfIndemnityTextField.Min = 0
+	//				isBuildingOptional = true
+	//			}
+	//		}
+	//	}
 	if !isValidationForQuote {
 		out = ruleOutput.(*SellableOutput)
 		log.InfoF(out.Msg)
 		return out, nil
 	}
-
-	//you must have both 'building' and 'content'
-	//if i have alreadyEarthquake and alreadyflood and tenant, fabricato is mandatory
-	isContenutoAndFabricato := func(types []string) error {
-		isContent := slices.Contains(types, "content")
-		isBuilding := slices.Contains(types, "building")
-
-		if !isContent {
-			return errors.New("Contenuto é obbligatorio")
-		}
-		if isBuildingOptional {
-			return nil
-		}
-
-		if !isBuilding {
-			return errors.New("Fabbricato é obbligatorio")
-		}
-		return nil
+	if alreadyEarthquake && !wantEarthquake.(bool) {
+		policy.Assets[0].Guarantees = slices.DeleteFunc(policy.Assets[0].Guarantees, func(g models.Guarante) bool { return g.Slug == "earthquake-building" })
 	}
+	if alreadyFlood && !wantFlood.(bool) {
+		policy.Assets[0].Guarantees = slices.DeleteFunc(policy.Assets[0].Guarantees, func(g models.Guarante) bool { return g.Slug == "flood-building" })
+	}
+
 	if policy.StartDate.IsZero() {
 		return nil, errors.New("Start date can't be 0")
 	}
 	if policy.EndDate.IsZero() {
 		return nil, errors.New("End date can't be 0")
 	}
-
+	//TO FIX
 	guaranteeExist := func(policy *models.Policy, groupName string) (isSelected bool, error error) {
 		var types []string
-		var companyName string
 		for _, guarantee := range policy.Assets[0].Guarantees {
 
-			companyName = guarantee.CompanyName
 			if guarantee.Group == groupName {
 				isSelected = guarantee.IsSelected
 				_, typeName, _ := strings.Cut(guarantee.Slug, "-")
@@ -182,12 +176,22 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 				}
 			}
 		}
-		err := isContenutoAndFabricato(types)
+		isContent := slices.Contains(types, "content")
+		isBuilding := slices.Contains(types, "building")
+
 		if len(types) == 0 {
 			return false, nil
 		}
-		if err != nil {
-			return isSelected, fmt.Errorf("Per %s %w", companyName, err)
+		return isSelected, nil
+		if !isContent {
+			return false, errors.New("Contenuto é obbligatorio")
+		}
+		if isBuildingOptional {
+			return true, nil
+		}
+
+		if !isBuilding {
+			return false, errors.New("Fabbricato é obbligatorio")
 		}
 		return isSelected, nil
 	}
@@ -245,10 +249,9 @@ func getCatnatInputRules(p *models.Policy) ([]byte, error) {
 		alreadyEarthquake = false
 		alreadyFlood = false
 	}
-
+	//change these names
 	in["alreadyFlood"] = alreadyFlood
 	in["wantFlood"] = wantFlood
-
 	in["alreadyEarthquake"] = alreadyEarthquake
 	in["wantEarthquake"] = wantEarthquake
 
