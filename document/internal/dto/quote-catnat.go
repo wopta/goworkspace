@@ -13,6 +13,11 @@ var useTypeMap = map[string]string{
 	"tenant":       "Conduttore",
 }
 
+var quoteQuestionMap = map[bool]string{
+	true:  "si",
+	false: "no",
+}
+
 var buildingYearMap = map[string]string{
 	"before_1950":       "Fino al 1950",
 	"from_1950_to_1990": "1950-1990",
@@ -50,6 +55,12 @@ type guaranteeCatnatDto struct {
 	Stock    string
 	Total    string
 }
+type QuestionsCatnatDto struct {
+	AlreadyEarthquake string
+	AlreadyFlood      string
+	WantEarthquake    string
+	WantFlood         string
+}
 type QuoteCatnatDTO struct {
 	Sede                buildingCatnatDto
 	EarthquakeGuarantee guaranteeCatnatDto
@@ -57,6 +68,7 @@ type QuoteCatnatDTO struct {
 	LandslideGuarantee  guaranteeCatnatDto
 	PaymentSplit        string
 	Prize               priceDTO
+	Questions           QuestionsCatnatDto
 }
 
 func NewCatnatDto() QuoteCatnatDTO {
@@ -69,34 +81,75 @@ func (dto *QuoteCatnatDTO) FromPolicy(policy *models.Policy) {
 	dto.Sede.buildingDTO.fromPolicy(*policy.Assets[0].Building, policy.Assets[0].Guarantees)
 	dto.Sede.Type = useTypeMap[policy.Assets[0].Building.UseType]
 	dto.Sede.BuildingMaterial = buildingMaterialMap[policy.Assets[0].Building.BuildingMaterial]
-	dto.Sede.BuildingYear = buildingMaterialMap[policy.Assets[0].Building.BuildingYear]
-	dto.Sede.LowestFloor = buildingMaterialMap[policy.Assets[0].Building.LowestFloor]
-	dto.Sede.Floor = buildingMaterialMap[policy.Assets[0].Building.Floor]
+	dto.Sede.BuildingYear = buildingYearMap[policy.Assets[0].Building.BuildingYear]
+	dto.Sede.LowestFloor = lowestFloorMap[policy.Assets[0].Building.LowestFloor]
+	dto.Sede.Floor = floorMap[policy.Assets[0].Building.Floor]
 
 	dto.EarthquakeGuarantee = newGuaranteeCatnatDto(policy, "EARTHQUAKE")
 	dto.FloodGuarantee = newGuaranteeCatnatDto(policy, "FLOOD")
 	dto.LandslideGuarantee = newGuaranteeCatnatDto(policy, "LANDSLIDE")
+
+	dto.Questions = newQuestionCatnatDto(policy)
 
 	dto.PaymentSplit = constants.PaymentSplitMap[policy.PaymentSplit]
 
 	dto.Prize.Split = getSplit(policy.PaymentSplit)
 	dto.Prize.Gross.ValueFloat = policy.PriceGross
 	dto.Prize.Gross.Text = lib.HumanaizePriceEuro(policy.PriceGross)
+	dto.Prize.Consultancy.ValueFloat = policy.ConsultancyValue.Price
+	dto.Prize.Consultancy.Text = lib.HumanaizePriceEuro(policy.ConsultancyValue.Price)
+	dto.Prize.Total.ValueFloat = policy.ConsultancyValue.Price + policy.PriceGross
+	dto.Prize.Total.Text = lib.HumanaizePriceEuro(policy.ConsultancyValue.Price + policy.PriceGross)
 }
+func newQuestionCatnatDto(p *models.Policy) (res QuestionsCatnatDto) {
+	res.AlreadyEarthquake = "===="
+	res.AlreadyFlood = "===="
+	res.WantFlood = "===="
+	res.WantEarthquake = "===="
 
+	var alreadyEarthquake any
+	var alreadyFlood any
+	var wantEarthquake any
+	var wantFlood any
+
+	if p.Assets[0].Building.UseType == "tenant" {
+		alreadyEarthquake = p.QuoteQuestions["alreadyEarthquake"]
+		alreadyFlood = p.QuoteQuestions["alreadyFlood"]
+		wantEarthquake = p.QuoteQuestions["wantEarthquake"]
+		wantFlood = p.QuoteQuestions["wantFlood"]
+
+		res.AlreadyEarthquake = quoteQuestionMap[alreadyEarthquake.(bool)]
+		res.AlreadyFlood = quoteQuestionMap[alreadyFlood.(bool)]
+		if wantEarthquake != nil {
+			res.WantEarthquake = quoteQuestionMap[wantEarthquake.(bool)]
+		}
+		if wantFlood != nil {
+			res.WantFlood = quoteQuestionMap[wantFlood.(bool)]
+		}
+	}
+
+	return res
+
+}
 func newGuaranteeCatnatDto(p *models.Policy, guarantee string) (res guaranteeCatnatDto) {
+	res.Building = "===="
+	res.Content = "===="
+	res.Stock = "===="
 	var total float64
 	for _, g := range p.Assets[0].Guarantees {
 		if g.Group != guarantee {
 			continue
 		}
-		if strings.HasSuffix(g.Name, "building") {
+		if g.Value.SumInsuredLimitOfIndemnity == 0 {
+			continue
+		}
+		if strings.HasSuffix(g.Slug, "building") {
 			res.Building = lib.HumanaizePriceEuro(float64(g.Value.SumInsuredLimitOfIndemnity))
 			total += g.Value.SumInsuredLimitOfIndemnity
-		} else if strings.HasSuffix(g.Name, "content") {
+		} else if strings.HasSuffix(g.Slug, "content") {
 			res.Content = lib.HumanaizePriceEuro(float64(g.Value.SumInsuredLimitOfIndemnity))
 			total += g.Value.SumInsuredLimitOfIndemnity
-		} else if strings.HasSuffix(g.Name, "stock") {
+		} else if strings.HasSuffix(g.Slug, "stock") {
 			res.Stock = lib.HumanaizePriceEuro(float64(g.Value.SumInsuredLimitOfIndemnity))
 			total += g.Value.SumInsuredLimitOfIndemnity
 		}

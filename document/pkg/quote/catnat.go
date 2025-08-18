@@ -18,6 +18,7 @@ type CatnatGenerator struct {
 
 func NewCatnatGenerator(engine *engine.Fpdf, policy *models.Policy, product models.Product) *CatnatGenerator {
 	dto := dto.NewCatnatDto()
+	dto.FromPolicy(policy)
 
 	return &CatnatGenerator{
 		baseGenerator: &baseGenerator{
@@ -122,13 +123,13 @@ func (c *CatnatGenerator) addCatnatHeading() {
 	c.engine.WriteText(c.engine.GetTableCell("DATI SEDE DA ASSICURARE", constants.BoldFontStyle, domain.FontSize(12)))
 	c.engine.SetDrawColor(constants.PinkColor)
 	c.engine.NewLine(2)
-	const (
-		firstColumnWidth  = 65
-		secondColumnWidth = 45
-		thirdColumnWidth  = 40
-		fourthColumnWidth = 35
+	var (
+		firstColumnWidth  float64 = 65
+		secondColumnWidth float64 = 45
+		thirdColumnWidth  float64 = 40
+		fourthColumnWidth float64 = 40
 	)
-	parserTableSede := func(lines [][]string) [][]domain.TableCell {
+	parserTableInfoSede := func(lines [][]string) [][]domain.TableCell {
 		result := make([][]domain.TableCell, 0, len(lines))
 		for _, texts := range lines {
 			result = append(result, []domain.TableCell{
@@ -172,7 +173,7 @@ func (c *CatnatGenerator) addCatnatHeading() {
 					Height:    constants.CellHeight,
 					FontStyle: constants.RegularFontStyle,
 					FontColor: constants.BlackColor,
-					Width:     thirdColumnWidth,
+					Width:     fourthColumnWidth,
 					FontSize:  constants.RegularFontSize,
 					Fill:      false,
 					FillColor: domain.Color{},
@@ -189,8 +190,53 @@ func (c *CatnatGenerator) addCatnatHeading() {
 		{"Anno di costruzione:", c.dto.Sede.BuildingYear, "Materiale di costruzione:", c.dto.Sede.BuildingMaterial},
 		{"Numero di piani edificio oltre il piano terra:", c.dto.Sede.Floor, "", ""},
 	}
-	c.engine.DrawTable(parserTableSede(dataSede))
-	c.engine.DrawLine(10, c.engine.GetY()-3, 200, c.engine.GetY()-3, 0.25, constants.PinkColor)
+	c.engine.DrawTable(parserTableInfoSede(dataSede))
+	c.engine.SetX(c.engine.GetX() - 3)
+	c.engine.SetY(c.engine.GetY() - 3)
+	firstColumnWidth = 170
+	secondColumnWidth = 20
+
+	parserTableQuestions := func(lines [][]string) [][]domain.TableCell {
+		result := make([][]domain.TableCell, 0, len(lines))
+		for _, texts := range lines {
+			result = append(result, []domain.TableCell{
+				{
+					Text:      texts[0],
+					Height:    constants.CellHeight,
+					Width:     firstColumnWidth,
+					FontStyle: constants.BoldFontStyle,
+					FontColor: constants.BlackColor,
+					Fill:      false,
+					FontSize:  constants.RegularFontSize,
+					FillColor: domain.Color{},
+					Align:     constants.LeftAlign,
+					Border:    "T",
+				},
+				{
+					Text:      texts[1],
+					Height:    constants.CellHeight,
+					FontStyle: constants.RegularFontStyle,
+					Width:     secondColumnWidth,
+					FontColor: constants.BlackColor,
+					FontSize:  constants.RegularFontSize,
+					Fill:      false,
+					FillColor: domain.Color{},
+					Align:     constants.LeftAlign,
+					Border:    "T",
+				},
+			})
+		}
+
+		return result
+	}
+	dataQuestion := [][]string{
+		{"Il Fabbricato e il Terreno da assicurare sono già coperti per la Garanzia Terremoto?", c.dto.Questions.AlreadyEarthquake},
+		{"Nel caso in cui il Fabbricato e il Terreno da assicurare posseggano già la Garanzia Terremoto, il Contraente intende acquistare la medesima copertura?", c.dto.Questions.WantEarthquake},
+		{"Il Fabbricato e il Terreno da assicurare sono già coperti per la Garanzia Alluvione?", c.dto.Questions.AlreadyFlood},
+		{"Nel caso in cui il Fabbricato e il Terreno da assicurare posseggano già la Garanzia Alluvione, il Contraente intende acquistare la medesima copertura?", c.dto.Questions.WantFlood},
+	}
+	c.engine.DrawTable(parserTableQuestions(dataQuestion))
+	c.engine.DrawLine(10, c.engine.GetY(), 200, c.engine.GetY(), 0.25, constants.PinkColor)
 }
 
 func (c *CatnatGenerator) addTableGuarantee() {
