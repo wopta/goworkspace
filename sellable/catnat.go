@@ -134,17 +134,7 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 	if wantFlood == nil {
 		wantFlood = false
 	}
-	//	useType := policy.Assets[0].Building.UseType
-	isBuildingOptional := false
 
-	//	if alreadyEarthquake && alreadyFlood && useType == "tenant" {
-	//		for _, guarantee := range out.Product.Companies[0].GuaranteesMap {
-	//			if strings.HasSuffix(guarantee.SynchronizeSlug, "building") {
-	//				guarantee.Config.SumInsuredLimitOfIndemnityTextField.Min = 0
-	//				isBuildingOptional = true
-	//			}
-	//		}
-	//	}
 	if !isValidationForQuote {
 		out = ruleOutput.(*SellableOutput)
 		log.InfoF(out.Msg)
@@ -163,7 +153,6 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 	if policy.EndDate.IsZero() {
 		return nil, errors.New("End date can't be 0")
 	}
-	//TO FIX
 	guaranteeExist := func(policy *models.Policy, groupName string) (isSelected bool, error error) {
 		var types []string
 		for _, guarantee := range policy.Assets[0].Guarantees {
@@ -177,21 +166,12 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 			}
 		}
 		isContent := slices.Contains(types, "content")
-		isBuilding := slices.Contains(types, "building")
 
 		if len(types) == 0 {
 			return false, nil
 		}
-		return isSelected, nil
 		if !isContent {
 			return false, errors.New("Contenuto é obbligatorio")
-		}
-		if isBuildingOptional {
-			return true, nil
-		}
-
-		if !isBuilding {
-			return false, errors.New("Fabbricato é obbligatorio")
 		}
 		return isSelected, nil
 	}
