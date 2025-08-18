@@ -219,23 +219,33 @@ func getCatnatInputRules(p *models.Policy) ([]byte, error) {
 	in["isEarthquakeSelected"] = false
 	in["isFloodSelected"] = false
 	locationlen := 0
+	var alreadyEarthquake any
+	var alreadyFlood any
+	var wantEarthquake any
+	var wantFlood any
 
-	alreadyEarthquake := p.QuoteQuestions["alreadyEarthquake"]
-	if alreadyEarthquake == nil {
-		return nil, errors.New("missing field alreadyEarthquake")
+	if p.Assets[0].Building.UseType == "owner-tenant" {
+		alreadyEarthquake = p.QuoteQuestions["alreadyEarthquake"]
+		if alreadyEarthquake == nil {
+			return nil, errors.New("missing field alreadyEarthquake")
+		}
+		alreadyFlood = p.QuoteQuestions["alreadyFlood"]
+		if alreadyFlood == nil {
+			return nil, errors.New("missing field alreadyFlood")
+		}
+		wantEarthquake = p.QuoteQuestions["wantEarthquake"]
+		if wantEarthquake == nil {
+			wantEarthquake = false
+		}
+		wantFlood = p.QuoteQuestions["wantFlood"]
+		if wantFlood == nil {
+			wantFlood = false
+		}
+	} else {
+		alreadyEarthquake = false
+		alreadyFlood = false
 	}
-	alreadyFlood := p.QuoteQuestions["alreadyFlood"]
-	if alreadyFlood == nil {
-		return nil, errors.New("missing field alreadyFlood")
-	}
-	wantEarthquake := p.QuoteQuestions["wantEarthquake"]
-	if wantEarthquake == nil {
-		wantEarthquake = false
-	}
-	wantFlood := p.QuoteQuestions["wantFlood"]
-	if wantFlood == nil {
-		wantFlood = false
-	}
+
 	in["alreadyFlood"] = alreadyFlood
 	in["wantFlood"] = wantFlood
 

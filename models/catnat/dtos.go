@@ -334,28 +334,8 @@ func (d *QuoteRequest) FromPolicyForQuote(policy *models.Policy) error {
 		}
 	}
 
-	alreadyEarthquake := policy.QuoteQuestions["alreadyEarthquake"]
-	if alreadyEarthquake == nil {
-		return errors.New("missing field alreadyEarthquake")
-	}
-	wantEarthquake := policy.QuoteQuestions["wantEarthquake"]
-	if wantEarthquake == nil {
-		wantEarthquake = false
-	}
-	alreadyFlood := policy.QuoteQuestions["alreadyFlood"]
-	if alreadyFlood == nil {
-		return errors.New("missing field alreadyFlood")
-	}
-	wantFlood := policy.QuoteQuestions["wantFlood"]
-	if wantFlood == nil {
-		wantFlood = false
-	}
 	asset := assetRequest{
 		ContractorAndTenant:  useTypeMap[baseAsset.Building.UseType],
-		EarthquakeCoverage:   quoteQuestionMap[alreadyEarthquake.(bool)],
-		FloodCoverage:        quoteQuestionMap[alreadyFlood.(bool)],
-		EarthquakePurchase:   quoteQuestionMap[(alreadyEarthquake.(bool) && wantEarthquake.(bool)) || !alreadyEarthquake.(bool)],
-		FloodPurchase:        quoteQuestionMap[(alreadyFlood.(bool) && wantFlood.(bool)) || !alreadyFlood.(bool)],
 		LandSlidePurchase:    no,
 		ConstructionMaterial: buildingMaterialMap[baseAsset.Building.BuildingMaterial],
 		ConstructionYear:     buildingYearMap[baseAsset.Building.BuildingYear],
@@ -363,6 +343,34 @@ func (d *QuoteRequest) FromPolicyForQuote(policy *models.Policy) error {
 		LowestFloor:          lowestFloorMap[baseAsset.Building.LowestFloor],
 		GuaranteeList:        make([]guaranteeList, 0),
 	}
+	if policy.Assets[0].Building.UseType == "owner-tenant" {
+		var alreadyEarthquake any
+		var alreadyFlood any
+		var wantEarthquake any
+		var wantFlood any
+
+		alreadyEarthquake = policy.QuoteQuestions["alreadyEarthquake"]
+		if alreadyEarthquake == nil {
+			return errors.New("missing field alreadyEarthquake")
+		}
+		wantEarthquake = policy.QuoteQuestions["wantEarthquake"]
+		if wantEarthquake == nil {
+			wantEarthquake = false
+		}
+		alreadyFlood = policy.QuoteQuestions["alreadyFlood"]
+		if alreadyFlood == nil {
+			return errors.New("missing field alreadyFlood")
+		}
+		wantFlood = policy.QuoteQuestions["wantFlood"]
+		if wantFlood == nil {
+			wantFlood = false
+		}
+		asset.EarthquakeCoverage = quoteQuestionMap[alreadyEarthquake.(bool)]
+		asset.FloodCoverage = quoteQuestionMap[alreadyFlood.(bool)]
+		asset.EarthquakePurchase = quoteQuestionMap[(alreadyEarthquake.(bool) && wantEarthquake.(bool)) || !alreadyEarthquake.(bool)]
+		asset.FloodPurchase = quoteQuestionMap[(alreadyFlood.(bool) && wantFlood.(bool)) || !alreadyFlood.(bool)]
+	}
+
 	if baseAsset.Building.BuildingAddress != nil {
 		asset.PostalCode = baseAsset.Building.BuildingAddress.PostalCode
 		asset.Address = formatAddress(baseAsset.Building.BuildingAddress)
