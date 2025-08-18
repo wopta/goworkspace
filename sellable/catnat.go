@@ -208,7 +208,8 @@ func getCatnatInputRules(p *models.Policy) ([]byte, error) {
 	var wantEarthquake any
 	var wantFlood any
 
-	if p.Assets[0].Building.UseType == "owner-tenant" {
+	log.Println("------------------", p.Assets[0].Building.UseType)
+	if p.Assets[0].Building.UseType == "tenant" {
 		alreadyEarthquake = p.QuoteQuestions["alreadyEarthquake"]
 		if alreadyEarthquake == nil {
 			return nil, errors.New("missing field alreadyEarthquake")
