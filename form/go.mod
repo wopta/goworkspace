@@ -9,7 +9,7 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/xuri/excelize/v2 v2.7.1
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.195
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.232
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.233
 	google.golang.org/api v0.181.0
 )
 

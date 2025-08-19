@@ -15,13 +15,13 @@ require (
 	github.com/xuri/excelize/v2 v2.9.0
 	gitlab.dev.wopta.it/goworkspace/inclusive v0.0.38
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.195
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.232
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.233
 	gitlab.dev.wopta.it/goworkspace/models v1.2.110
 	gitlab.dev.wopta.it/goworkspace/network v1.0.178
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.303
 	gitlab.dev.wopta.it/goworkspace/product v1.1.109
 	gitlab.dev.wopta.it/goworkspace/transaction v1.0.296
-	gitlab.dev.wopta.it/goworkspace/user v1.0.216
+	gitlab.dev.wopta.it/goworkspace/user v1.0.217
 	google.golang.org/api v0.206.0
 )
 
