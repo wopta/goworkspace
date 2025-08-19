@@ -339,16 +339,7 @@ func (c *CatnatGenerator) addFrazionamento() {
 
 func (c *CatnatGenerator) addSetInformativoInfo() {
 	c.engine.WriteText(c.engine.GetTableCell("Il presente preventivo non ha validità di proposta assicurativa.", constants.BoldFontStyle))
-	c.engine.WriteText(domain.TableCell{
-		Text:      "Ha valore esclusivamente nel giorno di emissione e non impegna la compagnia alla sottoscrizione del rischio.",
-		Fill:      true,
-		FontStyle: constants.BoldFontStyle,
-		FillColor: constants.YellowColor,
-		Height:    constants.CellHeight,
-		FontColor: constants.BlackColor,
-		FontSize:  constants.RegularFontSize,
-		Align:     constants.LeftAlign,
-	})
+	c.engine.WriteText(c.engine.GetTableCell("Ha valore esclusivamente nel giorno di emissione e non impegna la compagnia alla sottoscrizione del rischio."))
 	c.engine.NewLine(2)
 	c.engine.WriteText(c.engine.GetTableCell("Prima della sottoscrizione leggere il set informativo.", constants.BoldFontStyle))
 }
