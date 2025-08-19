@@ -35,17 +35,12 @@ func SignFiles(policy *models.Policy, product *models.Product, networkNode *mode
 	if err != nil {
 		return err
 	}
-	//TODO: remove this 'if' after catnat document is done
-	//this could  be done in a different step, to clean this function
-	if policy.Name != models.CatNatProduct {
-		p := <-document.ContractObj(*policy, networkNode, product)
-		document, err := p.SaveWithName(fmt.Sprint(policy.NameDesc, " Polizza"))
-		if err != nil {
-			return err
-		}
-		namirialInput.DocumentsFullPath = append(namirialInput.DocumentsFullPath, document.FullPath)
+	p := <-document.ContractObj(*policy, networkNode, product)
+	document, err := p.SaveWithName(fmt.Sprint(policy.NameDesc, " Polizza"))
+	if err != nil {
+		return err
 	}
-	//}
+	namirialInput.DocumentsFullPath = append(namirialInput.DocumentsFullPath, document.FullPath)
 	for _, path := range fullPathDocumentToSign {
 		namirialInput.DocumentsFullPath = append(namirialInput.DocumentsFullPath, path)
 	}

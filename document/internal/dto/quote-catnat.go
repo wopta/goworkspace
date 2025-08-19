@@ -75,16 +75,18 @@ func NewCatnatDto() QuoteCatnatDTO {
 	return QuoteCatnatDTO{}
 }
 
+func (b *buildingCatnatDto) fromPolicy(policy *models.Policy) {
+	b.buildingDTO = *newBuildingDTO()
+	b.buildingDTO.fromPolicy(*policy.Assets[0].Building, policy.Assets[0].Guarantees)
+	b.Type = useTypeMap[policy.Assets[0].Building.UseType]
+	b.BuildingMaterial = buildingMaterialMap[policy.Assets[0].Building.BuildingMaterial]
+	b.BuildingYear = buildingYearMap[policy.Assets[0].Building.BuildingYear]
+	b.LowestFloor = lowestFloorMap[policy.Assets[0].Building.LowestFloor]
+	b.Floor = floorMap[policy.Assets[0].Building.Floor]
+}
 func (dto *QuoteCatnatDTO) FromPolicy(policy *models.Policy) {
 	dto.Sede = buildingCatnatDto{}
-	dto.Sede.buildingDTO = *newBuildingDTO()
-	dto.Sede.buildingDTO.fromPolicy(*policy.Assets[0].Building, policy.Assets[0].Guarantees)
-	dto.Sede.Type = useTypeMap[policy.Assets[0].Building.UseType]
-	dto.Sede.BuildingMaterial = buildingMaterialMap[policy.Assets[0].Building.BuildingMaterial]
-	dto.Sede.BuildingYear = buildingYearMap[policy.Assets[0].Building.BuildingYear]
-	dto.Sede.LowestFloor = lowestFloorMap[policy.Assets[0].Building.LowestFloor]
-	dto.Sede.Floor = floorMap[policy.Assets[0].Building.Floor]
-
+	dto.Sede.fromPolicy(policy)
 	dto.EarthquakeGuarantee = newGuaranteeCatnatDto(policy, "EARTHQUAKE")
 	dto.FloodGuarantee = newGuaranteeCatnatDto(policy, "FLOOD")
 	dto.LandslideGuarantee = newGuaranteeCatnatDto(policy, "LANDSLIDE")
