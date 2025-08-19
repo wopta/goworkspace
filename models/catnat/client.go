@@ -207,7 +207,6 @@ func (c *NetClient) EnrichAteco(fiscalCode string) (response AtecoResponse, err 
 		}
 		return response, errors.New(string(errBytes))
 	}
-	err = json.NewDecoder(resp.Body).Decode(&response)
 	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		log.ErrorF("error decoding catnat response")
 		return response, err
