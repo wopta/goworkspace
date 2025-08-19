@@ -123,20 +123,35 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 		return nil, errors.New(out.Msg)
 	}
 
-	alreadyEarthquake := policy.QuoteQuestions["alreadyEarthquake"].(bool)
-	alreadyFlood := policy.QuoteQuestions["alreadyFlood"].(bool)
+	var alreadyEarthquake any
+	var alreadyFlood any
+	var wantEarthquake any
+	var wantFlood any
 
-	wantEarthquake := policy.QuoteQuestions["wantEarthquake"]
-	if wantEarthquake == nil {
-		wantEarthquake = false
-	}
-	wantFlood := policy.QuoteQuestions["wantFlood"]
-	if wantFlood == nil {
-		wantFlood = false
+	if policy.Assets[0].Building.UseType == "tenant" {
+		alreadyEarthquake = policy.QuoteQuestions["alreadyEarthquake"]
+		if alreadyEarthquake == nil {
+			return nil, errors.New("missing field alreadyEarthquake")
+		}
+		alreadyFlood = policy.QuoteQuestions["alreadyFlood"]
+		if alreadyFlood == nil {
+			return nil, errors.New("missing field alreadyFlood")
+		}
+		wantEarthquake = policy.QuoteQuestions["wantEarthquake"]
+		if wantEarthquake == nil {
+			wantEarthquake = false
+		}
+		wantFlood = policy.QuoteQuestions["wantFlood"]
+		if wantFlood == nil {
+			wantFlood = false
+		}
+	} else {
+		alreadyEarthquake = false
+		alreadyFlood = false
 	}
 
 	if policy.Assets[0].Building.UseType == "tenant" {
-		if !alreadyEarthquake && !alreadyFlood && !wantFlood.(bool) && !wantEarthquake.(bool) {
+		if !alreadyEarthquake.(bool) && !alreadyFlood.(bool) && !wantFlood.(bool) && !wantEarthquake.(bool) {
 			for i := range out.Product.Companies[0].GuaranteesMap {
 				if (out.Product.Companies[0].GuaranteesMap)[i].SynchronizeSlug == "naturalDisasters-stock" {
 					(out.Product.Companies[0].GuaranteesMap)[i].Config.SumInsuredLimitOfIndemnityTextField.Min = 5000
@@ -149,10 +164,10 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 		log.InfoF(out.Msg)
 		return out, nil
 	}
-	if alreadyEarthquake && !wantEarthquake.(bool) {
+	if alreadyEarthquake.(bool) && !wantEarthquake.(bool) {
 		policy.Assets[0].Guarantees = slices.DeleteFunc(policy.Assets[0].Guarantees, func(g models.Guarante) bool { return g.Slug == "earthquake-building" })
 	}
-	if alreadyFlood && !wantFlood.(bool) {
+	if alreadyFlood.(bool) && !wantFlood.(bool) {
 		policy.Assets[0].Guarantees = slices.DeleteFunc(policy.Assets[0].Guarantees, func(g models.Guarante) bool { return g.Slug == "flood-building" })
 	}
 
@@ -217,7 +232,6 @@ func getCatnatInputRules(p *models.Policy) ([]byte, error) {
 	var wantEarthquake any
 	var wantFlood any
 
-	log.Println("------------------", p.Assets[0].Building.UseType)
 	if p.Assets[0].Building.UseType == "tenant" {
 		alreadyEarthquake = p.QuoteQuestions["alreadyEarthquake"]
 		if alreadyEarthquake == nil {
