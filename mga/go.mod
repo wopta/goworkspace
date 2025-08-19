@@ -12,13 +12,13 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	gitlab.dev.wopta.it/goworkspace/document v1.1.260
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.195
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.233
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.234
 	gitlab.dev.wopta.it/goworkspace/models v1.2.110
 	gitlab.dev.wopta.it/goworkspace/network v1.0.178
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.303
 	gitlab.dev.wopta.it/goworkspace/product v1.1.109
 	gitlab.dev.wopta.it/goworkspace/transaction v1.0.296
-	gitlab.dev.wopta.it/goworkspace/user v1.0.217
+	gitlab.dev.wopta.it/goworkspace/user v1.0.218
 )
 
 require (

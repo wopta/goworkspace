@@ -14,7 +14,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/network v1.0.178
 	gitlab.dev.wopta.it/goworkspace/product v1.1.109
 	gitlab.dev.wopta.it/goworkspace/quote v1.0.287
-	gitlab.dev.wopta.it/goworkspace/user v1.0.217
+	gitlab.dev.wopta.it/goworkspace/user v1.0.218
 )
 
 require (
@@ -82,7 +82,7 @@ require (
 	github.com/xuri/nfp v0.0.0-20230919160717-d98342af3f05 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	gitlab.dev.wopta.it/goworkspace/document v1.1.260 // indirect
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.233 // indirect
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.234 // indirect
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.303 // indirect
 	gitlab.dev.wopta.it/goworkspace/sellable v1.0.222 // indirect
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.37 // indirect
