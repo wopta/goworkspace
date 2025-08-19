@@ -135,6 +135,15 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 		wantFlood = false
 	}
 
+	if policy.Assets[0].Building.UseType == "tenant" {
+		if !alreadyEarthquake && !alreadyFlood && !wantFlood.(bool) && !wantEarthquake.(bool) {
+			for i := range out.Product.Companies[0].GuaranteesMap {
+				if (out.Product.Companies[0].GuaranteesMap)[i].SynchronizeSlug == "naturalDisasters-stock" {
+					(out.Product.Companies[0].GuaranteesMap)[i].Config.SumInsuredLimitOfIndemnityTextField.Min = 5000
+				}
+			}
+		}
+	}
 	if !isValidationForQuote {
 		out = ruleOutput.(*SellableOutput)
 		log.InfoF(out.Msg)
