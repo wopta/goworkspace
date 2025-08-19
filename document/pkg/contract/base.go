@@ -132,6 +132,8 @@ func (bg *baseGenerator) woptaFooter() {
 }
 
 func (bg *baseGenerator) woptaPrivacySection() {
+	bg.emptyHeader()
+	bg.engine.NewPage()
 	const (
 		rowHeight   = 3
 		columnWidth = 190
@@ -695,6 +697,7 @@ func (bg *baseGenerator) signatureForm() {
 }
 
 func (bg *baseGenerator) AddMup() {
+	bg.emptyHeader()
 	bg.mup(false, bg.policy.Company, bg.policy.ConsultancyValue.Price, bg.policy.Channel)
 }
 
@@ -1062,6 +1065,7 @@ func (bg *baseGenerator) whoWeAre() {
 }
 
 func (bg *baseGenerator) addElectronicSignPolicy() {
+	bg.emptyHeader()
 	bg.engine.NewPage()
 	bg.engine.WriteText(bg.engine.GetTableCell("Servizio di Firma Elettronica Avanzata (“FEA”)", constants.BoldFontStyle, constants.CenterAlign))
 	bg.engine.WriteText(bg.engine.GetTableCell("in modalità One Time Password (“OTP”) erogato da Wopta Assicurazioni srl", constants.BoldFontStyle, constants.CenterAlign))
@@ -1104,6 +1108,7 @@ func (bg *baseGenerator) addElectronicSignPolicy() {
 }
 
 func (bg *baseGenerator) addOtpSignPolicy() {
+	bg.emptyHeader()
 	bg.engine.NewPage()
 	bg.engine.WriteText(bg.engine.GetTableCell("Scheda Tecnica Servizio di FEA in modalità OTP erogato da Wopta", constants.BoldFontStyle, constants.CenterAlign))
 	bg.engine.WriteText(bg.engine.GetTableCell("- DPCM 23 Febbraio 2013 art. 57 comma 1 lett. E) ed f) delle Regole Tecniche -", constants.CenterAlign))
