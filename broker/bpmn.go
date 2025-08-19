@@ -55,7 +55,6 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 
 	product = prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode, warrant)
 	mgaProduct = prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
-
 	switch flowKey {
 	case leadFlowKey:
 		flow = flowFile.LeadFlow
@@ -70,7 +69,7 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		return nil
 	}
 
-	flowHandlers := lib.SliceMap[models.Process, string](flow, func(h models.Process) string { return h.Name })
+	flowHandlers := lib.SliceMap(flow, func(h models.Process) string { return h.Name })
 	log.Printf("starting %s flow with set handlers: %s", flowKey, strings.Join(flowHandlers, ","))
 
 	state := bpmn.NewBpmn(*policy)
