@@ -835,6 +835,16 @@ func (bg *baseGenerator) companySignature() {
 	}
 
 	companiesMap := map[string]companyDetails{
+		models.NetInsuranceCompany: {
+			description: "Net company",
+			logo: logoInfo{
+				path:   "signature_axa.png",
+				x:      35,
+				y:      9,
+				width:  30,
+				height: 8,
+			},
+		},
 		models.AxaCompany: {
 			description: "AXA France Vie\n(Rappresentanza Generale per l'Italia)",
 			logo: logoInfo{
@@ -1049,4 +1059,81 @@ func (bg *baseGenerator) whoWeAre() {
 		FontColor: constants.BlackColor,
 		FontSize:  constants.RegularFontSize,
 	})
+}
+
+func (bg *baseGenerator) addElectronicSignPolicy() {
+	bg.engine.NewPage()
+	bg.engine.WriteText(bg.engine.GetTableCell("Servizio di Firma Elettronica Avanzata (“FEA”)", constants.BoldFontStyle, constants.CenterAlign))
+	bg.engine.WriteText(bg.engine.GetTableCell("in modalità One Time Password (“OTP”) erogato da Wopta Assicurazioni srl", constants.BoldFontStyle, constants.CenterAlign))
+	bg.engine.NewLine(2)
+
+	bg.engine.WriteText(bg.engine.GetTableCell("Wopta Assicurazioni S.r.l. (sede legale in Galleria del Corso, 1 – 20122 Milano (MI), partita iva 12072020964) (di seguito Wopta), ha scelto di avvalersi di processi digitali basati su documenti informatici per la sottoscrizione dei prodotti assicurativi e la documentazione operativa, dando un sostanzioso contributo alla tutela ambientale, evitando la stampa di una notevole mole di documenti."))
+	bg.engine.WriteText(bg.engine.GetTableCell("L’utilizzo di documenti informatici è consentito e incentivato dalla normativa (Art. 62 Reg. 40 - Utilizzo della firma elettronica avanzata, della firma elettronica qualificata e della firma digitale- 1. I distributori favoriscono l’utilizzo da parte dei contraenti della tecnologia di firma elettronica avanzata, di firma elettronica qualificata e di firma digitale per la sottoscrizione della documentazione relativa al contratto di assicurazione. 2. La polizza può essere formata come documento informatico sottoscritto con firma elettronica avanzata, con firma elettronica qualificata o con firma digitale, nel rispetto delle disposizioni normative vigenti in materia)."))
+	bg.engine.NewLine(2)
+	bg.engine.WriteText(bg.engine.GetTableCell("Condizioni Generali Servizio", constants.BoldFontStyle, constants.CenterAlign))
+	bg.engine.NewLine(2)
+	bg.engine.WriteTexts(bg.engine.GetTableCell("Il Servizio consente l’utilizzo della Firma Elettronica Autorizzata (da ora in poi FEA) solo dopo l’identificazione del Firmatario e l’esplicita autorizzazione all’utilizzo dello stesso. Il Firmatario in fase di identificazione dovrà fornire necessariamente un numero di telefono mobile e indirizzo mail validi, questi dovranno essere ad uso esclusivo e sotto il pieno controllo del Firmatario. Le comunicazioni del processo di firma avvengono tramite invio di Email all’indirizzo comunicato dal Firmatario. Il documento da firmare verrà inviato al Firmatario che potrà visionarlo. La FEA verrà apposta, sul documento ricevuto dal Firmatario accettando i punti firma indicati e confermando di aver letto il documento, con l’inserimento della One Time Password (OTP) quando richiesto. Si rimanda alla Sezione "), bg.engine.GetTableCell("\"Scheda Tecnica servizio\"", constants.BoldFontStyle), bg.engine.GetTableCell("per ulteriori informazioni. Il Firmatario accettando la FEA, dichiara che sia il numero telefonico mobile, l’indirizzo email comunicati e gli strumenti utilizzati per il processo di FEA sono sotto il proprio esclusivo controllo."))
+	bg.engine.NewLine(2)
+	bg.engine.WriteText(bg.engine.GetTableCell("L’utilizzo e la validità della FEA è sempre subordinata alla corretta conclusione del processo di identificazione del Firmatario."))
+	bg.engine.NewLine(2)
+	bg.engine.WriteText(bg.engine.GetTableCell("-	Attivazione del servizio", constants.BoldFontStyle))
+	bg.engine.NewLine(2)
+	bg.engine.WriteText(bg.engine.GetTableCell("Il nuovo Firmatario attiva e aderisce al servizio di FEA nel processo di identificazione, con contestuale accettazione delle presenti Condizioni Generali come indicato nel percorso di firma. Nel caso il Firmatario avesse già utilizzato il servizio di FEA in precedenza e quindi identificato, per ogni firma successiva alla prima verrà invitato a verificare l’esattezza dei dati personali archiviati e gli estremi dell’accettazione della FEA. In caso di variazioni dei dati, il Firmatario dovrà aggiornarli e accettare nuovamente la FEA. Il Nuovo Firmatario attiva la FEA mediante l’inserimento del codice OTP ricevuto via SMS/mail e attiva il processo di firma in conformità a quanto previsto dalla normativa vigente."))
+	bg.engine.NewLine(2)
+	bg.engine.WriteText(bg.engine.GetTableCell("-	Revoca del servizio", constants.BoldFontStyle))
+	bg.engine.NewLine(2)
+	bg.engine.WriteText(bg.engine.GetTableCell("Viene richiesto di rinnovare la scelta ad ogni processo di firma."))
+	bg.engine.NewLine(2)
+	bg.engine.WriteText(bg.engine.GetTableCell("-	Apposizione della firma elettronica avanzata", constants.BoldFontStyle))
+	bg.engine.NewLine(2)
+	bg.engine.WriteText(bg.engine.GetTableCell("L’ operazione di accettazione del presente documento “Servizio di Firma Elettronica Avanzata (“FEA”) in modalità One Time Password (“OTP”) erogato da Wopta Assicurazioni srl” viene effettuato ad ogni firma. L’apposizione della FEA sul documento informatico avviene con la validazione di tutti i punti firma richiesti e la dichiarazione di aver letto tutto il documento da firmare. A seguire, quando richiesto, dovrà essere inserito il codice OTP inviato al Firmatario attraverso il canale (SMS/Email) scelto dal Firmatario. Questa operazione conclude il proVcesso di firma crittografica del documento, necessario a rendere il documento elettronico integro, non modificabile, leggibile e autentico. Il processo di FEA può ritenersi concluso solo quando il Firmatario riceve l’email con il messaggio di completamento dell’operazione e contenente il documento firmato."))
+	bg.engine.WriteText(bg.engine.GetTableCell("Successivamente, il Firmatario potrà verificare in qualsiasi momento i dettagli del documento firmato su una pagina specifica nella homepage “Area Riservata”"))
+	bg.engine.NewLine(2)
+	bg.engine.WriteText(bg.engine.GetTableCell("-	Limitazioni d’uso", constants.BoldFontStyle))
+	bg.engine.NewLine(2)
+	bg.engine.WriteText(bg.engine.GetTableCell("Il Firmatario potrà utilizzare la firma elettronica avanzata esclusivamente per sottoscrivere i documenti per i quali ha accettato di aderire."))
+	bg.engine.NewLine(2)
+	bg.engine.WriteText(bg.engine.GetTableCell("-	Recupero e verifica del documento informatico sottoscritto", constants.BoldFontStyle))
+	bg.engine.NewLine(2)
+	bg.engine.WriteText(bg.engine.GetTableCell("Il cliente può recuperare il documento informatico sottoscritto attraverso l’apposita funzionalità descritta al punto precedente “Apposizione della firma elettronica avanzata”. Il cliente può verificare l’integrità, la non modifica e l’autenticità del documento e delle firme elettroniche attraverso i passi: Salvataggio sul proprio computer del documento informatico sottoscritto (formato pdf). Inoltre ad ogni documento sottoscritto è associato un Report dettagliato delle operazioni che hanno portato alla firma del documento stesso."))
+	bg.engine.NewPage()
+
+	bg.engine.WriteText(bg.engine.GetTableCell("-	Conservazione del documento informatico sottoscritto", constants.BoldFontStyle))
+	bg.engine.NewLine(2)
+	bg.engine.WriteText(bg.engine.GetTableCell("Wopta provvede all’archiviazione digitale del processo e dei dati del Firmatario con firma elettronica avanzata in ottemperanza alle indicazioni normative. Wopta si occupa della conservazione del documento e dell’archiviazione di tutte le evidenze informatiche necessarie a comprovarne l’integrità, la leggibilità, l’assenza di modifiche dopo l’apposizione delle firme e l’autenticità delle firme apposte, il tutto in conformità alla normativa tempo per tempo vigente."))
+}
+
+func (bg *baseGenerator) addOtpSignPolicy() {
+	bg.engine.NewPage()
+	bg.engine.WriteText(bg.engine.GetTableCell("Scheda Tecnica Servizio di FEA in modalità OTP erogato da Wopta", constants.BoldFontStyle, constants.CenterAlign))
+	bg.engine.WriteText(bg.engine.GetTableCell("- DPCM 23 Febbraio 2013 art. 57 comma 1 lett. E) ed f) delle Regole Tecniche -", constants.CenterAlign))
+	bg.engine.NewLine(2)
+
+	bg.engine.WriteText(bg.engine.GetTableCell("Per la consueta operatività Wopta si avvale, nel rispetto della normativa, di “documenti elettronici” in sostituzione di quelli cartacei."))
+	bg.engine.WriteText(bg.engine.GetTableCell("L'utilizzo dei documenti informatici è possibile grazie ad una tecnologia che Le permette di indicare, laddove richiesto, la Sua volontà di apporre la firma utilizzando una procedura gratuita e guidata autorizzata tramite un codice usa e getta."))
+	bg.engine.WriteText(bg.engine.GetTableCell("Il servizio di Firma Elettronica Avanzata (di seguito anche “FEA”) è attuato dalla Società nel rispetto delle vigenti disposizioni in materia."))
+
+	bg.engine.NewLine(2)
+	bg.engine.WriteText(bg.engine.GetTableCell("-	Il controllo esclusivo del firmatario del sistema di generazione della firma", constants.BoldFontStyle))
+	bg.engine.NewLine(2)
+
+	bg.engine.WriteText(bg.engine.GetTableCell("Il Cliente ha il controllo esclusivo del sistema del processo di firma, avendo sempre la possibilità, per ogni singola firma apposta di:"))
+	bg.engine.WriteText(bg.engine.GetTableCell("     -     visualizzare il contenuto dei documenti al momento della firma in modo da aver evidenza di quanto sta per sottoscrivere"))
+	bg.engine.WriteText(bg.engine.GetTableCell("     -     utilizzare gli appositi controlli per ingrandire/rimpicciolire il testo del documento"))
+	bg.engine.WriteText(bg.engine.GetTableCell("     -     identificare in modo intuitivo tutte le parti del documento dove è prevista una firma"))
+	bg.engine.WriteText(bg.engine.GetTableCell("     -     confermare la firma apposta"))
+	bg.engine.WriteText(bg.engine.GetTableCell("     -     annullare l’operazione di firma"))
+	bg.engine.WriteText(bg.engine.GetTableCell("Per garantire il massimo livello di sicurezza possibile relativamente a questa scelta tecnologica, Wopta Assicurazioni S.r.l. ha adottato le migliori soluzioni certificate sul mercato dotate di sofisticate tecnologie atte ad impedire manomissioni informatiche."))
+	bg.engine.WriteText(bg.engine.GetTableCell("La piattaforma utilizzata da Wopta e fornita da Namirial S.p.A. è integrata per la digitalizzazione delle transazioni di business e dei workflow documentali eSignAnyWhere (eSAW). Il sistema eSAW implementa funzionalità di apposizione delle firme digitali. La modalità standard è quella interattiva in cui i firmatari accedono ad un Web Signature Tray (Viewer) all’interno del quale è possibile visualizzare e firmare i documenti proposti seguendo un wizard particolarmente intuitivo. La modalità interattiva prevede un flusso secondo il quale un’applicazione oppure un sito internet richiedono la firma digitale di un documento attraverso la creazione di una pratica (o transazione) di firma."))
+	bg.engine.WriteText(bg.engine.GetTableCell("I documenti da firmare sono protetti da un meccanismo di autenticazione per assicurarsi che solamente il firmatario designato possa accedervi. Il meccanismo di autenticazione utilizza un OTP (One Time Password) inviato sul numero di cellulare del firmatario (dispositivo personale). Il sistema eSAW crea la pratica di firma e genera una URL univoca che la identifica e può essere direttamente utilizzata nel browser del firmatario designato. L’URL viene inviato all’email indicata dal firmatario in sede di censimento dati anagrafici. Accedendo con un browser alla URL della transazione di firma, viene mostrato il Viewer, ovvero un’interfaccia che presenta:"))
+	bg.engine.WriteText(bg.engine.GetTableCell("     -     Accettazione di utilizzo del servizio di FEA;"))
+	bg.engine.WriteText(bg.engine.GetTableCell("     -     Un’anteprima del documento da firmare;"))
+	bg.engine.WriteText(bg.engine.GetTableCell("     -     I controlli di firma;"))
+	bg.engine.WriteText(bg.engine.GetTableCell("     -     Il wizard di firma;"))
+	bg.engine.WriteText(bg.engine.GetTableCell("     -     Menu con Guida e azioni accessorie per l’utente;"))
+
+	bg.engine.NewLine(2)
+	bg.engine.WriteText(bg.engine.GetTableCell("-	La connessione univoca della firma al firmatario", constants.BoldFontStyle))
+	bg.engine.NewLine(2)
+	bg.engine.WriteText(bg.engine.GetTableCell("I dati di ogni firma raccolta vengono poi cifrati, utilizzando uno specifico certificato digitale, ed inclusi all'interno del documento sottoscritto. Il Cliente ha sempre la possibilità di verificare che il documento informatico sottoscritto non abbia subito modifiche dopo l’apposizione della firma; presso AgID all’ URL http://www.agid.gov.it/identita-digitali/firme-elettroniche/software-verifica.S"))
 }
