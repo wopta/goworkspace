@@ -7,6 +7,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/document/internal/domain"
 	"gitlab.dev.wopta.it/goworkspace/document/internal/dto"
 	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
+	"gitlab.dev.wopta.it/goworkspace/document/pkg/internal/catnat"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
@@ -34,9 +35,9 @@ func (c *CatnatGenerator) Exec() ([]byte, error) {
 	c.addCatnatHeader()
 	c.engine.NewPage()
 	c.engine.NewLine(5)
-	c.addCatnatHeading()
+	catnat.AddBuildingInformation(c.engine, c.dto.Sede, c.dto.Questions)
 	c.engine.NewLine(10)
-	c.addTableGuarantee()
+	catnat.AddTableGuarantee(c.engine, c.dto.Guarantees)
 	c.engine.NewLine(3)
 	c.addFrazionamento()
 	c.engine.NewLine(4)
@@ -115,216 +116,6 @@ func (c *CatnatGenerator) addCatnatHeader() {
 		c.engine.WriteText(c.engine.GetTableCell("PREVENTIVO\nANONIMO", domain.FontSize(10), constants.BoldFontStyle))
 		c.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_wopta.png", 165, 15, 35, 10)
 	})
-}
-
-func (c *CatnatGenerator) addCatnatHeading() {
-	c.engine.WriteText(c.engine.GetTableCell("DATI DEL PREVENIVO", constants.BoldFontStyle, constants.PinkColor, domain.FontSize(10)))
-	c.engine.NewLine(5)
-	c.engine.WriteText(c.engine.GetTableCell("DATI SEDE DA ASSICURARE", constants.BoldFontStyle, domain.FontSize(12)))
-	c.engine.SetDrawColor(constants.PinkColor)
-	c.engine.NewLine(2)
-	var (
-		firstColumnWidth  float64 = 65
-		secondColumnWidth float64 = 45
-		thirdColumnWidth  float64 = 40
-		fourthColumnWidth float64 = 40
-	)
-	parserTableInfoSede := func(lines [][]string) [][]domain.TableCell {
-		result := make([][]domain.TableCell, 0, len(lines))
-		for _, texts := range lines {
-			result = append(result, []domain.TableCell{
-				{
-					Text:      texts[0],
-					Height:    constants.CellHeight,
-					Width:     firstColumnWidth,
-					FontStyle: constants.BoldFontStyle,
-					FontColor: constants.BlackColor,
-					Fill:      false,
-					FontSize:  constants.RegularFontSize,
-					FillColor: domain.Color{},
-					Align:     constants.LeftAlign,
-					Border:    "T",
-				},
-				{
-					Text:      texts[1],
-					Height:    constants.CellHeight,
-					FontStyle: constants.RegularFontStyle,
-					Width:     secondColumnWidth,
-					FontColor: constants.BlackColor,
-					FontSize:  constants.RegularFontSize,
-					Fill:      false,
-					FillColor: domain.Color{},
-					Align:     constants.LeftAlign,
-					Border:    "T",
-				},
-				{
-					Text:      texts[2],
-					Height:    constants.CellHeight,
-					FontStyle: constants.BoldFontStyle,
-					FontColor: constants.BlackColor,
-					Width:     thirdColumnWidth,
-					FontSize:  constants.RegularFontSize,
-					Fill:      false,
-					FillColor: domain.Color{},
-					Align:     constants.LeftAlign,
-					Border:    "T",
-				}, {
-					Text:      texts[3],
-					Height:    constants.CellHeight,
-					FontStyle: constants.RegularFontStyle,
-					FontColor: constants.BlackColor,
-					Width:     fourthColumnWidth,
-					FontSize:  constants.RegularFontSize,
-					Fill:      false,
-					FillColor: domain.Color{},
-					Align:     constants.LeftAlign,
-					Border:    "T",
-				},
-			})
-		}
-
-		return result
-	}
-	dataSede := [][]string{
-		{"Indirizzo:", c.dto.Sede.Address, "Tipo Utilizzo Sede:", c.dto.Sede.Type},
-		{"Anno di costruzione:", c.dto.Sede.BuildingYear, "Materiale di costruzione:", c.dto.Sede.BuildingMaterial},
-		{"Numero di piani edificio oltre il piano terra:", c.dto.Sede.Floor, "", ""},
-	}
-	c.engine.DrawTable(parserTableInfoSede(dataSede))
-	c.engine.SetX(c.engine.GetX() - 3)
-	c.engine.SetY(c.engine.GetY() - 3)
-	firstColumnWidth = 170
-	secondColumnWidth = 20
-
-	parserTableQuestions := func(lines [][]string) [][]domain.TableCell {
-		result := make([][]domain.TableCell, 0, len(lines))
-		for _, texts := range lines {
-			result = append(result, []domain.TableCell{
-				{
-					Text:      texts[0],
-					Height:    constants.CellHeight,
-					Width:     firstColumnWidth,
-					FontStyle: constants.BoldFontStyle,
-					FontColor: constants.BlackColor,
-					Fill:      false,
-					FontSize:  constants.RegularFontSize,
-					FillColor: domain.Color{},
-					Align:     constants.LeftAlign,
-					Border:    "T",
-				},
-				{
-					Text:      texts[1],
-					Height:    constants.CellHeight,
-					FontStyle: constants.RegularFontStyle,
-					Width:     secondColumnWidth,
-					FontColor: constants.BlackColor,
-					FontSize:  constants.RegularFontSize,
-					Fill:      false,
-					FillColor: domain.Color{},
-					Align:     constants.LeftAlign,
-					Border:    "T",
-				},
-			})
-		}
-
-		return result
-	}
-	dataQuestion := [][]string{
-		{"Il Fabbricato e il Terreno da assicurare sono già coperti per la Garanzia Terremoto?", c.dto.Questions.AlreadyEarthquake},
-		{"Nel caso in cui il Fabbricato e il Terreno da assicurare posseggano già la Garanzia Terremoto, il Contraente intende acquistare la medesima copertura?", c.dto.Questions.WantEarthquake},
-		{"Il Fabbricato e il Terreno da assicurare sono già coperti per la Garanzia Alluvione?", c.dto.Questions.AlreadyFlood},
-		{"Nel caso in cui il Fabbricato e il Terreno da assicurare posseggano già la Garanzia Alluvione, il Contraente intende acquistare la medesima copertura?", c.dto.Questions.WantFlood},
-	}
-	c.engine.DrawTable(parserTableQuestions(dataQuestion))
-	c.engine.DrawLine(10, c.engine.GetY(), 200, c.engine.GetY(), 0.25, constants.PinkColor)
-}
-
-func (c *CatnatGenerator) addTableGuarantee() {
-	const (
-		widthColumn = 38
-	)
-	guranteeTable := func(lines [][]string) [][]domain.TableCell {
-		result := make([][]domain.TableCell, 0, len(lines))
-		var font domain.FontStyle
-		for i, texts := range lines {
-			if i == 0 {
-				font = constants.BoldFontStyle
-			} else {
-				font = constants.RegularFontStyle
-			}
-			result = append(result, []domain.TableCell{
-				{
-					Text:      texts[0],
-					Height:    constants.CellHeight,
-					Width:     widthColumn,
-					FontStyle: constants.BoldFontStyle,
-					FontColor: constants.BlackColor,
-					Fill:      false,
-					FontSize:  constants.RegularFontSize,
-					FillColor: domain.Color{},
-					Align:     constants.LeftAlign,
-					Border:    "1",
-				},
-				{
-					Text:      texts[1],
-					Height:    constants.CellHeight,
-					FontStyle: font,
-					Width:     widthColumn,
-					FontColor: constants.BlackColor,
-					FontSize:  constants.RegularFontSize,
-					Fill:      false,
-					FillColor: domain.Color{},
-					Align:     constants.LeftAlign,
-					Border:    "1",
-				},
-				{
-					Text:      texts[2],
-					Height:    constants.CellHeight,
-					FontStyle: font,
-					FontColor: constants.BlackColor,
-					Width:     widthColumn,
-					FontSize:  constants.RegularFontSize,
-					Fill:      false,
-					FillColor: domain.Color{},
-					Align:     constants.LeftAlign,
-					Border:    "1",
-				},
-				{
-					Text:      texts[3],
-					Height:    constants.CellHeight,
-					FontStyle: font,
-					FontColor: constants.BlackColor,
-					FontSize:  constants.RegularFontSize,
-					Fill:      false,
-					Width:     widthColumn,
-					FillColor: domain.Color{},
-					Align:     constants.LeftAlign,
-					Border:    "1",
-				},
-				{
-					Text:      texts[4],
-					Height:    constants.CellHeight,
-					FontStyle: font,
-					FontColor: constants.BlackColor,
-					Width:     widthColumn,
-					FontSize:  constants.RegularFontSize,
-					Fill:      false,
-					FillColor: domain.Color{},
-					Align:     constants.LeftAlign,
-					Border:    "1",
-				},
-			})
-		}
-
-		return result
-	}
-	guaranteeData := [][]string{
-		{"Garanzie", "Somma Assicurata Fabricato €", "Somma Assicurata Contenuto €", "Somma Assicurata Merci €", "Importo Annuo €"},
-		{"Terremoto", c.dto.EarthquakeGuarantee.Building, c.dto.EarthquakeGuarantee.Content, c.dto.EarthquakeGuarantee.Stock, c.dto.EarthquakeGuarantee.Total},
-		{"Alluvione", c.dto.FloodGuarantee.Building, c.dto.FloodGuarantee.Content, c.dto.FloodGuarantee.Stock, c.dto.FloodGuarantee.Total},
-		{"Frane", c.dto.LandslideGuarantee.Building, c.dto.LandslideGuarantee.Content, c.dto.LandslideGuarantee.Stock, c.dto.LandslideGuarantee.Total},
-	}
-	c.engine.DrawTable(guranteeTable(guaranteeData))
 }
 
 func (c *CatnatGenerator) addFrazionamento() {

@@ -9,6 +9,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/document/internal/domain"
 	"gitlab.dev.wopta.it/goworkspace/document/internal/dto"
 	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
+	"gitlab.dev.wopta.it/goworkspace/document/pkg/internal/catnat"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
 	"gitlab.dev.wopta.it/goworkspace/network"
@@ -44,17 +45,86 @@ func (el *CatnatGenerator) Generate() {
 	el.addMainHeader()
 	el.engine.NewPage()
 	el.engine.NewLine(constants.CellHeight)
+	if el.isProposal {
+		el.generateProposal()
+	} else {
+		el.generateContract()
+	}
+}
+func (el *CatnatGenerator) generateProposal() {
+	el.engine.NewLine(3)
+	el.addInitialGreatings()
+	el.engine.NewLine(3)
+	catnat.AddBuildingInformation(el.engine, el.dtoCatnat.SedeDaAssicurare, el.dtoCatnat.Questions)
+	el.engine.NewLine(3)
+	catnat.AddTableGuarantee(el.engine, el.dtoCatnat.Guarantee)
+	el.engine.NewLine(2)
+	el.addPolicyInformationSection()
+	el.engine.NewLine(2)
+	el.addLinks()
+	el.engine.NewLine(2)
+	el.addFinalGreatings()
+	el.engine.NewPage()
+	el.addStatements()
+	el.whoWeAre()
+	el.AddMup()
+	el.woptaPrivacySection()
+}
+
+func (el *CatnatGenerator) addFinalGreatings() {
+	el.engine.WriteText(el.engine.GetTableCell("Cordiali saluti."))
+	el.engine.NewLine(2)
+	el.engine.WriteText(el.engine.GetTableCell("Anna di Wopta Assicurazioni\nProteggiamo chi sei"))
+}
+
+// TODO: INSERT LINKs
+func (el *CatnatGenerator) addLinks() {
+	if el.policy.Channel == models.ECommerceChannel {
+		el.engine.WriteText(el.engine.GetTableCell("Qualora avessi necessità di ulteriori informazioni e supporto, la risposta che stai cercando potrebbe essere tra le nostre FAQ che trovi a questo link.<-add link!! "))
+		el.engine.NewLine(2)
+		el.engine.WriteText(el.engine.GetTableCell("Se non la trovi, puoi contattarci attraverso questo Form oppure scriverci a questa e-mail. In entrambi i casi un nostro esperto si prenderà cura della tua richiesta. "))
+	} else if el.policy.Channel == models.NetworkChannel {
+		el.engine.WriteText(el.engine.GetTableCell("Se hai necessità di ulteriori informazioni e supporto, contatta il tuo intermediario con il quale hai realizzato la polizza. "))
+	}
+}
+
+func (el *CatnatGenerator) addPolicyInformationSection() {
+	if el.dtoCatnat.Price.Consultancy.ValueFloat == 0 {
+		return
+	}
+	el.engine.NewLine(constants.CellHeight)
+	text :=
+		"Infine, ti ricordiamo la presente polizza prevede il pagamento dei seguenti costi:\n" +
+			fmt.Sprintf("- Premio di polizza: euro %v con frazionamento %v\n", el.dtoCatnat.Price.Gross.Text, el.dtoCatnat.Price.Split) +
+			fmt.Sprintf("- Contributo servizi di intermediazione annuale: euro %v corrisposti con il pagamento della prima rata di polizza\n", el.dtoCatnat.Price.Consultancy.Text) +
+			fmt.Sprintf("- Per un totale annuo di euro %v", el.dtoCatnat.Price.Total.Text)
+
+	el.engine.WriteText(el.engine.GetTableCell(text, constants.BlackColor))
+}
+func (el *CatnatGenerator) addInitialGreatings() {
+	el.engine.WriteText(el.engine.GetTableCell("Documento informativo di Wopta Assicurazioni relativo alla polizza Wopta per te Catastrofali Azienda", constants.PinkColor, constants.BoldFontStyle))
+	el.engine.NewLine(3)
+	el.engine.WriteText(el.engine.GetTableCell("Buongiorno " + el.dtoCatnat.Contractor.Name + " " + el.dtoCatnat.Contractor.Surname + ","))
+	el.engine.WriteText(el.engine.GetTableCell("Confermiamo emissione della polizza in oggetto con i seguenti dati."))
+	el.engine.WriteText(el.engine.GetTableCell("Verifica i dati e le informazioni qui riportate."))
+	el.engine.WriteText(el.engine.GetTableCell("Riceverai mail per la firma della polizza e, una volta effettuato anche il pagamento, questa risulterà valida ed efficace."))
+	el.engine.NewLine(2)
+	el.engine.WriteText(el.engine.GetTableCell("Nel seguito sono riportate le informazioni, le dichiarazioni ed i consensi che ti saranno richiesti e che saranno poi da firmare con i documenti che provvederemo ad inviarti."))
+	el.engine.NewLine(2)
+	el.engine.WriteText(el.engine.GetTableCell("Il presente documento vale a titolo informativo precontrattuale e non ha validità ai fini contrattuali.", constants.BoldFontStyle))
+	el.engine.NewLine(2)
+}
+func (el *CatnatGenerator) generateContract() {
 	el.addContractorInformation()
 	el.engine.NewLine(constants.CellHeight)
-	el.addStatement()
+	el.addStatements()
 	el.addAttachmentsInformation()
 	el.AddMup()
-	el.engine.NewPage()
 	el.woptaPrivacySection()
 	el.addElectronicSignPolicy()
 	el.addOtpSignPolicy()
 }
-func (el *CatnatGenerator) addStatement() {
+func (el *CatnatGenerator) addStatements() {
 	if el.policy.Statements == nil {
 		return
 	}
@@ -183,10 +253,6 @@ func (el *CatnatGenerator) addMainHeader() {
 }
 
 func (el *CatnatGenerator) addContractorInformation() {
-	//
-	//	cognome e nome.	XXXXXXXX XXXXXXXXXXXX
-	//	codice fiscale:	XXXXXXXXXXXXXXX
-	//	ruolo:	XXXXXXXXXXXXXXXXXXXXXXXX
 	el.engine.WriteText(el.engine.GetTableCell("In relazione alla polizza sopra meglio identificata, il contraente, nella figura del suo rappresentante legale:"))
 	const (
 		firstColumnWidth  float64 = 30

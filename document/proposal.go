@@ -40,6 +40,12 @@ func Proposal(policy *models.Policy, networkNode *models.NetworkNode, product *m
 		personaGlobalProposalV1(pdf.GetPdf(), policy, networkNode, product)
 		generator.AddMup()
 		document, err = generateProposalDocument(pdf.GetPdf(), policy)
+	case models.CatNatProduct:
+		pdf := engine.NewFpdf()
+		generator := contract.NewCatnatGenerator(pdf, policy, networkNode, *product, true)
+		generator.Generate()
+		document, err = generateProposalDocument(pdf.GetPdf(), policy)
+
 	}
 
 	log.Printf("proposal document generated for proposal n. %d", policy.ProposalNumber)
