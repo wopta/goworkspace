@@ -55,13 +55,13 @@ func newGuaranteeCatnatDto(p *models.Policy, guarantee string) (res guaranteeCat
 		}
 		if strings.HasSuffix(g.Slug, "building") {
 			res.Building = lib.HumanaizePriceEuro(float64(g.Value.SumInsuredLimitOfIndemnity))
-			total += g.Value.SumInsuredLimitOfIndemnity
+			total += g.Value.PremiumGrossYearly
 		} else if strings.HasSuffix(g.Slug, "content") {
 			res.Content = lib.HumanaizePriceEuro(float64(g.Value.SumInsuredLimitOfIndemnity))
-			total += g.Value.SumInsuredLimitOfIndemnity
+			total += g.Value.PremiumGrossYearly
 		} else if strings.HasSuffix(g.Slug, "stock") {
 			res.Stock = lib.HumanaizePriceEuro(float64(g.Value.SumInsuredLimitOfIndemnity))
-			total += g.Value.SumInsuredLimitOfIndemnity
+			total += g.Value.PremiumGrossYearly
 		}
 	}
 	res.Total = lib.HumanaizePriceEuro(total)
