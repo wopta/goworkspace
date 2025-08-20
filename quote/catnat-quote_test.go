@@ -53,10 +53,11 @@ func getPolicyWithEverythingForTest() *models.Policy {
 		panic("error retrieving policy")
 	}
 	json.Unmarshal(bytes, &policy)
+	policy.Assets[0].Building.UseType = "tenant"
 	return &policy
 }
 
-func TestQuoteCatnatWithEverything(t *testing.T) {
+func TestQuoteCatnat_Tenant(t *testing.T) {
 	t.Setenv("env", env.LocalTest)
 	policy := getPolicyWithEverythingForTest()
 	policy.QuoteQuestions["alreadyEarthquake"] = false
@@ -66,43 +67,59 @@ func TestQuoteCatnatWithEverything(t *testing.T) {
 		t.Fatal("error retrieving product")
 	}
 	client := new(mock_clientCatnat)
-	client.nameFileToCompare = "output_everything_alreadyfalse.json"
+	client.nameFileToCompare = "output_tenant_withAll.json"
 	_, err := catnatQuote(policy, product, mock_sellable, client.Quote)
 	if err != nil {
 		t.Fatal(err)
 	}
 }
-func TestQuoteCatnatWithEverythingButEarthquake(t *testing.T) {
+func TestQuoteCatnat_OwnerTenant(t *testing.T) {
+	t.Setenv("env", env.LocalTest)
+	policy := getPolicyWithEverythingForTest()
+	policy.Assets[0].Building.UseType = "owner-tenant"
+	policy.QuoteQuestions["alreadyEarthquake"] = false
+	policy.QuoteQuestions["alreadyFlood"] = false
+	product := product.GetProductV2(policy.Name, "v1", "mga", nil, nil)
+	if product == nil {
+		t.Fatal("error retrieving product")
+	}
+	client := new(mock_clientCatnat)
+	client.nameFileToCompare = "output_owner-tenant.json"
+	_, err := catnatQuote(policy, product, mock_sellable, client.Quote)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestQuoteCatnatWithEverythingButEarthquake_Building(t *testing.T) {
 	t.Setenv("env", env.LocalTest)
 	policy := getPolicyWithEverythingForTest()
 	policy.QuoteQuestions["alreadyEarthquake"] = true
 	policy.QuoteQuestions["wantEarthquake"] = false
-	policy.QuoteQuestions["alreadyFlood"] = true
-	policy.QuoteQuestions["wantFlood"] = true
+	policy.QuoteQuestions["alreadyFlood"] = false
 	product := product.GetProductV2(policy.Name, "v1", "mga", nil, nil)
 	if product == nil {
 		t.Fatal("error retrieving product")
 	}
 	client := new(mock_clientCatnat)
-	client.nameFileToCompare = "output_noearthquake.json"
+	client.nameFileToCompare = "output_everything_but_earthquake-building.json"
 	_, err := catnatQuote(policy, product, mock_sellable, client.Quote)
 	if err != nil {
 		t.Fatal(err)
 	}
 }
-func TestQuoteCatnatWithEverything2(t *testing.T) {
+func TestQuoteCatnatWithEverythingButFlood_Building(t *testing.T) {
 	t.Setenv("env", env.LocalTest)
 	policy := getPolicyWithEverythingForTest()
-	policy.QuoteQuestions["alreadyEarthquake"] = true
-	policy.QuoteQuestions["wantEarthquake"] = true
+	policy.QuoteQuestions["alreadyEarthquake"] = false
 	policy.QuoteQuestions["alreadyFlood"] = true
-	policy.QuoteQuestions["wantFlood"] = true
+	policy.QuoteQuestions["wantFlood"] = false
 	product := product.GetProductV2(policy.Name, "v1", "mga", nil, nil)
 	if product == nil {
 		t.Fatal("error retrieving product")
 	}
 	client := new(mock_clientCatnat)
-	client.nameFileToCompare = "output_everything_alreadytrue.json"
+	client.nameFileToCompare = "output_everything_but_flood-building.json"
 
 	_, err := catnatQuote(policy, product, mock_sellable, client.Quote)
 	if err != nil {
