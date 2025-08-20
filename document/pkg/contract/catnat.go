@@ -77,12 +77,11 @@ func (el *CatnatGenerator) addFinalGreatings() {
 	el.engine.WriteText(el.engine.GetTableCell("Anna di Wopta Assicurazioni\nProteggiamo chi sei"))
 }
 
-// TODO: INSERT LINKs
+// TODO: insert rght link for catnat form
 func (el *CatnatGenerator) addLinks() {
-	if el.policy.Channel == models.ECommerceChannel {
-		el.engine.WriteText(el.engine.GetTableCell("Qualora avessi necessità di ulteriori informazioni e supporto, la risposta che stai cercando potrebbe essere tra le nostre FAQ che trovi a questo link.<-add link!! "))
-		el.engine.NewLine(2)
-		el.engine.WriteText(el.engine.GetTableCell("Se non la trovi, puoi contattarci attraverso questo Form oppure scriverci a questa e-mail. In entrambi i casi un nostro esperto si prenderà cura della tua richiesta. "))
+	if el.policy.Channel == models.ECommerceChannel || true {
+		el.engine.WriteTexts(el.engine.GetTableCell("Qualora avessi necessità di ulteriori informazioni e supporto, la risposta che stai cercando potrebbe essere tra le nostre FAQ che trovi a questo "), domain.TableCell{Text: "link", Link: models.FAQ})
+		el.engine.WriteTexts(el.engine.GetTableCell("Se non la trovi, puoi contattarci attraverso questo "), domain.TableCell{Text: "Form", Link: "forma.com"}, el.engine.GetTableCell(" oppure scriverci a questa "), domain.TableCell{Text: "e-mail", Link: "mailto:info@wopta.it"}, el.engine.GetTableCell(".In entrambi i casi un nostro esperto si prenderà cura della tua richiesta. "))
 	} else if el.policy.Channel == models.NetworkChannel {
 		el.engine.WriteText(el.engine.GetTableCell("Se hai necessità di ulteriori informazioni e supporto, contatta il tuo intermediario con il quale hai realizzato la polizza. "))
 	}

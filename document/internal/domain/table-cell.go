@@ -10,5 +10,6 @@ type TableCell struct {
 	Fill      bool
 	FillColor Color
 	Align     TextAlign
+	Link      string
 	Border    string
 }
