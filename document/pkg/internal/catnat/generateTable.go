@@ -90,7 +90,7 @@ func AddTableGuarantee(e *engine.Fpdf, guarantees dto.CatnatGuaranteeDTO) {
 		{"Garanzie", "Somma Assicurata Fabricato €", "Somma Assicurata Contenuto €", "Somma Assicurata Merci €", "Importo Annuo €"},
 		{"Terremoto", guarantees.EarthquakeGuarantee.Building, guarantees.EarthquakeGuarantee.Content, guarantees.EarthquakeGuarantee.Stock, guarantees.EarthquakeGuarantee.Total},
 		{"Alluvione", guarantees.FloodGuarantee.Building, guarantees.FloodGuarantee.Content, guarantees.FloodGuarantee.Stock, guarantees.FloodGuarantee.Total},
-		{"Frane", guarantees.LandslideGuarantee.Building, guarantees.LandslideGuarantee.Content, guarantees.LandslideGuarantee.Stock, guarantees.LandslideGuarantee.Total},
+		{"Frana", guarantees.LandslideGuarantee.Building, guarantees.LandslideGuarantee.Content, guarantees.LandslideGuarantee.Stock, guarantees.LandslideGuarantee.Total},
 	}
 	e.DrawTable(guranteeTable(guaranteeData))
 }

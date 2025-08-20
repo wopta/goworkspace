@@ -8,7 +8,7 @@ import (
 )
 
 func AddBuildingInformation(e *engine.Fpdf, sede dto.BuildingCatnatDto, questions dto.QuestionsCatnatDto) {
-	e.WriteText(e.GetTableCell("DATI SEDE DA ASSICURARE", constants.BoldFontStyle, constants.LargeFontSize))
+	e.WriteText(e.GetTableCell("DATI SEDE DA ASSICURARE", constants.BoldFontStyle, constants.LargeFontSize, constants.PinkColor))
 	e.SetDrawColor(constants.PinkColor)
 	e.NewLine(2)
 	var (
