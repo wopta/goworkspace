@@ -53,7 +53,7 @@ func (cc *CommercialCombinedDTO) FromPolicy(policy models.Policy, product models
 
 	cc.Enterprise = newEnterpriseDTO()
 	for _, guarantee := range productGuarantees {
-		if guarantee.Type == "enterprise" {
+		if guarantee.Type == models.UserEterprise {
 			newGuarantee := newGuaranteeDTO()
 			newGuarantee.Description = guarantee.CompanyName
 			if guarantee.Slug == "additional-compensation" {

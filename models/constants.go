@@ -263,8 +263,9 @@ const (
 )
 
 const (
-	UserIndividual  = "individual"  //ditta individuale
-	UserLegalEntity = "legalEntity" //persona giuridica
+	UserIndividual  = "individual"  //->Persona fisica->physical
+	UserLegalEntity = "legalEntity" //(codice fiscale !="") -> individual company / (codice fiscale =="") -> enterprise(persona giuridica)
+	UserEterprise   = "enterprise"  //enterprise(persona giuridica)
 )
 
 const (
