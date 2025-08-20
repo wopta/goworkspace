@@ -1,6 +1,7 @@
 package quote
 
 import (
+	"fmt"
 	"time"
 
 	"gitlab.dev.wopta.it/goworkspace/document/internal/constants"
@@ -32,6 +33,7 @@ func NewCatnatGenerator(engine *engine.Fpdf, policy *models.Policy, product mode
 }
 
 func (c *CatnatGenerator) Exec() ([]byte, error) {
+	c.mainFooter()
 	c.addCatnatHeader()
 	c.engine.NewPage()
 	c.engine.NewLine(5)
@@ -48,6 +50,30 @@ func (c *CatnatGenerator) Exec() ([]byte, error) {
 	return c.engine.RawDoc()
 }
 
+func (lg *CatnatGenerator) mainFooter() {
+	var (
+		text = "Wopta per te. Catastrofali è un prodotto assicurativo di Net Insurance S.p.A Compagnia assicurativa distribuito da \n" +
+			"Wopta Assicurazioni S.r.l."
+	)
+
+	lg.engine.SetFooter(func() {
+		lg.engine.SetX(10)
+		lg.engine.SetY(-17)
+		lg.engine.WriteText(domain.TableCell{
+			Text:      text,
+			Height:    constants.CellHeight,
+			Width:     constants.FullPageWidth,
+			FontColor: constants.PinkColor,
+			FontSize:  constants.SmallFontSize,
+		})
+		lg.engine.WriteText(domain.TableCell{
+			Text:   fmt.Sprintf("%d", lg.engine.PageNumber()),
+			Height: constants.CellHeight,
+			Width:  0,
+			Align:  constants.RightAlign,
+		})
+	})
+}
 func (c *CatnatGenerator) addCatnatHeader() {
 	const (
 		firstColumnWidth  = 15
@@ -111,7 +137,7 @@ func (c *CatnatGenerator) addCatnatHeader() {
 	}
 	c.engine.SetHeader(func() {
 		c.engine.DrawTable(parseLogos([]string{"				Wopta per te", "Catastrofali Azienda"}))
-		c.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_vita.png", 10, 15, 13, 13)
+		c.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_catnat.png", 10, 15, 13, 13)
 		c.engine.NewLine(4)
 		c.engine.WriteText(c.engine.GetTableCell("PREVENTIVO\nANONIMO", domain.FontSize(10), constants.BoldFontStyle))
 		c.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_wopta.png", 165, 15, 35, 10)
