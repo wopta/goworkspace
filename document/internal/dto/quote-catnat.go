@@ -90,4 +90,7 @@ func (dto *QuoteCatnatDTO) FromPolicy(policy *models.Policy) {
 
 	dto.Prize = priceDTO{}
 	dto.Prize.fromPolicy(*policy)
+
+	dto.Guarantees = CatnatGuaranteeDTO{}
+	dto.Guarantees.fromPolicy(policy)
 }
