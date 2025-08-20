@@ -301,3 +301,7 @@ const (
 	AssetTypeEnterprise = "enterprise"
 	AssetTypeBuilding   = "building"
 )
+
+const (
+	FAQ = "https://www.wopta.it/it/faq"
+)

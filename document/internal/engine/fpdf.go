@@ -11,6 +11,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/document/internal/constants"
 	"gitlab.dev.wopta.it/goworkspace/document/internal/domain"
 	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 )
 
 var (
@@ -326,7 +327,12 @@ func (e *Fpdf) GetTableCell(text string, opts ...any) domain.TableCell {
 
 func (e *Fpdf) WriteTexts(tables ...domain.TableCell) {
 	for _, text := range tables {
-		e.RawWriteText(text)
+		log.ErrorF("prova", text.Link)
+		if text.Link == "" {
+			e.RawWriteText(text)
+		} else {
+			e.WriteLink(text.Link, e.GetTableCell(text.Text, constants.PinkColor))
+		}
 	}
 	e.NewLine(constants.CellHeight)
 }
