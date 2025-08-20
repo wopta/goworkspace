@@ -92,7 +92,6 @@ func AddBuildingInformation(e *engine.Fpdf, sede dto.BuildingCatnatDto, question
 					Text:      texts[0],
 					Height:    constants.CellHeight,
 					Width:     firstColumnWidth,
-					FontStyle: constants.BoldFontStyle,
 					FontColor: constants.BlackColor,
 					Fill:      false,
 					FontSize:  constants.RegularFontSize,
