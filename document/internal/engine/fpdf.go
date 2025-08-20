@@ -11,7 +11,6 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/document/internal/constants"
 	"gitlab.dev.wopta.it/goworkspace/document/internal/domain"
 	"gitlab.dev.wopta.it/goworkspace/lib"
-	"gitlab.dev.wopta.it/goworkspace/lib/log"
 )
 
 var (
@@ -145,6 +144,10 @@ func (f *Fpdf) PageNumber() int {
 }
 
 func (f *Fpdf) WriteText(cell domain.TableCell) {
+	if cell.Link != "" {
+		f.WriteLink(cell.Link, f.GetTableCell(cell.Text, constants.PinkColor))
+		return
+	}
 	oldFontStyle := f.style
 	oldFillColor := f.fillColor
 
@@ -327,7 +330,6 @@ func (e *Fpdf) GetTableCell(text string, opts ...any) domain.TableCell {
 
 func (e *Fpdf) WriteTexts(tables ...domain.TableCell) {
 	for _, text := range tables {
-		log.ErrorF("prova", text.Link)
 		if text.Link == "" {
 			e.RawWriteText(text)
 		} else {
