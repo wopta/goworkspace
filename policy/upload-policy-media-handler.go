@@ -30,7 +30,6 @@ func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interf
 		policy *models.Policy
 		req    UploadPolicyMediaReq
 	)
-
 	log.AddPrefix("UploadPolicyMediaFx")
 	defer log.PopPrefix()
 
