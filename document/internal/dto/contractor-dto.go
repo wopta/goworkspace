@@ -42,17 +42,17 @@ func newContractorDTO() *contractorDTO {
 }
 
 func (c *contractorDTO) fromPolicy(contractor models.Contractor) {
-	if len(contractor.Name) != 0 {
+	if contractor.Name != "" {
 		c.Name = contractor.Name
 	}
-	if len(contractor.Surname) != 0 {
+	if contractor.Surname != "" {
 		c.Surname = contractor.Surname
 	}
-	if len(contractor.FiscalCode) != 0 {
+	if contractor.FiscalCode != "" {
 		c.FiscalCode = contractor.FiscalCode
 		c.FiscalCode_VatCode = c.FiscalCode + "/"
 	}
-	if len(contractor.VatCode) != 0 {
+	if contractor.VatCode != "" {
 		c.VatCode = contractor.VatCode
 		c.FiscalCode_VatCode += c.VatCode
 	}
