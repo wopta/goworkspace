@@ -92,7 +92,7 @@ func (c *NetClient) quote(dto QuoteRequest) (response QuoteResponse, err error) 
 		if err != nil {
 			return response, err
 		}
-		return response, errors.New(string(errBytes))
+		return response, errors.New(resp.Status + ":" + string(errBytes))
 	}
 	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		log.ErrorF("error decoding catnat response")
@@ -136,7 +136,7 @@ func (c *NetClient) emit(dto QuoteRequest) (response QuoteResponse, err error) {
 		if err != nil {
 			return response, err
 		}
-		return response, errors.New(string(errBytes))
+		return response, errors.New(resp.Status + ":" + string(errBytes))
 	}
 	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		log.ErrorF("error decoding catnat response")
@@ -177,7 +177,7 @@ func (c *NetClient) Download(numeroPolizza string) (response DownloadResponse, e
 		if err != nil {
 			return response, err
 		}
-		return response, errors.New(string(errBytes))
+		return response, errors.New(resp.Status + ":" + string(errBytes))
 	}
 	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		log.ErrorF("error decoding catnat response")
@@ -205,7 +205,7 @@ func (c *NetClient) EnrichAteco(fiscalCode string) (response AtecoResponse, err 
 		if err != nil {
 			return response, err
 		}
-		return response, errors.New(string(errBytes))
+		return response, errors.New(resp.Status + ":" + string(errBytes))
 	}
 	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		log.ErrorF("error decoding catnat response")
