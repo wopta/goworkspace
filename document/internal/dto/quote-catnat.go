@@ -89,5 +89,5 @@ func (dto *QuoteCatnatDTO) FromPolicy(policy *models.Policy) {
 	dto.PaymentSplit = constants.PaymentSplitMap[policy.PaymentSplit]
 
 	dto.Prize = priceDTO{}
-	dto.FromPolicy(policy)
+	dto.Prize.fromPolicy(*policy)
 }
