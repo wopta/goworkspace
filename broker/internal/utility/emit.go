@@ -29,18 +29,20 @@ func SignFiles(policy *models.Policy, product *models.Product, networkNode *mode
 		DocumentsFullPath: make([]string, 0),
 		SendEmail:         sendEmail,
 	}
+	p := <-document.ContractObj(*policy, networkNode, product)
+	p.ParentPath += "/namirial"
+	_, err := p.SaveWithName(fmt.Sprint(policy.NameDesc, " Polizza"))
+	if err != nil {
+		return err
+	}
+	//namirialInput.DocumentsFullPath = append(namirialInput.DocumentsFullPath, document.FullPath)
+
 	//Preparing dto for namirial
 	basePathForDocument := strings.ReplaceAll(fmt.Sprintf("temp/%s/namirial/", policy.Uid), " ", "_")
 	fullPathDocumentToSign, err := lib.ListGoogleStorageFolderContent(basePathForDocument)
 	if err != nil {
 		return err
 	}
-	p := <-document.ContractObj(*policy, networkNode, product)
-	document, err := p.SaveWithName(fmt.Sprint(policy.NameDesc, " Polizza"))
-	if err != nil {
-		return err
-	}
-	namirialInput.DocumentsFullPath = append(namirialInput.DocumentsFullPath, document.FullPath)
 	for _, path := range fullPathDocumentToSign {
 		namirialInput.DocumentsFullPath = append(namirialInput.DocumentsFullPath, path)
 	}
