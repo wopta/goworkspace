@@ -43,7 +43,6 @@ func CatnatDownloadCertification(store bpmn.StorageData) error {
 	if err != nil {
 		return err
 	}
-	return nil
 	client := catnat.NewNetClient()
 	resp, err := client.Download(numeroPoliza.String)
 	if err != nil {
