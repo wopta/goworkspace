@@ -9,12 +9,6 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-var splitPayment map[string]string = map[string]string{
-	string(models.PaySplitMonthly):           "mensile",
-	string(models.PaySplitYearly):            "annuale",
-	string(models.PaySplitSingleInstallment): "singolo",
-}
-
 type LifeDTO struct {
 	Contractor       *contractorDTO
 	Channel          string
@@ -77,7 +71,7 @@ func formatDate(t time.Time) string {
 }
 
 func getSplit(split string) string {
-	if split, ok := splitPayment[split]; ok {
+	if split, ok := constants.PaymentSplitMap[split]; ok {
 		return split
 	}
 	return ""
