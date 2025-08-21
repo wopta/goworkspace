@@ -169,7 +169,7 @@ func (el *LifeGenerator) addMainHeader() {
 
 	rowsData := [][]string{
 		{"I dati del tuo Preventivo", "I tuoi dati"},
-		{"Numero: " + el.dtoLife.ProposalNumber, "Contraente: " + el.dtoLife.GetFullNameContractor()},
+		{"Numero: " + el.dtoLife.ProposalNumber, "Contraente: " + el.dtoLife.Contractor.GetFullNameContractor()},
 		{"Decorre dal: " + el.dtoLife.ValidityDate.StartDate, "C.F./P.IVA: " + el.dtoLife.Contractor.FiscalCode},
 		{"Scade il: " + el.dtoLife.ValidityDate.EndDate, "Indirizzo: " + el.dtoLife.GetAddressFirstPart()},
 		{"Prima scadenza Annuale il: " + el.dtoLife.ValidityDate.FirstAnnuityExpiry, el.dtoLife.GetAddressSecondPart()},

@@ -10,6 +10,7 @@ import (
 type contractorDTO struct {
 	Name               string
 	Surname            string
+	CompanyName        string
 	FiscalCode         string
 	VatCode            string
 	FiscalCode_VatCode string
@@ -47,6 +48,9 @@ func (c *contractorDTO) fromPolicy(contractor models.Contractor) {
 	}
 	if contractor.Surname != "" {
 		c.Surname = contractor.Surname
+	}
+	if contractor.CompanyName != "" {
+		c.CompanyName = contractor.CompanyName
 	}
 	if contractor.FiscalCode != "" {
 		c.FiscalCode = contractor.FiscalCode
@@ -98,4 +102,10 @@ func (c *contractorDTO) fromPolicy(contractor models.Contractor) {
 	}
 	c.Address = strings.ToUpper(c.StreetName + ", " + c.StreetNumber + "\n" + c.PostalCode + " " + c.City + " (" + c.CityCode + ")\n")
 
+}
+func (c *contractorDTO) GetFullNameContractor() string {
+	if c.CompanyName != "" {
+		return c.CompanyName + c.Name + " " + c.Surname
+	}
+	return c.Name + " " + c.Surname
 }

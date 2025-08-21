@@ -70,10 +70,6 @@ func (l *LifeDTO) GetAddressSecondPart() string {
 	return l.Contractor.PostalCode + " " + l.Contractor.City + " (" + l.Contractor.CityCode + ")"
 }
 
-func (l *LifeDTO) GetFullNameContractor() string {
-	return l.Contractor.Name + " " + l.Contractor.Surname
-}
-
 func formatDate(t time.Time) string {
 	location, _ := time.LoadLocation("Europe/Rome")
 	time := t.In(location)
