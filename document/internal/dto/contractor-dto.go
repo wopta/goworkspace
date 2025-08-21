@@ -104,8 +104,5 @@ func (c *contractorDTO) fromPolicy(contractor models.Contractor) {
 
 }
 func (c *contractorDTO) GetFullNameContractor() string {
-	if c.CompanyName != "" {
-		return c.CompanyName + c.Name + " " + c.Surname
-	}
-	return c.Name + " " + c.Surname
+	return c.CompanyName + c.Name + " " + c.Surname
 }
