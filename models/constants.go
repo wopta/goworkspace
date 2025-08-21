@@ -262,10 +262,14 @@ const (
 	RuiSectionB    = "B"
 )
 
+// contractorFiscalcode = contractor.fiscalCode
+// "physical": $.contractor.type = 'individual' OR $.contractor.type = ""
+// "enterprise": (($.contractor.type = 'legalEntity'  and .contractorFiscalcode = "”) or  $.contractor.type = 'enterprise'
+// "individualCompany": $.contractor.type = 'legalEntity' and .contractorFiscalcode != ”"
 const (
-	UserIndividual  = "individual"  //->Persona fisica->physical
-	UserLegalEntity = "legalEntity" //(codice fiscale !="") -> individual company / (codice fiscale =="") -> enterprise(persona giuridica)
-	UserEterprise   = "enterprise"  //enterprise(persona giuridica)
+	UserIndividual  = "individual"
+	UserEterprise   = "enterprise"
+	UserLegalEntity = "legalEntity"
 )
 
 const (

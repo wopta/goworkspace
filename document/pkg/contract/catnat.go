@@ -103,7 +103,7 @@ func (el *CatnatGenerator) addPolicyInformationSection() {
 func (el *CatnatGenerator) addInitialGreatings() {
 	el.engine.WriteText(el.engine.GetTableCell("Documento informativo di Wopta Assicurazioni relativo alla polizza Wopta per te Catastrofali Azienda", constants.PinkColor, constants.BoldFontStyle))
 	el.engine.NewLine(3)
-	el.engine.WriteText(el.engine.GetTableCell("Buongiorno " + el.dtoCatnat.Contractor.Name + " " + el.dtoCatnat.Contractor.Surname + ","))
+	el.engine.WriteText(el.engine.GetTableCell("Buongiorno " + el.dtoCatnat.Contractor.GetFullNameContractor() + ","))
 	el.engine.WriteText(el.engine.GetTableCell("Confermiamo emissione della polizza in oggetto con i seguenti dati."))
 	el.engine.WriteText(el.engine.GetTableCell("Verifica i dati e le informazioni qui riportate."))
 	el.engine.WriteText(el.engine.GetTableCell("Riceverai mail per la firma della polizza e, una volta effettuato anche il pagamento, questa risulterà valida ed efficace."))
