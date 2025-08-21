@@ -64,11 +64,11 @@ func (pf *ProformaDTO) FromPolicy(policy models.Policy) {
 }
 
 func (c *proformaContractorDTO) fromPolicy(contr models.Contractor) {
-	c.NameAndSurname = lib.TrimSpace(contr.Name + " " + contr.Surname)
-	if contr.Type == "legalEntity" {
+	if contr.Type == models.UserLegalEntity {
 		c.FiscalOrVatCode = contr.VatCode
 	} else {
 		c.FiscalOrVatCode = contr.FiscalCode
+		c.NameAndSurname = lib.TrimSpace(contr.Name + " " + contr.Surname)
 	}
 	if contr.Residence != nil {
 		c.StreetNameAndNumber = contr.Residence.StreetName + " " + contr.Residence.StreetNumber

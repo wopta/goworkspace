@@ -12,12 +12,6 @@ import (
 var partnershipRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/v1/life/{partnershipUid}",
-		Handler: lib.ResponseLoggerWrapper(LifePartnershipFx),
-		Method:  http.MethodGet,
-		Roles:   []string{lib.UserRoleAll},
-	},
-	{
-		Route:   "/v1/life/{partnershipUid}",
 		Handler: lib.ResponseLoggerWrapper(NewLifePartnershipFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},

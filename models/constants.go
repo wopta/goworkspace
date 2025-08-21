@@ -31,7 +31,6 @@ const (
 	PolicyStatusRenewed            = "Renewed"
 	PolicyStatusUnsolved           = "Unsolved"
 	PolicyStatusManualSigned       = "ManualSigned"
-	PolicyStatusRefunded           = "Refunded"
 )
 
 func GetWaitForApprovalStatusList() []string {
@@ -263,8 +262,13 @@ const (
 	RuiSectionB    = "B"
 )
 
+// contractorFiscalcode = contractor.fiscalCode
+// "physical": $.contractor.type = 'individual' OR $.contractor.type = ""
+// "enterprise": (($.contractor.type = 'legalEntity'  and .contractorFiscalcode = "”) or  $.contractor.type = 'enterprise'
+// "individualCompany": $.contractor.type = 'legalEntity' and .contractorFiscalcode != ”"
 const (
 	UserIndividual  = "individual"
+	UserEterprise   = "enterprise"
 	UserLegalEntity = "legalEntity"
 )
 
@@ -301,4 +305,8 @@ const (
 const (
 	AssetTypeEnterprise = "enterprise"
 	AssetTypeBuilding   = "building"
+)
+
+const (
+	FAQ = "https://www.wopta.it/it/faq"
 )

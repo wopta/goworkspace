@@ -3,6 +3,7 @@ package quote
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models/catnat"
@@ -36,7 +37,7 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	}()
 	log.Println("Handler start -----------------------------------------------")
 
-	_, err = lib.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
+	auth, err := lib.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	if err != nil {
 		log.ErrorF("error getting authToken")
 		return "", nil, err
@@ -48,7 +49,11 @@ func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	}
 	client := catnat.NewNetClient()
 
-	networkNode := network.GetNetworkNodeByUid(reqPolicy.ProducerUid)
+	nodeUid := reqPolicy.PartnershipName
+	if strings.EqualFold(reqPolicy.Channel, models.NetworkChannel) {
+		nodeUid = auth.UserID
+	}
+	networkNode := network.GetNetworkNodeByUid(nodeUid)
 	var warrant *models.Warrant
 	if networkNode != nil {
 		warrant = networkNode.GetWarrant()
@@ -78,6 +83,7 @@ func catnatQuote(policy *models.Policy, product *models.Product, sellable sellab
 	if err != nil {
 		return resp, err
 	}
+	log.PrintStruct("---policy after sellable:", policy)
 	internal.AddGuaranteesSettingsFromProduct(policy, outSellable.Product)
 
 	var cnReq catnat.QuoteRequest

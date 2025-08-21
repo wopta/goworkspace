@@ -28,6 +28,7 @@ func CatnatIntegration(store *bpmnEngine.StorageBpnm) error {
 	if err != nil {
 		return err
 	}
+	policy.CodeCompany = res.PolicyNumber
 	store.AddLocal("numeroPolizza", &flow.String{String: res.PolicyNumber})
 	return nil
 }
@@ -42,7 +43,7 @@ func CatnatDownloadCertification(store *bpmnEngine.StorageBpnm) error {
 	if err != nil {
 		return err
 	}
-
+	return nil
 	client := catnat.NewNetClient()
 	resp, err := client.Download(numeroPoliza.String)
 	if err != nil {
@@ -57,6 +58,6 @@ func CatnatDownloadCertification(store *bpmnEngine.StorageBpnm) error {
 	if err != nil {
 		return err
 	}
-	policy.CodeCompany = numeroPoliza.String
+
 	return err
 }

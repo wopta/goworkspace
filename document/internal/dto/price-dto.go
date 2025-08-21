@@ -1,5 +1,10 @@
 package dto
 
+import (
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/models"
+)
+
 type priceDTO struct {
 	Gross       numeric
 	Net         numeric
@@ -17,4 +22,14 @@ func newPriceDTO() *priceDTO {
 		Consultancy: newNumeric(),
 		Total:       newNumeric(),
 	}
+}
+
+func (price *priceDTO) fromPolicy(policy models.Policy) {
+	price.Split = getSplit(policy.PaymentSplit)
+	price.Gross.ValueFloat = policy.PriceGross
+	price.Gross.Text = lib.HumanaizePriceEuro(policy.PriceGross)
+	price.Consultancy.ValueFloat = policy.ConsultancyValue.Price
+	price.Consultancy.Text = lib.HumanaizePriceEuro(policy.ConsultancyValue.Price)
+	price.Total.ValueFloat = policy.ConsultancyValue.Price + policy.PriceGross
+	price.Total.Text = lib.HumanaizePriceEuro(policy.ConsultancyValue.Price + policy.PriceGross)
 }

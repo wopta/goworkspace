@@ -73,9 +73,9 @@ type GuaranteValue struct {
 	DeductibleValues           GuaranteFieldValue  `firestore:"deductibleValues,omitempty" json:"deductibleValues,omitempty"`
 	DeductibleType             string              `firestore:"deductibleType,omitempty" json:"deductibleType,omitempty"`
 	DeductibleUnit             string              `firestore:"deductibleUnit,omitempty" json:"deductibleUnit,omitempty"`
-	SumInsuredLimitOfIndemnity float64             `json:"sumInsuredLimitOfIndemnity,omitempty" json:"sumInsuredLimitOfIndemnity,omitempty"`
-	SumInsured                 float64             `json:"sumInsured,omitempty" json:"sumInsured,omitempty"`
-	LimitOfIndemnity           float64             `json:"limitOfIndemnity,omitempty" json:"limitOfIndemnity,omitempty"`
+	SumInsuredLimitOfIndemnity float64             `firestore:"sumInsuredLimitOfIndemnity,omitempty" json:"sumInsuredLimitOfIndemnity,omitempty"`
+	SumInsured                 float64             `firestore:"sumInsured,omitempty" json:"sumInsured,omitempty"`
+	LimitOfIndemnity           float64             `firestore:"limitOfIndemnity,omitempty" json:"limitOfIndemnity,omitempty"`
 	SelfInsurance              string              `firestore:"selfInsurance,omitempty" json:"selfInsurance,omitempty"`
 	SumInsuredValues           GuaranteFieldValue  `firestore:"sumInsuredValues,omitempty" json:"sumInsuredValues,omitempty"`
 	DeductibleDesc             string              `firestore:"deductibleDesc,omitempty" json:"deductibleDesc,omitempty"`
@@ -100,8 +100,8 @@ type GuaranteConfig struct {
 	DeductibleValues                       GuaranteFieldValue   `firestore:"deductibleValues,omitempty" json:"deductibleValues,omitempty"`
 	DeductibleType                         string               `firestore:"deductibleType,omitempty" json:"deductibleType,omitempty"`
 	DeductibleUnit                         string               `firestore:"deductibleUnit,omitempty" json:"deductibleUnit,omitempty"`
-	SumInsuredLimitOfIndemnity             float64              `json:"sumInsuredLimitOfIndemnity,omitempty" json:"sumInsuredLimitOfIndemnity,omitempty"`
-	LimitOfIndemnity                       float64              `json:"limitOfIndemnity,omitempty" json:"limitOfIndemnity,omitempty"`
+	SumInsuredLimitOfIndemnity             float64              `firestore:"sumInsuredLimitOfIndemnity,omitempty" json:"sumInsuredLimitOfIndemnity,omitempty"`
+	LimitOfIndemnity                       float64              `firestore:"limitOfIndemnity,omitempty" json:"limitOfIndemnity,omitempty"`
 	SelfInsurance                          string               `firestore:"selfInsurance,omitempty" json:"selfInsurance,omitempty"`
 	SumInsuredValues                       GuaranteFieldValue   `firestore:"sumInsuredValues,omitempty" json:"sumInsuredValues,omitempty"`
 	DeductibleDesc                         string               `firestore:"deductibleDesc,omitempty" json:"deductibleDesc,omitempty"`

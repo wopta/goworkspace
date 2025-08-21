@@ -144,6 +144,10 @@ func (f *Fpdf) PageNumber() int {
 }
 
 func (f *Fpdf) WriteText(cell domain.TableCell) {
+	if cell.Link != "" {
+		f.WriteLink(cell.Link, f.GetTableCell(cell.Text, constants.PinkColor))
+		return
+	}
 	oldFontStyle := f.style
 	oldFillColor := f.fillColor
 
@@ -326,7 +330,11 @@ func (e *Fpdf) GetTableCell(text string, opts ...any) domain.TableCell {
 
 func (e *Fpdf) WriteTexts(tables ...domain.TableCell) {
 	for _, text := range tables {
-		e.RawWriteText(text)
+		if text.Link == "" {
+			e.RawWriteText(text)
+		} else {
+			e.WriteLink(text.Link, e.GetTableCell(text.Text, constants.PinkColor))
+		}
 	}
 	e.NewLine(constants.CellHeight)
 }

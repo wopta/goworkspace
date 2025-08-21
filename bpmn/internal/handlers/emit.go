@@ -246,6 +246,6 @@ func sendEmitProposalMail(state *bpmnEngine.StorageBpnm) error {
 		addresses.ToAddress.String(),
 		addresses.CcAddress.String(),
 	)
-	mail.SendMailProposal(*policy.Policy, addresses.FromAddress, addresses.ToAddress, addresses.CcAddress, flowName.String, []string{models.ContractDocumentFormat})
+	mail.SendMailProposal(*policy.Policy, addresses.FromAddress, addresses.ToAddress, addresses.CcAddress, flowName.String, []string{models.ProposalAttachmentName})
 	return nil
 }

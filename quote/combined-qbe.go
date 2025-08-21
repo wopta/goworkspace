@@ -184,7 +184,7 @@ func mapCellByColumnAndSection(column, section string, priceGroup map[string]mod
 	parsedValue, err := parseCellValue(cell.Value)
 	if err != nil {
 		hasError = true
-		log.ErrorF("error parsing value: %s", err.Error())
+		log.WarningF("error parsing value: %s", err.Error())
 	}
 
 	switch column {

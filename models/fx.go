@@ -16,7 +16,9 @@ const (
 	yearly  = "yearly"
 )
 
-type Fx struct{}
+type Fx struct {
+	FxCatnat
+}
 
 func (fx *Fx) ToString(value float64) string {
 	var r int

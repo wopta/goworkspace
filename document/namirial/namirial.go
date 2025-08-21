@@ -129,13 +129,8 @@ func prepareDocuments(idsDocument ...string) (resp prepareResponse, err error) {
 	//The signatures that dont use the default place holder are put inside Unassigned,so you need to iterate them and fix their size and position
 	for i := range resp.UnassignedElements.Signatures {
 		sign := &resp.UnassignedElements.Signatures[i]
-		if sign.FieldDefinition.Size.Height < sign.FieldDefinition.Size.Width {
-			continue
-		}
+		sign.FieldDefinition.Size.Width = 100
 		sign.FieldDefinition.Size.Height = 50
-		sign.FieldDefinition.Position.X -= 25
-		sign.FieldDefinition.Position.Y -= 10
-		sign.FieldDefinition.Size.Width = 150
 	}
 	resp.Activities[0].Action.Sign.Elements.Signatures = append(resp.Activities[0].Action.Sign.Elements.Signatures, resp.UnassignedElements.Signatures...)
 	for i := range resp.Activities[0].Action.Sign.Elements.Signatures {
@@ -217,18 +212,18 @@ func buildBodyToSend(prepareteResponse prepareResponse, idFiles []string, callba
 
 // adjust the request to insert information regard the contractor
 func setContractorDataInSendBody(bodySend *sendNamirialRequest, policy models.Policy) error {
-	var signer *models.User
-	if policy.Contractor.Type == models.UserLegalEntity { //for legalentity who pay is between contractors
+	var signer *models.User = policy.Contractor.ToUser()
+
+	if policy.Contractor.Type == models.UserLegalEntity { // i need to use only the phone of the signer
 		for _, contractor := range *policy.Contractors {
 			if contractor.IsSignatory {
-				signer = &contractor
+				signer.Phone = contractor.Phone
+				signer.Surname = contractor.Surname
+				signer.Name = contractor.Name
 				break
 			}
 		}
-	} else {
-		signer = policy.Contractor.ToUser()
 	}
-
 	if signer == nil {
 		return errors.New("You need to populate contractors to sign")
 	}
@@ -238,7 +233,6 @@ func setContractorDataInSendBody(bodySend *sendNamirialRequest, policy models.Po
 		contactInfo.Surname = signer.Surname
 		contactInfo.GivenName = signer.Name
 		contactInfo.Email = signer.Mail
-		contactInfo.PhoneNumber = signer.Phone
 		contactInfo.PhoneNumber = signer.Phone
 	}
 	return nil

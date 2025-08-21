@@ -150,7 +150,7 @@ const buildingType = "building"
 const contentType = "content"
 const stockType = "stock"
 
-const catNatProductCode = "007"
+const catNatProductCode = "009"
 const catNatDistributorCode = "0168"
 const catNatLegalPerson = "2"
 const catNatSalesChannel = "3"
@@ -167,9 +167,9 @@ var guaranteeSlugToCodes = map[string]string{
 }
 
 var guaranteeTypeToCodes = map[string]string{
-	buildingType: "/00",
 	contentType:  "/01",
 	stockType:    "/02",
+	buildingType: "/03",
 }
 
 var guaranteeCodeToSlug = map[string]string{
@@ -179,14 +179,14 @@ var guaranteeCodeToSlug = map[string]string{
 }
 
 var guaranteeTypeCodeToType = map[string]string{
-	"/00": buildingType,
 	"/01": contentType,
 	"/02": stockType,
+	"/03": buildingType,
 }
 
 var useTypeMap = map[string]string{
-	"owner-tenant": "si",
-	"tenant":       "no",
+	"owner-tenant": "si", //chi possiede
+	"tenant":       "no", //che è in affitto
 }
 var buildingYearMap = map[string]int{
 	"before_1950":       1,
@@ -241,12 +241,13 @@ func (d *QuoteRequest) FromPolicyForEmit(policy *models.Policy) error {
 	if policy.Contractor.VatCode == "" {
 		return errors.New("You need to compile Contractor.VatCode")
 	}
+	fiscalCode := policy.Contractor.FiscalCode
 	if policy.Contractor.Type == "legalEntity" { //persona giuridica
 		dt = catNatLegalPerson
 		if policy.Contractor.CompanyName == "" {
 			return errors.New("You need to compile Contractor.CompanyName")
 		}
-		policy.Contractor.FiscalCode = policy.Contractor.VatCode
+		fiscalCode = policy.Contractor.VatCode
 	} else { //ditta individuale i need all date
 		dt = catNatSoleProp
 		if policy.Contractor.Name == "" {
@@ -265,7 +266,7 @@ func (d *QuoteRequest) FromPolicyForEmit(policy *models.Policy) error {
 		Surname:                   policy.Contractor.Surname,
 		CompanyName:               policy.Contractor.CompanyName,
 		VatNumber:                 policy.Contractor.VatCode,
-		FiscalCode:                policy.Contractor.FiscalCode,
+		FiscalCode:                fiscalCode,
 		AtecoCode:                 policy.Contractor.Ateco,
 		Phone:                     policy.Contractor.Phone,
 		Email:                     policy.Contractor.Mail,
@@ -333,28 +334,8 @@ func (d *QuoteRequest) FromPolicyForQuote(policy *models.Policy) error {
 		}
 	}
 
-	alreadyEarthquake := policy.QuoteQuestions["alreadyEarthquake"]
-	if alreadyEarthquake == nil {
-		return errors.New("missing field alreadyEarthquake")
-	}
-	wantEarthquake := policy.QuoteQuestions["wantEarthquake"]
-	if wantEarthquake == nil {
-		wantEarthquake = false
-	}
-	alreadyFlood := policy.QuoteQuestions["alreadyFlood"]
-	if alreadyFlood == nil {
-		return errors.New("missing field alreadyFlood")
-	}
-	wantFlood := policy.QuoteQuestions["wantFlood"]
-	if wantFlood == nil {
-		wantFlood = false
-	}
 	asset := assetRequest{
 		ContractorAndTenant:  useTypeMap[baseAsset.Building.UseType],
-		EarthquakeCoverage:   quoteQuestionMap[alreadyEarthquake.(bool)],
-		FloodCoverage:        quoteQuestionMap[alreadyFlood.(bool)],
-		EarthquakePurchase:   quoteQuestionMap[(alreadyEarthquake.(bool) && wantEarthquake.(bool)) || !alreadyEarthquake.(bool)],
-		FloodPurchase:        quoteQuestionMap[(alreadyFlood.(bool) && wantFlood.(bool)) || !alreadyFlood.(bool)],
 		LandSlidePurchase:    no,
 		ConstructionMaterial: buildingMaterialMap[baseAsset.Building.BuildingMaterial],
 		ConstructionYear:     buildingYearMap[baseAsset.Building.BuildingYear],
@@ -362,6 +343,34 @@ func (d *QuoteRequest) FromPolicyForQuote(policy *models.Policy) error {
 		LowestFloor:          lowestFloorMap[baseAsset.Building.LowestFloor],
 		GuaranteeList:        make([]guaranteeList, 0),
 	}
+	if policy.Assets[0].Building.UseType == "tenant" {
+		var alreadyEarthquake any
+		var alreadyFlood any
+		var wantEarthquake any
+		var wantFlood any
+
+		alreadyEarthquake = policy.QuoteQuestions["alreadyEarthquake"]
+		if alreadyEarthquake == nil {
+			return errors.New("missing field alreadyEarthquake")
+		}
+		wantEarthquake = policy.QuoteQuestions["wantEarthquake"]
+		if wantEarthquake == nil {
+			wantEarthquake = false
+		}
+		alreadyFlood = policy.QuoteQuestions["alreadyFlood"]
+		if alreadyFlood == nil {
+			return errors.New("missing field alreadyFlood")
+		}
+		wantFlood = policy.QuoteQuestions["wantFlood"]
+		if wantFlood == nil {
+			wantFlood = false
+		}
+		asset.EarthquakeCoverage = quoteQuestionMap[alreadyEarthquake.(bool)]
+		asset.FloodCoverage = quoteQuestionMap[alreadyFlood.(bool)]
+		asset.EarthquakePurchase = quoteQuestionMap[(alreadyEarthquake.(bool) && wantEarthquake.(bool)) || !alreadyEarthquake.(bool)]
+		asset.FloodPurchase = quoteQuestionMap[(alreadyFlood.(bool) && wantFlood.(bool)) || !alreadyFlood.(bool)]
+	}
+
 	if baseAsset.Building.BuildingAddress != nil {
 		asset.PostalCode = baseAsset.Building.BuildingAddress.PostalCode
 		asset.Address = formatAddress(baseAsset.Building.BuildingAddress)
@@ -403,7 +412,15 @@ func getGuarantee(policy *models.Policy, slug string) (*models.Guarante, error) 
 
 // Given a quoteResponse of catnat, sum and assign the assentDailt to each guarantees
 func mappingQuoteResponseToGuarantee(quoteResponse QuoteResponse, policy *models.Policy) error {
-	rates := float64(models.PaySplitRateMap[models.PaySplit(policy.PaymentSplit)])
+	for i := range policy.Assets[0].Guarantees {
+		policy.Assets[0].Guarantees[i].Value.PremiumGrossYearly = 0
+	}
+	split := policy.PaymentSplit
+	if split == "" {
+		log.Printf("split isnt inserted, use default '%s'", models.PaySplitYearly)
+		split = string(models.PaySplitYearly)
+	}
+	rates := float64(models.PaySplitRateMap[models.PaySplit(split)])
 	if rates == 0 {
 		return errors.New("Rates is 0")
 	}
@@ -437,14 +454,13 @@ func mappingQuoteResponseToPolicy(quoteResponse QuoteResponse, policy *models.Po
 	if split == "" {
 		log.Printf("split isnt inserted, use default '%s'", models.PaySplitYearly)
 		split = string(models.PaySplitYearly)
-
 	}
 	policy.OffersPrices = map[string]map[string]*models.Price{
 		"default": {
 			split: &models.Price{},
 		},
 	}
-	rates := float64(models.PaySplitRateMap[models.PaySplit(policy.PaymentSplit)])
+	rates := float64(models.PaySplitRateMap[models.PaySplit(split)])
 	if rates == 0 {
 		return errors.New("Rates is 0")
 	}

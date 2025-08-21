@@ -38,7 +38,7 @@ func SetProposalData(policy *models.Policy, networkNode *models.NetworkNode, mga
 
 		log.Println("setting policy statements")
 
-		*policy.Statements, err = question.GetStatements(policy)
+		*policy.Statements, err = question.GetStatements(policy, false)
 		if err != nil {
 			log.ErrorF("error setting policy statements: %s", err.Error())
 			return

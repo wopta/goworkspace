@@ -19,6 +19,8 @@ func Quote(policy *models.Policy, product *models.Product) ([]byte, error) {
 	switch policy.Name {
 	case models.LifeProduct:
 		generator = quote.NewLifeGenerator(engine.NewFpdf(), policy, product)
+	case models.CatNatProduct:
+		generator = quote.NewCatnatGenerator(engine.NewFpdf(), policy, *product)
 	case models.GapProduct:
 		return nil, errProductNotImplemented
 	case models.PersonaProduct:

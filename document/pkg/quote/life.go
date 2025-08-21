@@ -312,7 +312,7 @@ func (lg *LifeGenerator) disclaimer() {
 }
 
 func (lg *LifeGenerator) whoWeAre() {
-	lg.baseGenerator.whoWeAre()
+	lg.baseGenerator.WhoWeAre()
 
 	lg.engine.NewLine(5)
 

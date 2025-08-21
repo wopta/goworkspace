@@ -67,6 +67,9 @@ func setProductBodyData(policy models.Policy, bodyData *BodyData) {
 	case models.GapProduct:
 		bodyData.ProductName = "Auto Valore Protetto"
 		bodyData.ProductForm = "gap#contact-us"
+	case models.CatNatProduct:
+		bodyData.ProductName = "Catastrofali azienda"
+		bodyData.ProductForm = "cat-nat#contact-us"
 	}
 	link, _ := lib.GetLastVersionPrecontrattuale(policy.Name, policy.ProductVersion)
 	bodyData.InformationSetsUrl = fmt.Sprint(lib.BaseStorageGoogleUrl, link)
@@ -232,4 +235,12 @@ func getMailAttachments(policy models.Policy, attachmentNames []string) []models
 	}
 
 	return at
+}
+
+func getTemplateEmail(flowName, templateType string, policy models.Policy) (string, error) {
+	bodyData := getBodyData(policy)
+
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, templateType))
+
+	return fillTemplate(templateFile, &bodyData), nil
 }
