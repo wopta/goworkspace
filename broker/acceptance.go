@@ -76,6 +76,9 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		log.Printf("policy Uid %s: wrong status %s", policy.Uid, policy.Status)
 		return "", nil, fmt.Errorf("policy uid '%s': wrong status '%s'", policy.Uid, policy.Status)
 	}
+	if policy.Name == models.CatNatProduct {
+		return DraftAcceptanceFx(w, r)
+	}
 
 	switch payload.Action {
 	case models.PolicyStatusRejected:
