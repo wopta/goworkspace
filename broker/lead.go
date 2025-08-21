@@ -51,6 +51,18 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	policy.Normalize()
 
+	if policy.Name == models.CatNatProduct {
+		log.Println("Using leadCatnat")
+		err = leaddraft(authToken, &policy)
+		if err != nil {
+			return "", nil, err
+		}
+
+		log.Println("Handler end -------------------------------------------------")
+
+		resp, err := policy.Marshal()
+		return string(resp), &policy, err
+	}
 	err = lead(authToken, &policy)
 	if err != nil {
 		log.ErrorF("error creating lead: %s", err.Error())
