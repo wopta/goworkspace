@@ -240,7 +240,7 @@ func (el *CatnatGenerator) addMainHeader() {
 	}
 	rowsData := [][]string{
 		{"I dati del tuo Polizza", "I tuoi dati"},
-		{"Numero: " + number, "Contraente: " + el.dtoCatnat.Contractor.Name + " " + el.dtoCatnat.Contractor.Surname},
+		{"Numero: " + number, "Contraente: " + el.dtoCatnat.Contractor.GetFullNameContractor()},
 		{"Decorre dal: " + el.dtoCatnat.ValidityDate.StartDate, "C.F./P.IVA: " + el.dtoCatnat.Contractor.FiscalCode_VatCode},
 		{"Scade il: " + el.dtoCatnat.ValidityDate.EndDate, "Sede Legale: " + strings.ReplaceAll(el.dtoCatnat.Contractor.Address, "\n", "")},
 		{"Si rinnova a scadenza, salvo disdetta da inviare 30 giorni prima", "Sede Assicurata: " + strings.ReplaceAll(el.dtoCatnat.SedeDaAssicurare.Address, "\n", "")},
