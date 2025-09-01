@@ -29,11 +29,6 @@ const (
 )
 
 var (
-	CompanyMap map[string]string = map[string]string{
-		models.AxaCompany:      "AXA FRANCE VIE S.A.",
-		models.SogessurCompany: "Sogessur SA",
-		models.GlobalCompany:   "Global Assistance",
-	}
 	colorWhite = rgbColor{
 		r: 255,
 		g: 255,

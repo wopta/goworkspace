@@ -305,7 +305,7 @@ func (bg *baseGenerator) mupInfo(companyName string, consultancyPrice float64, c
 			"e un compenso direttamente dal Contraente, pari ad %s."
 	)
 
-	if tCompanyName := constants.CompanyMap[companyName]; tCompanyName != "" {
+	if tCompanyName := models.CompanyMap[companyName]; tCompanyName != "" {
 		companyName = tCompanyName
 	}
 
