@@ -163,7 +163,7 @@ func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) (d
 	receiptInfo := document.NewReceiptInfo()
 
 	if policy.Company != "" {
-		receiptInfo.PolicyInfo.Company = document.CompanyMap[policy.Company]
+		receiptInfo.PolicyInfo.Company = models.CompanyMap[policy.Company]
 	}
 	if policy.NameDesc != "" {
 		receiptInfo.PolicyInfo.ProductDescription = strings.ToUpper(policy.NameDesc)
@@ -174,6 +174,9 @@ func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) (d
 
 	if policy.Contractor.Name != "" {
 		receiptInfo.CustomerInfo.Fullname = strings.TrimSpace(policy.Contractor.Name + " " + policy.Contractor.Surname)
+	} else {
+		receiptInfo.CustomerInfo.Fullname = strings.TrimSpace(policy.Contractor.CompanyName)
+
 	}
 
 	address := policy.Contractor.Residence

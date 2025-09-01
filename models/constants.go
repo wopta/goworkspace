@@ -190,6 +190,13 @@ const (
 	NetInsuranceCompany string = "net-insurance"
 )
 
+var CompanyMap map[string]string = map[string]string{
+	AxaCompany:          "AXA FRANCE VIE S.A.",
+	SogessurCompany:     "Sogessur SA",
+	GlobalCompany:       "Global Assistance",
+	NetInsuranceCompany: "Net Insurance",
+}
+
 const (
 	FabrickPaymentProvider string = "fabrick"
 	ManualPaymentProvider  string = "manual"
