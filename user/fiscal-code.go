@@ -117,7 +117,7 @@ func checkFiscalCode(user models.User, fiscalCodeToCheck string) (err error) {
 		return errors.New("Errore il codice fiscale deve contenere 16 cifre")
 	}
 
-	checkDigit, err := calculateControlCharacterFromFiscalCode(fiscalCodeToCheck)
+	checkDigit, err := CalculateControlCharacterFromFiscalCode(fiscalCodeToCheck)
 	if err != nil {
 		return err
 	}
@@ -360,7 +360,7 @@ func calculateBirthPlaceCode(cityOfBirth, provinceOfBirth string) (string, error
 	return birthPlaceCode, nil
 }
 
-func calculateControlCharacterFromFiscalCode(fiscalCode string) (string, error) {
+func CalculateControlCharacterFromFiscalCode(fiscalCode string) (string, error) {
 	var surnameCode, nameCode, birthDateCode, birthPlaceCode string
 	surnameCode = fiscalCode[:3]
 	nameCode = fiscalCode[3:6]
