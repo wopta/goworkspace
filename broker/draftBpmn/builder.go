@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"gitlab.dev.wopta.it/goworkspace/lib"
-	"gitlab.dev.wopta.it/goworkspace/lib/log"
 )
 
 func getKeyInjectProcess(targetPro, targetAct string, order activityOrder) injectionKey {
@@ -236,7 +235,6 @@ func (a *BpnmBuilder) buildActivities(processName string, activitiesToBuild ...a
 // Returns an error if any referenced activity is missing.
 func (p *processBpnm) hydrateGateways(activities []activityBuilder) error {
 	for _, builderActivity := range activities {
-		log.Printf("--- Process %v Activity building %v", p.name, builderActivity.Name)
 		var gateways []*gateway = make([]*gateway, len(builderActivity.Gateways))
 		for igat, builderGateway := range builderActivity.Gateways {
 			gateway := &gateway{
@@ -255,7 +253,6 @@ func (p *processBpnm) hydrateGateways(activities []activityBuilder) error {
 					prefix := fmt.Sprintf("input activity: '%v' and output activity: '%v'", gateway.nextActivities[iact].name, builderActivity.Name)
 					return fmt.Errorf(prefix+", has error: %v", e.Error())
 				}
-				log.Printf("Linked with %v", nextJump)
 			}
 			gateways[igat] = gateway
 		}
