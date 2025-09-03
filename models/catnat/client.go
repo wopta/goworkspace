@@ -221,6 +221,9 @@ type enrichEtecoCatnat struct {
 }
 
 func (c *NetClient) EnrichAteco(fiscalCode string) (response enrichEtecoCatnat, err error) {
+	if len(fiscalCode) != 11 && len(fiscalCode) != 16 {
+		return response, errors.New("Inserire partita iva o codice fiscale")
+	}
 	if len(fiscalCode) == 11 { //partita iva
 		checkDigit := CalculateControlNumberFromVatCode(fiscalCode)
 		if checkDigit != string(fiscalCode[10]) {
