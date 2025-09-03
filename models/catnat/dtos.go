@@ -68,7 +68,7 @@ type contractor struct {
 	AtecoCode                 string `json:"codiceAteco,omitempty"`
 	PostalCode                string `json:"cap,omitempty"`
 	Address                   string `json:"indirizzo,omitempty"`
-	Locality                  string `json:"comune,omitempty"`
+	City                      string `json:"comune,omitempty"`
 	CityCode                  string `json:"provincia,omitempty"`
 	Phone                     string `json:"telefonoCellulare,omitempty"`
 	Email                     string `json:"email,omitempty"`
@@ -280,7 +280,7 @@ func (d *QuoteRequest) FromPolicyForEmit(policy *models.Policy) error {
 	}
 	if policy.Contractor.CompanyAddress != nil {
 		contr.Address = formatAddress(policy.Contractor.CompanyAddress)
-		contr.Locality = policy.Contractor.CompanyAddress.Locality
+		contr.City = policy.Contractor.CompanyAddress.City
 		contr.CityCode = policy.Contractor.CompanyAddress.CityCode
 		contr.PostalCode = policy.Contractor.CompanyAddress.PostalCode
 	}
