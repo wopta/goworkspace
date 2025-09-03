@@ -156,14 +156,13 @@ func (qb *QueryBuilder) extractLimit(params map[string]string) error {
 }
 
 func (qb *QueryBuilder) parseQuery() string {
-	const queryPrefix = "SELECT **tableAlias**.uid, **tableAlias**.name AS productName, " +
+	const queryPrefix = "SELECT *,COALESCE(fullName || (CASE WHEN (fullName <> '' and companyName  <> '') then ', ' else '' END) || companyName,'') as contractor FROM " +
+
+		"(SELECT **tableAlias**.uid, **tableAlias**.name AS productName, " +
 		"**tableAlias**.codeCompany, CAST(**tableAlias**.proposalNumber AS INT64) AS proposalNumber, " +
 		"**tableAlias**.nameDesc, **tableAlias**.status, " +
-		"TRIM(COALESCE(JSON_VALUE(**tableAlias**.data,'$.contractor.name'), '') || ' ' || " +
-		"COALESCE(JSON_VALUE(**tableAlias**.data, '$.contractor.surname'), '') || ' ' || " +
-		"COALESCE(JSON_VALUE(**tableAlias**.data, '$.contractor.companyName'), '')" +
-		") AS contractor, " +
-
+		"TRIM(COALESCE(JSON_VALUE(**tableAlias**.data,'$.contractor.name'), '') || ' ' || COALESCE(JSON_VALUE(**tableAlias**.data, '$.contractor.surname'), '')) as fullName," +
+		"COALESCE(JSON_VALUE(**tableAlias**.data, '$.contractor.companyName'),'') as companyName," +
 		"**tableAlias**.priceGross AS price, **tableAlias**.priceGrossMonthly AS priceMonthly, " +
 		"COALESCE(nn.name, '') AS producer, COALESCE(**tableAlias**.producerCode, '') AS producerCode, " +
 		"**tableAlias**.startDate, **tableAlias**.endDate, **tableAlias**.paymentSplit, " +
@@ -185,7 +184,7 @@ func (qb *QueryBuilder) parseQuery() string {
 
 	query := strings.ReplaceAll(rawQuery.String(), "**tableName**", qb.tableName)
 	query = strings.ReplaceAll(query, "**tableAlias**", qb.tableAlias)
-
+	query += ")"
 	return query
 }
 
