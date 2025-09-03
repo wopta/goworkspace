@@ -88,7 +88,7 @@ type legalRepresentative struct {
 	FiscalCode string `json:"codiceFiscale,omitempty"`
 	PostalCode string `json:"cap,omitempty"`
 	Address    string `json:"indirizzo,omitempty"`
-	Locality   string `json:"comune,omitempty"`
+	City       string `json:"comune,omitempty"`
 	CityCode   string `json:"provincia,omitempty"`
 	Phone      string `json:"telefonoCellulare,omitempty"`
 	Email      string `json:"email,omitempty"`
@@ -103,7 +103,7 @@ type assetRequest struct {
 	LandSlidePurchase    string          `json:"acquistoFrane"`
 	PostalCode           string          `json:"cap"`
 	Address              string          `json:"indirizzo"`
-	Locality             string          `json:"comune"`
+	City                 string          `json:"comune"`
 	CityCode             string          `json:"provincia"`
 	ConstructionMaterial int             `json:"materialeDiCostruzione"`
 	ConstructionYear     int             `json:"annoDiCostruzione"`
@@ -299,7 +299,7 @@ func (d *QuoteRequest) FromPolicyForEmit(policy *models.Policy) error {
 				if v.Residence != nil {
 					legalRep.Address = formatAddress(v.Residence)
 					legalRep.PostalCode = v.Residence.PostalCode
-					legalRep.Locality = v.Residence.Locality
+					legalRep.City = v.Residence.City
 					legalRep.CityCode = v.Residence.CityCode
 				}
 				break
@@ -374,7 +374,7 @@ func (d *QuoteRequest) FromPolicyForQuote(policy *models.Policy) error {
 	if baseAsset.Building.BuildingAddress != nil {
 		asset.PostalCode = baseAsset.Building.BuildingAddress.PostalCode
 		asset.Address = formatAddress(baseAsset.Building.BuildingAddress)
-		asset.Locality = baseAsset.Building.BuildingAddress.Locality
+		asset.City = baseAsset.Building.BuildingAddress.City
 		asset.CityCode = baseAsset.Building.BuildingAddress.CityCode
 	}
 	log.Println("Managing slug guarantees")
