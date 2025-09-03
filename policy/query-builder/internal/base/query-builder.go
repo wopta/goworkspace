@@ -158,9 +158,12 @@ func (qb *QueryBuilder) extractLimit(params map[string]string) error {
 func (qb *QueryBuilder) parseQuery() string {
 	const queryPrefix = "SELECT **tableAlias**.uid, **tableAlias**.name AS productName, " +
 		"**tableAlias**.codeCompany, CAST(**tableAlias**.proposalNumber AS INT64) AS proposalNumber, " +
-		"**tableAlias**.nameDesc, **tableAlias**.status, RTRIM(COALESCE(JSON_VALUE(**tableAlias**.data, " +
-		"'$.contractor.name'), '') || ' ' || " +
-		"COALESCE(JSON_VALUE(**tableAlias**.data, '$.contractor.surname'), '')) AS contractor, " +
+		"**tableAlias**.nameDesc, **tableAlias**.status, " +
+		"TRIM(COALESCE(JSON_VALUE(**tableAlias**.data,'$.contractor.name'), '') || ' ' || " +
+		"COALESCE(JSON_VALUE(**tableAlias**.data, '$.contractor.surname'), '') || ' ' || " +
+		"COALESCE(JSON_VALUE(**tableAlias**.data, '$.contractor.companyName'), '')" +
+		") AS contractor, " +
+
 		"**tableAlias**.priceGross AS price, **tableAlias**.priceGrossMonthly AS priceMonthly, " +
 		"COALESCE(nn.name, '') AS producer, COALESCE(**tableAlias**.producerCode, '') AS producerCode, " +
 		"**tableAlias**.startDate, **tableAlias**.endDate, **tableAlias**.paymentSplit, " +
