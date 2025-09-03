@@ -442,6 +442,9 @@ func mappingQuoteResponseToGuarantee(quoteResponse QuoteResponse, policy *models
 	}
 	for i := range policy.Assets[0].Guarantees {
 		policy.Assets[0].Guarantees[i].Value.PremiumGrossYearly = lib.RoundFloat(policy.Assets[0].Guarantees[i].Value.PremiumGrossYearly*rates, 2)
+		if split != string(models.PaySplitYear) && split != string(models.PaySplitYearly) {
+			policy.Assets[0].Guarantees[i].Value.PremiumGrossMonthly = lib.RoundFloat(policy.Assets[0].Guarantees[i].Value.PremiumGrossYearly/rates, 2)
+		}
 	}
 	return nil
 }
