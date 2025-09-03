@@ -76,7 +76,11 @@ func setDateInfo(index int, transaction models.Transaction, policy models.Policy
 	now := time.Now().UTC()
 
 	startDate := lib.AddMonths(policy.StartDate, 12*transaction.Annuity)
-	transaction.EffectiveDate = lib.AddMonths(startDate, index)
+	var split models.PaySplit = models.PaySplit(policy.PaymentSplit)
+	if split == "" {
+		split = models.PaySplitMonthly
+	}
+	transaction.EffectiveDate = lib.AddMonths(startDate, index*models.PaySplitMonthsMap[split])
 	transaction.ScheduleDate = transaction.EffectiveDate.Format(time.DateOnly)
 	// TODO: code smell - this info is needed for Fabrick only but we don't know the params for other scenarios
 	transaction.ExpirationDate = lib.AddMonths(now, 18).Format(time.DateOnly)
