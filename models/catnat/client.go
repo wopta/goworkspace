@@ -218,7 +218,7 @@ func (c *NetClient) EnrichAteco(fiscalCode string) (response AtecoResponse, err 
 	if len(fiscalCode) == 11 { //partita iva
 		checkDigit := CalculateControlNumberFromVatCode(fiscalCode)
 		if checkDigit != string(fiscalCode[10]) {
-			return response, errors.New("codice ateco non corretto, verificare il codice di controllo")
+			return response, errors.New("Partita iva non corretta, verificare il codice di controllo")
 		}
 	}
 	url := os.Getenv("NET_BASEURL") + "/OperationsGateway/InformazioniCompagnia/" + fiscalCode
@@ -243,7 +243,7 @@ func (c *NetClient) EnrichAteco(fiscalCode string) (response AtecoResponse, err 
 		return response, err
 	}
 	if response.Result != "OK" {
-		return response, errors.New("Error Enrich ateco")
+		return response, errors.New("Codice ateco non trovato, inseriscilo manualmente")
 	}
 	//Formatting ateco code
 	var ateco string
