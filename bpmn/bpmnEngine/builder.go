@@ -279,6 +279,11 @@ func (p *processBpnm) hydrateGateways(activities []activityBuilder, bpmn *FlowBp
 						return fmt.Errorf("Between previeus activity '%s' and next activity '%s' there is an error: %v", builderActivity.Name, nextJump, err.Error())
 					}
 				}
+				gateway.nextActivities[iact] = p.activities[nextJump]
+				if e := isInputProvidedByOutput(gateway.nextActivities[iact].requiredInputData, builderActivity.OutputDataRequired); e != nil {
+					prefix := fmt.Sprintf("input activity: '%v' and output activity: '%v'", gateway.nextActivities[iact].name, builderActivity.Name)
+					return fmt.Errorf(prefix+", has error: %v", e.Error())
+				}
 			}
 			gateways[igat] = gateway
 		}

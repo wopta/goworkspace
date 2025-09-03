@@ -13,6 +13,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
 	"gitlab.dev.wopta.it/goworkspace/network"
+	"gitlab.dev.wopta.it/goworkspace/question"
 )
 
 type CatnatGenerator struct {
@@ -65,7 +66,7 @@ func (el *CatnatGenerator) generateProposal() {
 	el.engine.NewLine(2)
 	el.addFinalGreatings()
 	el.engine.NewPage()
-	el.addStatements()
+	el.addStatements(true)
 	el.whoWeAre()
 	el.AddMup()
 	el.woptaPrivacySection()
@@ -116,18 +117,20 @@ func (el *CatnatGenerator) addInitialGreatings() {
 func (el *CatnatGenerator) generateContract() {
 	el.addContractorInformation()
 	el.engine.NewLine(constants.CellHeight)
-	el.addStatements()
+	el.addStatements(false)
 	el.addAttachmentsInformation()
 	el.AddMup()
 	el.woptaPrivacySection()
 	el.addElectronicSignPolicy()
 	el.addOtpSignPolicy()
 }
-func (el *CatnatGenerator) addStatements() {
+func (el *CatnatGenerator) addStatements(includeCompanyStatements bool) {
 	if el.policy.Statements == nil {
 		return
 	}
-	for _, statement := range *el.policy.Statements {
+	statements, _ := question.GetStatements(el.policy, includeCompanyStatements)
+
+	for _, statement := range statements {
 		el.printStatement(statement)
 	}
 }
@@ -237,7 +240,7 @@ func (el *CatnatGenerator) addMainHeader() {
 	}
 	rowsData := [][]string{
 		{"I dati del tuo Polizza", "I tuoi dati"},
-		{"Numero: " + number, "Contraente: " + el.dtoCatnat.Contractor.Name + " " + el.dtoCatnat.Contractor.Surname},
+		{"Numero: " + number, "Contraente: " + el.dtoCatnat.Contractor.GetFullNameContractor()},
 		{"Decorre dal: " + el.dtoCatnat.ValidityDate.StartDate, "C.F./P.IVA: " + el.dtoCatnat.Contractor.FiscalCode_VatCode},
 		{"Scade il: " + el.dtoCatnat.ValidityDate.EndDate, "Sede Legale: " + strings.ReplaceAll(el.dtoCatnat.Contractor.Address, "\n", "")},
 		{"Si rinnova a scadenza, salvo disdetta da inviare 30 giorni prima", "Sede Assicurata: " + strings.ReplaceAll(el.dtoCatnat.SedeDaAssicurare.Address, "\n", "")},

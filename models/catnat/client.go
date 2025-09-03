@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -189,7 +190,37 @@ func (c *NetClient) Download(numeroPolizza string) (response DownloadResponse, e
 	}
 	return response, nil
 }
+func CalculateControlNumberFromVatCode(vatCode string) string {
+	x := 0
+	y := 0
+	i := 0
+	for {
+		if i == 10 {
+			break
+		}
+		if i%2 != 0 {
+			y += (int(vatCode[i]) - 48) * 2
+			if (int(vatCode[i])-48)*2 > 9 {
+				y -= 9
+			}
+		} else {
+			x += (int(vatCode[i]) - 48)
+		}
+
+		i++
+	}
+	sum := x + y
+	sum = sum % 10
+	sum = (10 - sum) % 10
+	return fmt.Sprint(sum)
+}
 func (c *NetClient) EnrichAteco(fiscalCode string) (response AtecoResponse, err error) {
+	if len(fiscalCode) == 11 { //partita iva
+		checkDigit := CalculateControlNumberFromVatCode(fiscalCode)
+		if checkDigit != string(fiscalCode[10]) {
+			return response, errors.New("Partita iva non corretta, verificare il codice di controllo")
+		}
+	}
 	url := os.Getenv("NET_BASEURL") + "/OperationsGateway/InformazioniCompagnia/" + fiscalCode
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -212,7 +243,22 @@ func (c *NetClient) EnrichAteco(fiscalCode string) (response AtecoResponse, err 
 		return response, err
 	}
 	if response.Result != "OK" {
-		return response, errors.New("Error Enrich ateco")
+		return response, errors.New("Codice ateco non trovato, inseriscilo manualmente")
 	}
+	//Formatting ateco code
+	var ateco string
+	hasDot := func(i int) bool {
+		if i == 0 {
+			return false
+		}
+		return i%2 == 0
+	}
+	for i := range response.Ateco {
+		if hasDot(i) {
+			ateco += "."
+		}
+		ateco += string(response.Ateco[i])
+	}
+	response.Ateco = ateco
 	return response, err
 }

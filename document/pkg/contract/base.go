@@ -948,7 +948,7 @@ func (bg *baseGenerator) checkStatementSpace(statement models.Statement) {
 		}
 
 		answer := ""
-		if question.HasAnswer {
+		if question.Answer != nil && question.HasAnswer {
 			answer = constants.No
 			if *question.Answer {
 				answer = constants.Yes

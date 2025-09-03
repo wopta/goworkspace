@@ -114,8 +114,18 @@ func checkFiscalCode(user models.User, fiscalCodeToCheck string) (err error) {
 
 	fiscalCode := []rune(fiscalCodeToCheck)
 	if len(fiscalCodeToCheck) != 16 {
-		return errors.New("Errore codice fiscale")
+		return errors.New("Errore il codice fiscale deve contenere 16 cifre")
 	}
+
+	checkDigit, err := CalculateControlCharacterFromFiscalCode(fiscalCodeToCheck)
+	if err != nil {
+		return err
+	}
+
+	if fiscalCodeToCheck[15:16] != checkDigit {
+		return errors.New("Errore  check digit")
+	}
+
 	//clean fiscal code from omocodia
 	for _, numberPositionToClean := range numbersPositionInFiscalCode {
 		char := fiscalCode[numberPositionToClean]
@@ -123,10 +133,9 @@ func checkFiscalCode(user models.User, fiscalCodeToCheck string) (err error) {
 			fiscalCode[numberPositionToClean] = toUse
 		}
 	}
-	if fiscalCodeToMatch == string(fiscalCode) {
+	if fiscalCodeToMatch[:15] == string(fiscalCode[:15]) {
 		return nil
 	}
-
 	areSegmentsEqual := func(fiscalCodeA, fiscalCodeB string, startIndex, endIndex int) bool {
 		for i := startIndex; i <= endIndex; i++ {
 			if fiscalCodeA[i] != fiscalCodeB[i] {
@@ -349,6 +358,16 @@ func calculateBirthPlaceCode(cityOfBirth, provinceOfBirth string) (string, error
 	}
 
 	return birthPlaceCode, nil
+}
+
+func CalculateControlCharacterFromFiscalCode(fiscalCode string) (string, error) {
+	var surnameCode, nameCode, birthDateCode, birthPlaceCode string
+	surnameCode = fiscalCode[:3]
+	nameCode = fiscalCode[3:6]
+	birthDateCode = fiscalCode[6:11]
+	birthPlaceCode = fiscalCode[11:15]
+	checkDigit, err := calculateControlCharacter(surnameCode, nameCode, birthDateCode, birthPlaceCode)
+	return checkDigit, err
 }
 
 func calculateControlCharacter(surnameCode, nameCode, birthDateCode, birthPlaceCode string) (string, error) {
