@@ -115,7 +115,7 @@ func SendMailContract(policy models.Policy, at *[]models.Attachment, from, to, c
 	}
 	var attachmentToSend []models.Attachment
 	for _, attach := range *at {
-		if !strings.Contains(attach.Name, models.ContractAttachmentName) {
+		if !strings.Contains(attach.Name, models.ContractAttachmentName) && !strings.Contains(attach.Name, models.PreContractAttachmentName) {
 			continue
 		}
 		attachmentToSend = append(attachmentToSend, attach)

@@ -4,12 +4,10 @@ import (
 	"encoding/base64"
 	"fmt"
 	"os"
-	"strings"
 
 	bpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
 	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib"
-	"gitlab.dev.wopta.it/goworkspace/models"
 	"gitlab.dev.wopta.it/goworkspace/models/catnat"
 )
 
@@ -52,7 +50,7 @@ func CatnatDownloadCertification(store bpmn.StorageData) error {
 	if err != nil {
 		return err
 	}
-	filePath := strings.ReplaceAll(fmt.Sprintf("%s/%s/namirial/%s %s", "temp", policy.Uid, models.ContractAttachmentName, "NetInsurance"), " ", "_")
+	filePath := fmt.Sprint("temp/", policy.Uid, "/namirial/", policy.NameDesc, " Contratto NetInsurance ", policy.CodeCompany)
 	_, err = lib.PutToStorageErr(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, bytes)
 	if err != nil {
 		return err

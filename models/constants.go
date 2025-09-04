@@ -263,10 +263,10 @@ const (
 )
 
 const (
-	InformationSetAttachmentName = "Precontrattuale"
-	ProposalAttachmentName       = "Proposta"
+	ProposalAttachmentName = "Proposta"
 	//to use with namirial, to sign
-	ContractAttachmentName = "Contratto"
+	PreContractAttachmentName = "Precontrattuale"
+	ContractAttachmentName    = "Contratto"
 	//
 	ContractNonDigitalAttachmentName = "Contratto non digitale"
 	RvmInstructionsAttachmentName    = "Scheda Rapporto Visita Medica"

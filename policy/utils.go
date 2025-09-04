@@ -169,18 +169,13 @@ func AddSignedDocumentsInPolicy(policy *models.Policy) error {
 		fileName, typeFile, _ = strings.Cut(fileName, ".")
 		fileName = strings.ReplaceAll(fileName, "_", " ")
 
-		filePath := strings.ReplaceAll(fmt.Sprintf("temp/%s/%v", policy.Uid, documents.Documents[i].FileName), " ", "_")
+		filePath := strings.ReplaceAll(fmt.Sprint("temp/", policy.Uid, "/", documents.Documents[i].FileName), " ", "_")
 		log.Println("path file path:", filePath)
 
 		gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, body)
-		//TODO: to remove eventually
-		//With the new implementation of namirial we use the file's name to extract the label that will be showed in FE
-		//Instead in the old one, the label was hardcode independently of 'NameDesc' (that happened to be the filename that we used for namirial)
-		//olfImplementation of namirial: fw, err := w.CreateFormFile("file", NameDesc+" Polizza.pdf")'
-		//So to allow retrocompatibility we use this, old file sent with old implementation
-		if strings.Contains(fileName, policy.NameDesc) {
-			fileName = models.ContractAttachmentName
-		}
+
+		fileName, _ = strings.CutPrefix(fileName, policy.NameDesc+" ")
+		fileName, _ = strings.CutSuffix(fileName, " "+policy.CodeCompany)
 
 		*policy.Attachments = append(*policy.Attachments, models.Attachment{
 			Name:        fileName,
