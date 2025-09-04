@@ -442,15 +442,16 @@ func mappingQuoteResponseToGuarantee(quoteResponse QuoteResponse, policy *models
 	}
 	for i := range policy.Assets[0].Guarantees {
 		policy.Assets[0].Guarantees[i].Value.PremiumGrossYearly = lib.RoundFloat(policy.Assets[0].Guarantees[i].Value.PremiumGrossYearly*rates, 2)
-		if split != string(models.PaySplitYear) && split != string(models.PaySplitYearly) {
-			policy.Assets[0].Guarantees[i].Value.PremiumGrossMonthly = lib.RoundFloat(policy.Assets[0].Guarantees[i].Value.PremiumGrossYearly/rates, 2)
-		}
 	}
 	return nil
 }
 
 func mappingQuoteResponseToPolicy(quoteResponse QuoteResponse, policy *models.Policy) error {
 	policy.PriceGross = quoteResponse.AnnualGross
+	rates := float64(models.PaySplitRateMap[models.PaySplit(policy.PaymentSplit)])
+	if policy.PaymentSplit != string(models.PaySplitYear) && policy.PaymentSplit != string(models.PaySplitYearly) {
+		policy.PriceGrossMonthly = lib.RoundFloat(policy.PriceGross/rates, 2)
+	}
 	policy.PriceNett = quoteResponse.AnnualNet
 	policy.TaxAmount = quoteResponse.AnnualTax
 	split := policy.PaymentSplit
@@ -463,7 +464,6 @@ func mappingQuoteResponseToPolicy(quoteResponse QuoteResponse, policy *models.Po
 			split: &models.Price{},
 		},
 	}
-	rates := float64(models.PaySplitRateMap[models.PaySplit(split)])
 	if rates == 0 {
 		return errors.New("Rates is 0")
 	}
