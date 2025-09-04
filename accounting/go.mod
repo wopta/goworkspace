@@ -9,11 +9,11 @@ require (
 	github.com/fattureincloud/fattureincloud-go-sdk/v2 v2.1.1
 	github.com/go-chi/chi/v5 v5.0.12
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.197
-	gitlab.dev.wopta.it/goworkspace/models v1.2.125
-	gitlab.dev.wopta.it/goworkspace/network v1.0.193
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.326
-	gitlab.dev.wopta.it/goworkspace/product v1.1.124
-	gitlab.dev.wopta.it/goworkspace/transaction v1.0.319
+	gitlab.dev.wopta.it/goworkspace/models v1.2.126
+	gitlab.dev.wopta.it/goworkspace/network v1.0.194
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.327
+	gitlab.dev.wopta.it/goworkspace/product v1.1.125
+	gitlab.dev.wopta.it/goworkspace/transaction v1.0.320
 )
 
 require (
@@ -81,7 +81,7 @@ require (
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
-	gitlab.dev.wopta.it/goworkspace/document v1.1.282 // indirect
+	gitlab.dev.wopta.it/goworkspace/document v1.1.283 // indirect
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.39 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
