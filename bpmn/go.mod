@@ -7,7 +7,7 @@ replace gitlab.dev.wopta.it/goworkspace/bpmn => ./
 require (
 	github.com/maja42/goval v1.4.0
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.198
-	gitlab.dev.wopta.it/goworkspace/models v1.2.129
+	gitlab.dev.wopta.it/goworkspace/models v1.2.130
 )
 
 require (

@@ -13,8 +13,8 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/ttacon/libphonenumber v1.2.1
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.198
-	gitlab.dev.wopta.it/goworkspace/models v1.2.129
-	gitlab.dev.wopta.it/goworkspace/network v1.0.197
+	gitlab.dev.wopta.it/goworkspace/models v1.2.130
+	gitlab.dev.wopta.it/goworkspace/network v1.0.198
 )
 
 require (
