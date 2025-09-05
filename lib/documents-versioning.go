@@ -29,7 +29,8 @@ func compareVersions(a, b string) int {
 	return int(patch_b) - int(patch_a)
 }
 
-func GetLastVersionPrecontrattuale(productName, version string) (string, error) {
+// get SetInformativo or Precontrattuale
+func GetLastVersionSetInformativo(productName, version string) (string, error) {
 	bucket := "documents-public-dev"
 	path := fmt.Sprint("information-sets/", productName, "/", version)
 	res, err := getLastVersionDocument(bucket, path, "Precontrattuale")
