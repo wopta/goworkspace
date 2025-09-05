@@ -13,7 +13,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/models v1.2.131
 	gitlab.dev.wopta.it/goworkspace/network v1.0.199
 	gitlab.dev.wopta.it/goworkspace/product v1.1.130
-	gitlab.dev.wopta.it/goworkspace/quote v1.0.319
+	gitlab.dev.wopta.it/goworkspace/quote v1.0.320
 	gitlab.dev.wopta.it/goworkspace/user v1.0.239
 )
 
@@ -81,9 +81,9 @@ require (
 	github.com/xuri/excelize/v2 v2.8.1 // indirect
 	github.com/xuri/nfp v0.0.0-20230919160717-d98342af3f05 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
-	gitlab.dev.wopta.it/goworkspace/document v1.1.290 // indirect
+	gitlab.dev.wopta.it/goworkspace/document v1.1.291 // indirect
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.255 // indirect
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.334 // indirect
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.335 // indirect
 	gitlab.dev.wopta.it/goworkspace/sellable v1.0.244 // indirect
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.40 // indirect
 	go.opencensus.io v0.24.0 // indirect
