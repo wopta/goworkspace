@@ -47,6 +47,7 @@ func (el *CatnatGenerator) Generate() {
 	el.engine.NewPage()
 	el.engine.NewLine(constants.CellHeight)
 	if el.isProposal {
+		el.engine.DrawWatermark(constants.Proposal)
 		el.generateProposal()
 	} else {
 		el.generateContract()
@@ -232,19 +233,17 @@ func (el *CatnatGenerator) addMainHeader() {
 		}
 		return result
 	}
-	number := ""
-	if el.isProposal {
-		number = fmt.Sprint(el.policy.ProposalNumber)
-	} else {
-		number = el.policy.CodeCompany
-	}
 	rowsData := [][]string{
 		{"I dati del tuo Polizza", "I tuoi dati"},
-		{"Numero: " + number, "Contraente: " + el.dtoCatnat.Contractor.GetFullNameContractor()},
+		{"Numero: " + el.policy.CodeCompany, "Contraente: " + el.dtoCatnat.Contractor.GetFullNameContractor()},
 		{"Decorre dal: " + el.dtoCatnat.ValidityDate.StartDate, "C.F./P.IVA: " + el.dtoCatnat.Contractor.FiscalCode_VatCode},
 		{"Scade il: " + el.dtoCatnat.ValidityDate.EndDate, "Sede Legale: " + strings.ReplaceAll(el.dtoCatnat.Contractor.Address, "\n", "")},
 		{"Si rinnova a scadenza, salvo disdetta da inviare 30 giorni prima", "Sede Assicurata: " + strings.ReplaceAll(el.dtoCatnat.SedeDaAssicurare.Address, "\n", "")},
 		{"Produttore: Michele Lomazzi", " "},
+	}
+	if el.isProposal {
+		rowsData[0][0] = "I dati della tua proposta"
+		rowsData[1][0] = fmt.Sprint("Numero: ", el.policy.ProposalNumber)
 	}
 	el.engine.SetHeader(func() {
 		firstColumnWidth = 15
@@ -300,9 +299,9 @@ func (el *CatnatGenerator) addContractorInformation() {
 		return result
 	}
 	rowsData := [][]string{
-		{"cognome e nome: ", el.dtoCatnat.Contractor.Name + " " + el.dtoCatnat.Contractor.Surname},
-		{"codice fiscale: ", el.dtoCatnat.Contractor.FiscalCode},
-		{"ruolo", "xxxxx"},
+		{"cognome e nome: ", el.dtoCatnat.Contractor.GetFullNameContractor()},
+		{"codice fiscale/partia iva: ", el.dtoCatnat.Contractor.GetFiscalCodeVatCode()},
+		{"ruolo", "Legare Rappresentante"},
 	}
 	el.engine.DrawTable(parseData(rowsData))
 	el.engine.WriteText(domain.TableCell{

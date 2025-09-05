@@ -106,3 +106,7 @@ func (c *contractorDTO) fromPolicy(contractor models.Contractor) {
 func (c *contractorDTO) GetFullNameContractor() string {
 	return c.CompanyName + c.Name + " " + c.Surname
 }
+
+func (c *contractorDTO) GetFiscalCodeVatCode() string {
+	return strings.Join([]string{c.FiscalCode, c.VatCode}, "/")
+}
