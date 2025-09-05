@@ -11,18 +11,13 @@ import (
 	_ "gitlab.dev.wopta.it/goworkspace/callback"
 	_ "gitlab.dev.wopta.it/goworkspace/claim"
 	_ "gitlab.dev.wopta.it/goworkspace/companydata"
-	"gitlab.dev.wopta.it/goworkspace/document"
 	_ "gitlab.dev.wopta.it/goworkspace/document"
 	_ "gitlab.dev.wopta.it/goworkspace/enrich"
 	_ "gitlab.dev.wopta.it/goworkspace/form"
 	_ "gitlab.dev.wopta.it/goworkspace/mail"
 	_ "gitlab.dev.wopta.it/goworkspace/mga"
-	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/network"
 	_ "gitlab.dev.wopta.it/goworkspace/partnership"
-	"gitlab.dev.wopta.it/goworkspace/policy"
 	_ "gitlab.dev.wopta.it/goworkspace/policy"
-	"gitlab.dev.wopta.it/goworkspace/product"
 	_ "gitlab.dev.wopta.it/goworkspace/question"
 	_ "gitlab.dev.wopta.it/goworkspace/quote"
 	_ "gitlab.dev.wopta.it/goworkspace/renew"
@@ -38,17 +33,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error loading .env file: %s", err)
 	}
-
-	pl, _ := policy.GetPolicy("Be4AQAb74M5GFUiFGgAg")
-	net := network.GetNetworkNodeByUid(pl.ProducerUid)
-	var warrant *models.Warrant
-	if net != nil {
-		warrant = net.GetWarrant()
-	}
-	pr := product.GetProductV2(pl.Name, pl.ProductVersion, pl.Channel, net, warrant)
-	doc := <-document.ContractObj(pl, net, pr)
-	os.WriteFile("prova1.pdf", doc.Bytes, os.ModePerm)
-
 	port := "8080"
 	if envPort := os.Getenv("PORT"); envPort != "" {
 		port = envPort
