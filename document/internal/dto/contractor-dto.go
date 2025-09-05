@@ -8,21 +8,20 @@ import (
 )
 
 type contractorDTO struct {
-	Name               string
-	Surname            string
-	CompanyName        string
-	FiscalCode         string
-	VatCode            string
-	FiscalCode_VatCode string
-	StreetName         string
-	StreetNumber       string
-	City               string
-	PostalCode         string
-	CityCode           string
-	Mail               string
-	Phone              string
-	BirthDate          string
-	Address            string
+	Name         string
+	Surname      string
+	CompanyName  string
+	FiscalCode   string
+	VatCode      string
+	StreetName   string
+	StreetNumber string
+	City         string
+	PostalCode   string
+	CityCode     string
+	Mail         string
+	Phone        string
+	BirthDate    string
+	Address      string
 }
 
 func newContractorDTO() *contractorDTO {
@@ -54,11 +53,9 @@ func (c *contractorDTO) fromPolicy(contractor models.Contractor) {
 	}
 	if contractor.FiscalCode != "" {
 		c.FiscalCode = contractor.FiscalCode
-		c.FiscalCode_VatCode = c.FiscalCode + "/"
 	}
 	if contractor.VatCode != "" {
 		c.VatCode = contractor.VatCode
-		c.FiscalCode_VatCode += c.VatCode
 	}
 
 	if contractor.Type == models.UserLegalEntity && contractor.CompanyAddress != nil {
@@ -104,9 +101,19 @@ func (c *contractorDTO) fromPolicy(contractor models.Contractor) {
 
 }
 func (c *contractorDTO) GetFullNameContractor() string {
-	return c.CompanyName + c.Name + " " + c.Surname
+	return c.CompanyName + " " + c.Name + " " + c.Surname
 }
 
 func (c *contractorDTO) GetFiscalCodeVatCode() string {
-	return strings.Join([]string{c.FiscalCode, c.VatCode}, "/")
+	var res = ""
+	if c.FiscalCode != "" {
+		res = c.FiscalCode
+	}
+	if c.FiscalCode != "" && c.VatCode != "" {
+		res += "/"
+	}
+	if c.VatCode != "" {
+		res += c.VatCode
+	}
+	return res
 }

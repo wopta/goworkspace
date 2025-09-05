@@ -236,7 +236,7 @@ func (el *CatnatGenerator) addMainHeader() {
 	rowsData := [][]string{
 		{"I dati del tuo Polizza", "I tuoi dati"},
 		{"Numero: " + el.policy.CodeCompany, "Contraente: " + el.dtoCatnat.Contractor.GetFullNameContractor()},
-		{"Decorre dal: " + el.dtoCatnat.ValidityDate.StartDate, "C.F./P.IVA: " + el.dtoCatnat.Contractor.FiscalCode_VatCode},
+		{"Decorre dal: " + el.dtoCatnat.ValidityDate.StartDate, "C.F./P.IVA: " + el.dtoCatnat.Contractor.GetFiscalCodeVatCode()},
 		{"Scade il: " + el.dtoCatnat.ValidityDate.EndDate, "Sede Legale: " + strings.ReplaceAll(el.dtoCatnat.Contractor.Address, "\n", "")},
 		{"Si rinnova a scadenza, salvo disdetta da inviare 30 giorni prima", "Sede Assicurata: " + strings.ReplaceAll(el.dtoCatnat.SedeDaAssicurare.Address, "\n", "")},
 		{"Produttore: Michele Lomazzi", " "},
@@ -261,7 +261,7 @@ func (el *CatnatGenerator) addMainHeader() {
 func (el *CatnatGenerator) addContractorInformation() {
 	el.engine.WriteText(el.engine.GetTableCell("In relazione alla polizza sopra meglio identificata, il contraente, nella figura del suo rappresentante legale:"))
 	const (
-		firstColumnWidth  float64 = 30
+		firstColumnWidth  float64 = 40
 		secondColumnWidth         = constants.FullPageWidth - firstColumnWidth
 	)
 	parseData := func(rows [][]string) [][]domain.TableCell {
@@ -300,7 +300,7 @@ func (el *CatnatGenerator) addContractorInformation() {
 	}
 	rowsData := [][]string{
 		{"cognome e nome: ", el.dtoCatnat.Contractor.GetFullNameContractor()},
-		{"codice fiscale/partia iva: ", el.dtoCatnat.Contractor.GetFiscalCodeVatCode()},
+		{"C.F./P.IVA: ", el.dtoCatnat.Contractor.GetFiscalCodeVatCode()},
 		{"ruolo", "Legare Rappresentante"},
 	}
 	el.engine.DrawTable(parseData(rowsData))
