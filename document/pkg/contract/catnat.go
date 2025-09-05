@@ -119,6 +119,7 @@ func (el *CatnatGenerator) generateContract() {
 	el.addContractorInformation()
 	el.engine.NewLine(constants.CellHeight)
 	el.addStatements(false)
+	el.engine.NewPage()
 	el.addAttachmentsInformation()
 	el.AddMup()
 	el.woptaPrivacySection()
@@ -132,6 +133,10 @@ func (el *CatnatGenerator) addStatements(includeCompanyStatements bool) {
 	statements, _ := question.GetStatements(el.policy, includeCompanyStatements)
 
 	for _, statement := range statements {
+		_, y := el.engine.GetPageSize()
+		if el.engine.GetY() > y*0.8 {
+			el.engine.NewPage()
+		}
 		el.printStatement(statement)
 	}
 }
