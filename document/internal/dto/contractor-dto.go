@@ -100,15 +100,22 @@ func (c *contractorDTO) fromPolicy(contractor models.Contractor) {
 	c.Address = strings.ToUpper(c.StreetName + ", " + c.StreetNumber + "\n" + c.PostalCode + " " + c.City + " (" + c.CityCode + ")\n")
 
 }
-func (c *contractorDTO) GetFullNameContractor() string {
-	return c.CompanyName + " " + c.Name + " " + c.Surname
+func (c *contractorDTO) GetFullNameContractor() (res string) {
+	res = c.Name
+	if c.Surname != "" {
+		res += " " + c.Surname
+	}
+	if c.CompanyName != "" {
+		if res != "" {
+			res += ", "
+		}
+		res += c.CompanyName
+	}
+	return res
 }
 
 func (c *contractorDTO) GetFiscalCodeVatCode() string {
-	var res = ""
-	if c.FiscalCode != "" {
-		res = c.FiscalCode
-	}
+	var res = c.FiscalCode
 	if c.FiscalCode != "" && c.VatCode != "" {
 		res += "/"
 	}
