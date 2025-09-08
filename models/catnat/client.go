@@ -214,7 +214,16 @@ func CalculateControlNumberFromVatCode(vatCode string) string {
 	sum = (10 - sum) % 10
 	return fmt.Sprint(sum)
 }
-func (c *NetClient) EnrichAteco(fiscalCode string) (response AtecoResponse, err error) {
+
+type enrichEtecoCatnat struct {
+	AtecoCode string `json:"atecoCode"`
+	Message   string `json:"message"`
+}
+
+func (c *NetClient) EnrichAteco(fiscalCode string) (response enrichEtecoCatnat, err error) {
+	if len(fiscalCode) != 11 && len(fiscalCode) != 16 {
+		return response, errors.New("Inserire partita iva o codice fiscale")
+	}
 	if len(fiscalCode) == 11 { //partita iva
 		checkDigit := CalculateControlNumberFromVatCode(fiscalCode)
 		if checkDigit != string(fiscalCode[10]) {
@@ -238,12 +247,16 @@ func (c *NetClient) EnrichAteco(fiscalCode string) (response AtecoResponse, err 
 		}
 		return response, errors.New(resp.Status + ":" + string(errBytes))
 	}
-	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
+	var respDecoded AtecoResponse
+	if err = json.NewDecoder(resp.Body).Decode(&respDecoded); err != nil {
 		log.ErrorF("error decoding catnat response")
 		return response, err
 	}
-	if response.Result != "OK" {
-		return response, errors.New("Codice ateco non trovato, inseriscilo manualmente")
+
+	if respDecoded.Result != "OK" {
+		response.AtecoCode = ""
+		response.Message = "Codice ateco non trovato, inseriscilo manualmente"
+		return response, nil
 	}
 	//Formatting ateco code
 	var ateco string
@@ -253,12 +266,12 @@ func (c *NetClient) EnrichAteco(fiscalCode string) (response AtecoResponse, err 
 		}
 		return i%2 == 0
 	}
-	for i := range response.Ateco {
+	for i := range respDecoded.Ateco {
 		if hasDot(i) {
 			ateco += "."
 		}
-		ateco += string(response.Ateco[i])
+		ateco += string(respDecoded.Ateco[i])
 	}
-	response.Ateco = ateco
+	response.AtecoCode = ateco
 	return response, err
 }

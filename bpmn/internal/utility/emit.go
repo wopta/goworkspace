@@ -31,7 +31,7 @@ func SignFiles(policy *models.Policy, product *models.Product, networkNode *mode
 	}
 	p := <-document.ContractObj(*policy, networkNode, product)
 	p.ParentPath += "/namirial"
-	_, err := p.SaveWithName(fmt.Sprint(policy.NameDesc, " Polizza"))
+	_, err := p.Save()
 	if err != nil {
 		return err
 	}

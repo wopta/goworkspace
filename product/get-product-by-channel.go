@@ -123,7 +123,7 @@ func getDefaultProduct(productName, channel string) *models.Product {
 		return nil
 	}
 
-	link, _ := lib.GetLastVersionPrecontrattuale(product.Name, product.Version)
+	link, _ := lib.GetLastVersionSetInformativo(product.Name, product.Version)
 	for i := range product.Companies {
 		product.Companies[i].InformationSetLink = fmt.Sprint(lib.BaseStorageGoogleUrl, link)
 	}
@@ -167,7 +167,7 @@ func GetLatestActiveProduct(productName, channel string, networkNode *models.Net
 
 	log.Println("function end ---------------------")
 
-	link, _ := lib.GetLastVersionPrecontrattuale(product.Name, product.Version)
+	link, _ := lib.GetLastVersionSetInformativo(product.Name, product.Version)
 	for i := range product.Companies {
 		product.Companies[i].InformationSetLink = fmt.Sprint(lib.BaseStorageGoogleUrl, link)
 	}

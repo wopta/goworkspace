@@ -27,7 +27,6 @@ func GetStatements(policy *models.Policy, includeCompanyStatements bool) ([]mode
 		IncludeExternalCompanyStatements: includeCompanyStatements,
 	}
 	inputRuleStr, err := json.Marshal(inputRuleStruct)
-	log.Printf("-------------prova %s\n\n", string(inputRuleStr))
 	if err != nil {
 		log.ErrorF("error marshaling policy: %s", err.Error())
 		return nil, err

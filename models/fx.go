@@ -157,11 +157,10 @@ func (fx *Fx) FloatToString(in float64, decimal int64) string {
 }
 
 /*
-	SURVEY AND STATEMENT CUSTOM FUNCTIONS
+SURVEY AND STATEMENT CUSTOM FUNCTIONS
 */
-
-func (fx *Fx) AppendStatement(statements []*Statement, id int64, title, subtitle string,
-	hasMultipleAnswers, hasAnswer, expectedAnswer, companySign, contractorSign bool) []*Statement {
+func createStatement(id int64, title, subtitle string,
+	hasMultipleAnswers, hasAnswer, expectedAnswer, companySign, contractorSign bool) *Statement {
 	statement := &Statement{
 		Id:                 id,
 		Title:              title,
@@ -180,7 +179,11 @@ func (fx *Fx) AppendStatement(statements []*Statement, id int64, title, subtitle
 	if hasMultipleAnswers {
 		statement.HasMultipleAnswers = &hasMultipleAnswers
 	}
-	return append(statements, statement)
+	return statement
+}
+func (fx *Fx) AppendStatement(statements []*Statement, id int64, title, subtitle string,
+	hasMultipleAnswers, hasAnswer, expectedAnswer, companySign, contractorSign bool) []*Statement {
+	return append(statements, createStatement(id, title, subtitle, hasMultipleAnswers, hasAnswer, expectedAnswer, companySign, contractorSign))
 }
 
 func (fx *Fx) AppendSurvey(surveys []*Survey, id int64, title, subtitle string, hasMultipleAnswers,
@@ -204,6 +207,10 @@ func (fx *Fx) AppendSurvey(surveys []*Survey, id int64, title, subtitle string, 
 		survey.HasMultipleAnswers = &hasMultipleAnswers
 	}
 	return append(surveys, survey)
+}
+
+func (fx *Fx) AppendQuestionInLast(statement []*Statement, text string, isBold, indent, hasAnswer, expectedAnswer bool) {
+	statement[len(statement)-1].Questions = fx.AppendQuestion(statement[len(statement)-1].Questions, text, isBold, indent, hasAnswer, expectedAnswer)
 }
 
 func (fx *Fx) AppendQuestion(questions []*Question, text string, isBold, indent, hasAnswer, expectedAnswer bool) []*Question {

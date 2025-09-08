@@ -71,7 +71,7 @@ func setProductBodyData(policy models.Policy, bodyData *BodyData) {
 		bodyData.ProductName = "Catastrofali azienda"
 		bodyData.ProductForm = "cat-nat#contact-us"
 	}
-	link, _ := lib.GetLastVersionPrecontrattuale(policy.Name, policy.ProductVersion)
+	link, _ := lib.GetLastVersionSetInformativo(policy.Name, policy.ProductVersion)
 	bodyData.InformationSetsUrl = fmt.Sprint(lib.BaseStorageGoogleUrl, link)
 
 }

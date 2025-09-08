@@ -4,25 +4,25 @@ import (
 	"strings"
 
 	"gitlab.dev.wopta.it/goworkspace/document/internal/constants"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 type contractorDTO struct {
-	Name               string
-	Surname            string
-	CompanyName        string
-	FiscalCode         string
-	VatCode            string
-	FiscalCode_VatCode string
-	StreetName         string
-	StreetNumber       string
-	City               string
-	PostalCode         string
-	CityCode           string
-	Mail               string
-	Phone              string
-	BirthDate          string
-	Address            string
+	Name         string
+	Surname      string
+	CompanyName  string
+	FiscalCode   string
+	VatCode      string
+	StreetName   string
+	StreetNumber string
+	City         string
+	PostalCode   string
+	CityCode     string
+	Mail         string
+	Phone        string
+	BirthDate    string
+	Address      string
 }
 
 func newContractorDTO() *contractorDTO {
@@ -54,11 +54,9 @@ func (c *contractorDTO) fromPolicy(contractor models.Contractor) {
 	}
 	if contractor.FiscalCode != "" {
 		c.FiscalCode = contractor.FiscalCode
-		c.FiscalCode_VatCode = c.FiscalCode + "/"
 	}
 	if contractor.VatCode != "" {
 		c.VatCode = contractor.VatCode
-		c.FiscalCode_VatCode += c.VatCode
 	}
 
 	if contractor.Type == models.UserLegalEntity && contractor.CompanyAddress != nil {
@@ -103,6 +101,11 @@ func (c *contractorDTO) fromPolicy(contractor models.Contractor) {
 	c.Address = strings.ToUpper(c.StreetName + ", " + c.StreetNumber + "\n" + c.PostalCode + " " + c.City + " (" + c.CityCode + ")\n")
 
 }
-func (c *contractorDTO) GetFullNameContractor() string {
-	return c.CompanyName + c.Name + " " + c.Surname
+func (c *contractorDTO) GetFullNameContractor() (res string) {
+	nameSurname := lib.JoinNoEmptyStrings([]string{c.Name, c.Surname}, " ")
+	return lib.JoinNoEmptyStrings([]string{nameSurname, c.CompanyName}, ", ")
+}
+
+func (c *contractorDTO) GetFiscalCodeVatCode() string {
+	return lib.JoinNoEmptyStrings([]string{c.FiscalCode, c.VatCode}, "/")
 }

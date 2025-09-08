@@ -68,7 +68,7 @@ type contractor struct {
 	AtecoCode                 string `json:"codiceAteco,omitempty"`
 	PostalCode                string `json:"cap,omitempty"`
 	Address                   string `json:"indirizzo,omitempty"`
-	Locality                  string `json:"comune,omitempty"`
+	City                      string `json:"comune,omitempty"`
 	CityCode                  string `json:"provincia,omitempty"`
 	Phone                     string `json:"telefonoCellulare,omitempty"`
 	Email                     string `json:"email,omitempty"`
@@ -88,7 +88,7 @@ type legalRepresentative struct {
 	FiscalCode string `json:"codiceFiscale,omitempty"`
 	PostalCode string `json:"cap,omitempty"`
 	Address    string `json:"indirizzo,omitempty"`
-	Locality   string `json:"comune,omitempty"`
+	City       string `json:"comune,omitempty"`
 	CityCode   string `json:"provincia,omitempty"`
 	Phone      string `json:"telefonoCellulare,omitempty"`
 	Email      string `json:"email,omitempty"`
@@ -103,7 +103,7 @@ type assetRequest struct {
 	LandSlidePurchase    string          `json:"acquistoFrane"`
 	PostalCode           string          `json:"cap"`
 	Address              string          `json:"indirizzo"`
-	Locality             string          `json:"comune"`
+	City                 string          `json:"comune"`
 	CityCode             string          `json:"provincia"`
 	ConstructionMaterial int             `json:"materialeDiCostruzione"`
 	ConstructionYear     int             `json:"annoDiCostruzione"`
@@ -280,7 +280,7 @@ func (d *QuoteRequest) FromPolicyForEmit(policy *models.Policy) error {
 	}
 	if policy.Contractor.CompanyAddress != nil {
 		contr.Address = formatAddress(policy.Contractor.CompanyAddress)
-		contr.Locality = policy.Contractor.CompanyAddress.Locality
+		contr.City = policy.Contractor.CompanyAddress.City
 		contr.CityCode = policy.Contractor.CompanyAddress.CityCode
 		contr.PostalCode = policy.Contractor.CompanyAddress.PostalCode
 	}
@@ -299,7 +299,7 @@ func (d *QuoteRequest) FromPolicyForEmit(policy *models.Policy) error {
 				if v.Residence != nil {
 					legalRep.Address = formatAddress(v.Residence)
 					legalRep.PostalCode = v.Residence.PostalCode
-					legalRep.Locality = v.Residence.Locality
+					legalRep.City = v.Residence.City
 					legalRep.CityCode = v.Residence.CityCode
 				}
 				break
@@ -374,7 +374,7 @@ func (d *QuoteRequest) FromPolicyForQuote(policy *models.Policy) error {
 	if baseAsset.Building.BuildingAddress != nil {
 		asset.PostalCode = baseAsset.Building.BuildingAddress.PostalCode
 		asset.Address = formatAddress(baseAsset.Building.BuildingAddress)
-		asset.Locality = baseAsset.Building.BuildingAddress.Locality
+		asset.City = baseAsset.Building.BuildingAddress.City
 		asset.CityCode = baseAsset.Building.BuildingAddress.CityCode
 	}
 	log.Println("Managing slug guarantees")
@@ -448,6 +448,10 @@ func mappingQuoteResponseToGuarantee(quoteResponse QuoteResponse, policy *models
 
 func mappingQuoteResponseToPolicy(quoteResponse QuoteResponse, policy *models.Policy) error {
 	policy.PriceGross = quoteResponse.AnnualGross
+	rates := float64(models.PaySplitRateMap[models.PaySplit(policy.PaymentSplit)])
+	if policy.PaymentSplit != string(models.PaySplitYear) && policy.PaymentSplit != string(models.PaySplitYearly) {
+		policy.PriceGrossMonthly = lib.RoundFloat(policy.PriceGross/rates, 2)
+	}
 	policy.PriceNett = quoteResponse.AnnualNet
 	policy.TaxAmount = quoteResponse.AnnualTax
 	split := policy.PaymentSplit
@@ -460,7 +464,6 @@ func mappingQuoteResponseToPolicy(quoteResponse QuoteResponse, policy *models.Po
 			split: &models.Price{},
 		},
 	}
-	rates := float64(models.PaySplitRateMap[models.PaySplit(split)])
 	if rates == 0 {
 		return errors.New("Rates is 0")
 	}

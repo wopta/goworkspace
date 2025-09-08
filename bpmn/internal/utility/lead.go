@@ -41,14 +41,14 @@ func SetLeadData(policy *models.Policy, product models.Product, networkNode *mod
 	}
 
 	setRenewInfo(policy, product)
-	linkDocument, err := lib.GetLastVersionPrecontrattuale(policy.Name, policy.ProductVersion)
+	linkDocument, err := lib.GetLastVersionSetInformativo(policy.Name, policy.ProductVersion)
 	if err != nil {
 		return err
 	}
 	log.Println("add information set")
 	informationSet := models.Attachment{
-		Name:        "Precontrattuale",
-		FileName:    "Precontrattuale.pdf",
+		Name:        "Set Informativo Precontrattuale",
+		FileName:    "Set Informativo Precontrattuale.pdf",
 		MimeType:    lib.GetContentType("pdf"),
 		ContentType: lib.GetContentType("pdf"),
 		Link:        "gs://" + linkDocument,

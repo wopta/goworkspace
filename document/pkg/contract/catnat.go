@@ -47,6 +47,7 @@ func (el *CatnatGenerator) Generate() {
 	el.engine.NewPage()
 	el.engine.NewLine(constants.CellHeight)
 	if el.isProposal {
+		el.engine.DrawWatermark(constants.Proposal)
 		el.generateProposal()
 	} else {
 		el.generateContract()
@@ -105,7 +106,7 @@ func (el *CatnatGenerator) addInitialGreatings() {
 	el.engine.WriteText(el.engine.GetTableCell("Documento informativo di Wopta Assicurazioni relativo alla polizza Wopta per te Catastrofali Azienda", constants.PinkColor, constants.BoldFontStyle))
 	el.engine.NewLine(3)
 	el.engine.WriteText(el.engine.GetTableCell("Buongiorno " + el.dtoCatnat.Contractor.GetFullNameContractor() + ","))
-	el.engine.WriteText(el.engine.GetTableCell("Confermiamo emissione della polizza in oggetto con i seguenti dati."))
+	el.engine.WriteText(el.engine.GetTableCell("Confermiamo il salvataggio  della proposta in oggetto con i seguenti dati."))
 	el.engine.WriteText(el.engine.GetTableCell("Verifica i dati e le informazioni qui riportate."))
 	el.engine.WriteText(el.engine.GetTableCell("Riceverai mail per la firma della polizza e, una volta effettuato anche il pagamento, questa risulterà valida ed efficace."))
 	el.engine.NewLine(2)
@@ -118,6 +119,7 @@ func (el *CatnatGenerator) generateContract() {
 	el.addContractorInformation()
 	el.engine.NewLine(constants.CellHeight)
 	el.addStatements(false)
+	el.engine.NewPage()
 	el.addAttachmentsInformation()
 	el.AddMup()
 	el.woptaPrivacySection()
@@ -131,6 +133,10 @@ func (el *CatnatGenerator) addStatements(includeCompanyStatements bool) {
 	statements, _ := question.GetStatements(el.policy, includeCompanyStatements)
 
 	for _, statement := range statements {
+		_, y := el.engine.GetPageSize()
+		if el.engine.GetY() > y*0.8 {
+			el.engine.NewPage()
+		}
 		el.printStatement(statement)
 	}
 }
@@ -232,19 +238,17 @@ func (el *CatnatGenerator) addMainHeader() {
 		}
 		return result
 	}
-	number := ""
-	if el.isProposal {
-		number = fmt.Sprint(el.policy.ProposalNumber)
-	} else {
-		number = el.policy.CodeCompany
-	}
 	rowsData := [][]string{
 		{"I dati del tuo Polizza", "I tuoi dati"},
-		{"Numero: " + number, "Contraente: " + el.dtoCatnat.Contractor.GetFullNameContractor()},
-		{"Decorre dal: " + el.dtoCatnat.ValidityDate.StartDate, "C.F./P.IVA: " + el.dtoCatnat.Contractor.FiscalCode_VatCode},
+		{"Numero: " + el.policy.CodeCompany, "Contraente: " + el.dtoCatnat.Contractor.GetFullNameContractor()},
+		{"Decorre dal: " + el.dtoCatnat.ValidityDate.StartDate, "C.F./P.IVA: " + el.dtoCatnat.Contractor.GetFiscalCodeVatCode()},
 		{"Scade il: " + el.dtoCatnat.ValidityDate.EndDate, "Sede Legale: " + strings.ReplaceAll(el.dtoCatnat.Contractor.Address, "\n", "")},
 		{"Si rinnova a scadenza, salvo disdetta da inviare 30 giorni prima", "Sede Assicurata: " + strings.ReplaceAll(el.dtoCatnat.SedeDaAssicurare.Address, "\n", "")},
 		{"Produttore: Michele Lomazzi", " "},
+	}
+	if el.isProposal {
+		rowsData[0][0] = "I dati della tua proposta"
+		rowsData[1][0] = fmt.Sprint("Numero: ", el.policy.ProposalNumber)
 	}
 	el.engine.SetHeader(func() {
 		firstColumnWidth = 15
@@ -262,7 +266,7 @@ func (el *CatnatGenerator) addMainHeader() {
 func (el *CatnatGenerator) addContractorInformation() {
 	el.engine.WriteText(el.engine.GetTableCell("In relazione alla polizza sopra meglio identificata, il contraente, nella figura del suo rappresentante legale:"))
 	const (
-		firstColumnWidth  float64 = 30
+		firstColumnWidth  float64 = 40
 		secondColumnWidth         = constants.FullPageWidth - firstColumnWidth
 	)
 	parseData := func(rows [][]string) [][]domain.TableCell {
@@ -300,9 +304,9 @@ func (el *CatnatGenerator) addContractorInformation() {
 		return result
 	}
 	rowsData := [][]string{
-		{"cognome e nome: ", el.dtoCatnat.Contractor.Name + " " + el.dtoCatnat.Contractor.Surname},
-		{"codice fiscale: ", el.dtoCatnat.Contractor.FiscalCode},
-		{"ruolo", "xxxxx"},
+		{"cognome e nome: ", el.dtoCatnat.Contractor.GetFullNameContractor()},
+		{"C.F./P.IVA: ", el.dtoCatnat.Contractor.GetFiscalCodeVatCode()},
+		{"ruolo", "Legare Rappresentante"},
 	}
 	el.engine.DrawTable(parseData(rowsData))
 	el.engine.WriteText(domain.TableCell{

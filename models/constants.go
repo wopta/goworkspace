@@ -59,12 +59,23 @@ const (
 	PaySplitTrimestral        PaySplit = "trimestral"
 )
 
+// Map how many rate there are in PaySplit
 var PaySplitRateMap = map[PaySplit]int{
 	PaySplitMonthly:           12,
 	PaySplitYear:              1,
 	PaySplitYearly:            1,
 	PaySplitSemestral:         2,
 	PaySplitTrimestral:        4,
+	PaySplitSingleInstallment: 1,
+}
+
+// Map how many months there  in a PaySplit
+var PaySplitMonthsMap = map[PaySplit]int{
+	PaySplitMonthly:           1,
+	PaySplitYear:              12,
+	PaySplitYearly:            12,
+	PaySplitSemestral:         6,
+	PaySplitTrimestral:        3,
 	PaySplitSingleInstallment: 1,
 }
 
@@ -252,10 +263,10 @@ const (
 )
 
 const (
-	InformationSetAttachmentName = "Precontrattuale"
-	ProposalAttachmentName       = "Proposta"
+	ProposalAttachmentName = "Proposta"
 	//to use with namirial, to sign
-	ContractAttachmentName = "Contratto"
+	PreContractAttachmentName = "Precontrattuale"
+	ContractAttachmentName    = "Contratto"
 	//
 	ContractNonDigitalAttachmentName = "Contratto non digitale"
 	RvmInstructionsAttachmentName    = "Scheda Rapporto Visita Medica"

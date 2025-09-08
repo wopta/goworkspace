@@ -60,7 +60,7 @@ func generateContractDocument(pdf *fpdf.Fpdf, policy *models.Policy) (DocumentGe
 	if err != nil {
 		return res, err
 	}
-	res.FileName = fmt.Sprintf(models.ContractDocumentFormat, policy.NameDesc, policy.CodeCompany)
+	res.FileName = fmt.Sprint(policy.NameDesc, "  Contratto ", policy.CodeCompany)
 	res.ParentPath = fmt.Sprintf("temp/%s", policy.Uid)
 	res.Bytes = out.Bytes()
 	return res, nil

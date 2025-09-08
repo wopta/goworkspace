@@ -2,6 +2,7 @@ package document
 
 import (
 	"bytes"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -55,6 +56,7 @@ func ContractObj(data models.Policy, networkNode *models.NetworkNode, product *m
 			generator := contract.NewCatnatGenerator(pdf, &data, networkNode, *product, false)
 			generator.Generate()
 			document, err = generateContractDocument(pdf.GetPdf(), &data)
+			document.FileName = fmt.Sprint(data.NameDesc, " Precontrattuale Wopta ", data.CodeCompany)
 		case models.PersonaProduct:
 			pdf := engine.NewFpdf()
 			generator := contract.NewPersonaGenerator(pdf, &data, networkNode, *product, false)
