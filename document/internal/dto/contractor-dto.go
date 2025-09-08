@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"gitlab.dev.wopta.it/goworkspace/document/internal/constants"
+	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
@@ -101,26 +102,10 @@ func (c *contractorDTO) fromPolicy(contractor models.Contractor) {
 
 }
 func (c *contractorDTO) GetFullNameContractor() (res string) {
-	res = c.Name
-	if c.Surname != "" {
-		res += " " + c.Surname
-	}
-	if c.CompanyName != "" {
-		if res != "" {
-			res += ", "
-		}
-		res += c.CompanyName
-	}
-	return res
+	nameSurname := lib.JoinNoEmptyStrings([]string{c.Name, c.Surname}, " ")
+	return lib.JoinNoEmptyStrings([]string{nameSurname, c.CompanyName}, ", ")
 }
 
 func (c *contractorDTO) GetFiscalCodeVatCode() string {
-	var res = c.FiscalCode
-	if c.FiscalCode != "" && c.VatCode != "" {
-		res += "/"
-	}
-	if c.VatCode != "" {
-		res += c.VatCode
-	}
-	return res
+	return lib.JoinNoEmptyStrings([]string{c.FiscalCode, c.VatCode}, "/")
 }
