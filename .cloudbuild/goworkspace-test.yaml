@@ -1,9 +1,22 @@
 steps:
+  - name: 'gcr.io/cloud-builders/gcloud:latest'
+    args:
+      - '-c'
+      - |
+        mkdir -p /workspace/
+        gcloud artifacts generic download\
+          --destination=/workspace/ \
+          --package=golang \
+          --version=${_VERSION} \
+          --project=${PROJECT_ID} \
+          --repository=cache \
+          --location=${_REGION}  || true
+    id: get cache build
+    entrypoint: bash
   - name: gcr.io/cloud-builders/gcloud
     args:
       - '-c'
       - |
-
         mkdir -p /tmp/src/    
         cp -r /workspace/* /tmp/src/
         mkdir -p /workspace/goworkspace/ 
@@ -20,15 +33,49 @@ steps:
           --location=${_REGION}
 
         cd function-data/
-        tar -xvzf function-data.tar.gz
+        tar -xzf function-data.tar.gz 
+    id: download function-data
     entrypoint: bash
   - name: 'golang:1.23'
     args:
+      - bash
       - '-c'
       - |
-        cd goworkspace
+
+        if [ -s golang.tar.gz ]; then
+          mkdir -p $_GOCACHE
+          tar -xzf golang.tar.gz -C "$_GOCACHE"
+        else
+          echo "No existing cache found — will build from scratch."
+        fi
+
+        cd /workspace/goworkspace
+        set -e
         go test gitlab.dev.wopta.it/goworkspace/...
+        cd /workspace/
+        rm golang.tar.gz
+        tar -czf golang.tar.gz -C $_GOCACHE .
+    id: run test
+  - name: 'gcr.io/cloud-builders/gcloud:latest'
+    args:
+      - '-c'
+      - |
+        # Upload the archive to Artifact Registry
+        gcloud artifacts versions delete ${_VERSION} \
+          --project=${PROJECT_ID} \
+          --repository=cache \
+          --location=${_REGION} \
+          --package=golang \
+          --quiet || true
+
+        gcloud artifacts generic upload \
+          --project=${PROJECT_ID} \
+          --repository=cache \
+          --location=${_REGION} \
+          --version=${_VERSION} \
+          --source=/workspace/golang.tar.gz \
+          --package=golang \
+    id: update cache
     entrypoint: bash
 options:
   logging: CLOUD_LOGGING_ONLY
-
