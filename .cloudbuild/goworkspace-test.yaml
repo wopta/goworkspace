@@ -6,12 +6,26 @@ steps:
         mkdir -p /workspace/
         gcloud artifacts generic download\
           --destination=/workspace/ \
-          --package=golang \
-          --version=${_VERSION} \
+          --package=build \
+          --version=build \
           --project=${PROJECT_ID} \
           --repository=cache \
           --location=${_REGION}  || true
-    id: get cache build
+    id: download cached build
+    entrypoint: bash
+  - name: 'gcr.io/cloud-builders/gcloud:latest'
+    args:
+      - '-c'
+      - |
+        mkdir -p /workspace/
+        gcloud artifacts generic download\
+          --destination=/workspace/ \
+          --package=modules \
+          --version=modules \
+          --project=${PROJECT_ID} \
+          --repository=cache \
+          --location=${_REGION}  || true
+    id: download cached modules
     entrypoint: bash
   - name: gcr.io/cloud-builders/gcloud
     args:
@@ -27,7 +41,7 @@ steps:
         gcloud artifacts generic download\
           --destination=/workspace/function-data \
           --package=function-data \
-          --version=${_VERSION} \
+          --version=function-data \
           --project=${PROJECT_ID} \
           --repository=function-data \
           --location=${_REGION}
@@ -41,41 +55,73 @@ steps:
       - bash
       - '-c'
       - |
+        export GOCACHE=/workspace/cache
+        export GOMODCACHE=/workspace/gomodcache
 
-        if [ -s golang.tar.gz ]; then
-          mkdir -p $_GOCACHE
-          tar -xzf golang.tar.gz -C $_GOCACHE
+        if [ -s build.tar.gz ]; then
+          mkdir -p $$GOCACHE
+          tar -xzf build.tar.gz -C $$GOCACHE
         else
           echo "No existing cache found — will build from scratch."
+        fi
+
+        if [ -s modules.tar.gz ]; then
+          mkdir -p $$GOMODCACHE
+          tar -xzf modules.tar.gz -C $$GOMODCACHE
+        else
+          echo "No existing cache modules found — will download everything."
         fi
 
         cd /workspace/goworkspace
         set -e
         go test gitlab.dev.wopta.it/goworkspace/...
         cd /workspace/
-        rm golang.tar.gz
-        tar -czf golang.tar.gz -C $_GOCACHE .
+        rm -f build.tar.gz
+        tar -czf build.tar.gz -C $$GOCACHE .
+
+        rm -f modules.tar.gz
+        tar -czf modules.tar.gz -C $$GOMODCACHE .
     id: run test
   - name: 'gcr.io/cloud-builders/gcloud:latest'
     args:
       - '-c'
       - |
-        # Upload the archive to Artifact Registry
-        gcloud artifacts versions delete ${_VERSION} \
+        gcloud artifacts versions delete build \
           --project=${PROJECT_ID} \
           --repository=cache \
           --location=${_REGION} \
-          --package=golang \
+          --package=build \
           --quiet || true
 
         gcloud artifacts generic upload \
           --project=${PROJECT_ID} \
           --repository=cache \
           --location=${_REGION} \
-          --version=${_VERSION} \
-          --source=/workspace/golang.tar.gz \
-          --package=golang \
-    id: update cache
+          --version=build \
+          --source=/workspace/build.tar.gz \
+          --package=build \
+    id: update cache build
+    entrypoint: bash
+  - name: 'gcr.io/cloud-builders/gcloud:latest'
+    args:
+      - '-c'
+      - |
+        gcloud artifacts versions delete modules \
+          --project=${PROJECT_ID} \
+          --repository=cache \
+          --location=${_REGION} \
+          --package=modules \
+          --quiet || true
+
+        gcloud artifacts generic upload \
+          --project=${PROJECT_ID} \
+          --repository=cache \
+          --location=${_REGION} \
+          --version=modules \
+          --source=/workspace/modules.tar.gz \
+          --package=modules \
+    id: update cache modules
     entrypoint: bash
 options:
   logging: CLOUD_LOGGING_ONLY
+
