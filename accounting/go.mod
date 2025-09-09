@@ -8,12 +8,12 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/fattureincloud/fattureincloud-go-sdk/v2 v2.1.1
 	github.com/go-chi/chi/v5 v5.0.12
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.199
-	gitlab.dev.wopta.it/goworkspace/models v1.2.132
-	gitlab.dev.wopta.it/goworkspace/network v1.0.200
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.336
-	gitlab.dev.wopta.it/goworkspace/product v1.1.131
-	gitlab.dev.wopta.it/goworkspace/transaction v1.0.329
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.200
+	gitlab.dev.wopta.it/goworkspace/models v1.2.133
+	gitlab.dev.wopta.it/goworkspace/network v1.0.201
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.337
+	gitlab.dev.wopta.it/goworkspace/product v1.1.132
+	gitlab.dev.wopta.it/goworkspace/transaction v1.0.330
 )
 
 require (
@@ -81,8 +81,8 @@ require (
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
-	gitlab.dev.wopta.it/goworkspace/document v1.1.292 // indirect
-	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.41 // indirect
+	gitlab.dev.wopta.it/goworkspace/document v1.1.293 // indirect
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.42 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.49.0 // indirect
