@@ -8,6 +8,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/document/internal/domain"
 	"gitlab.dev.wopta.it/goworkspace/document/internal/dto"
 	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
+	"gitlab.dev.wopta.it/goworkspace/document/pkg/internal/utils"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
@@ -312,8 +313,7 @@ func (lg *LifeGenerator) disclaimer() {
 }
 
 func (lg *LifeGenerator) whoWeAre() {
-	lg.baseGenerator.WhoWeAre()
-
+	utils.WhoWeAre(lg.engine)
 	lg.engine.NewLine(5)
 
 	lg.engine.RawWriteText(domain.TableCell{

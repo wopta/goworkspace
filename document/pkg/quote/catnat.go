@@ -9,6 +9,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/document/internal/dto"
 	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
 	"gitlab.dev.wopta.it/goworkspace/document/pkg/internal/catnat"
+	"gitlab.dev.wopta.it/goworkspace/document/pkg/internal/utils"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
@@ -162,6 +163,6 @@ func (c *CatnatGenerator) addSetInformativoInfo() {
 	c.engine.WriteText(c.engine.GetTableCell("Prima della sottoscrizione leggere il set informativo.", constants.BoldFontStyle))
 }
 func (c *CatnatGenerator) addWhoAreWeCatnat() {
-	c.WhoWeAre()
+	utils.WhoWeAre(c.engine)
 	catnat.AddWhoAreWeCatnat(c.engine)
 }
