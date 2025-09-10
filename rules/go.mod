@@ -82,6 +82,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/network v1.0.202 // indirect
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.339 // indirect
 	gitlab.dev.wopta.it/goworkspace/product v1.1.133 // indirect
+	gitlab.dev.wopta.it/goworkspace/question v1.0.188 // indirect
 	gitlab.dev.wopta.it/goworkspace/sellable v1.0.247 // indirect
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.42 // indirect
 	go.opencensus.io v0.24.0 // indirect

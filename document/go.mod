@@ -15,6 +15,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.200
 	gitlab.dev.wopta.it/goworkspace/models v1.2.134
 	gitlab.dev.wopta.it/goworkspace/network v1.0.202
+	gitlab.dev.wopta.it/goworkspace/question v1.0.188
 )
 
 require (
