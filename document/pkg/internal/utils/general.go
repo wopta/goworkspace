@@ -6,7 +6,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
 )
 
-func WhoWeAre(e *engine.Fpdf) {
+func AddWhoWeAre(e *engine.Fpdf) {
 	e.WriteText(domain.TableCell{
 		Text:      "Chi siamo",
 		Height:    constants.CellHeight,

@@ -37,13 +37,13 @@ func GenerateMup(companyName string, consultancyPrice float64, channel string, n
 		policy:       &mockPolicy,
 		worksForNode: workFor,
 	}
-	generator.mup(true, companyName, consultancyPrice, channel)
+	generator.generateMup(true, companyName, consultancyPrice, channel)
 
 	err = generator.engine.GetPdf().Output(&out)
 	return out, err
 }
 
-func (bg *baseGenerator) mup(isManualGenerated bool, companyName string, consultancyPrice float64, channel string) {
+func (bg *baseGenerator) generateMup(isManualGenerated bool, companyName string, consultancyPrice float64, channel string) {
 	if !isManualGenerated && (bg.networkNode != nil && !bg.networkNode.HasAnnex && bg.networkNode.Type != models.PartnershipNetworkNodeType) {
 		return
 	}
@@ -58,31 +58,31 @@ func (bg *baseGenerator) mup(isManualGenerated bool, companyName string, consult
 		bg.emptyFooter()
 	}
 
-	producerInfo := bg.producerInfo()
-	proponentInfo := bg.proponentInfo()
+	producerInfo := bg.addProducerInfo()
+	proponentInfo := bg.addProponentInfo()
 	designationInfo := bg.designationInfo()
-	mupSection2Info, mupSection5Info := bg.mupInfo(companyName, consultancyPrice, channel)
+	mupSection2Info, mupSection5Info := bg.addMupInfo(companyName, consultancyPrice, channel)
 
 	bg.engine.NewPage()
 
-	bg.mupTitle()
+	bg.addMupTitle()
 	bg.engine.NewLine(3)
-	bg.mupSectionI(producerInfo, proponentInfo, designationInfo)
+	bg.addMupSectionI(producerInfo, proponentInfo, designationInfo)
 	bg.engine.NewLine(3)
-	bg.mupSectionII(mupSection2Info)
+	bg.addMupSectionII(mupSection2Info)
 	bg.engine.NewLine(3)
-	bg.mupSectionIII(proponentInfo["name"])
+	bg.addMupSectionIII(proponentInfo["name"])
 	bg.engine.NewLine(3)
-	bg.mupSectionIV()
+	bg.addMupSectionIV()
 	bg.engine.NewLine(3)
-	bg.mupSectionV(mupSection5Info)
+	bg.addMupSectionV(mupSection5Info)
 	bg.engine.NewLine(3)
-	bg.mupSectionVI()
+	bg.addMupSectionVI()
 	bg.engine.NewPage()
-	bg.mupSectionVII()
+	bg.addMupSectionVII()
 }
 
-func (bg *baseGenerator) mupTitle() {
+func (bg *baseGenerator) addMupTitle() {
 	text := "ALLEGATO 3 - MODELLO UNICO PRECONTRATTUALE (MUP) PER I PRODOTTI ASSICURATIVI"
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle, constants.CenterAlign))
 
@@ -96,12 +96,12 @@ func (bg *baseGenerator) mupTitle() {
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
 }
 
-func (bg *baseGenerator) mupSectionI(producerInfo, proponentInfo map[string]string, designation string) {
+func (bg *baseGenerator) addMupSectionI(producerInfo, proponentInfo map[string]string, designation string) {
 	text := "SEZIONE I - Informazioni generali sull’Intermediario che entra in contatto con " +
 		"il contraente"
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle))
 
-	bg.mupProducerTable(producerInfo, proponentInfo, designation)
+	bg.addMupProducerTable(producerInfo, proponentInfo, designation)
 
 	text = "Gli estremi identificativi e di iscrizione dell’Intermediario e dei soggetti che " +
 		"operano per lo stesso possono essere verificati consultando il Registro Unico degli Intermediari assicurativi " +
@@ -109,14 +109,14 @@ func (bg *baseGenerator) mupSectionI(producerInfo, proponentInfo map[string]stri
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
 }
 
-func (bg *baseGenerator) mupSectionII(body string) {
+func (bg *baseGenerator) addMupSectionII(body string) {
 	text := "SEZIONE II - Informazioni sul modello di distribuzione"
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle))
 
 	bg.engine.WriteText(bg.engine.GetTableCell(body, constants.RegularFontStyle))
 }
 
-func (bg *baseGenerator) mupSectionIII(proponent string) {
+func (bg *baseGenerator) addMupSectionIII(proponent string) {
 	text := "SEZIONE III - Informazioni relative a potenziali situazioni di conflitto " +
 		"d’interessi"
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle))
@@ -130,7 +130,7 @@ func (bg *baseGenerator) mupSectionIII(proponent string) {
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
 }
 
-func (bg *baseGenerator) mupSectionIV() {
+func (bg *baseGenerator) addMupSectionIV() {
 	text := "SEZIONE IV - Informazioni sull’attività di distribuzione e consulenza"
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle))
 
@@ -161,7 +161,7 @@ func (bg *baseGenerator) mupSectionIV() {
 	bg.engine.NewLine(constants.CellHeight)
 }
 
-func (bg *baseGenerator) mupSectionV(body string) {
+func (bg *baseGenerator) addMupSectionV(body string) {
 	text := "SEZIONE V - Informazioni relative alle remunerazioni"
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle))
 
@@ -171,7 +171,7 @@ func (bg *baseGenerator) mupSectionV(body string) {
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
 }
 
-func (bg *baseGenerator) mupSectionVI() {
+func (bg *baseGenerator) addMupSectionVI() {
 	text := "SEZIONE VI - Informazioni sul pagamento dei premi"
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle))
 
@@ -187,7 +187,7 @@ func (bg *baseGenerator) mupSectionVI() {
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
 }
 
-func (bg *baseGenerator) mupSectionVII() {
+func (bg *baseGenerator) addMupSectionVII() {
 	text := "SEZIONE VII - Informazioni sugli strumenti di tutela del contraente"
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.BoldFontStyle))
 
@@ -207,7 +207,7 @@ func (bg *baseGenerator) mupSectionVII() {
 	bg.engine.WriteText(bg.engine.GetTableCell(text, constants.RegularFontStyle))
 }
 
-func (bg *baseGenerator) producerInfo() map[string]string {
+func (bg *baseGenerator) addProducerInfo() map[string]string {
 	producer := map[string]string{
 		"name":            "LOMAZZI MICHELE",
 		"ruiSection":      "A",
@@ -238,7 +238,7 @@ func (bg *baseGenerator) producerInfo() map[string]string {
 	return producer
 }
 
-func (bg *baseGenerator) proponentInfo() map[string]string {
+func (bg *baseGenerator) addProponentInfo() map[string]string {
 	proponentInfo := make(map[string]string)
 
 	defer log.Printf("proponent info: %+v", proponentInfo)
@@ -290,7 +290,7 @@ func (bg *baseGenerator) proponentInfo() map[string]string {
 	return proponentInfo
 }
 
-func (bg *baseGenerator) mupInfo(companyName string, consultancyPrice float64, channel string) (section2Info, section5Info string) {
+func (bg *baseGenerator) addMupInfo(companyName string, consultancyPrice float64, channel string) (section2Info, section5Info string) {
 	const (
 		mgaProponentFormat = "La distribuzione relativamente a questa proposta/contratto è svolta per conto della " +
 			"seguente Impresa di assicurazione: %s"
@@ -337,7 +337,7 @@ func (bg *baseGenerator) mupInfo(companyName string, consultancyPrice float64, c
 	return section2Info, section5Info
 }
 
-func (bg *baseGenerator) mupProducerTable(producerInfo, proponentInfo map[string]string, designation string) {
+func (bg *baseGenerator) addMupProducerTable(producerInfo, proponentInfo map[string]string, designation string) {
 	type entry struct {
 		title string
 		body  string

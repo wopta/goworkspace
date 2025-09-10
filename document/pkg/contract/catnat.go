@@ -70,8 +70,8 @@ func (el *CatnatGenerator) generateProposal() {
 	el.engine.NewPage()
 	el.engine.DrawWatermark(constants.Proposal)
 	el.addStatements(true)
-	utils.WhoWeAre(el.engine)
-	catnat.WhoAreWeCatnat(el.engine)
+	utils.AddWhoWeAre(el.engine)
+	catnat.AddWhoAreWeCatnat(el.engine)
 	el.AddMup()
 	el.woptaPrivacySection()
 }

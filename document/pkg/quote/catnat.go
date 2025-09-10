@@ -34,7 +34,7 @@ func NewCatnatGenerator(engine *engine.Fpdf, policy *models.Policy, product mode
 }
 
 func (c *CatnatGenerator) Exec() ([]byte, error) {
-	c.mainFooter()
+	c.addMainFooter()
 	c.addCatnatHeader()
 	c.engine.NewPage()
 	c.engine.NewLine(5)
@@ -48,12 +48,12 @@ func (c *CatnatGenerator) Exec() ([]byte, error) {
 	c.engine.NewLine(4)
 	c.addSetInformativoInfo()
 	c.engine.NewLine(4)
-	c.whoAreWe()
+	c.addWhoAreWe()
 
 	return c.engine.RawDoc()
 }
 
-func (lg *CatnatGenerator) mainFooter() {
+func (lg *CatnatGenerator) addMainFooter() {
 	var (
 		text = "Wopta per te. Catastrofali è un prodotto assicurativo di Net Insurance S.p.A Compagnia assicurativa distribuito da \n" +
 			"Wopta Assicurazioni S.r.l."
@@ -162,7 +162,7 @@ func (c *CatnatGenerator) addSetInformativoInfo() {
 	c.engine.NewLine(2)
 	c.engine.WriteText(c.engine.GetTableCell("Prima della sottoscrizione leggere il set informativo.", constants.BoldFontStyle))
 }
-func (c *CatnatGenerator) whoAreWe() {
-	utils.WhoWeAre(c.engine)
-	catnat.WhoAreWeCatnat(c.engine)
+func (c *CatnatGenerator) addWhoAreWe() {
+	utils.AddWhoWeAre(c.engine)
+	catnat.AddWhoAreWeCatnat(c.engine)
 }

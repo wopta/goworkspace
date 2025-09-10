@@ -313,7 +313,7 @@ func (lg *LifeGenerator) disclaimer() {
 }
 
 func (lg *LifeGenerator) whoWeAre() {
-	utils.WhoWeAre(lg.engine)
+	utils.AddWhoWeAre(lg.engine)
 	lg.engine.NewLine(5)
 
 	lg.engine.RawWriteText(domain.TableCell{
