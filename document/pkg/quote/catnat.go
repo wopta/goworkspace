@@ -48,7 +48,7 @@ func (c *CatnatGenerator) Exec() ([]byte, error) {
 	c.engine.NewLine(4)
 	c.addSetInformativoInfo()
 	c.engine.NewLine(4)
-	c.addWhoAreWeCatnat()
+	c.whoAreWe()
 
 	return c.engine.RawDoc()
 }
@@ -162,7 +162,7 @@ func (c *CatnatGenerator) addSetInformativoInfo() {
 	c.engine.NewLine(2)
 	c.engine.WriteText(c.engine.GetTableCell("Prima della sottoscrizione leggere il set informativo.", constants.BoldFontStyle))
 }
-func (c *CatnatGenerator) addWhoAreWeCatnat() {
+func (c *CatnatGenerator) whoAreWe() {
 	utils.WhoWeAre(c.engine)
-	catnat.AddWhoAreWeCatnat(c.engine)
+	catnat.WhoAreWeCatnat(c.engine)
 }
