@@ -301,7 +301,7 @@ func GetFilesByEnvV2(file string) ([]byte, error) {
 	case env.Production:
 		res, err = GetFromStorageErr("core-350507-function-data", file, "")
 	default:
-		err = fmt.Errorf("No env '%v' not found", os.Getenv("env"))
+		err = fmt.Errorf("No env '%v' found", os.Getenv("env"))
 	}
 
 	return res, err
