@@ -10,6 +10,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/document/internal/dto"
 	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
 	"gitlab.dev.wopta.it/goworkspace/document/pkg/internal/catnat"
+	"gitlab.dev.wopta.it/goworkspace/document/pkg/internal/utils"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
 	"gitlab.dev.wopta.it/goworkspace/network"
@@ -69,7 +70,7 @@ func (el *CatnatGenerator) generateProposal() {
 	el.engine.NewPage()
 	el.engine.DrawWatermark(constants.Proposal)
 	el.addStatements(true)
-	el.whoWeAre()
+	utils.WhoWeAre(el.engine)
 	catnat.AddWhoAreWeCatnat(el.engine)
 	el.AddMup()
 	el.woptaPrivacySection()
