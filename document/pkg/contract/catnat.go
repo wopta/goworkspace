@@ -47,13 +47,13 @@ func (el *CatnatGenerator) Generate() {
 	el.engine.NewPage()
 	el.engine.NewLine(constants.CellHeight)
 	if el.isProposal {
-		el.engine.DrawWatermark(constants.Proposal)
 		el.generateProposal()
 	} else {
 		el.generateContract()
 	}
 }
 func (el *CatnatGenerator) generateProposal() {
+	el.engine.DrawWatermark(constants.Proposal)
 	el.engine.NewLine(3)
 	el.addInitialGreatings()
 	el.engine.NewLine(3)
@@ -67,8 +67,10 @@ func (el *CatnatGenerator) generateProposal() {
 	el.engine.NewLine(2)
 	el.addFinalGreatings()
 	el.engine.NewPage()
+	el.engine.DrawWatermark(constants.Proposal)
 	el.addStatements(true)
 	el.whoWeAre()
+	catnat.AddWhoAreWeCatnat(el.engine)
 	el.AddMup()
 	el.woptaPrivacySection()
 }
@@ -81,7 +83,7 @@ func (el *CatnatGenerator) addFinalGreatings() {
 
 // TODO: insert rght link for catnat form
 func (el *CatnatGenerator) addLinks() {
-	if el.policy.Channel == models.ECommerceChannel || true {
+	if el.policy.Channel == models.ECommerceChannel {
 		el.engine.WriteTexts(el.engine.GetTableCell("Qualora avessi necessità di ulteriori informazioni e supporto, la risposta che stai cercando potrebbe essere tra le nostre FAQ che trovi a questo "), domain.TableCell{Text: "link", Link: models.FAQ})
 		el.engine.WriteTexts(el.engine.GetTableCell("Se non la trovi, puoi contattarci attraverso questo "), domain.TableCell{Text: "Form", Link: "forma.com"}, el.engine.GetTableCell(" oppure scriverci a questa "), domain.TableCell{Text: "e-mail", Link: "mailto:info@wopta.it"}, el.engine.GetTableCell(".In entrambi i casi un nostro esperto si prenderà cura della tua richiesta. "))
 	} else if el.policy.Channel == models.NetworkChannel {
@@ -136,6 +138,9 @@ func (el *CatnatGenerator) addStatements(includeCompanyStatements bool) {
 		_, y := el.engine.GetPageSize()
 		if el.engine.GetY() > y*0.8 {
 			el.engine.NewPage()
+			if el.isProposal {
+				el.engine.DrawWatermark(constants.Proposal)
+			}
 		}
 		el.printStatement(statement)
 	}

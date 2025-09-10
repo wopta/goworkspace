@@ -1040,7 +1040,7 @@ func (bg *baseGenerator) printStatement(statement models.Statement) {
 }
 func (bg *baseGenerator) whoWeAre() {
 	bg.engine.WriteText(domain.TableCell{
-		Text:      "k. Chi siamo",
+		Text:      "Chi siamo",
 		Height:    constants.CellHeight,
 		FontStyle: constants.BoldFontStyle,
 		FontColor: constants.PinkColor,

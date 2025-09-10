@@ -37,6 +37,8 @@ func (c *CatnatGenerator) Exec() ([]byte, error) {
 	c.addCatnatHeader()
 	c.engine.NewPage()
 	c.engine.NewLine(5)
+	c.engine.WriteText(c.engine.GetTableCell("DATI DEL PREVENTIVO", constants.BoldFontStyle, constants.LargeFontSize, constants.PinkColor))
+	c.engine.NewLine(3)
 	catnat.AddBuildingInformation(c.engine, c.dto.Sede, c.dto.Questions)
 	c.engine.NewLine(10)
 	catnat.AddTableGuarantee(c.engine, c.dto.Guarantees)
@@ -161,6 +163,5 @@ func (c *CatnatGenerator) addSetInformativoInfo() {
 }
 func (c *CatnatGenerator) addWhoAreWeCatnat() {
 	c.WhoWeAre()
-	c.engine.NewLine(5)
-	c.engine.WriteTexts(c.engine.GetTableCell("Net Insurance S.p.a ", constants.BoldFontStyle), c.engine.GetTableCell("compagnia assicurativa, Sede Legale e Direzione Generale via Giuseppe Antonio Guattani, 4 00161 Roma"))
+	catnat.AddWhoAreWeCatnat(c.engine)
 }
