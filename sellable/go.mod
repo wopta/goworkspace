@@ -7,9 +7,9 @@ replace gitlab.dev.wopta.it/goworkspace/sellable => ./
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.200
-	gitlab.dev.wopta.it/goworkspace/models v1.2.133
-	gitlab.dev.wopta.it/goworkspace/network v1.0.201
-	gitlab.dev.wopta.it/goworkspace/product v1.1.132
+	gitlab.dev.wopta.it/goworkspace/models v1.2.134
+	gitlab.dev.wopta.it/goworkspace/network v1.0.202
+	gitlab.dev.wopta.it/goworkspace/product v1.1.133
 )
 
 require (
