@@ -98,7 +98,7 @@ func (c *contractorDTO) fromPolicy(contractor models.Contractor) {
 			c.Phone = contractor.Phone
 		}
 	}
-	c.Address = strings.ToUpper(c.StreetName + ", " + c.StreetNumber + "\n" + c.PostalCode + " " + c.City + " (" + c.CityCode + ")\n")
+	c.Address = strings.ToUpper(c.StreetName + ", " + c.StreetNumber + " \n" + c.PostalCode + " " + c.City + " (" + c.CityCode + ")\n")
 
 }
 func (c *contractorDTO) GetFullNameContractor() (res string) {

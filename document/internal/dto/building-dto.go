@@ -86,5 +86,5 @@ func (b *buildingDTO) fromPolicy(building models.Building, guarantees []models.G
 			b.Guarantees[guarantee.Slug].fromPolicy(guarantee)
 		}
 	}
-	b.Address = strings.ToUpper(b.StreetName + ", " + b.StreetNumber + "\n" + b.PostalCode + " " + b.City + " (" + b.CityCode + ")\n")
+	b.Address = strings.ToUpper(b.StreetName + ", " + b.StreetNumber + " \n" + b.PostalCode + " " + b.City + " (" + b.CityCode + ")\n")
 }
