@@ -698,7 +698,7 @@ func (bg *baseGenerator) signatureForm() {
 
 func (bg *baseGenerator) AddMup() {
 	bg.emptyHeader()
-	bg.mup(false, bg.policy.Company, bg.policy.ConsultancyValue.Price, bg.policy.Channel)
+	bg.generateMup(false, bg.policy.Company, bg.policy.ConsultancyValue.Price, bg.policy.Channel)
 }
 
 func (bg *baseGenerator) designationInfo() string {
