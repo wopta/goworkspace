@@ -12,11 +12,9 @@ import (
 
 	"gitlab.dev.wopta.it/goworkspace/callback/internal"
 	"gitlab.dev.wopta.it/goworkspace/lib"
-	"gitlab.dev.wopta.it/goworkspace/mail"
 	"gitlab.dev.wopta.it/goworkspace/models"
 	"gitlab.dev.wopta.it/goworkspace/network"
 	"gitlab.dev.wopta.it/goworkspace/payment/consultancy"
-	plc "gitlab.dev.wopta.it/goworkspace/policy"
 	prd "gitlab.dev.wopta.it/goworkspace/product"
 	tr "gitlab.dev.wopta.it/goworkspace/transaction"
 )
@@ -96,7 +94,6 @@ func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod, origin s
 		transaction            models.Transaction
 		networkNode            *models.NetworkNode
 		mgaProduct             *models.Product
-		warrant                *models.Warrant
 		err                    error
 		policyCollection       string = lib.PolicyCollection
 		transactionsCollection string = lib.TransactionsCollection
@@ -113,9 +110,6 @@ func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod, origin s
 	}
 
 	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
-	}
 
 	if transaction, err = payTransaction(policy, providerId, trSchedule, paymentMethod, transactionsCollection, networkNode); err != nil {
 		return err
@@ -136,34 +130,6 @@ func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod, origin s
 	transaction.BigQueryParse()
 
 	if policy.Annuity == 0 {
-
-		if err = plc.AddSignedDocumentsInPolicy(&policy); err != nil {
-			return err
-		}
-
-		// TODO: all methods save the data, they shouldn't to avoid data corruption
-		if err = plc.SetUserIntoPolicyContractor(&policy); err != nil {
-			return err
-		}
-
-		if err = network.UpdateNetworkNodePortfolio(&policy, networkNode); err != nil {
-			return err
-		}
-
-		flowName, _ := policy.GetFlow(networkNode, warrant)
-		toAddress := mail.GetContractorEmail(&policy)
-		ccAddress := mail.Address{}
-		fromAddress := mail.AddressAnna
-
-		switch flowName {
-		case models.ProviderMgaFlow, models.RemittanceMgaFlow:
-			ccAddress = mail.GetNetworkNodeEmail(networkNode)
-		}
-
-		err = mail.SendMailContract(policy, policy.Attachments, fromAddress, toAddress, ccAddress, flowName)
-		if err != nil {
-			return err
-		}
 		storage := bpmnEngine.NewStorageBpnm()
 		flow, err := bpmn.GetFlow(&policy, storage)
 		if err != nil {
