@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net"
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -51,7 +52,16 @@ func GetLocalIP() net.IP {
 }
 func main() {
 	var bind map[string]string = make(map[string]string)
-	start := 8080
+	var err error
+	var start int
+	if len(os.Args) < 2 {
+		start = 8080
+	} else {
+		start, err = strconv.Atoi(os.Args[1])
+		if err != nil {
+			panic(err)
+		}
+	}
 	var serversErrors []string
 	for i, function := range ALL_FUNCTIONS {
 		cmd := exec.Command(os.Getenv("GOWORKSPACE") + "/../bin/api")
@@ -66,8 +76,8 @@ func main() {
 		}
 		defer cmd.Process.Kill()
 	}
-	time.Sleep(time.Second * 2)
-	fmt.Printf("Server started %s:%v\n", GetLocalIP(), start)
+	time.Sleep(time.Second)
+	fmt.Printf("\nServer started %s:%v\n", GetLocalIP(), start)
 	if len(serversErrors) > 0 {
 		fmt.Printf("Errors: %v\n", serversErrors)
 	}
@@ -82,8 +92,8 @@ func main() {
 			return
 		}
 		url := strings.Split(r.URL.String(), "/")[1]
-		url = strings.ToUpper(string(url[0])) + url[1:]
-		url = "http://localhost:" + bind[url] + r.URL.String()
+		funcName := strings.ToUpper(string(url[0])) + url[1:]
+		url = "http://localhost:" + bind[funcName] + r.URL.String()
 		nR, _ := http.NewRequest(r.Method, url, r.Body)
 		nR.Header = r.Header
 		nR.Body = r.Body
@@ -91,9 +101,9 @@ func main() {
 		client := &http.Client{
 			Timeout: time.Second * 10, // Timeout each requests
 		}
+		fmt.Printf("Calling function %s...\n\n", funcName)
 		resp, e := client.Do(nR)
 		if e != nil {
-			panic(e.Error())
 			w.WriteHeader(resp.StatusCode)
 			w.Write([]byte(e.Error()))
 			return
@@ -102,8 +112,9 @@ func main() {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Content-Type", r.Header.Get("Content-Type"))
 		w.WriteHeader(resp.StatusCode)
-		body, _ := ioutil.ReadAll(resp.Body)
+		body, _ := io.ReadAll(resp.Body)
 		w.Write(body)
+		fmt.Printf("\nServer is running at %s:%v\n", GetLocalIP(), start)
 
 	})
 
