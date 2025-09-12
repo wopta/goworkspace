@@ -137,7 +137,7 @@ func (el *CatnatGenerator) addStatements(includeCompanyStatements bool) {
 
 	for _, statement := range statements {
 		_, y := el.engine.GetPageSize()
-		if el.engine.GetY() > y*0.8 {
+		if el.engine.GetY() > y*0.7 {
 			el.engine.NewPage()
 			if el.isProposal {
 				el.engine.DrawWatermark(constants.Proposal)
