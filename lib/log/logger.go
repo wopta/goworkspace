@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"slices"
 	"strings"
@@ -63,7 +62,7 @@ func newLog() *LoggerWopta {
 	}
 	return &LoggerWopta{
 		prefix:        []string{},
-		writer:        log.Writer(),
+		writer:        os.Stdout,
 		parserMessage: parser,
 	}
 }
