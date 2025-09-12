@@ -102,7 +102,7 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 	log.AddPrefix("CatnatSellalble")
 	defer log.PopPrefix()
 
-	in, err := getCatnatInputRules(policy)
+	in, err := getCatnatV1InputRules(policy)
 	if err != nil {
 		return nil, err
 	}
@@ -128,49 +128,53 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 	var wantEarthquake any
 	var wantFlood any
 
-	if policy.Assets[0].Building.UseType == "tenant" {
-		alreadyEarthquake = policy.QuoteQuestions["alreadyEarthquake"]
-		if alreadyEarthquake == nil {
-			return nil, errors.New("missing field alreadyEarthquake")
-		}
-		alreadyFlood = policy.QuoteQuestions["alreadyFlood"]
-		if alreadyFlood == nil {
-			return nil, errors.New("missing field alreadyFlood")
-		}
-		wantEarthquake = policy.QuoteQuestions["wantEarthquake"]
-		if wantEarthquake == nil {
-			wantEarthquake = false
-		}
-		wantFlood = policy.QuoteQuestions["wantFlood"]
-		if wantFlood == nil {
-			wantFlood = false
-		}
-	} else {
-		alreadyEarthquake = false
-		alreadyFlood = false
+	//TODO to change with  v2
+	//if policy.Assets[0].Building.UseType == "tenant" {
+	alreadyEarthquake = policy.QuoteQuestions["alreadyEarthquake"]
+	if alreadyEarthquake == nil {
+		return nil, errors.New("missing field alreadyEarthquake")
 	}
+	alreadyFlood = policy.QuoteQuestions["alreadyFlood"]
+	if alreadyFlood == nil {
+		return nil, errors.New("missing field alreadyFlood")
+	}
+	wantEarthquake = policy.QuoteQuestions["wantEarthquake"]
+	if wantEarthquake == nil {
+		wantEarthquake = false
+	}
+	wantFlood = policy.QuoteQuestions["wantFlood"]
+	if wantFlood == nil {
+		wantFlood = false
+	}
+	//TODO to change with  v2
+	//}
+	//	else {
+	//		alreadyEarthquake = false
+	//		alreadyFlood = false
+	//	}
 
-	if policy.Assets[0].Building.UseType == "tenant" {
-		if !alreadyEarthquake.(bool) && !alreadyFlood.(bool) && !wantFlood.(bool) && !wantEarthquake.(bool) {
-			for i := range out.Product.Companies[0].GuaranteesMap {
-				if (out.Product.Companies[0].GuaranteesMap)[i].SynchronizeSlug == "naturalDisasters-stock" {
-					(out.Product.Companies[0].GuaranteesMap)[i].Config.SumInsuredLimitOfIndemnityTextField.Min = 5000
-				}
-			}
-		}
-	}
+	//	if policy.Assets[0].Building.UseType == "tenant" {
+	//		if !alreadyEarthquake.(bool) && !alreadyFlood.(bool) && !wantFlood.(bool) && !wantEarthquake.(bool) {
+	//			for i := range out.Product.Companies[0].GuaranteesMap {
+	//				if (out.Product.Companies[0].GuaranteesMap)[i].SynchronizeSlug == "naturalDisasters-stock" {
+	//					(out.Product.Companies[0].GuaranteesMap)[i].Config.SumInsuredLimitOfIndemnityTextField.Min = 5000
+	//				}
+	//			}
+	//		}
+	//	}
 	if !isValidationForQuote {
 		out = ruleOutput.(*SellableOutput)
 		log.InfoF(out.Msg)
 		return out, nil
 	}
-	if alreadyEarthquake.(bool) && !wantEarthquake.(bool) {
-		policy.Assets[0].Guarantees = slices.DeleteFunc(policy.Assets[0].Guarantees, func(g models.Guarante) bool { return g.Slug == "earthquake-building" })
-	}
-	if alreadyFlood.(bool) && !wantFlood.(bool) {
-		policy.Assets[0].Guarantees = slices.DeleteFunc(policy.Assets[0].Guarantees, func(g models.Guarante) bool { return g.Slug == "flood-building" })
-	}
-
+	//TODO to change with  v2
+	//	if alreadyEarthquake.(bool) && !wantEarthquake.(bool) {
+	//		policy.Assets[0].Guarantees = slices.DeleteFunc(policy.Assets[0].Guarantees, func(g models.Guarante) bool { return g.Slug == "earthquake-building" })
+	//	}
+	//	if alreadyFlood.(bool) && !wantFlood.(bool) {
+	//		policy.Assets[0].Guarantees = slices.DeleteFunc(policy.Assets[0].Guarantees, func(g models.Guarante) bool { return g.Slug == "flood-building" })
+	//	}
+	//
 	if policy.StartDate.IsZero() {
 		return nil, errors.New("Start date can't be 0")
 	}
@@ -203,7 +207,7 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 
 	exist, err := guaranteeExist(policy, "LANDSLIDE")
 	if !exist {
-		return nil, errors.New("You need to have landslide")
+		return nil, errors.New("Hai bisogno di frane")
 	}
 	if err != nil {
 		return nil, err
@@ -222,7 +226,7 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 	return out, nil
 }
 
-func getCatnatInputRules(p *models.Policy) ([]byte, error) {
+func getCatnatV2InputRules(p *models.Policy) ([]byte, error) {
 	var res []byte
 	in := make(map[string]any)
 	in["isEarthquakeSelected"] = false
@@ -257,6 +261,48 @@ func getCatnatInputRules(p *models.Policy) ([]byte, error) {
 	//change these names
 	in["alreadyFlood"] = alreadyFlood
 	in["wantFlood"] = wantFlood
+	in["alreadyEarthquake"] = alreadyEarthquake
+	in["wantEarthquake"] = wantEarthquake
+
+	for _, a := range p.Assets {
+		if a.Type == models.AssetTypeBuilding {
+			locationlen += 1
+		}
+	}
+
+	in["locationlen"] = locationlen
+	res, err := json.Marshal(in)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+func getCatnatV1InputRules(p *models.Policy) ([]byte, error) {
+	var res []byte
+	in := make(map[string]any)
+	in["isEarthquakeSelected"] = false
+	in["isFloodSelected"] = false
+	locationlen := 0
+
+	alreadyEarthquake := p.QuoteQuestions["alreadyEarthquake"]
+	if alreadyEarthquake == nil {
+		return nil, errors.New("missing field alreadyEarthquake")
+	}
+	alreadyFlood := p.QuoteQuestions["alreadyFlood"]
+	if alreadyFlood == nil {
+		return nil, errors.New("missing field alreadyFlood")
+	}
+	wantEarthquake := p.QuoteQuestions["wantEarthquake"]
+	if wantEarthquake == nil {
+		wantEarthquake = false
+	}
+	wantFlood := p.QuoteQuestions["wantFlood"]
+	if wantFlood == nil {
+		wantFlood = false
+	}
+	in["alreadyFlood"] = alreadyFlood
+	in["wantFlood"] = wantFlood
+
 	in["alreadyEarthquake"] = alreadyEarthquake
 	in["wantEarthquake"] = wantEarthquake
 

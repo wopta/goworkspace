@@ -150,7 +150,7 @@ const buildingType = "building"
 const contentType = "content"
 const stockType = "stock"
 
-const catNatProductCode = "009"
+const catNatProductCode = "007"
 const catNatDistributorCode = "0168"
 const catNatLegalPerson = "2"
 const catNatSalesChannel = "3"
@@ -166,7 +166,7 @@ var guaranteeSlugToCodes = map[string]string{
 	landlideSlug:   "209",
 }
 
-var guaranteeTypeToCodes = map[string]string{
+var guaranteeTypeToCodesV2 = map[string]string{
 	contentType:  "/01",
 	stockType:    "/02",
 	buildingType: "/03",
@@ -178,10 +178,21 @@ var guaranteeCodeToSlug = map[string]string{
 	"209": landlideSlug,
 }
 
-var guaranteeTypeCodeToType = map[string]string{
+var guaranteeTypeCodeToTypeV2 = map[string]string{
 	"/01": contentType,
 	"/02": stockType,
 	"/03": buildingType,
+}
+
+var guaranteeTypeToCodesV1 = map[string]string{
+	buildingType: "/00",
+	contentType:  "/01",
+	stockType:    "/02",
+}
+var guaranteeTypeCodeToTypeV1 = map[string]string{
+	"/00": buildingType,
+	"/01": contentType,
+	"/02": stockType,
 }
 
 var useTypeMap = map[string]string{
@@ -343,33 +354,34 @@ func (d *QuoteRequest) FromPolicyForQuote(policy *models.Policy) error {
 		LowestFloor:          lowestFloorMap[baseAsset.Building.LowestFloor],
 		GuaranteeList:        make([]guaranteeList, 0),
 	}
-	if policy.Assets[0].Building.UseType == "tenant" {
-		var alreadyEarthquake any
-		var alreadyFlood any
-		var wantEarthquake any
-		var wantFlood any
+	//TODO to change with  v2
+	//if policy.Assets[0].Building.UseType == "tenant" {
+	var alreadyEarthquake any
+	var alreadyFlood any
+	var wantEarthquake any
+	var wantFlood any
 
-		alreadyEarthquake = policy.QuoteQuestions["alreadyEarthquake"]
-		if alreadyEarthquake == nil {
-			return errors.New("missing field alreadyEarthquake")
-		}
-		wantEarthquake = policy.QuoteQuestions["wantEarthquake"]
-		if wantEarthquake == nil {
-			wantEarthquake = false
-		}
-		alreadyFlood = policy.QuoteQuestions["alreadyFlood"]
-		if alreadyFlood == nil {
-			return errors.New("missing field alreadyFlood")
-		}
-		wantFlood = policy.QuoteQuestions["wantFlood"]
-		if wantFlood == nil {
-			wantFlood = false
-		}
-		asset.EarthquakeCoverage = quoteQuestionMap[alreadyEarthquake.(bool)]
-		asset.FloodCoverage = quoteQuestionMap[alreadyFlood.(bool)]
-		asset.EarthquakePurchase = quoteQuestionMap[(alreadyEarthquake.(bool) && wantEarthquake.(bool)) || !alreadyEarthquake.(bool)]
-		asset.FloodPurchase = quoteQuestionMap[(alreadyFlood.(bool) && wantFlood.(bool)) || !alreadyFlood.(bool)]
+	alreadyEarthquake = policy.QuoteQuestions["alreadyEarthquake"]
+	if alreadyEarthquake == nil {
+		return errors.New("missing field alreadyEarthquake")
 	}
+	wantEarthquake = policy.QuoteQuestions["wantEarthquake"]
+	if wantEarthquake == nil {
+		wantEarthquake = false
+	}
+	alreadyFlood = policy.QuoteQuestions["alreadyFlood"]
+	if alreadyFlood == nil {
+		return errors.New("missing field alreadyFlood")
+	}
+	wantFlood = policy.QuoteQuestions["wantFlood"]
+	if wantFlood == nil {
+		wantFlood = false
+	}
+	asset.EarthquakeCoverage = quoteQuestionMap[alreadyEarthquake.(bool)]
+	asset.FloodCoverage = quoteQuestionMap[alreadyFlood.(bool)]
+	asset.EarthquakePurchase = quoteQuestionMap[(alreadyEarthquake.(bool) && wantEarthquake.(bool)) || !alreadyEarthquake.(bool)]
+	asset.FloodPurchase = quoteQuestionMap[(alreadyFlood.(bool) && wantFlood.(bool)) || !alreadyFlood.(bool)]
+	//}
 
 	if baseAsset.Building.BuildingAddress != nil {
 		asset.PostalCode = baseAsset.Building.BuildingAddress.PostalCode
@@ -394,7 +406,7 @@ func setGuaranteeValue(asset *assetRequest, guarantee models.Guarante, slug stri
 		return fmt.Errorf("Error format in guarantee slug")
 	}
 	if guarantee.Value.SumInsuredLimitOfIndemnity != 0 {
-		gL.GuaranteeCode = guaranteeSlugToCodes[guaranteeName] + guaranteeTypeToCodes[guaranteeType]
+		gL.GuaranteeCode = guaranteeSlugToCodes[guaranteeName] + guaranteeTypeToCodesV1[guaranteeType]
 		gL.CapitalAmount = int(guarantee.Value.SumInsuredLimitOfIndemnity)
 		asset.GuaranteeList = append(asset.GuaranteeList, gL)
 	}
@@ -428,7 +440,7 @@ func mappingQuoteResponseToGuarantee(quoteResponse QuoteResponse, policy *models
 		for _, guaranteeDetailCatnat := range assetDetailCatnat.GuaranteesDetail {
 			guaranteeCode, guaranteeTypeCode, _ := strings.Cut(guaranteeDetailCatnat.GuaranteeCode, "/")
 			guaranteeName := guaranteeCodeToSlug[guaranteeCode]
-			guaranteeType := guaranteeTypeCodeToType["/"+guaranteeTypeCode]
+			guaranteeType := guaranteeTypeCodeToTypeV1["/"+guaranteeTypeCode]
 			if guaranteeName == "" || guaranteeType == "" {
 				return fmt.Errorf("Error parsing guarantee codes: %v", guaranteeDetailCatnat.GuaranteeCode)
 			}
