@@ -24,7 +24,10 @@ type mock_clientCatnat struct {
 	nameFileToCompare string
 }
 
-func (c *mock_clientCatnat) Quote(dto catnat.QuoteRequest, _ *models.Policy) (response catnat.QuoteResponse, err error) {
+func (c *mock_clientCatnat) Quote(dto catnat.QuoteRequest, p *models.Policy) (response catnat.QuoteResponse, err error) {
+	if p.ProductVersion != "v2" {
+		return
+	}
 	if c.withError {
 		return response, errors.New("quote error")
 	}
