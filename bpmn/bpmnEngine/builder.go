@@ -270,6 +270,7 @@ func (p *processBpnm) hydrateGateways(activities []activityBuilder, bpmn *FlowBp
 						gateway.nextActivities[iact] = flow.process[processName].activities[activityName]
 						return nil
 					})
+					continue
 				} else {
 					if _, exist := p.activities[nextJump]; !exist {
 						return fmt.Errorf("No event named %v", nextJump)
