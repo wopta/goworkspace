@@ -37,7 +37,7 @@ func (f *FlowBpnm) RunAt(processName, startingActivity string) error {
 	if process.storageBpnm == nil {
 		return errors.New("Miss storage")
 	}
-	if firstActivities == nil || len(firstActivities) == 0 {
+	if len(firstActivities) == 0 {
 		return fmt.Errorf("Process '%v' has no activity '%v'", process.name, startingActivity)
 	}
 	var err error
@@ -98,7 +98,7 @@ func (act *activity) runActivity(nameProcess string, storage *StorageBpnm) (err 
 			return err
 		}
 	}
-	if err = checkLocalResources(storage, act.requiredInputData); err != nil {
+	if err = checkResources(storage, act.requiredInputData); err != nil {
 		return fmt.Errorf("Process '%v' with Activity  '%v' has an input error: %v", nameProcess, act.name, err.Error())
 	}
 
@@ -163,7 +163,7 @@ func (act *activity) evaluateDecisions(processName string, storage *StorageBpnm,
 			return []*activity{}, nil
 		}
 		if ga.decision == "" {
-			if err = checkLocalResources(storage, act.requiredOutputData); err != nil {
+			if err = checkResources(storage, act.requiredOutputData); err != nil {
 				return nil, fmt.Errorf("Process '%v' with activity '%v' has an output error: %v", processName, act.name, err.Error())
 			}
 			log.InfoF("Decision evaluation: None")
@@ -182,7 +182,7 @@ func (act *activity) evaluateDecisions(processName string, storage *StorageBpnm,
 			return nil, fmt.Errorf("Process '%v' with activity '%v' has an decision error: expected a 'bool' type, got a %v", processName, act.name, reflect.TypeOf(resultEvaluation).String())
 		}
 		if result {
-			if err = checkLocalResources(storage, act.requiredOutputData); err != nil {
+			if err = checkResources(storage, act.requiredOutputData); err != nil {
 				return nil, fmt.Errorf("Process '%v' with activity '%v' has an output error: %v", processName, act.name, err.Error())
 			}
 			storage.markWhatNeeded(act.requiredOutputData)
@@ -193,8 +193,11 @@ func (act *activity) evaluateDecisions(processName string, storage *StorageBpnm,
 	return res, nil
 }
 
-func checkLocalResources(st *StorageBpnm, req []typeData) error {
-	local := st.getAllLocals()
+func checkResources(st *StorageBpnm, req []typeData) error {
+	local := st.getAllGlobals()
+	for name, value := range st.getAllLocals() {
+		local[name] = value
+	}
 	for _, requiredData := range req {
 		storedData, exist := local[requiredData.Name]
 		if !exist {

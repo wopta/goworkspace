@@ -6,7 +6,6 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/callback_out"
 	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/payment/fabrick"
 )
 
 type CallbackInfo struct {
@@ -20,7 +19,8 @@ func (c *CallbackInfo) GetType() string {
 type PaymentInfoBpmn struct {
 	Schedule      string
 	PaymentMethod string
-	fabrick.FabrickCallback
+	ProviderId    string
+	models.FabrickPaymentsRequest
 }
 
 func (*PaymentInfoBpmn) GetType() string {
@@ -82,4 +82,12 @@ type Addresses struct {
 
 func (*Addresses) GetType() string {
 	return "addresses"
+}
+
+type Transaction struct {
+	*models.Transaction
+}
+
+func (*Transaction) GetType() string {
+	return "transaction"
 }

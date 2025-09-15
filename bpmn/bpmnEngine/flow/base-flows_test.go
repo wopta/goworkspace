@@ -46,7 +46,6 @@ func getBuilderFlowChannel(log *mockLog, store *bpmnEngine.StorageBpnm) (*bpmnEn
 		builder.AddHandler("sendEmitProposalMail", funcTest("sendEmitProposalMail", log)),
 		builder.AddHandler("setLeadData", funcTest("setLeadData", log)),
 		builder.AddHandler("sendLeadMail", funcTest("sendLeadMail", log)),
-		builder.AddHandler("updatePolicy", funcTest("updatePolicy", log)),
 		builder.AddHandler("sign", funcTest("sign", log)),
 		builder.AddHandler("payTransaction", funcTest("payTransaction", log)),
 		builder.AddHandler("sendProposalMail", funcTest("sendProposalMail", log)),
@@ -61,6 +60,11 @@ func getBuilderFlowChannel(log *mockLog, store *bpmnEngine.StorageBpnm) (*bpmnEn
 		builder.AddHandler("rejected", funcTest("rejected", log)),
 		builder.AddHandler("approved", funcTest("approved", log)),
 		builder.AddHandler("sendAcceptanceMail", funcTest("sendAcceptanceMail", log)),
+		builder.AddHandler("generateInvoice", funcTest("generateInvoice", log)),
+		builder.AddHandler("updatePolicyAsPaid", funcTest("updatePolicyAsPaid", log)),
+		builder.AddHandler("promotePolicy", funcTest("promotePolicy", log)),
+		builder.AddHandler("saveTransactionAndPolicy", funcTest("saveTransactionAndPolicy", log)),
+		builder.AddHandler("createNetworkTransaction", funcTest("createNetworkTransaction", log)),
 	)
 	if e != nil {
 		return nil, e
@@ -97,7 +101,7 @@ func testFlow(t *testing.T, process string, expectedACtivities []string, store *
 }
 
 var (
-	policyEcommerce = Policy{&models.Policy{Channel: lib.ECommerceChannel, Name: "test policy"}}
+	policyEcommerce = Policy{&models.Policy{Channel: lib.ECommerceChannel, Name: "test policy", PaymentMode: models.PaymentModeRecurrent}}
 	policyMga       = Policy{&models.Policy{Channel: lib.MgaChannel, Name: "test policy"}}
 	policyNetwork   = Policy{&models.Policy{Channel: lib.NetworkChannel, Name: "test policy"}}
 	policyCatnat    = Policy{&models.Policy{Channel: lib.NetworkChannel, Name: models.CatNatProduct}}
@@ -105,6 +109,7 @@ var (
 
 var (
 	paymentInfo = PaymentInfoBpmn{}
+	transaction = Transaction{}
 	addresses   = Addresses{}
 )
 
@@ -170,16 +175,64 @@ func TestProposalForEcommerce(t *testing.T) {
 	testFlow(t, "proposal", exps, store, getBuilderFlowChannel)
 }
 
-func TestPayForEcommerce(t *testing.T) {
+func TestPayAnnuity0FirstRate(t *testing.T) {
 	store := bpmnEngine.NewStorageBpnm()
+	policyEcommerce.Annuity = 0
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("product", &productEcommerce)
 	store.AddGlobal("networkNode", &winNode)
+	store.AddGlobal("paymentInfo", &paymentInfo)
+	store.AddGlobal("transaction", &transaction)
+	store.AddGlobal("sendEmail", &BoolBpmn{true})
 	initBaseStorage(store)
 
 	exps := []string{
-		"updatePolicy",
 		"payTransaction",
+		"updatePolicyAsPaid",
+		"promotePolicy",
+		"sendMailContract",
+		"generateInvoice",
+		"createNetworkTransaction",
+		"saveTransactionAndPolicy",
+	}
+	testFlow(t, "pay", exps, store, getBuilderFlowChannel)
+}
+func TestPayAnnuityNot0FirstRate(t *testing.T) {
+	store := bpmnEngine.NewStorageBpnm()
+	policyEcommerce.Annuity = 1
+	store.AddGlobal("policy", &policyEcommerce)
+	store.AddGlobal("product", &productEcommerce)
+	store.AddGlobal("networkNode", &winNode)
+	store.AddGlobal("paymentInfo", &paymentInfo)
+	store.AddGlobal("transaction", &transaction)
+	initBaseStorage(store)
+
+	exps := []string{
+		"payTransaction",
+		"updatePolicyAsPaid",
+		"generateInvoice",
+		"createNetworkTransaction",
+		"saveTransactionAndPolicy",
+	}
+	testFlow(t, "pay", exps, store, getBuilderFlowChannel)
+}
+
+func TestPaySingleRate(t *testing.T) {
+	store := bpmnEngine.NewStorageBpnm()
+	policyEcommerce.PaymentMode = models.PaymentModeSingle
+	store.AddGlobal("policy", &policyEcommerce)
+	store.AddGlobal("product", &productEcommerce)
+	store.AddGlobal("networkNode", &winNode)
+	store.AddGlobal("paymentInfo", &paymentInfo)
+	store.AddGlobal("transaction", &transaction)
+	initBaseStorage(store)
+
+	exps := []string{
+		"payTransaction",
+		"updatePolicyAsPaid",
+		"generateInvoice",
+		"createNetworkTransaction",
+		"saveTransactionAndPolicy",
 	}
 	testFlow(t, "pay", exps, store, getBuilderFlowChannel)
 }
@@ -247,20 +300,6 @@ func TestApprovalForMga(t *testing.T) {
 
 	exps := []string{}
 	testFlow(t, "requestApproval", exps, store, getBuilderFlowChannel)
-}
-
-func TestPayForMga(t *testing.T) {
-	store := bpmnEngine.NewStorageBpnm()
-	store.AddGlobal("policy", &policyMga)
-	store.AddGlobal("product", &productMga)
-	store.AddGlobal("networkNode", &winNode)
-	initBaseStorage(store)
-
-	exps := []string{
-		"updatePolicy",
-		"payTransaction",
-	}
-	testFlow(t, "pay", exps, store, getBuilderFlowChannel)
 }
 
 func TestSignForMga(t *testing.T) {
@@ -336,20 +375,6 @@ func TestApprovalForProviderMga(t *testing.T) {
 		"sendRequestApprovalMail",
 	}
 	testFlow(t, "requestApproval", exps, store, getBuilderFlowChannel)
-}
-
-func TestPayForProviderMga(t *testing.T) {
-	store := bpmnEngine.NewStorageBpnm()
-	store.AddGlobal("policy", &policyNetwork)
-	store.AddGlobal("product", &productProviderMga)
-	store.AddGlobal("networkNode", &winNode)
-	initBaseStorage(store)
-
-	exps := []string{
-		"updatePolicy",
-		"payTransaction",
-	}
-	testFlow(t, "pay", exps, store, getBuilderFlowChannel)
 }
 
 func TestSignForProviderMga(t *testing.T) {
@@ -432,6 +457,8 @@ func TestPayForRemittanceMga(t *testing.T) {
 	store.AddGlobal("policy", &policyNetwork)
 	store.AddGlobal("product", &productRemittanceMga)
 	store.AddGlobal("networkNode", &winNode)
+	store.AddGlobal("paymentInfo", &paymentInfo)
+	store.AddGlobal("transaction", &transaction)
 	initBaseStorage(store)
 
 	exps := []string{}

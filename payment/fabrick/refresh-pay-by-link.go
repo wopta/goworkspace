@@ -8,9 +8,8 @@ import (
 	"strconv"
 	"time"
 
-	"gitlab.dev.wopta.it/goworkspace/lib/log"
-
 	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/mail"
 	"gitlab.dev.wopta.it/goworkspace/models"
 	"gitlab.dev.wopta.it/goworkspace/network"

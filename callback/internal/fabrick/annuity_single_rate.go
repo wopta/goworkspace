@@ -5,14 +5,14 @@ import (
 	"net/http"
 	"strings"
 
+	"gitlab.dev.wopta.it/goworkspace/bpmn"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/mail"
 
-	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/network"
 	plc "gitlab.dev.wopta.it/goworkspace/policy"
-	prd "gitlab.dev.wopta.it/goworkspace/product"
-	tr "gitlab.dev.wopta.it/goworkspace/transaction"
 )
 
 /*
@@ -22,10 +22,9 @@ transaction and have no other side effects
 */
 func (FabrickCallback) AnnuitySingleRateFx(_ http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		err            error
-		requestPayload FabrickRequestPayload
-		request        = new(FabrickRequest)
-		response       = FabrickResponse{Result: true, Locale: "it"}
+		err      error
+		request  = models.FabrickPaymentsRequest{}
+		response = FabrickResponse{Result: true, Locale: "it"}
 	)
 
 	log.AddPrefix("FabrickAnnuitySingleRateFx")
@@ -41,18 +40,14 @@ func (FabrickCallback) AnnuitySingleRateFx(_ http.ResponseWriter, r *http.Reques
 	providerId := ""
 	paymentMethod := ""
 
-	err = json.NewDecoder(r.Body).Decode(&requestPayload)
+	err = json.NewDecoder(r.Body).Decode(&request)
 	defer r.Body.Close()
 	if err != nil {
 		log.ErrorF("error decoding request body: %s", err)
 		return "", nil, err
 	}
-	strPayload, err := request.FromPayload(requestPayload)
-	if err != nil {
-		log.ErrorF("error decoding request body: %s", err)
-		return "", nil, err
-	}
-	response.RequestPayload = strPayload
+	strRequest, _ := json.Marshal(request)
+	response.RequestPayload = string(strRequest)
 
 	if request.PaymentID == "" {
 		log.Println(ErrProviderIdNotSet)
@@ -68,7 +63,13 @@ func (FabrickCallback) AnnuitySingleRateFx(_ http.ResponseWriter, r *http.Reques
 
 	paymentMethod = strings.ToLower(request.Bill.Transactions[0].PaymentMethod)
 
-	err = annuitySingleRate(policyUid, providerId, trSchedule, paymentMethod)
+	paymentInfo := flow.PaymentInfoBpmn{
+		Schedule:               trSchedule,
+		ProviderId:             providerId,
+		PaymentMethod:          paymentMethod,
+		FabrickPaymentsRequest: request,
+	}
+	err = annuitySingleRate(policyUid, paymentInfo)
 	if err != nil {
 		log.ErrorF("error paying first annuity rate: %s", err)
 		response.Result = false
@@ -82,13 +83,10 @@ func (FabrickCallback) AnnuitySingleRateFx(_ http.ResponseWriter, r *http.Reques
 	return string(stringRes), response, nil
 }
 
-func annuitySingleRate(policyUid, providerId, trSchedule, paymentMethod string) error {
+func annuitySingleRate(policyUid string, paymentInfo flow.PaymentInfoBpmn) error {
 	var (
-		policy      models.Policy
-		transaction models.Transaction
-		networkNode *models.NetworkNode
-		mgaProduct  *models.Product
-		err         error
+		policy models.Policy
+		err    error
 	)
 
 	policy, err = plc.GetPolicy(policyUid)
@@ -99,23 +97,14 @@ func annuitySingleRate(policyUid, providerId, trSchedule, paymentMethod string) 
 		return ErrPolicyNotFound
 	}
 
-	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-
-	if transaction, err = payTransaction(policy, providerId, trSchedule, paymentMethod, lib.TransactionsCollection, networkNode); err != nil {
+	storage := bpmnEngine.NewStorageBpnm()
+	storage.AddGlobal("paymentInfo", &paymentInfo)
+	storage.AddGlobal("addresses", &flow.Addresses{
+		FromAddress: mail.AddressAnna,
+	})
+	flow, err := bpmn.GetFlow(&policy, storage)
+	if err != nil {
 		return err
 	}
-
-	firestoreBatch := map[string]map[string]interface{}{
-		lib.TransactionsCollection: {
-			transaction.Uid: transaction,
-		},
-	}
-	if err = lib.SetBatchFirestoreErr(firestoreBatch); err != nil {
-		return err
-	}
-	transaction.BigQuerySave()
-
-	mgaProduct = prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
-
-	return tr.CreateNetworkTransactions(&policy, &transaction, networkNode, mgaProduct)
+	return flow.Run("pay")
 }

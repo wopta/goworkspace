@@ -179,7 +179,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		}
 
 		// Create/Update document on user collection based on contractor fiscalCode
-		err = plc.SetUserIntoPolicyContractor(&policy)
+		err = plc.PromotePolicy(&policy)
 		if err != nil {
 			log.ErrorF("error set user into policy contractor: %s", err.Error())
 			return "", nil, err

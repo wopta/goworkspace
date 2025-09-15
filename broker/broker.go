@@ -109,12 +109,6 @@ var brokerRoutes []lib.Route = []lib.Route{
 	//		Roles:   []string{lib.UserRoleAll},
 	//	},
 	{
-		Route:   "/draft/policy/payment",
-		Handler: lib.ResponseLoggerWrapper(paymentFx),
-		Method:  http.MethodPost,
-		Roles:   []string{},
-	},
-	{
 		Route:   "/policy/v1/{uid}",
 		Handler: lib.ResponseLoggerWrapper(UpdatePolicyFx),
 		Method:  http.MethodPatch,

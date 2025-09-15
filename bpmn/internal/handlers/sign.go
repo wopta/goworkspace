@@ -67,6 +67,10 @@ func sendMailContract(state *bpmnEngine.StorageBpnm) error {
 		return err
 	}
 
+	if !sendEmail.Bool {
+		return nil
+	}
+
 	addresses.ToAddress = mail.GetContractorEmail(policy.Policy)
 	switch flowName.String {
 	case models.ProviderMgaFlow, models.RemittanceMgaFlow:

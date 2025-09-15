@@ -202,7 +202,7 @@ func updateUserAndNetworkNode(state *bpmnEngine.StorageBpnm) error {
 		return err
 	}
 	// promote documents from temp bucket to user and connect it to policy
-	err = plc.SetUserIntoPolicyContractor(policy.Policy)
+	err = plc.PromotePolicy(policy.Policy)
 	if err != nil {
 		log.ErrorF("[putUser] ERROR SetUserIntoPolicyContractor %s", err.Error())
 		return err

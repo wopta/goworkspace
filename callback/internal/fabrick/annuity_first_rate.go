@@ -4,19 +4,16 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
-	"time"
 
 	"gitlab.dev.wopta.it/goworkspace/bpmn"
 	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/mail"
 
 	"gitlab.dev.wopta.it/goworkspace/callback/internal"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/network"
-	"gitlab.dev.wopta.it/goworkspace/payment/consultancy"
-	prd "gitlab.dev.wopta.it/goworkspace/product"
-	tr "gitlab.dev.wopta.it/goworkspace/transaction"
 )
 
 /*
@@ -27,10 +24,9 @@ if it is the first transaction ever
 */
 func (FabrickCallback) AnnuityFirstRateFx(_ http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
-		err            error
-		requestPayload FabrickRequestPayload
-		request        = new(FabrickRequest)
-		response       = FabrickResponse{Result: true, Locale: "it"}
+		err      error
+		request  = models.FabrickPaymentsRequest{}
+		response = FabrickResponse{Result: true, Locale: "it"}
 	)
 
 	log.AddPrefix("FabrickAnnuityFirstRateFx")
@@ -46,18 +42,14 @@ func (FabrickCallback) AnnuityFirstRateFx(_ http.ResponseWriter, r *http.Request
 	providerId := ""
 	paymentMethod := ""
 
-	err = json.NewDecoder(r.Body).Decode(&requestPayload)
+	err = json.NewDecoder(r.Body).Decode(&request)
 	defer r.Body.Close()
 	if err != nil {
 		log.ErrorF("error decoding request body: %s", err)
 		return "", nil, err
 	}
-	strPayload, err := request.FromPayload(requestPayload)
-	if err != nil {
-		log.ErrorF("error decoding request body: %s", err)
-		return "", nil, err
-	}
-	response.RequestPayload = strPayload
+	strRequest, _ := json.Marshal(request)
+	response.RequestPayload = string(strRequest)
 
 	if request.PaymentID == "" {
 		log.Println(ErrProviderIdNotSet)
@@ -73,7 +65,13 @@ func (FabrickCallback) AnnuityFirstRateFx(_ http.ResponseWriter, r *http.Request
 
 	paymentMethod = strings.ToLower(request.Bill.Transactions[0].PaymentMethod)
 
-	err = annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod, r.Header.Get("Origin"))
+	paymentInfo := flow.PaymentInfoBpmn{
+		Schedule:               trSchedule,
+		ProviderId:             providerId,
+		PaymentMethod:          paymentMethod,
+		FabrickPaymentsRequest: request,
+	}
+	err = annuityFirstRate(policyUid, paymentInfo)
 	if err != nil {
 		log.ErrorF("error paying first annuity rate: %s", err)
 		response.Result = false
@@ -87,83 +85,28 @@ func (FabrickCallback) AnnuityFirstRateFx(_ http.ResponseWriter, r *http.Request
 	return string(stringRes), response, nil
 }
 
-func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod, origin string) error {
+func annuityFirstRate(policyUid string, paymentInfo flow.PaymentInfoBpmn) error {
 	var (
-		policy                 models.Policy
-		renewPolicy            models.Policy
-		transaction            models.Transaction
-		networkNode            *models.NetworkNode
-		mgaProduct             *models.Product
-		err                    error
-		policyCollection       string = lib.PolicyCollection
-		transactionsCollection string = lib.TransactionsCollection
+		policy      models.Policy
+		renewPolicy models.Policy
+		err         error
 	)
-
 	if policy, err = internal.GetPolicyByUidAndCollection(policyUid, lib.PolicyCollection); err != nil {
 		return ErrPolicyNotFound
 	}
 
 	if renewPolicy, err = internal.GetPolicyByUidAndCollection(policyUid, lib.RenewPolicyCollection); err == nil && renewPolicy.Uid == policyUid {
 		policy = renewPolicy
-		policyCollection = lib.RenewPolicyCollection
-		transactionsCollection = lib.RenewTransactionCollection
 	}
 
-	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-
-	if transaction, err = payTransaction(policy, providerId, trSchedule, paymentMethod, transactionsCollection, networkNode); err != nil {
+	storage := bpmnEngine.NewStorageBpnm()
+	storage.AddGlobal("paymentInfo", &paymentInfo)
+	storage.AddGlobal("addresses", &flow.Addresses{
+		FromAddress: mail.AddressAnna,
+	})
+	flow, err := bpmn.GetFlow(&policy, storage)
+	if err != nil {
 		return err
 	}
-
-	policy.IsPay = true
-	policy.Status = models.PolicyStatusPay
-	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusPay)
-
-	if policy.Annuity > 0 {
-		policy.Status = models.PolicyStatusRenewed
-		policy.StatusHistory = append(policy.StatusHistory, policy.Status)
-	}
-
-	policy.Updated = time.Now().UTC()
-
-	policy.BigQueryParse()
-	transaction.BigQueryParse()
-
-	if policy.Annuity == 0 {
-		storage := bpmnEngine.NewStorageBpnm()
-		flow, err := bpmn.GetFlow(&policy, storage)
-		if err != nil {
-			return err
-		}
-		defer flow.Run("pay")
-	}
-
-	if err := consultancy.GenerateInvoice(policy, transaction); err != nil {
-		log.Printf("error handling consultancy: %s", err.Error())
-	}
-
-	policy.BigQueryParse()
-	transaction.BigQueryParse()
-
-	firestoreBatch := map[string]map[string]interface{}{
-		policyCollection: {
-			policy.Uid: policy,
-		},
-		transactionsCollection: {
-			transaction.Uid: transaction,
-		},
-	}
-	if err = lib.SetBatchFirestoreErr(firestoreBatch); err != nil {
-		return err
-	}
-	if err = lib.InsertRowsBigQuery(lib.WoptaDataset, policyCollection, policy); err != nil {
-		return err
-	}
-	if err = lib.InsertRowsBigQuery(lib.WoptaDataset, transactionsCollection, transaction); err != nil {
-		return err
-	}
-
-	mgaProduct = prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
-
-	return tr.CreateNetworkTransactions(&policy, &transaction, networkNode, mgaProduct)
+	return flow.Run("pay")
 }

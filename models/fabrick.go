@@ -1,6 +1,8 @@
-package fabrick
+package models
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 func UnmarshalFabrickPaymentResponse(data []byte) (FabrickPaymentResponse, error) {
 	var r FabrickPaymentResponse
@@ -13,12 +15,12 @@ func (r *FabrickPaymentResponse) Marshal() ([]byte, error) {
 }
 
 type FabrickPaymentResponse struct {
-	Status  *string       `json:"status,omitempty"`
-	Errors  []interface{} `json:"errors,omitempty"`
-	Payload *Payload      `json:"payload,omitempty"`
+	Status  *string         `json:"status,omitempty"`
+	Errors  []interface{}   `json:"errors,omitempty"`
+	Payload *FabrickPayload `json:"payload,omitempty"`
 }
 
-type Payload struct {
+type FabrickPayload struct {
 	ExternalID        *string     `json:"externalId,omitempty"`
 	PaymentID         *string     `json:"paymentId,omitempty"`
 	MerchantID        *string     `json:"merchantId,omitempty"`
@@ -39,24 +41,26 @@ func (r *FabrickPaymentsRequest) Marshal() ([]byte, error) {
 }
 
 type FabrickPaymentsRequest struct {
-	MerchantID           string               `json:"merchantId,omitempty"`
-	ExternalID           string               `json:"externalId,omitempty"`
-	PaymentConfiguration PaymentConfiguration `json:"paymentConfiguration,omitempty"`
-	Bill                 Bill                 `json:"bill,omitempty"`
+	MerchantID           string                      `json:"merchantId,omitempty"`
+	PaymentID            string                      `json:"paymentId,omitempty"`
+	ExternalID           string                      `json:"externalId,omitempty"`
+	PaymentConfiguration FabrickPaymentConfiguration `json:"paymentConfiguration,omitempty"`
+	Bill                 FabrickBill                 `json:"bill,omitempty"`
 }
 
-type Bill struct {
-	ExternalID          string               `json:"externalId,omitempty"`
-	Amount              float64              `json:"amount,omitempty"`
-	Currency            string               `json:"currency,omitempty"`
-	Description         string               `json:"description,omitempty"`
-	Items               []Item               `json:"items,omitempty"`
-	ScheduleTransaction *ScheduleTransaction `json:"scheduleTransaction,omitempty"`
-	MandateCreation     string               `json:"mandateCreation,omitempty"`
-	Subjects            *[]Subject           `json:"subjects,omitempty"`
+type FabrickBill struct {
+	ExternalID          string                      `json:"externalId,omitempty"`
+	Amount              float64                     `json:"amount,omitempty"`
+	Currency            string                      `json:"currency,omitempty"`
+	Description         string                      `json:"description,omitempty"`
+	Items               []FabrickItem               `json:"items,omitempty"`
+	ScheduleTransaction *FabrickScheduleTransaction `json:"scheduleTransaction,omitempty"`
+	MandateCreation     string                      `json:"mandateCreation,omitempty"`
+	Subjects            *[]FabrickSubject           `json:"subjects,omitempty"`
+	Transactions        []TransactionCallback       `json:"transactions,omitempty"`
 }
 
-type Item struct {
+type FabrickItem struct {
 	ExternalID       string  `json:"externalId,omitempty"`
 	Amount           float64 `json:"amount,omitempty"`
 	Currency         string  `json:"currency,omitempty"`
@@ -65,12 +69,12 @@ type Item struct {
 	XInfo            string  `json:"xInfo,omitempty"`
 }
 
-type ScheduleTransaction struct {
+type FabrickScheduleTransaction struct {
 	DueDate                             string `json:"dueDate,omitempty"`
 	PaymentInstrumentResolutionStrategy string `json:"paymentInstrumentResolutionStrategy,omitempty"`
 }
 
-type Subject struct {
+type FabrickSubject struct {
 	Role       string  `json:"role,omitempty"`
 	ExternalID string  `json:"externalId,omitempty"`
 	Email      string  `json:"email,omitempty"`
@@ -78,15 +82,15 @@ type Subject struct {
 	XInfo      *string `json:"xInfo,omitempty"`
 }
 
-type PaymentConfiguration struct {
-	ExpirationDate          string                  `json:"expirationDate,omitempty"`
-	AllowedPaymentMethods   *[]AllowedPaymentMethod `json:"allowedPaymentMethods,omitempty"`
-	PayByLink               *[]PayByLink            `json:"payByLink,omitempty"`
-	CallbackURL             string                  `json:"callbackUrl,omitempty"`
-	PaymentPageRedirectUrls PaymentPageRedirectUrls `json:"paymentPageRedirectUrls,omitempty"`
+type FabrickPaymentConfiguration struct {
+	ExpirationDate          string                         `json:"expirationDate,omitempty"`
+	AllowedPaymentMethods   *[]FabrickAllowedPaymentMethod `json:"allowedPaymentMethods,omitempty"`
+	PayByLink               *[]PayByLink                   `json:"payByLink,omitempty"`
+	CallbackURL             string                         `json:"callbackUrl,omitempty"`
+	PaymentPageRedirectUrls FabrickPaymentPageRedirectUrls `json:"paymentPageRedirectUrls,omitempty"`
 }
 
-type AllowedPaymentMethod struct {
+type FabrickAllowedPaymentMethod struct {
 	Role           string   `json:"role,omitempty"`
 	PaymentMethods []string `json:"paymentMethods,omitempty"`
 }
@@ -97,7 +101,7 @@ type PayByLink struct {
 	Template   string `json:"template,omitempty"`
 }
 
-type PaymentPageRedirectUrls struct {
+type FabrickPaymentPageRedirectUrls struct {
 	OnFailure      string `json:"onFailure,omitempty"`
 	OnSuccess      string `json:"onSuccess,omitempty"`
 	OnInterruption string `json:"onInterruption,omitempty"`
@@ -124,7 +128,7 @@ type TransactionCallback struct {
 	GatewayID           interface{} `json:"gatewayId"`
 	AcquirerID          interface{} `json:"acquirerId"`
 	Status              *string     `json:"status,omitempty"`
-	PaymentMethod       *string     `json:"paymentMethod,omitempty"`
+	PaymentMethod       string      `json:"paymentMethod,omitempty"`
 }
 
 type BillCallback struct {
