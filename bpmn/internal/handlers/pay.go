@@ -89,6 +89,7 @@ func generateInvoice(state *bpmnEngine.StorageBpnm) error {
 		bpmnEngine.GetDataRef("policy", &policy, state),
 		bpmnEngine.GetDataRef("transaction", &transaction, state),
 	)
+
 	if err := consultancy.GenerateInvoice(*policy.Policy, *transaction.Transaction); err != nil {
 		log.Printf("error handling consultancy: %s", err.Error())
 	}
@@ -185,5 +186,6 @@ func payTransaction(state *bpmnEngine.StorageBpnm) error {
 
 	transaction.BigQuerySave()
 	state.AddGlobal("transaction", &flow.Transaction{Transaction: &transaction})
+	state.AddLocal("skipInvoice", &flow.BoolBpmn{Bool: lib.IsEqual(policy.StartDate.AddDate(policy.Annuity, 0, 0), transaction.EffectiveDate)})
 	return nil
 }
