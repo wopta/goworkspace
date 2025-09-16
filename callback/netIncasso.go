@@ -66,8 +66,7 @@ func sendEmailErrorIncasso(nPolicy int, errors []string) {
 	mailRequest.To = []string{"luca.frangiamore@wopta.it"}
 	lines := []string{
 		"Ciao,",
-		fmt.Sprintf("Nella data del %v sono state quietanzate %v polizze cat-nat, %v delle quali hanno avuto problemi<br>", time.Now().Format("2006-01-02"), nPolicy, len(errors)),
-		"Gli errori rilevati sono:<br>",
+		fmt.Sprintf("Nella data del %v sono state quietanzate %v polizze cat-nat, %v delle quali hanno avuto problemi, gli errori rilevati sono:<br><br>", time.Now().Format("2006-01-02"), nPolicy, len(errors)),
 		strings.Join(errors, "<br>"),
 	}
 	for _, line := range lines {
@@ -85,7 +84,7 @@ func getPolicyToCallNetIncasso() ([]models.Policy, error) {
 			{
 				Field:      "companyEmitted",
 				Operator:   "==",
-				QueryValue: true,
+				QueryValue: false,
 			},
 			{
 				Field:      "isDeleted",
