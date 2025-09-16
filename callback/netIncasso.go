@@ -63,7 +63,8 @@ func sendEmailErrorIncasso(nPolicy int, errors []string) {
 	var mailRequest mail.MailRequest
 	mailRequest.IsHtml = true
 	mailRequest.FromAddress = mail.AddressAnna
-	mailRequest.To = []string{"luca.frangiamore@wopta.it"}
+	mailRequest.To = []string{"processi@wopta.it"}
+	mailRequest.Subject = "Polizze non incassate!"
 	lines := []string{
 		"Ciao,",
 		fmt.Sprintf("Nella data del %v sono state quietanzate %v polizze cat-nat, %v delle quali hanno avuto problemi, gli errori rilevati sono:<br><br>", time.Now().Format("2006-01-02"), nPolicy, len(errors)),
