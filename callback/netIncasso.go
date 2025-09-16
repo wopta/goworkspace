@@ -23,7 +23,7 @@ func incassoNetFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	if e != nil {
 		return "", nil, e
 	}
-	log.Println("Policies to emit with Incasso catnat: ", len(policies))
+	log.Println("Policies to emit for Incasso catnat: ", len(policies))
 	catnatClient := catnat.NewNetClient()
 	var errors []string
 	var policiesSent []models.Policy
@@ -66,7 +66,7 @@ func sendEmailErrorIncasso(nPolicy int, errors []string) {
 	mailRequest.To = []string{"luca.frangiamore@wopta.it"}
 	lines := []string{
 		"Ciao,",
-		fmt.Sprintf("Nella data del %v sono state quietanzate a net %v, %v delle quali hanno avuto problemi<br>", time.Now().Format("2006-01-02"), nPolicy, len(errors)),
+		fmt.Sprintf("Nella data del %v sono state quietanzate %v polizze cat-nat, %v delle quali hanno avuto problemi<br>", time.Now().Format("2006-01-02"), nPolicy, len(errors)),
 		"Gli errori rilevati sono:<br>",
 		strings.Join(errors, "<br>"),
 	}
@@ -85,7 +85,7 @@ func getPolicyToCallNetIncasso() ([]models.Policy, error) {
 			{
 				Field:      "companyEmitted",
 				Operator:   "==",
-				QueryValue: false,
+				QueryValue: true,
 			},
 			{
 				Field:      "isDeleted",
