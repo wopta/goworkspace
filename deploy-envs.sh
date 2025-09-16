@@ -19,15 +19,15 @@ echo "FX_ENTRYPOINT: ${FX_ENTRYPOINT}"
 TAG_VERSION=$(echo "${TAG}" | sed -r 's/\./_/g')
 echo "TAG_VERSION: ${TAG_VERSION}"
 
+GOVERSION=go123
+GEN_FX=--gen2
 # === DEV ENV VARS =============================================================
 if [[ "${TAG}" == *"dev"* ]]; then
     echo "Setting DEV environment variables..."
     BUCKET=function-data
-	GOVERSION=go123
     REGION=europe-west1
     PROJECT=positive-apex-350507
     ENV=dev
-    GEN_FX=--gen2
     SERVICE_ACCOUNT=wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com
     TIMEOUT=60
     VPC=functions-connector
@@ -37,11 +37,9 @@ fi
 if [[ "${TAG}" == *"uat"* ]]; then
     echo "Setting UAT environment variables..."
     BUCKET=core-452909-function-data
-	GOVERSION=go123
     REGION=europe-west1
     PROJECT=core-452909
     ENV=uat
-    GEN_FX=--gen2
     SERVICE_ACCOUNT=wopta-uat-cloudbuild-sa@core-452909.iam.gserviceaccount.com
     TIMEOUT=60
     VPC=functions-connector
@@ -51,11 +49,9 @@ fi
 if [[ "${TAG}" == *"prod"* ]]; then
     echo "Setting PROD environment variables..."
     BUCKET=core-350507-function-data
-	GOVERSION=go121
     REGION=europe-west1
     PROJECT=core-350507
     ENV=prod
-    GEN_FX=""
     SERVICE_ACCOUNT=wopta-prod-cloudbuild-sa@core-350507.iam.gserviceaccount.com
     TIMEOUT=520
     VPC=functions-connector
