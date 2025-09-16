@@ -141,6 +141,14 @@ type Documento struct {
 	DescrizioneDocumento string `json:"descrizioneDocumento"`
 	DatiDocumento        string `json:"datiDocumento"`
 }
+type IncassoNetRequest struct {
+	CodiceCompagnia string `json:"codiceCompagnia"`
+	PolicyNumber    string `json:"numeroPolizza"`
+	PolicyDate      string `json:"periodoDiRiferimento"`
+	PaymentDate     string `json:"dataPagamento"`
+	TipologiaTitolo string `json:"tipologiaTitolo"`
+	IdProgressivo   int    `json:"idProgressivo"`
+}
 
 const earthquakeSlug = "earthquake"
 const floodSlug = "flood"

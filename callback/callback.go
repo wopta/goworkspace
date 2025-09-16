@@ -17,6 +17,12 @@ var callbackRoutes []lib.Route = []lib.Route{
 	//		Roles:   []string{},
 	//	},
 	{
+		Route:   "/v1/net/incasso",
+		Handler: lib.ResponseLoggerWrapper(incassoNetFx),
+		Method:  http.MethodGet,
+		Roles:   []string{},
+	},
+	{
 		Route:   "/v1/sign",
 		Handler: lib.ResponseLoggerWrapper(signFx),
 		Method:  http.MethodGet,
