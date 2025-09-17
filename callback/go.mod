@@ -7,7 +7,7 @@ replace gitlab.dev.wopta.it/goworkspace/callback => ./
 require (
 	cloud.google.com/go/firestore v1.15.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
-	gitlab.dev.wopta.it/goworkspace/bpmn v1.0.120
+	gitlab.dev.wopta.it/goworkspace/bpmn v1.0.121
 	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.150
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.203
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.263
