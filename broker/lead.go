@@ -47,7 +47,7 @@ func leadFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-
+	policy.ProducerUid = authToken.UserID
 	err = json.Unmarshal([]byte(body), &policy)
 	if err != nil {
 		log.ErrorF("error unmarshalling policy: %s", err.Error())
