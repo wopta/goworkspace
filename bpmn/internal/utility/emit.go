@@ -69,7 +69,6 @@ func EmitPay(policy *models.Policy, productP, mgaProductP *models.Product, netwo
 	log.Printf("Policy Uid %s", policy.Uid)
 
 	policy.IsPay = false
-	return
 	payUrl, err := CreatePolicyTransactions(policy, productP, mgaProductP, networkNode)
 	if err != nil {
 		return
