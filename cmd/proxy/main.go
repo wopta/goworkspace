@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"net/http"
 	"os"
@@ -42,7 +41,7 @@ var ALL_FUNCTIONS []string = []string{
 func GetLocalIP() net.IP {
 	conn, err := net.Dial("udp", "8.8.8.8:80")
 	if err != nil {
-		log.Fatal(err)
+		return []byte("127.0.0.1")
 	}
 	defer conn.Close()
 
@@ -50,25 +49,42 @@ func GetLocalIP() net.IP {
 
 	return localAddress.IP
 }
+
+type mockStd struct{}
+
+var isLogOn bool = false
+
+func (mockStd) Write(p []byte) (n int, err error) {
+	if isLogOn {
+		return os.Stdout.Write(p)
+	}
+	return len(p), nil
+}
+
 func main() {
 	var bind map[string]string = make(map[string]string)
 	var err error
 	var start int
+	var path string
 	if len(os.Args) < 2 {
-		start = 8080
-	} else {
-		start, err = strconv.Atoi(os.Args[1])
+		panic("Need functions path")
+	}
+	if len(os.Args) >= 2 {
+		path = os.Args[1]
+	}
+	if len(os.Args) >= 3 {
+		start, err = strconv.Atoi(os.Args[2])
 		if err != nil {
 			panic(err)
 		}
 	}
 	var serversErrors []string
 	for i, function := range ALL_FUNCTIONS {
-		cmd := exec.Command(os.Getenv("GOWORKSPACE") + "/../bin/api")
+		cmd := exec.Command(path)
 		cmd.Env = append(cmd.Env, "FUNCTION_TARGET="+function, " ")
 		cmd.Env = append(cmd.Env, "PORT="+fmt.Sprint(start+i+1))
 		cmd.Stdin = os.Stdin
-		cmd.Stdout = os.Stdout
+		cmd.Stdout = mockStd{}
 		cmd.Stderr = os.Stderr
 		bind[function] = fmt.Sprint(start + i + 1)
 		if e := cmd.Start(); e != nil {
@@ -77,6 +93,7 @@ func main() {
 		defer cmd.Process.Kill()
 	}
 	time.Sleep(time.Second)
+	isLogOn = true
 	fmt.Printf("\nServer started %s:%v\n", GetLocalIP(), start)
 	if len(serversErrors) > 0 {
 		fmt.Printf("Errors: %v\n", serversErrors)
@@ -85,7 +102,7 @@ func main() {
 		if r.Method == http.MethodOptions {
 			w.Header().Set("Access-Control-Allow-Credentials", "true")
 			w.Header().Set("Access-Control-Allow-Headers", "Authorization,Content-Type,X-Firebase-Appcheck")
-			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, PATCH, OPTIONS, PUT, DELETE")
 			w.Header().Set("Access-Control-Allow-Origin", "*")
 			w.Header().Set("Access-Control-Max-Age", "600")
 			w.WriteHeader(http.StatusNoContent)

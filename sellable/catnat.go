@@ -181,6 +181,7 @@ func CatnatSellable(policy *models.Policy, product *models.Product, isValidation
 	if policy.EndDate.IsZero() {
 		return nil, errors.New("End date can't be 0")
 	}
+
 	guaranteeExist := func(policy *models.Policy, groupName string) (isSelected bool, error error) {
 		var types []string
 		for _, guarantee := range policy.Assets[0].Guarantees {

@@ -6,19 +6,17 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	draftbpmn "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
-	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
+	"gitlab.dev.wopta.it/goworkspace/bpmn"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/mail"
 	"gitlab.dev.wopta.it/goworkspace/models"
+	"gitlab.dev.wopta.it/goworkspace/network"
 
 	plc "gitlab.dev.wopta.it/goworkspace/policy"
 )
-
-func (*AcceptancePayload) GetType() string {
-	return "acceptanceInfo"
-}
 
 func DraftAcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
@@ -71,6 +69,7 @@ func DraftAcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, err
 		return "", nil, fmt.Errorf("policy uid '%s': wrong status '%s'", policy.Uid, policy.Status)
 	}
 	addresses := &flow.Addresses{}
+	networkNode := network.GetNetworkNodeByUid(policy.ProducerUid)
 	switch policy.Channel {
 	case models.MgaChannel:
 		addresses.ToAddress = mail.Address{
@@ -82,11 +81,11 @@ func DraftAcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, err
 		addresses.ToAddress = mail.GetContractorEmail(&policy)
 	}
 
-	storage := draftbpmn.NewStorageBpnm()
+	storage := bpmnEngine.NewStorageBpnm()
 	storage.AddGlobal("addresses", addresses)
 	storage.AddGlobal("action", &flow.String{String: payload.Action})
 
-	flow, err := getFlow(&policy, storage)
+	flow, err := bpmn.GetFlow(&policy, storage)
 	if err != nil {
 		return "", nil, err
 	}

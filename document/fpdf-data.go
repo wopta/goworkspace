@@ -291,11 +291,19 @@ func loadPersonaGuarantees(policy *models.Policy, product *models.Product) (map[
 	sort.Slice(slugs, func(i, j int) bool {
 		return slugs[i].order < slugs[j].order
 	})
-
+	println("assent", len(policy.Assets))
 	for _, asset := range policy.Assets {
+		println("guarantee", len(asset.Guarantees))
 		for _, guarantee := range asset.Guarantees {
 			var price float64
 			var details string
+			//guarantee.Offer[offerName] == nil sometimes
+			//i search for offername for both guarantees,
+			//first guarantee has offerName while the second one dosnt, each guarantees have to contain offerName?
+			//i have to skip if i dont find offername?
+			//there is a problem with the creation of guaranteees?
+			//policy that is broken:87bw9QAvzGnlgOdyGjVS
+			//it has been written 2 years ago
 
 			guaranteesMap[guarantee.Slug]["sumInsuredLimitOfIndemnity"] = humanize.FormatFloat("#.###,", guarantee.Offer[offerName].SumInsuredLimitOfIndemnity) + " €"
 			if policy.PaymentSplit == string(models.PaySplitMonthly) {

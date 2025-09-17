@@ -51,10 +51,6 @@ type NetworkNode struct {
 	Consens             []NodeConsens         `json:"consens" firestore:"consens" bigquery:"-"`
 }
 
-func (n *NetworkNode) GetType() string {
-	return "networkNode"
-}
-
 type NodeProduct struct {
 	Name      string        `json:"-" firestore:"-" bigquery:"name"`
 	Companies []NodeCompany `json:"-" firestore:"-" bigquery:"companies"`

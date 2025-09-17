@@ -52,34 +52,12 @@ func SetToPay(policy *models.Policy) error {
 }
 
 func promoteContractorDocumentsToUser(policy *models.Policy) error {
-	var (
-		tempPathFormat = "temp/%s/%s"
-		userPathFormat = "assets/users/%s/%s"
-	)
 	log.AddPrefix("UpdateIdentityDocument")
 	defer log.PopPrefix()
 
 	for _, identityDocument := range policy.Contractor.IdentityDocuments {
-		frontGsLink, err := lib.PromoteFile(
-			fmt.Sprintf(tempPathFormat, policy.Uid, identityDocument.FrontMedia.FileName),
-			fmt.Sprintf(userPathFormat, policy.Contractor.Uid, identityDocument.FrontMedia.FileName),
-		)
-		if err != nil {
-			log.ErrorF("error saving front file: %s", err.Error())
+		if err := promoteIdentityDocument(policy, identityDocument); err != nil {
 			return err
-		}
-		identityDocument.FrontMedia.Link = frontGsLink
-
-		if identityDocument.BackMedia != nil {
-			backGsLink, err := lib.PromoteFile(
-				fmt.Sprintf(tempPathFormat, policy.Uid, identityDocument.BackMedia.FileName),
-				fmt.Sprintf(userPathFormat, policy.Contractor.Uid, identityDocument.BackMedia.FileName),
-			)
-			if err != nil {
-				log.ErrorF("error saving back file: %s", err.Error())
-				return err
-			}
-			identityDocument.BackMedia.Link = backGsLink
 		}
 	}
 	policy.Updated = time.Now().UTC()
@@ -89,8 +67,8 @@ func promoteContractorDocumentsToUser(policy *models.Policy) error {
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
-func SetUserIntoPolicyContractor(policy *models.Policy) error {
-	log.AddPrefix("setUserIntoPolicyContractor")
+func PromotePolicy(policy *models.Policy) error {
+	log.AddPrefix("promotePolicy")
 	defer log.PopPrefix()
 	log.Printf("Policy %s", policy.Uid)
 	userUid, newUser, err := models.GetUserUIDByFiscalCode(policy.Contractor.FiscalCode)
@@ -117,6 +95,11 @@ func SetUserIntoPolicyContractor(policy *models.Policy) error {
 		log.ErrorF("error promoting namirial documents: %s", err.Error())
 		return err
 	}
+	err = promoteAssets(policy)
+	if err != nil {
+		log.ErrorF("error promoting assent documents: %s", err.Error())
+		return err
+	}
 
 	if newUser {
 		policy.Contractor.CreationDate = time.Now().UTC()
@@ -136,6 +119,28 @@ func SetUserIntoPolicyContractor(policy *models.Policy) error {
 	}
 	_, err = models.UpdateUserByFiscalCode(*user)
 	return err
+}
+func promoteAssets(policy *models.Policy) error {
+	for _, assent := range policy.Assets {
+		//TODO: to change when there will be more type of assents that has document
+		if assent.Person == nil {
+			continue
+		}
+		for _, identityDocument := range assent.Person.IdentityDocuments {
+			if err := promoteIdentityDocument(policy, identityDocument); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+func RemoveTempPolicy(policy *models.Policy) error {
+	tempPathFormat := "temp/%s"
+	log.AddPrefix("RemoveTempPolicy")
+	defer log.PopPrefix()
+	log.Printf("Policy %s,path %v", policy.Uid, fmt.Sprintf(tempPathFormat, policy.Uid))
+
+	return lib.RemoveFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), fmt.Sprintf(tempPathFormat, policy.Uid))
 }
 
 // Download the signed file from the envelope, add them inside the policy's attachments and save the policy.
@@ -256,7 +261,38 @@ func promoteNamirialDirectory(policy *models.Policy) error {
 		}
 		log.Printf("Promoted %v", finalFullPath)
 	}
+	policy.DocumentName = fmt.Sprintf(userPathFormat, policy.Contractor.Uid, "")
 	return err
+}
+
+func promoteIdentityDocument(policy *models.Policy, identityDocument *models.IdentityDocument) error {
+	tempPathFormat := "temp/%s/%s"
+	userPathFormat := "assets/users/%s/%s"
+
+	if identityDocument.FrontMedia != nil {
+		frontGsLink, err := lib.PromoteFile(
+			fmt.Sprintf(tempPathFormat, policy.Uid, identityDocument.FrontMedia.FileName),
+			fmt.Sprintf(userPathFormat, policy.Contractor.Uid, identityDocument.FrontMedia.FileName),
+		)
+		if err != nil {
+			log.ErrorF("error saving front file: %s", err.Error())
+			return err
+		}
+		identityDocument.FrontMedia.Link = frontGsLink
+	}
+
+	if identityDocument.BackMedia != nil {
+		backGsLink, err := lib.PromoteFile(
+			fmt.Sprintf(tempPathFormat, policy.Uid, identityDocument.BackMedia.FileName),
+			fmt.Sprintf(userPathFormat, policy.Contractor.Uid, identityDocument.BackMedia.FileName),
+		)
+		if err != nil {
+			log.ErrorF("error saving back file: %s", err.Error())
+			return err
+		}
+		identityDocument.BackMedia.Link = backGsLink
+	}
+	return nil
 }
 
 func AddProposalDoc(policy *models.Policy, networkNode *models.NetworkNode, mgaProduct *models.Product) error {

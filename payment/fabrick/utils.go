@@ -105,16 +105,16 @@ func getFabrickRequestBody(
 		expireDate = lib.AddMonths(time.Now().UTC(), 18).Format(expireDateFormat)
 	}
 
-	pay := FabrickPaymentsRequest{
+	pay := models.FabrickPaymentsRequest{
 		MerchantID: woptaMerchantId,
 		ExternalID: externalId,
-		PaymentConfiguration: PaymentConfiguration{
-			PaymentPageRedirectUrls: PaymentPageRedirectUrls{
+		PaymentConfiguration: models.FabrickPaymentConfiguration{
+			PaymentPageRedirectUrls: models.FabrickPaymentPageRedirectUrls{
 				OnSuccess: redirectUrl,
 				OnFailure: redirectUrl,
 			},
 			ExpirationDate: expireDate,
-			AllowedPaymentMethods: &[]AllowedPaymentMethod{{
+			AllowedPaymentMethods: &[]models.FabrickAllowedPaymentMethod{{
 				Role: "payer",
 				PaymentMethods: lib.SliceMap(
 					paymentMethods,
@@ -123,18 +123,18 @@ func getFabrickRequestBody(
 			}},
 			CallbackURL: callbackUrl,
 		},
-		Bill: Bill{
+		Bill: models.FabrickBill{
 			ExternalID:      externalId,
 			Amount:          amount,
 			Currency:        currency,
 			Description:     fmt.Sprintf("Pagamento polizza n° %s", policy.CodeCompany),
 			MandateCreation: mandate,
-			Items: []Item{{
+			Items: []models.FabrickItem{{
 				ExternalID: externalId,
 				Amount:     amount,
 				Currency:   currency,
 			}},
-			Subjects: &[]Subject{{
+			Subjects: &[]models.FabrickSubject{{
 				ExternalID: customerId,
 				Role:       "customer",
 				Email:      policy.Contractor.Mail,
@@ -144,7 +144,7 @@ func getFabrickRequestBody(
 	}
 
 	if scheduleDate != "" {
-		pay.Bill.ScheduleTransaction = &ScheduleTransaction{
+		pay.Bill.ScheduleTransaction = &models.FabrickScheduleTransaction{
 			DueDate:                             scheduleDate,
 			PaymentInstrumentResolutionStrategy: "BY_PAYER",
 		}
@@ -186,8 +186,8 @@ func createFabrickTransaction(
 	createMandate, scheduleFirstRate, isFirstRate bool,
 	customerId string,
 	paymentMethods []string,
-) <-chan FabrickPaymentResponse {
-	r := make(chan FabrickPaymentResponse)
+) <-chan models.FabrickPaymentResponse {
+	r := make(chan models.FabrickPaymentResponse)
 
 	go func() {
 		defer close(r)
@@ -209,10 +209,10 @@ func createFabrickTransaction(
 			status := "200"
 			local := "local"
 			url := fmt.Sprintf("www.dev.wopta.it/%s", transaction.Uid)
-			r <- FabrickPaymentResponse{
+			r <- models.FabrickPaymentResponse{
 				Status: &status,
 				Errors: nil,
-				Payload: &Payload{
+				Payload: &models.FabrickPayload{
 					ExternalID:        &local,
 					PaymentID:         &local,
 					MerchantID:        &local,
@@ -234,7 +234,7 @@ func createFabrickTransaction(
 				lib.CheckError(err)
 				log.Printf("policy '%s' response body: %s", policy.Uid, string(body))
 
-				var result FabrickPaymentResponse
+				var result models.FabrickPaymentResponse
 
 				if res.StatusCode != 200 {
 					log.Printf("exiting with statusCode: %d", res.StatusCode)

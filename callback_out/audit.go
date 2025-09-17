@@ -1,11 +1,10 @@
 package callback_out
 
 import (
-	"io"
 	"time"
 
 	"cloud.google.com/go/bigquery"
-	"gitlab.dev.wopta.it/goworkspace/callback_out/internal"
+	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
@@ -26,29 +25,23 @@ type auditSchema struct {
 	Error         string                `bigquery:"error"`
 }
 
-func saveAudit(node *models.NetworkNode, action internal.CallbackoutAction, res internal.CallbackInfo) {
+func saveAudit(node *models.NetworkNode, res base.CallbackInfo) {
 	var (
-		audit   auditSchema
-		resBody []byte
+		audit auditSchema
 	)
 
 	audit.CreationDate = lib.GetBigQueryNullDateTime(time.Now().UTC())
 	audit.Client = node.CallbackConfig.Name
 	audit.NodeUid = node.Uid
-	audit.Action = action
+	audit.Action = string(res.ResAction)
 
-	audit.ReqBody = string(res.RequestBody)
-	if res.Request != nil {
-		audit.ReqMethod = res.Request.Method
-		audit.ReqPath = res.Request.Host + res.Request.URL.RequestURI()
-	}
+	audit.ReqBody = string(res.ReqBody)
+	audit.ReqMethod = res.ReqMethod
+	audit.ReqPath = res.ReqPath
+	//audit.ReqPath = res.Request.Host + res.Request.URL.RequestURI()
 
-	if res.Response != nil {
-		resBody, _ = io.ReadAll(res.Response.Body)
-		defer res.Response.Body.Close()
-		audit.ResStatusCode = res.Response.StatusCode
-		audit.ResBody = string(resBody)
-	}
+	audit.ResStatusCode = res.ResStatusCode
+	audit.ResBody = string(res.ResBody)
 
 	if res.Error != nil {
 		audit.Error = res.Error.Error()

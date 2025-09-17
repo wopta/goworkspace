@@ -36,7 +36,7 @@ func NewNetClient() (client *NetClient) {
 	config := clientcredentials.Config{
 		ClientID:     os.Getenv("NETINS_ID"),
 		ClientSecret: os.Getenv("NETINS_SECRET"),
-		Scopes:       []string{"emettiPolizza_441-006-006", "emettiPolizza_441-027-056", "emettiPolizza_441-029-007", "IncassaTitolo_441", "InserisciAllegato_441", "StampaPolizza_441"},
+		Scopes:       []string{"emettiPolizza_441-006-006", "emettiPolizza_441-027-056", "emettiPolizza_441-029-007", "emettiPolizza_441-029-009", "IncassaTitolo_441", "InserisciAllegato_441", "StampaPolizza_441"},
 		TokenURL:     tokenUrl,
 		EndpointParams: url.Values{
 			"grant_type": {"client_credentials"},
@@ -274,4 +274,45 @@ func (c *NetClient) EnrichAteco(fiscalCode string) (response enrichEtecoCatnat, 
 	}
 	response.AtecoCode = ateco
 	return response, err
+}
+
+func (c *NetClient) Incasso(policy models.Policy) error {
+	url := os.Getenv("NET_BASEURL") + "/OperationsGateway/IncassaTitolo/IncassoTitolo"
+	dto := IncassoNetRequest{
+		CodiceCompagnia: "441",
+		PolicyNumber:    policy.CodeCompany,
+		PolicyDate:      policy.CreationDate.Format(time.RFC3339),
+		PaymentDate:     policy.Updated.Format(time.RFC3339),
+		TipologiaTitolo: "Quietanza",
+		IdProgressivo:   0,
+	}
+	rBuff := new(bytes.Buffer)
+	err := json.NewEncoder(rBuff).Encode(dto)
+
+	if err != nil {
+		return err
+	}
+	log.Println("Request catnat: ", string(rBuff.String()))
+	req, _ := http.NewRequest(http.MethodPost, url, rBuff)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := c.Client.Do(req)
+	if err != nil {
+		log.Error(err)
+		return fmt.Errorf("Errore policy: %v", policy.CodeCompany)
+	}
+	strResponse, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("error incasso for policy %v con stato %v response %v", policy.CodeCompany, resp.StatusCode, string(strResponse))
+	}
+	var response struct {
+		Esito  string   `json:"esito"`
+		Errori []string `json:"errori"`
+	}
+	if err = json.Unmarshal(strResponse, &response); err != nil {
+		return fmt.Errorf("error decoding catnat body: %v", string(strResponse))
+	}
+	if response.Esito != "OK" {
+		return fmt.Errorf("error incasso for policy %v con stato %v response %v", policy.CodeCompany, resp.StatusCode, string(strResponse))
+	}
+	return nil
 }

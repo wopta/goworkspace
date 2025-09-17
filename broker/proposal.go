@@ -2,18 +2,18 @@ package broker
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
 
-	"gitlab.dev.wopta.it/goworkspace/broker/internal/utility"
+	"gitlab.dev.wopta.it/goworkspace/bpmn"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/mail"
 
-	"gitlab.dev.wopta.it/goworkspace/callback_out"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/network"
 	plc "gitlab.dev.wopta.it/goworkspace/policy"
 )
 
@@ -22,7 +22,7 @@ type ProposalReq struct {
 	SendEmail *bool `json:"sendEmail"`
 }
 
-func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func proposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err    error
 		policy models.Policy
@@ -53,51 +53,29 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
-	if lib.GetBoolEnv("PROPOSAL_V2") {
-		err = json.Unmarshal(body, &req)
-		if err != nil {
-			log.ErrorF("error proposal body: %s", err.Error())
-			return "", nil, err
-		}
+	err = json.Unmarshal(body, &req)
+	if err != nil {
+		log.ErrorF("error proposal body: %s", err.Error())
+		return "", nil, err
+	}
 
-		if req.SendEmail == nil {
-			sendEmail = true
-		} else {
-			sendEmail = *req.SendEmail
-		}
+	policy, err = plc.GetPolicy(req.PolicyUid)
+	if err != nil {
+		log.ErrorF("error fetching policy %s from Firestore...: %s", req.PolicyUid, err.Error())
+		return "", nil, err
+	}
 
-		policy, err = plc.GetPolicy(req.PolicyUid)
-		if err != nil {
-			log.ErrorF("error fetching policy %s from Firestore...: %s", req.PolicyUid, err.Error())
-			return "", nil, err
-		}
+	if policy.Status != models.PolicyStatusInitLead {
+		log.Printf("cannot save proposal for policy with status %s", policy.Status)
+		return "", nil, fmt.Errorf("cannot save proposal for policy with status %s", policy.Status)
+	}
 
-		if policy.Status != models.PolicyStatusInitLead {
-			log.Printf("cannot save proposal for policy with status %s", policy.Status)
-			return "", nil, fmt.Errorf("cannot save proposal for policy with status %s", policy.Status)
-		}
+	brokerUpdatePolicy(&policy, req.BrokerBaseRequest)
 
-		brokerUpdatePolicy(&policy, req.BrokerBaseRequest)
-
-		err = proposal(&policy)
-		if err != nil {
-			log.ErrorF("error creating proposal: %s", err.Error())
-			return "", nil, err
-		}
-	} else {
-		err = json.Unmarshal(body, &policy)
-		if err != nil {
-			log.ErrorF("error unmarshaling policy: %s", err.Error())
-			return "", nil, err
-		}
-
-		err = lead(authToken, &policy)
-		if err != nil {
-			log.ErrorF("error creating lead: %s", err.Error())
-			return "", nil, err
-		}
-		utility.SetProposalNumber(&policy)
-		policy.RenewDate = policy.CreationDate.AddDate(1, 0, 0)
+	err = proposal(&policy, *req.SendEmail)
+	if err != nil {
+		log.ErrorF("error creating proposal: %s", err.Error())
+		return "", nil, err
 	}
 
 	resp, err := policy.Marshal()
@@ -110,35 +88,28 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	return string(resp), &policy, err
 }
-
-func proposal(policy *models.Policy) error {
+func proposal(policy *models.Policy, sendEmail bool) error {
 	log.AddPrefix("proposal")
 	defer log.PopPrefix()
 	log.Println("starting bpmn flow...")
-
-	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
+	storage := bpmnEngine.NewStorageBpnm()
+	storage.AddGlobal("is_PROPOSAL_V2", &flow.BoolBpmn{Bool: lib.GetBoolEnv("PROPOSAL_V2")})
+	storage.AddGlobal("addresses", &flow.Addresses{
+		FromAddress: mail.AddressAnna,
+	})
+	storage.AddGlobal("sendEmail", &flow.BoolBpmn{
+		Bool: sendEmail,
+	})
+	flow, err := bpmn.GetFlow(policy, storage)
+	if err != nil {
+		return err
+	}
+	err = flow.Run("proposal")
+	if err != nil {
+		return err
 	}
 
-	state := runBrokerBpmn(policy, proposalFlowKey)
-	if state == nil || state.Data == nil {
-		log.Println("error bpmn - state not set")
-		return errors.New("error on bpmn - no data present")
-	}
-	if state.IsFailed {
-		log.Println("error bpmn - state failed")
-		return errors.New("error bpmn - state failed")
-	}
-
-	*policy = *state.Data
-
-	log.Printf("saving proposal n. %d to bigquery...", policy.ProposalNumber)
 	policy.BigquerySave()
-
-	if !policy.IsReserved {
-		callback_out.Execute(networkNode, *policy, callback_out.Proposal)
-	}
 
 	return nil
 }

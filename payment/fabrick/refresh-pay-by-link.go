@@ -8,13 +8,12 @@ import (
 	"strconv"
 	"time"
 
-	"gitlab.dev.wopta.it/goworkspace/lib/log"
-
 	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/mail"
 	"gitlab.dev.wopta.it/goworkspace/models"
 	"gitlab.dev.wopta.it/goworkspace/network"
-	"gitlab.dev.wopta.it/goworkspace/payment/common"
+	"gitlab.dev.wopta.it/goworkspace/payment/internal"
 	plc "gitlab.dev.wopta.it/goworkspace/policy"
 	plcRenew "gitlab.dev.wopta.it/goworkspace/policy/renew"
 	prd "gitlab.dev.wopta.it/goworkspace/product"
@@ -108,7 +107,7 @@ func RefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, interfa
 		return "", nil, err
 	}
 
-	err = common.SaveTransactionsToDB(updatedTransactions, transactionCollection)
+	err = internal.SaveTransactionsToDB(updatedTransactions, transactionCollection)
 	if err != nil {
 		return "", nil, err
 	}

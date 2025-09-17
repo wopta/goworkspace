@@ -151,16 +151,16 @@ func getTransactionByPolicyUidAndScheduleDate(policyUid, scheduleDate, collectio
 				Operator:   "==",
 				QueryValue: policyUid,
 			},
-			{
-				Field:      "scheduleDate",
-				Operator:   "==",
-				QueryValue: scheduleDate,
-			},
-			{
-				Field:      "isDelete",
-				Operator:   "==",
-				QueryValue: false,
-			},
+			//		{
+			//			Field:      "scheduleDate",
+			//			Operator:   "==",
+			//			QueryValue: scheduleDate,
+			//		},
+			//		{
+			//			Field:      "isDelete",
+			//			Operator:   "==",
+			//			QueryValue: false,
+			//		},
 		},
 	}
 	query, err := q.FirestoreWherefields(collection)

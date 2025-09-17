@@ -2,22 +2,22 @@ package broker
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 	"io"
 	"net/http"
 
-	"gitlab.dev.wopta.it/goworkspace/callback_out"
+	bpmn "gitlab.dev.wopta.it/goworkspace/bpmn"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/mail"
 	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/network"
 	plc "gitlab.dev.wopta.it/goworkspace/policy"
 )
 
 type RequestApprovalReq = BrokerBaseRequest
 
-func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func requestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err    error
 		req    RequestApprovalReq
@@ -61,18 +61,18 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		return "", nil, err
 	}
 
-	if policy.ProducerUid != authToken.UserID {
-		log.Printf("user %s cannot request approval for policy %s because producer not equal to request user",
-			authToken.UserID, policy.Uid)
-		return "", nil, errors.New("operation not allowed")
-	}
+	//	if policy.ProducerUid != authToken.UserID {
+	//		log.Printf("user %s cannot request approval for policy %s because producer not equal to request user",
+	//			authToken.UserID, policy.Uid)
+	//		return "", nil, errors.New("operation not allowed")
+	//	}
 
-	allowedStatus := []string{models.PolicyStatusInitLead, models.PolicyStatusNeedsApproval}
+	//allowedStatus := []string{models.PolicyStatusInitLead, models.PolicyStatusNeedsApproval}
 
-	if !policy.IsReserved || !lib.SliceContains(allowedStatus, policy.Status) {
-		log.Printf("cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
-		return "", nil, fmt.Errorf("cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
-	}
+	//	if !policy.IsReserved || !lib.SliceContains(allowedStatus, policy.Status) {
+	//		log.Printf("cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
+	//		return "", nil, fmt.Errorf("cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
+	//	}
 
 	brokerUpdatePolicy(&policy, req)
 
@@ -98,31 +98,21 @@ func requestApproval(policy *models.Policy) error {
 
 	log.Println("start -------------------------------------")
 
-	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
-	}
+	storage := bpmnEngine.NewStorageBpnm()
 
 	log.Println("starting bpmn flow...")
 
-	state := runBrokerBpmn(policy, requestApprovalFlowKey)
-	if state == nil || state.Data == nil {
-		log.Println("error bpmn - state not set")
-		return errors.New("error on bpmn - no data present")
+	storage.AddGlobal("addresses", &flow.Addresses{
+		FromAddress: mail.AddressAnna,
+	})
+	flow, err := bpmn.GetFlow(policy, storage)
+	if err != nil {
+		return err
 	}
-	if state.IsFailed {
-		log.Println("error bpmn - state failed")
-		return nil
-	}
+	err = flow.Run("requestApproval")
 
-	*policy = *state.Data
+	log.Println("Handler end -------------------------------------------------")
 
-	log.Printf("saving policy with uid %s to bigquery...", policy.Uid)
 	policy.BigquerySave()
-
-	callback_out.Execute(networkNode, *policy, callback_out.RequestApproval)
-
-	log.Println("end ---------------------------------------")
-
 	return err
 }

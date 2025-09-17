@@ -26,12 +26,46 @@ func GetGoogleStorageClient() (*storage.Client, context.Context, error) {
 func PutToGoogleStorage(bucketname string, path string, file []byte) (string, error) {
 	log.Println("PutToGoogleStorage")
 	client, ctx, e := GetGoogleStorageClient()
+	if e != nil {
+		return "", e
+	}
 	bucket := client.Bucket(bucketname)
 	write := bucket.Object(path).NewWriter(ctx)
 	defer write.Close()
 	write.Write(file)
 	return "gs://" + bucketname + "/" + path, e
 
+}
+
+func RemoveFromGoogleStorage(bucketName, path string) error {
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	if err != nil {
+		return fmt.Errorf("storage.NewClient: %w", err)
+	}
+	defer client.Close()
+
+	// Ensure path ends with "/" so only objects inside it are deleted.
+	prefix := path
+	if prefix[len(prefix)-1] != '/' {
+		prefix += "/"
+	}
+
+	it := client.Bucket(bucketName).Objects(ctx, &storage.Query{Prefix: prefix})
+	for {
+		attr, err := it.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return fmt.Errorf("iterating objects: %w", err)
+		}
+		if err := client.Bucket(bucketName).Object(attr.Name).Delete(ctx); err != nil {
+			return fmt.Errorf("deleting object %q: %w", attr.Name, err)
+		}
+	}
+
+	return nil
 }
 
 func PutToGoogleStorageWithSpecificContentType(bucketName string, path string, file []byte, contentType string) (str string, err error) {

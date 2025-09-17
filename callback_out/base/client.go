@@ -8,8 +8,6 @@ import (
 	"os"
 	"time"
 
-	"gitlab.dev.wopta.it/goworkspace/callback_out/internal"
-	md "gitlab.dev.wopta.it/goworkspace/callback_out/models"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
@@ -17,7 +15,7 @@ import (
 type Client struct {
 	basePath       string
 	producer       string
-	externalConfig internal.CallbackExternalConfig
+	externalConfig CallbackExternalConfig
 	network        string
 }
 
@@ -27,7 +25,7 @@ func NewClient(networkNode *models.NetworkNode, network string) *Client {
 		return nil
 	}
 
-	var externalConfig internal.CallbackExternalConfig
+	var externalConfig CallbackExternalConfig
 	configBytes := lib.GetFilesByEnv("callback-out/base.json")
 	if err := json.Unmarshal(configBytes, &externalConfig); err != nil {
 		return nil
@@ -41,25 +39,19 @@ func NewClient(networkNode *models.NetworkNode, network string) *Client {
 	}
 }
 
-func (c *Client) baseRequest(policy models.Policy) internal.CallbackInfo {
+func (c *Client) baseRequest(policy models.Policy, action CallbackoutAction) (callbackInfo CallbackInfo) {
 	rawBody, err := json.Marshal(policy)
+	callbackInfo.ResAction = action
 	if err != nil {
-		return internal.CallbackInfo{
-			Request:     nil,
-			RequestBody: nil,
-			Response:    nil,
-			Error:       err,
-		}
+		callbackInfo.Error = err
+		return callbackInfo
+
 	}
 
 	req, err := http.NewRequest(http.MethodPost, c.basePath, bytes.NewReader(rawBody))
 	if err != nil {
-		return internal.CallbackInfo{
-			Request:     nil,
-			RequestBody: nil,
-			Response:    nil,
-			Error:       err,
-		}
+		callbackInfo.Error = err
+		return callbackInfo
 	}
 
 	c.setAuth(req)
@@ -69,50 +61,46 @@ func (c *Client) baseRequest(policy models.Policy) internal.CallbackInfo {
 		Timeout: 30 * time.Second,
 	}
 	res, err := client.Do(req)
-
-	return internal.CallbackInfo{
-		Request:     req,
-		RequestBody: rawBody,
-		Response:    res,
-		Error:       err,
-	}
+	//TODO: insert action
+	callbackInfo.FromRequestResponse(action, res, req)
+	return callbackInfo
 }
 
-func (c *Client) Proposal(policy models.Policy) internal.CallbackInfo {
-	return c.baseRequest(policy)
+func (c *Client) Proposal(policy models.Policy) CallbackInfo {
+	return c.baseRequest(policy, Proposal)
 }
 
-func (c *Client) Emit(policy models.Policy) internal.CallbackInfo {
-	return c.baseRequest(policy)
+func (c *Client) Emit(policy models.Policy) CallbackInfo {
+	return c.baseRequest(policy, Emit)
 }
 
-func (c *Client) RequestApproval(policy models.Policy) internal.CallbackInfo {
-	return c.baseRequest(policy)
+func (c *Client) RequestApproval(policy models.Policy) CallbackInfo {
+	return c.baseRequest(policy, RequestApproval)
 }
 
-func (c *Client) Paid(policy models.Policy) internal.CallbackInfo {
-	return c.baseRequest(policy)
+func (c *Client) Paid(policy models.Policy) CallbackInfo {
+	return c.baseRequest(policy, Paid)
 }
 
-func (c *Client) Signed(policy models.Policy) internal.CallbackInfo {
-	return c.baseRequest(policy)
+func (c *Client) Signed(policy models.Policy) CallbackInfo {
+	return c.baseRequest(policy, Signed)
 }
 
-func (c *Client) Approved(policy models.Policy) internal.CallbackInfo {
-	return c.baseRequest(policy)
+func (c *Client) Approved(policy models.Policy) CallbackInfo {
+	return c.baseRequest(policy, Approved)
 }
 
-func (c *Client) Rejected(policy models.Policy) internal.CallbackInfo {
-	return c.baseRequest(policy)
+func (c *Client) Rejected(policy models.Policy) CallbackInfo {
+	return c.baseRequest(policy, Rejected)
 }
 
-func (c *Client) DecodeAction(rawAction string) []string {
+func (c *Client) DecodeAction(rawAction CallbackoutAction) []CallbackoutAction {
 	actionEnabled, ok := c.externalConfig.Events[rawAction]
 	if !actionEnabled || !ok {
 		return nil
 	}
 
-	availableActions := md.GetAvailableActions()
+	availableActions := GetAvailableActions()
 	decodedActions := availableActions[rawAction]
 
 	return decodedActions

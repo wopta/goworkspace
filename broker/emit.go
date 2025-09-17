@@ -6,21 +6,29 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 	"time"
 
-	"gitlab.dev.wopta.it/goworkspace/broker/internal/utility"
-	"gitlab.dev.wopta.it/goworkspace/lib/log"
-
-	prd "gitlab.dev.wopta.it/goworkspace/product"
-
-	"cloud.google.com/go/civil"
-	"gitlab.dev.wopta.it/goworkspace/callback_out"
+	"gitlab.dev.wopta.it/goworkspace/bpmn"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/mail"
 	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/network"
 	plc "gitlab.dev.wopta.it/goworkspace/policy"
+	prd "gitlab.dev.wopta.it/goworkspace/product"
 	"gitlab.dev.wopta.it/goworkspace/question"
+)
+
+var (
+	Proposal        string = "Proposal"
+	RequestApproval string = "RequestApproval"
+	Emit            string = "Emit"
+	Signed          string = "Signed"
+	Paid            string = "Paid"
+	EmitRemittance  string = "EmitRemittance"
+	Approved        string = "Approved"
+	Rejected        string = "Rejected"
 )
 
 const (
@@ -44,13 +52,14 @@ type EmitRequest struct {
 	SendEmail   *bool               `json:"sendEmail"`
 }
 
-func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func emitFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		request      EmitRequest
 		err          error
 		policy       models.Policy
 		responseEmit EmitResponse
 	)
+
 	log.AddPrefix("EmitFx")
 	defer log.PopPrefix()
 
@@ -61,7 +70,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	token := r.Header.Get("Authorization")
 	authToken, err := lib.GetAuthTokenFromIdToken(token)
 	if err != nil {
-		log.ErrorF("error getting authToken")
+		log.Printf("error getting authToken")
 		return "", nil, err
 	}
 	log.Printf(
@@ -77,17 +86,14 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	err = json.Unmarshal([]byte(body), &request)
 	if err != nil {
-		log.ErrorF("error unmarshaling policy: %s", err.Error())
+		log.Printf("error unmarshalling policy: %s", err.Error())
 		return "", nil, err
 	}
 
 	uid := request.Uid
 	log.Printf("Uid: %s", uid)
 
-	paymentSplit = request.PaymentSplit
-	log.Printf("paymentSplit: %s", paymentSplit)
-
-	paymentMode = request.PaymentMode
+	paymentMode := request.PaymentMode
 	log.Printf("paymentMode: %s", paymentMode)
 
 	policy, err = plc.GetPolicy(uid)
@@ -99,16 +105,9 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	policyJsonLog, _ := policy.Marshal()
 	log.Printf("Policy %s JSON: %s", uid, string(policyJsonLog))
-
 	if policy.IsPay || policy.IsSign || policy.CompanyEmit || policy.CompanyEmitted || policy.IsDeleted {
 		log.Printf("cannot emit policy %s because state is not correct", policy.Uid)
 		return "", nil, errors.New("operation not allowed")
-	}
-
-	if request.SendEmail == nil {
-		sendEmail = true
-	} else {
-		sendEmail = *request.SendEmail
 	}
 
 	productConfig := prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
@@ -117,55 +116,51 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	}
 
 	emitUpdatePolicy(&policy, request)
-	//!!!!!TODO must be eliminated, should use either this or the new one
-	//Only for test!!!!!
-	if policy.Name == models.CatNatProduct {
-		log.Println("Using emitCatnat")
-		responseEmit, err = emitDraft(&policy, request)
-		if err != nil {
-			return "", nil, err
-		}
-
-		b, err := json.Marshal(responseEmit)
-
-		log.Println("Handler end -------------------------------------------------")
-
-		return string(b), responseEmit, err
-	}
-	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
-	}
 
 	if policy.IsReserved && policy.Status != models.PolicyStatusApproved {
 		log.Printf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
 		return "", nil, fmt.Errorf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
 	}
-	responseEmit = emit(&policy, request)
+	responseEmit, err = emitDraft(&policy, request)
+	if err != nil {
+		return "", nil, err
+	}
 
-	b, e := json.Marshal(responseEmit)
+	b, err := json.Marshal(responseEmit)
+
 	log.Println("Handler end -------------------------------------------------")
-	return string(b), responseEmit, e
 
+	return string(b), responseEmit, err
 }
 
-func emit(policy *models.Policy, request EmitRequest) EmitResponse {
-	log.AddPrefix("Emit")
-	defer log.PopPrefix()
+func emitDraft(policy *models.Policy, request EmitRequest) (EmitResponse, error) {
 	log.Println("start ------------------------------------------------")
 	var responseEmit EmitResponse
 
-	firePolicy := lib.PolicyCollection
-	fireGuarantee := lib.GuaranteeCollection
-
 	log.Printf("Emitting - Policy Uid %s", policy.Uid)
 	log.Println("starting bpmn flow...")
-	state := runBrokerBpmn(policy, emitFlowKey)
-	if state == nil || state.Data == nil || state.IsFailed {
-		log.Println("error bpmn - state not set correctly")
-		return responseEmit
+
+	paymentSplit := request.PaymentSplit
+	log.Printf("paymentSplit: %s", paymentSplit)
+
+	storage := bpmnEngine.NewStorageBpnm()
+	if request.SendEmail == nil {
+		storage.AddGlobal("sendEmail", &flow.BoolBpmn{Bool: true})
+	} else {
+		storage.AddGlobal("sendEmail", &flow.BoolBpmn{Bool: *request.SendEmail})
 	}
-	*policy = *state.Data
+	storage.AddGlobal("paymentSplit", &flow.String{String: request.PaymentSplit})
+	storage.AddGlobal("paymentMode", &flow.String{String: request.PaymentMode})
+	storage.AddGlobal("addresses", &flow.Addresses{FromAddress: mail.AddressAnna})
+
+	flow, err := bpmn.GetFlow(policy, storage)
+	if err != nil {
+		return responseEmit, err
+	}
+	err = flow.Run("emit")
+	if err != nil {
+		return responseEmit, err
+	}
 
 	responseEmit = EmitResponse{
 		UrlPay:       policy.PayUrl,
@@ -179,25 +174,11 @@ func emit(policy *models.Policy, request EmitRequest) EmitResponse {
 	policyJson, _ := policy.Marshal()
 	log.Printf("Policy %s: %s", request.Uid, string(policyJson))
 
-	log.Println("saving policy to firestore...")
-	err := lib.SetFirestoreErr(firePolicy, request.Uid, policy)
-	lib.CheckError(err)
-
-	log.Println("saving policy to bigquery...")
-	policy.BigquerySave()
-
 	log.Println("saving guarantees to bigquery...")
-	models.SetGuaranteBigquery(*policy, "emit", fireGuarantee)
-
-	callbackAction := callback_out.Emit
-	if warrant != nil && warrant.GetFlowName(policy.Name) == models.RemittanceMgaFlow {
-		callbackAction = callback_out.EmitRemittance
-	}
-
-	callback_out.Execute(networkNode, *policy, callbackAction)
+	models.SetGuaranteBigquery(*policy, "emit", lib.GuaranteeCollection)
 
 	log.Println("end --------------------------------------------------")
-	return responseEmit
+	return responseEmit, nil
 }
 
 func emitUpdatePolicy(policy *models.Policy, request EmitRequest) {
@@ -251,28 +232,6 @@ func brokerUpdatePolicy(policy *models.Policy, request BrokerBaseRequest) {
 	policy.SanitizePaymentData()
 
 	log.Println("end --------------------------------------")
-}
-
-func emitBase(policy *models.Policy) {
-	log.AddPrefix("emitBase")
-	defer log.PopPrefix()
-	log.Printf("Policy Uid %s", policy.Uid)
-	firePolicy := lib.PolicyCollection
-	now := time.Now().UTC()
-
-	policy.CompanyEmit = true
-	policy.CompanyEmitted = false
-	policy.EmitDate = now
-	policy.BigEmitDate = civil.DateTimeOf(now)
-	company, numb, tot := utility.GetSequenceByCompany(strings.ToLower(policy.Company), firePolicy)
-	log.Printf("codeCompany: %s", company)
-	log.Printf("numberCompany: %d", numb)
-	log.Printf("number: %d", tot)
-	policy.Number = tot
-	policy.NumberCompany = numb
-	policy.CodeCompany = company
-	policy.RenewDate = policy.StartDate.AddDate(1, 0, 0)
-	policy.BigRenewDate = civil.DateTimeOf(policy.RenewDate)
 }
 
 func calculatePaymentComponents(policy *models.Policy) {

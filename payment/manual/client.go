@@ -5,9 +5,8 @@ import (
 	"time"
 
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
-
 	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/payment/common"
+	"gitlab.dev.wopta.it/goworkspace/payment/internal"
 )
 
 type Client struct {
@@ -39,10 +38,10 @@ func (c *Client) Update() (string, []models.Transaction, error) {
 }
 func (c *Client) Validate() error {
 	if len(c.Transactions) == 0 {
-		return common.ErrInvalidTransactions
+		return internal.ErrInvalidTransactions
 	}
 
-	if err := common.CheckPaymentModes(c.Policy); err != nil {
+	if err := internal.CheckPaymentModes(c.Policy); err != nil {
 		return err
 	}
 

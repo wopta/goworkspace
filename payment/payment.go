@@ -8,7 +8,6 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
 	"gitlab.dev.wopta.it/goworkspace/payment/fabrick"
-	"gitlab.dev.wopta.it/goworkspace/payment/manual"
 )
 
 var paymentRoutes []lib.Route = []lib.Route{
@@ -32,14 +31,14 @@ var paymentRoutes []lib.Route = []lib.Route{
 	},
 	{
 		Route:   "/manual/v1/{transactionUid}",
-		Handler: lib.ResponseLoggerWrapper(manual.ManualPaymentFx),
+		Handler: lib.ResponseLoggerWrapper(ManualPaymentFx),
 		Method:  http.MethodPost,
 		Roles: []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAreaManager,
 			models.UserRoleAgency, models.UserRoleAgent},
 	},
 	{
 		Route:   "/manual/v1/renew/{transactionUid}",
-		Handler: lib.ResponseLoggerWrapper(manual.RenewManualPaymentFx),
+		Handler: lib.ResponseLoggerWrapper(RenewManualPaymentFx),
 		Method:  http.MethodPost,
 		Roles: []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAreaManager,
 			models.UserRoleAgency, models.UserRoleAgent},

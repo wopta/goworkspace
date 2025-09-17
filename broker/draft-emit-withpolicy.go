@@ -7,13 +7,13 @@ import (
 	"net/http"
 	"time"
 
-	draftbpnm "gitlab.dev.wopta.it/goworkspace/broker/draftBpmn"
-	"gitlab.dev.wopta.it/goworkspace/broker/draftBpmn/flow"
+	"gitlab.dev.wopta.it/goworkspace/bpmn"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/mail"
 	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/network"
 	prd "gitlab.dev.wopta.it/goworkspace/product"
 )
 
@@ -63,11 +63,6 @@ func DraftEmitWithPolicyFx(w http.ResponseWriter, r *http.Request) (string, any,
 		return "", "", err
 	}
 
-	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
-	}
-
 	if policy.IsReserved && policy.Status != models.PolicyStatusApproved {
 		log.Printf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
 		return "", nil, fmt.Errorf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
@@ -93,17 +88,17 @@ func emitDraftWithPolicy(policy *models.Policy) (EmitResponse, error) {
 	log.Printf("Emitting - Policy Uid %s", policy.Uid)
 	log.Println("starting bpmn flow...")
 
-	paymentSplit = "monthly"
-	log.Printf("paymentSplit: %s", paymentSplit)
+	paymentSplit := "monthly"
+	paymentMode := "single"
 
-	storage := draftbpnm.NewStorageBpnm()
+	storage := bpmnEngine.NewStorageBpnm()
 	storage.AddGlobal("sendEmail", &flow.BoolBpmn{Bool: true})
-	storage.AddGlobal("paymentSplit", &flow.String{String: "monthly"})
-	storage.AddGlobal("paymentMode", &flow.String{String: "single"})
+	storage.AddGlobal("paymentSplit", &flow.String{String: paymentSplit})
+	storage.AddGlobal("paymentMode", &flow.String{String: paymentMode})
 	storage.AddGlobal("addresses", &flow.Addresses{FromAddress: mail.AddressAnna})
 
 	log.Printf("paymentMode: %s", paymentMode)
-	flow, err := getFlow(policy, storage)
+	flow, err := bpmn.GetFlow(policy, storage)
 	if err != nil {
 		return responseEmit, err
 	}

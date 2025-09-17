@@ -16,7 +16,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
 	"gitlab.dev.wopta.it/goworkspace/network"
-	"gitlab.dev.wopta.it/goworkspace/payment"
+	"gitlab.dev.wopta.it/goworkspace/payment/client"
 	"gitlab.dev.wopta.it/goworkspace/transaction"
 )
 
@@ -296,7 +296,7 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 		policy.PaymentMode = models.PaymentModeRecurrent
 	}
 
-	client := payment.NewClient(policy.Payment, policy, product, transactions, customerId != "", customerId)
+	client := client.NewClient(policy.Payment, policy, product, transactions, customerId != "", customerId)
 	payUrl, hasMandate, transactions, err := client.Renew()
 	if err != nil {
 		return

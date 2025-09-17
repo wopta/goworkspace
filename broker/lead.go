@@ -7,13 +7,17 @@ import (
 	"net/http"
 	"slices"
 
-	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/bpmn"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/mail"
+
+	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
-	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
-func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func leadFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		err    error
 		policy models.Policy
@@ -26,6 +30,7 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	log.Println("loading authToken from idToken...")
 
+	origin := r.Header.Get("origin")
 	token := r.Header.Get("Authorization")
 	authToken, err := lib.GetAuthTokenFromIdToken(token)
 	if err != nil {
@@ -45,25 +50,13 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	err = json.Unmarshal([]byte(body), &policy)
 	if err != nil {
-		log.ErrorF("error unmarshaling policy: %s", err.Error())
+		log.ErrorF("error unmarshalling policy: %s", err.Error())
 		return "", nil, err
 	}
 
 	policy.Normalize()
 
-	if policy.Name == models.CatNatProduct {
-		log.Println("Using leadCatnat")
-		err = leaddraft(authToken, &policy)
-		if err != nil {
-			return "", nil, err
-		}
-
-		log.Println("Handler end -------------------------------------------------")
-
-		resp, err := policy.Marshal()
-		return string(resp), &policy, err
-	}
-	err = lead(authToken, &policy)
+	err = lead(authToken, &policy, origin)
 	if err != nil {
 		log.ErrorF("error creating lead: %s", err.Error())
 		return "", nil, err
@@ -80,7 +73,7 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	return string(resp), &policy, err
 }
 
-func lead(authToken models.AuthToken, policy *models.Policy) error {
+func lead(authToken models.AuthToken, policy *models.Policy, origin string) error {
 	var err error
 	log.AddPrefix("lead")
 	defer log.PopPrefix()
@@ -99,25 +92,19 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 		log.Printf("setting policy channel to '%s'", policy.Channel)
 	}
 
-	networkNode = network.GetNetworkNodeByUid(authToken.UserID)
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
-	}
-
 	log.Println("starting bpmn flow...")
-	state := runBrokerBpmn(policy, leadFlowKey)
-	if state == nil || state.Data == nil {
-		log.Println("error bpmn - state not set")
-		return errors.New("error on bpmn - no data present")
+	storage := bpmnEngine.NewStorageBpnm()
+	storage.AddGlobal("addresses", &flow.Addresses{
+		FromAddress: mail.AddressAnna,
+	})
+	flowLead, e := bpmn.GetFlow(policy, storage)
+	if e != nil {
+		return e
 	}
-	*policy = *state.Data
-
-	log.Println("saving lead to firestore...")
-	err = lib.SetFirestoreErr(lib.PolicyCollection, policy.Uid, policy)
-	lib.CheckError(err)
-
-	log.Println("saving lead to bigquery...")
-	policy.BigquerySave()
+	e = flowLead.Run("lead")
+	if e != nil {
+		return e
+	}
 
 	log.Println("saving guarantees to bigquery...")
 	models.SetGuaranteBigquery(*policy, "lead", lib.GuaranteeCollection)
