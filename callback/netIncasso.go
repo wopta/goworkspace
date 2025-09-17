@@ -33,15 +33,20 @@ func incassoNetFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 			continue
 		}
 	}
+	updateAllPolices(policies)
 	if len(errors) == 0 {
 		log.Println("All policy incassate in net-insurance")
 		return "{}", "", nil
 	}
 	log.Println("Policies with errors: ", len(errors))
 	sendEmailErrorIncasso(len(policies), errors)
+	return "{}", "", nil
+}
+
+func updateAllPolices(policies []models.Policy) {
+	log.Println("Setting CompanyEmitted=true")
 	wait := sync.WaitGroup{}
 	wait.Add(len(policies))
-	log.Println("Setting CompanyEmitted=true")
 	for i := range policies {
 		go func() {
 			policies[i].CompanyEmitted = true
@@ -58,7 +63,6 @@ func incassoNetFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		}()
 	}
 	wait.Wait()
-	return "{}", "", nil
 }
 
 func sendEmailErrorIncasso(nPolicy int, errors []string) {
@@ -98,7 +102,12 @@ func getPolicyToCallNetIncasso() ([]models.Policy, error) {
 			{
 				Field:      "isPay",
 				Operator:   "==",
-				QueryValue: true,
+				QueryValue: false,
+			},
+			{
+				Field:      "status",
+				Operator:   "==",
+				QueryValue: models.PolicyStatusToPay,
 			},
 			{
 				Field:      "name",
