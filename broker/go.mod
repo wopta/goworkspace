@@ -12,7 +12,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/go-gota/gota v0.12.0
 	github.com/maja42/goval v1.4.0
-	gitlab.dev.wopta.it/goworkspace/bpmn v1.0.118
+	gitlab.dev.wopta.it/goworkspace/bpmn v1.0.119
 	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.149
 	gitlab.dev.wopta.it/goworkspace/document v1.1.301
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.202
