@@ -177,7 +177,6 @@ func TestProposalForEcommerce(t *testing.T) {
 
 func TestPayAnnuity0FirstRate(t *testing.T) {
 	store := bpmnEngine.NewStorageBpnm()
-	initBaseStorage(store)
 	policyEcommerce.Annuity = 0
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("product", &productEcommerce)
@@ -186,33 +185,34 @@ func TestPayAnnuity0FirstRate(t *testing.T) {
 	store.AddGlobal("transaction", &transaction)
 	store.AddGlobal("skipInvoice", &BoolBpmn{false})
 	store.AddGlobal("sendEmail", &BoolBpmn{true})
+	initBaseStorage(store)
 
 	exps := []string{
 		"payTransaction",
-		"updatePolicyAsPaid",
 		"promotePolicy",
-		"sendMailContract",
+		"updatePolicyAsPaid",
 		"generateInvoice",
 		"createNetworkTransaction",
 		"saveTransactionAndPolicy",
+		"sendMailContract",
 	}
 	testFlow(t, "pay", exps, store, getBuilderFlowChannel)
 }
 func TestPayAnnuityNot0FirstRate(t *testing.T) {
 	store := bpmnEngine.NewStorageBpnm()
+	initBaseStorage(store)
 	policyEcommerce.Annuity = 1
+	store.AddGlobal("sendEmail", &BoolBpmn{false})
 	store.AddGlobal("policy", &policyEcommerce)
 	store.AddGlobal("product", &productEcommerce)
 	store.AddGlobal("networkNode", &winNode)
 	store.AddGlobal("paymentInfo", &paymentInfo)
 	store.AddGlobal("transaction", &transaction)
-	store.AddGlobal("skipInvoice", &BoolBpmn{false})
-	initBaseStorage(store)
+	store.AddGlobal("skipInvoice", &BoolBpmn{true})
 
 	exps := []string{
 		"payTransaction",
 		"updatePolicyAsPaid",
-		"generateInvoice",
 		"createNetworkTransaction",
 		"saveTransactionAndPolicy",
 	}

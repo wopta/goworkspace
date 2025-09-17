@@ -18,8 +18,8 @@ import (
 func AddPayHandlers(builder *bpmnEngine.BpnmBuilder) error {
 	return bpmnEngine.IsError(
 		builder.AddHandler("payTransaction", payTransaction),
-		builder.AddHandler("updatePolicyAsPaid", updatePolicyAsPaid),
 		builder.AddHandler("promotePolicy", promotePolicy),
+		builder.AddHandler("updatePolicyAsPaid", updatePolicyAsPaid),
 		builder.AddHandler("generateInvoice", generateInvoice),
 		builder.AddHandler("saveTransactionAndPolicy", saveTransactionAndPolicy),
 		builder.AddHandler("createNetworkTransaction", createNetworkTransaction),
@@ -134,7 +134,6 @@ func promotePolicy(state *bpmnEngine.StorageBpnm) error {
 
 	if policy.IsPay || policy.Status != models.PolicyStatusToPay {
 		log.WarningF("policy already updated with isPay %t and status %s", policy.IsPay, policy.Status)
-		state.AddLocal("sendEmail", &flow.BoolBpmn{Bool: false})
 		return nil
 	}
 
@@ -159,7 +158,7 @@ func promotePolicy(state *bpmnEngine.StorageBpnm) error {
 		return err
 	}
 
-	state.AddLocal("sendEmail", &flow.BoolBpmn{Bool: true})
+	state.AddGlobal("sendEmail", &flow.BoolBpmn{Bool: true})
 	return nil
 }
 

@@ -103,6 +103,7 @@ func annuityFirstRate(policyUid string, paymentInfo flow.PaymentInfoBpmn) error 
 	storage.AddGlobal("addresses", &flow.Addresses{
 		FromAddress: mail.AddressAnna,
 	})
+	storage.AddGlobal("sendEmail", &flow.BoolBpmn{Bool: false})
 
 	flow, err := bpmn.GetFlow(&policy, storage)
 	if err != nil {
