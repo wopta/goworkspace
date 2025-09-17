@@ -3,7 +3,10 @@ package _script
 import (
 	// "log"
 
+	"log"
+
 	"github.com/go-jose/go-jose/v4"
+	"github.com/google/uuid"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
 	"gitlab.dev.wopta.it/goworkspace/network"
@@ -528,5 +531,33 @@ func createPartnershipFacileVetrina() error {
 		return err
 	}
 
+	return nn.SaveBigQuery()
+}
+func createNodeForImportLife(code string) error {
+	var (
+		err error
+		nn  *models.NetworkNode
+	)
+	node := models.NetworkNode{
+		Uid:      uuid.NewString(),
+		Code:     code,
+		Type:     models.AgentNetworkNodeType,
+		IsActive: true,
+		Products: []models.Product{{
+			Name:         models.LifeProduct,
+			NameDesc:     &nameDesc,
+			Version:      models.ProductV2,
+			NameTitle:    "Wopta per te",
+			NameSubtitle: "Vita",
+			Companies:    []models.Company{{Name: "axa"}},
+		}},
+		Warrant: "ptns_remunerazione_zero",
+	}
+
+	nn, err = network.CreateNode(node)
+	if err != nil {
+		return err
+	}
+	log.Println("Node created: ", code)
 	return nn.SaveBigQuery()
 }
