@@ -102,12 +102,12 @@ func getPolicyToCallNetIncasso() ([]models.Policy, error) {
 			{
 				Field:      "isPay",
 				Operator:   "==",
-				QueryValue: false,
+				QueryValue: true,
 			},
 			{
 				Field:      "status",
 				Operator:   "==",
-				QueryValue: models.PolicyStatusToPay,
+				QueryValue: models.PolicyStatusPay,
 			},
 			{
 				Field:      "name",
