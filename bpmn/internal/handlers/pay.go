@@ -176,7 +176,7 @@ func payTransaction(state *bpmnEngine.StorageBpnm) error {
 		return err
 	}
 
-	providerId := paymentInfo.FabrickPaymentsRequest.PaymentID
+	providerId := paymentInfo.ProviderId
 	transaction, _ := tr.GetTransactionToBePaid(policy.Uid, providerId, paymentInfo.Schedule, lib.TransactionsCollection)
 	err = tr.Pay(&transaction, paymentInfo.PaymentMethod)
 	if err != nil {

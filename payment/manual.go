@@ -9,16 +9,15 @@ import (
 
 	"gitlab.dev.wopta.it/goworkspace/bpmn"
 	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	"gitlab.dev.wopta.it/goworkspace/mail"
 
 	"github.com/go-chi/chi/v5"
 	"gitlab.dev.wopta.it/goworkspace/lib"
-	"gitlab.dev.wopta.it/goworkspace/mail"
 	"gitlab.dev.wopta.it/goworkspace/models"
 	"gitlab.dev.wopta.it/goworkspace/network"
-	"gitlab.dev.wopta.it/goworkspace/payment/consultancy"
 	"gitlab.dev.wopta.it/goworkspace/payment/internal"
-	plc "gitlab.dev.wopta.it/goworkspace/policy"
 	prd "gitlab.dev.wopta.it/goworkspace/product"
 	trn "gitlab.dev.wopta.it/goworkspace/transaction"
 )
@@ -39,9 +38,6 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		flowName    string = models.ECommerceFlow
 		networkNode *models.NetworkNode
 		warrant     *models.Warrant
-		ccAddress   = mail.Address{}
-		fromAddress = mail.AddressAnna
-		toAddress   = mail.Address{}
 	)
 
 	log.AddPrefix("ManualPaymentFx")
@@ -107,7 +103,6 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 			return "", nil, err
 		}
 		warrant = networkNode.GetWarrant()
-		ccAddress = mail.GetNetworkNodeEmail(networkNode)
 		flowName, _ = policy.GetFlow(networkNode, warrant)
 		log.Printf("flowName '%s'", flowName)
 	}
@@ -166,87 +161,24 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	trn.CreateNetworkTransactions(&policy, &transaction, networkNode, mgaProduct)
 
-	isFirstTransactionAnnuity := lib.IsEqual(policy.StartDate.AddDate(policy.Annuity, 0, 0), transaction.EffectiveDate)
 	// Update policy if needed
-	if !policy.IsPay && policy.Annuity == 0 {
-		policy.SanitizePaymentData()
-
-		// Add contract to policy
-		err = plc.AddSignedDocumentsInPolicy(&policy)
-		if err != nil {
-			log.ErrorF("error add contract to policy: %s", err.Error())
-			return "", nil, err
-		}
-
-		// Create/Update document on user collection based on contractor fiscalCode
-		err = plc.PromotePolicy(&policy)
-		if err != nil {
-			log.ErrorF("error set user into policy contractor: %s", err.Error())
-			return "", nil, err
-		}
-
-		// Update Policy as paid
-		if isFirstTransactionAnnuity {
-			if err := consultancy.GenerateInvoice(policy, transaction); err != nil {
-				log.Printf("error handling consultancy: %s", err.Error())
-			}
-		}
-
-		err = plc.Pay(&policy)
-		if err != nil {
-			log.ErrorF("error policy pay: %s", err.Error())
-			return "", nil, err
-		}
-
-		// Update NetworkNode Portfolio
-		err = network.UpdateNetworkNodePortfolio(&policy, networkNode)
-		if err != nil {
-			log.ErrorF("error updating %s portfolio %s", networkNode.Type, err.Error())
-			return "", nil, err
-		}
-
-		policy.BigquerySave()
-
-		storage := bpmnEngine.NewStorageBpnm()
-		flow, err := bpmn.GetFlow(&policy, storage)
-		if err != nil {
-			return "", nil, err
-		}
-		err = flow.Run("pay")
-		if err != nil {
-			return "", nil, err
-		}
-		// Send mail with the contract to the user
-		toAddress = mail.GetContractorEmail(&policy)
-
-		// Send mail with the contract to the user
-		log.Printf(
-			"Sending email from '%s', to '%s', cc '%s'",
-			fromAddress.String(),
-			toAddress.String(),
-			ccAddress.String(),
-		)
-		err = mail.SendMailContract(policy, policy.Attachments, fromAddress, toAddress, ccAddress, flowName)
-	} else if !policy.IsPay && policy.Annuity > 0 && isFirstTransactionAnnuity {
-		policy.SanitizePaymentData()
-		// Update Policy as paid and renewed
-		policy.IsPay = true
-		policy.Status = models.PolicyStatusRenewed
-		policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusPay, policy.Status)
-		policy.Updated = time.Now().UTC()
-
-		if isFirstTransactionAnnuity {
-			if err := consultancy.GenerateInvoice(policy, transaction); err != nil {
-				log.Printf("error handling consultancy: %s", err.Error())
-			}
-		}
-
-		err = lib.SetFirestoreErr(lib.PolicyCollection, policy.Uid, policy)
-		if err != nil {
-			log.ErrorF("error saving policy %s to Firestore: %s", policy.Uid, err.Error())
-			return "", nil, err
-		}
-		policy.BigquerySave()
+	storage := bpmnEngine.NewStorageBpnm()
+	paymentInfo := flow.PaymentInfoBpmn{
+		Schedule:      transaction.ScheduleDate,
+		ProviderId:    transaction.ProviderId,
+		PaymentMethod: transaction.PaymentMethod,
+	}
+	storage.AddGlobal("paymentInfo", &paymentInfo)
+	storage.AddGlobal("addresses", &flow.Addresses{
+		FromAddress: mail.AddressAnna,
+	})
+	flow, err := bpmn.GetFlow(&policy, storage)
+	if err != nil {
+		return "", nil, err
+	}
+	err = flow.Run("pay")
+	if err != nil {
+		return "", nil, err
 	}
 
 	return "{}", nil, err

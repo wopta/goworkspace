@@ -20,7 +20,6 @@ type PaymentInfoBpmn struct {
 	Schedule      string
 	PaymentMethod string
 	ProviderId    string
-	models.FabrickPaymentsRequest
 }
 
 func (*PaymentInfoBpmn) GetType() string {

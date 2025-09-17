@@ -66,10 +66,9 @@ func (FabrickCallback) AnnuityFirstRateFx(_ http.ResponseWriter, r *http.Request
 	paymentMethod = strings.ToLower(request.Bill.Transactions[0].PaymentMethod)
 
 	paymentInfo := flow.PaymentInfoBpmn{
-		Schedule:               trSchedule,
-		ProviderId:             providerId,
-		PaymentMethod:          paymentMethod,
-		FabrickPaymentsRequest: request,
+		Schedule:      trSchedule,
+		ProviderId:    providerId,
+		PaymentMethod: paymentMethod,
 	}
 	err = annuityFirstRate(policyUid, paymentInfo)
 	if err != nil {
