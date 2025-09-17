@@ -47,7 +47,7 @@ func leadFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-	policy.ProducerUid = authToken.UserID
+
 	err = json.Unmarshal([]byte(body), &policy)
 	if err != nil {
 		log.ErrorF("error unmarshalling policy: %s", err.Error())
@@ -56,6 +56,7 @@ func leadFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 
 	policy.Normalize()
 
+	policy.ProducerUid = authToken.UserID
 	err = lead(authToken, &policy, origin)
 	if err != nil {
 		log.ErrorF("error creating lead: %s", err.Error())
@@ -128,6 +129,9 @@ func checkIfPolicyIsLead(policy *models.Policy) error {
 
 	if err := policyDoc.DataTo(&recoveredPolicy); err != nil {
 		log.ErrorF("error converting policy %s data: %s", policy.Uid, err.Error())
+		return nil
+	}
+	if recoveredPolicy.Uid == "" {
 		return nil
 	}
 
