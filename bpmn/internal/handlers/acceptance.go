@@ -15,7 +15,7 @@ func AddAcceptanceHandlers(builder *bpmnEngine.BpnmBuilder) error {
 		builder.AddHandler("rejected", rejectPolicy),
 		builder.AddHandler("approved", approvePolicy),
 		builder.AddHandler("sendAcceptanceMail", sendAcceptanceMail),
-		builder.AddHandler("end_accepance", savePolicy),
+		builder.AddHandler("end_acceptance", savePolicy),
 	)
 }
 
