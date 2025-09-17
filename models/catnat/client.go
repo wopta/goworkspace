@@ -302,20 +302,17 @@ func (c *NetClient) Incasso(policy models.Policy) error {
 	}
 	strResponse, _ := io.ReadAll(resp.Body)
 	if resp.StatusCode != http.StatusOK {
-		log.ErrorF("error incasso for policy %v con stato %v response %v", policy.CodeCompany, resp.StatusCode, string(strResponse))
-		return fmt.Errorf("Errore policy: %v", policy.CodeCompany)
+		return fmt.Errorf("error incasso for policy %v con stato %v response %v", policy.CodeCompany, resp.StatusCode, string(strResponse))
 	}
 	var response struct {
 		Esito  string   `json:"esito"`
 		Errori []string `json:"errori"`
 	}
 	if err = json.Unmarshal(strResponse, &response); err != nil {
-		log.ErrorF("error decoding catnat body: %v", string(strResponse))
-		return fmt.Errorf("Errore policy: %v", policy.CodeCompany)
+		return fmt.Errorf("error decoding catnat body: %v", string(strResponse))
 	}
 	if response.Esito != "OK" {
-		log.ErrorF("error incasso for policy %v con stato %v response %v", policy.CodeCompany, resp.StatusCode, string(strResponse))
-		return fmt.Errorf("Errore policy: %v", policy.CodeCompany)
+		return fmt.Errorf("error incasso for policy %v con stato %v response %v", policy.CodeCompany, resp.StatusCode, string(strResponse))
 	}
 	return nil
 }
