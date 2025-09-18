@@ -7,11 +7,11 @@ replace gitlab.dev.wopta.it/goworkspace/policy => ./
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
-	gitlab.dev.wopta.it/goworkspace/document v1.1.303
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.203
-	gitlab.dev.wopta.it/goworkspace/models v1.2.140
-	gitlab.dev.wopta.it/goworkspace/network v1.0.208
-	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.45
+	gitlab.dev.wopta.it/goworkspace/document v1.1.304
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.204
+	gitlab.dev.wopta.it/goworkspace/models v1.2.141
+	gitlab.dev.wopta.it/goworkspace/network v1.0.209
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.46
 	google.golang.org/grpc v1.63.2
 )
 
