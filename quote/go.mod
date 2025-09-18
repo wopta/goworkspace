@@ -10,13 +10,13 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/go-gota/gota v0.12.0
 	github.com/xuri/excelize/v2 v2.8.1
-	gitlab.dev.wopta.it/goworkspace/document v1.1.306
+	gitlab.dev.wopta.it/goworkspace/document v1.1.307
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.206
-	gitlab.dev.wopta.it/goworkspace/models v1.2.143
-	gitlab.dev.wopta.it/goworkspace/network v1.0.211
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.350
-	gitlab.dev.wopta.it/goworkspace/product v1.1.142
-	gitlab.dev.wopta.it/goworkspace/sellable v1.0.256
+	gitlab.dev.wopta.it/goworkspace/models v1.2.144
+	gitlab.dev.wopta.it/goworkspace/network v1.0.212
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.351
+	gitlab.dev.wopta.it/goworkspace/product v1.1.143
+	gitlab.dev.wopta.it/goworkspace/sellable v1.0.257
 	google.golang.org/api v0.209.0
 	modernc.org/mathutil v1.5.0
 )
