@@ -1,6 +1,7 @@
 package channelFlow
 
 import (
+	"fmt"
 	"time"
 
 	"cloud.google.com/go/bigquery"
@@ -206,8 +207,7 @@ func saveAudit(node *models.NetworkNode, callbackInfo base.CallbackInfo, policy 
 	if callbackInfo.ResStatusCode == 200 {
 		policy.AddSystemNote(func(p *models.Policy) models.PolicyNote {
 			return models.PolicyNote{
-				Text: "Callback " + audit.Client + " eseguita correttamente",
-			}
+				Text: fmt.Sprintf("Callback %v per l'operazione '%v' eseguita correttamente", audit.Client, audit.Action)}
 		})
 	}
 	return nil
