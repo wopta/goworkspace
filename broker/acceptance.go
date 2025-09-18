@@ -104,6 +104,11 @@ func acceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	}
 
 	log.Println("Handler end -------------------------------------------------")
-
+	switch policy.Status {
+	case models.PolicyStatusApproved:
+		policy.AddSystemNote(models.GetApproveNote)
+	case models.PolicyStatusRejected:
+		policy.AddSystemNote(models.GetRejectNote)
+	}
 	return "{}", nil, nil
 }

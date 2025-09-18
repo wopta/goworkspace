@@ -73,7 +73,6 @@ func (p *Policy) AddSystemNote(getterNote func(p *Policy) PolicyNote) error {
 	note.CreateDate = time.Now()
 	note.PolicyUid = p.Uid
 	note.Type = "System"
-	note.ReadableByProducer = false
 	if lib.GetBoolEnv(env.Local) {
 		note.Text += "(Operazione eseguita in ambiente locale, non veritiera)"
 	}
@@ -114,6 +113,18 @@ func GetManualRenewNote(_ *Policy) PolicyNote {
 func GetChangePaymentProviderNote(_ *Policy) PolicyNote {
 	return PolicyNote{
 		Text: "Cambio mandato",
+	}
+}
+func GetApproveNote(_ *Policy) PolicyNote {
+	return PolicyNote{
+		Text:               "Polizza é stata approvata",
+		ReadableByProducer: true,
+	}
+}
+func GetRejectNote(_ *Policy) PolicyNote {
+	return PolicyNote{
+		Text:               "Polizza é stata rigettata",
+		ReadableByProducer: true,
 	}
 }
 func GetProposalNote(p *Policy) PolicyNote {
