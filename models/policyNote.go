@@ -71,9 +71,6 @@ func (p *Policy) AddSystemNote(getterNote func(p *Policy) PolicyNote) error {
 	note := getterNote(p)
 	note.CreateDate = time.Now()
 	note.PolicyUid = p.Uid
-	if note.CreatedBy == "" {
-		return errors.New("Need to specify the creator")
-	}
 	err := lib.SetFirestoreErr(lib.PolicyNoteCollection, lib.NewDoc(lib.PolicyNoteCollection), note)
 	if err != nil {
 		return err
