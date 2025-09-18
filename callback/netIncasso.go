@@ -23,7 +23,7 @@ func incassoNetFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	if e != nil {
 		return "", nil, e
 	}
-	log.Println("Policies to incassare in net-insurance: ", len(policies))
+	log.Println("Policies to incassare in net-insurance system: ", len(policies))
 	catnatClient := catnat.NewNetClient()
 	var errors []string
 	for i := range policies {
@@ -35,7 +35,7 @@ func incassoNetFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	}
 	updateAllPolices(policies)
 	if len(errors) == 0 {
-		log.Println("All policy incassate in net-insurance")
+		log.Println("All policy incassate in net-insurance system")
 		return "{}", "", nil
 	}
 	log.Println("Policies with errors: ", len(errors))
@@ -60,6 +60,7 @@ func updateAllPolices(policies []models.Policy) {
 
 			policies[i].BigquerySave()
 			log.Printf("Policy %v saved", policies[i].CodeCompany)
+			wait.Done()
 		}()
 	}
 	wait.Wait()

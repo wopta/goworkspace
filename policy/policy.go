@@ -52,6 +52,18 @@ var policyRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAgency, lib.UserRoleAgent},
 	},
+	{
+		Route:   "/v1/notes/{policyUid}",
+		Handler: lib.ResponseLoggerWrapper(getPolicyNotes),
+		Method:  http.MethodGet,
+		Roles:   []string{},
+	},
+	{
+		Route:   "/v1/note/{policyUid}",
+		Handler: lib.ResponseLoggerWrapper(postPolicyNote),
+		Method:  http.MethodPost,
+		Roles:   []string{},
+	},
 }
 
 func init() {

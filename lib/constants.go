@@ -55,6 +55,7 @@ const (
 	RenewTransactionCollection   string = "renewTransactions"      // firestore and bigquery
 	MailReportCollection         string = "mailReport"             // only for bigquery
 	NodeConsensAuditsCollencion  string = "nodeConsensAudits"      // firestore and bigquery
+	PolicyNoteCollection         string = "policyNote"             // firestore
 )
 const (
 	BaseStorageGoogleUrl = "https://storage.googleapis.com/"
