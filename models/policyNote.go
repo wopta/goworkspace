@@ -17,7 +17,7 @@ type PolicyNotes struct {
 
 type PolicyNote struct {
 	Name               string    `json:"name" firestore:"name"`
-	Username           string    `json:"username" firestore:"username"`
+	Username           string    `json:"surname" firestore:"surname"`
 	CreateDate         time.Time `json:"createDate" firestore:"createDate"`
 	Type               string    `json:"type" firestore:"type"`
 	ReadableByProducer bool      `json:"readableByProducer" firestore:"readableByProducer"`
