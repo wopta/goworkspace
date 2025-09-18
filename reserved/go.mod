@@ -7,10 +7,10 @@ replace gitlab.dev.wopta.it/goworkspace/reserved => ./
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.204
-	gitlab.dev.wopta.it/goworkspace/models v1.2.141
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.348
-	gitlab.dev.wopta.it/goworkspace/product v1.1.140
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.205
+	gitlab.dev.wopta.it/goworkspace/models v1.2.142
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.349
+	gitlab.dev.wopta.it/goworkspace/product v1.1.141
 )
 
 require (
@@ -78,9 +78,9 @@ require (
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
-	gitlab.dev.wopta.it/goworkspace/document v1.1.304 // indirect
-	gitlab.dev.wopta.it/goworkspace/network v1.0.209 // indirect
-	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.46 // indirect
+	gitlab.dev.wopta.it/goworkspace/document v1.1.305 // indirect
+	gitlab.dev.wopta.it/goworkspace/network v1.0.210 // indirect
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.47 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.49.0 // indirect
