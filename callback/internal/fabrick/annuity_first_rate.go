@@ -70,7 +70,11 @@ func (FabrickCallback) AnnuityFirstRateFx(_ http.ResponseWriter, r *http.Request
 		ProviderId:    providerId,
 		PaymentMethod: paymentMethod,
 	}
-	err = annuityFirstRate(policyUid, paymentInfo)
+	var policy models.Policy
+	if policy, err = internal.GetPolicyByUidAndCollection(policyUid, lib.PolicyCollection); err != nil {
+		return "", "", ErrPolicyNotFound
+	}
+	err = annuityFirstRate(&policy, paymentInfo)
 	if err != nil {
 		log.ErrorF("error paying first annuity rate: %s", err)
 		response.Result = false
@@ -80,22 +84,18 @@ func (FabrickCallback) AnnuityFirstRateFx(_ http.ResponseWriter, r *http.Request
 	if err != nil {
 		log.ErrorF("error marshaling error response: %s", err)
 	}
-
+	policy.AddSystemNote(models.GetPayNote)
 	return string(stringRes), response, nil
 }
 
-func annuityFirstRate(policyUid string, paymentInfo flow.PaymentInfoBpmn) error {
+func annuityFirstRate(policy *models.Policy, paymentInfo flow.PaymentInfoBpmn) error {
 	var (
-		policy      models.Policy
 		renewPolicy models.Policy
 		err         error
 	)
-	if policy, err = internal.GetPolicyByUidAndCollection(policyUid, lib.PolicyCollection); err != nil {
-		return ErrPolicyNotFound
-	}
 
-	if renewPolicy, err = internal.GetPolicyByUidAndCollection(policyUid, lib.RenewPolicyCollection); err == nil && renewPolicy.Uid == policyUid {
-		policy = renewPolicy
+	if renewPolicy, err = internal.GetPolicyByUidAndCollection(policy.Uid, lib.RenewPolicyCollection); err == nil && renewPolicy.Uid == policy.Uid {
+		policy = &renewPolicy
 	}
 
 	storage := bpmnEngine.NewStorageBpnm()
@@ -105,7 +105,7 @@ func annuityFirstRate(policyUid string, paymentInfo flow.PaymentInfoBpmn) error 
 	})
 	storage.AddGlobal("sendEmail", &flow.BoolBpmn{Bool: false})
 
-	flow, err := bpmn.GetFlow(&policy, storage)
+	flow, err := bpmn.GetFlow(policy, storage)
 	if err != nil {
 		return err
 	}

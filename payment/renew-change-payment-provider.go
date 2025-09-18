@@ -125,5 +125,6 @@ func RenewChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (strin
 		return "", nil, err
 	}
 
+	policy.AddSystemNote(models.GetRenewNote)
 	return string(rawResp), resp, err
 }

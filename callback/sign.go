@@ -95,6 +95,7 @@ func namirialStepFinished(policyUid string, sendEmail bool) error {
 	}
 
 	policy.BigquerySave()
+	policy.AddSystemNote(models.GetSignNote)
 
 	return nil
 }

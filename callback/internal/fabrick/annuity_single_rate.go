@@ -68,7 +68,11 @@ func (FabrickCallback) AnnuitySingleRateFx(_ http.ResponseWriter, r *http.Reques
 		ProviderId:    providerId,
 		PaymentMethod: paymentMethod,
 	}
-	err = annuitySingleRate(policyUid, paymentInfo)
+	policy, err := plc.GetPolicy(policyUid)
+	if err != nil {
+		return "", "", err
+	}
+	err = annuitySingleRate(&policy, paymentInfo)
 	if err != nil {
 		log.ErrorF("error paying first annuity rate: %s", err)
 		response.Result = false
@@ -79,19 +83,15 @@ func (FabrickCallback) AnnuitySingleRateFx(_ http.ResponseWriter, r *http.Reques
 		log.ErrorF("error marshaling error response: %s", err)
 	}
 
+	policy.AddSystemNote(models.GetPayNote)
 	return string(stringRes), response, nil
 }
 
-func annuitySingleRate(policyUid string, paymentInfo flow.PaymentInfoBpmn) error {
+func annuitySingleRate(policy *models.Policy, paymentInfo flow.PaymentInfoBpmn) error {
 	var (
-		policy models.Policy
-		err    error
+		err error
 	)
 
-	policy, err = plc.GetPolicy(policyUid)
-	if err != nil {
-		return err
-	}
 	if policy.Uid == "" {
 		return ErrPolicyNotFound
 	}
@@ -102,7 +102,7 @@ func annuitySingleRate(policyUid string, paymentInfo flow.PaymentInfoBpmn) error
 		FromAddress: mail.AddressAnna,
 	})
 	storage.AddGlobal("sendEmail", &flow.BoolBpmn{Bool: false})
-	flow, err := bpmn.GetFlow(&policy, storage)
+	flow, err := bpmn.GetFlow(policy, storage)
 	if err != nil {
 		return err
 	}

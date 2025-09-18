@@ -141,5 +141,6 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 		return "", nil, err
 	}
 
+	policy.AddSystemNote(models.GetManualRenewNote)
 	return "{}", nil, err
 }

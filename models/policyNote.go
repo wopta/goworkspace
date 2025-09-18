@@ -66,3 +66,91 @@ func policyNotesToListData(query *firestore.DocumentIterator) (PolicyNotes, erro
 	}
 	return result, nil
 }
+
+func (p *Policy) AddSystemNote(getterNote func(p *Policy) PolicyNote) error {
+	note := getterNote(p)
+	note.CreateDate = time.Now()
+	note.PolicyUid = p.Uid
+	if note.CreatedBy == "" {
+		return errors.New("Need to specify the creator")
+	}
+	err := lib.SetFirestoreErr(lib.PolicyNoteCollection, lib.NewDoc(lib.PolicyNoteCollection), note)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetEmitNote(_ *Policy) PolicyNote {
+	return PolicyNote{
+		Text:         "La polizza é stata emessa",
+		Type:         "System",
+		OnlyProducer: false,
+	}
+}
+
+func GetSignNote(_ *Policy) PolicyNote {
+	return PolicyNote{
+		Text:         "La polizza é stata firmata",
+		Type:         "System",
+		OnlyProducer: false,
+	}
+}
+
+func GetPayNote(_ *Policy) PolicyNote {
+	return PolicyNote{
+		Text:         "La polizza é stata pagata",
+		Type:         "System",
+		OnlyProducer: false,
+	}
+}
+func GetRenewNote(_ *Policy) PolicyNote {
+	return PolicyNote{
+		Text:         "La polizza é stata rinnovata",
+		Type:         "System",
+		OnlyProducer: false,
+	}
+}
+func GetManualRenewNote(_ *Policy) PolicyNote {
+	return PolicyNote{
+		Text:         "La polizza é stata rinnovata manualmente",
+		Type:         "System",
+		OnlyProducer: false,
+	}
+}
+func GetChangePaymentProviderNote(_ *Policy) PolicyNote {
+	return PolicyNote{
+		Text:         "Cambio mandato",
+		Type:         "System",
+		OnlyProducer: false,
+	}
+}
+func GetProposalNote(p *Policy) PolicyNote {
+	var text string
+	switch p.Status {
+	case PolicyStatusProposal:
+		text = "Salvataggio proposta"
+	case PolicyStatusNeedsApproval:
+		text = "Salvataggio proposta, Rapporto Visita Medica"
+	}
+
+	return PolicyNote{
+		Text:         text,
+		Type:         "System",
+		OnlyProducer: false,
+	}
+}
+func GetChangeAppendiceNote(_ *Policy) PolicyNote {
+	return PolicyNote{
+		Text:         "Appendice modificata",
+		Type:         "System",
+		OnlyProducer: false,
+	}
+}
+func GetDeletePolicyNote(_ *Policy) PolicyNote {
+	return PolicyNote{
+		Text:         "Appendice modificata",
+		Type:         "System",
+		OnlyProducer: false,
+	}
+}

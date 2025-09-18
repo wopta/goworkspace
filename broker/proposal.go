@@ -85,7 +85,7 @@ func proposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	}
 
 	log.Println("Handler end -------------------------------------------------")
-
+	policy.AddSystemNote(models.GetProposalNote)
 	return string(resp), &policy, err
 }
 func proposal(policy *models.Policy, sendEmail bool) error {

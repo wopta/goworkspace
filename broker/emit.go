@@ -128,7 +128,7 @@ func emitFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	b, err := json.Marshal(responseEmit)
 
 	log.Println("Handler end -------------------------------------------------")
-
+	policy.AddSystemNote(models.GetEmitNote)
 	return string(b), responseEmit, err
 }
 

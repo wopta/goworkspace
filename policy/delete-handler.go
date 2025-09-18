@@ -64,6 +64,7 @@ func DeletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	models.SetGuaranteBigquery(policy, "delete", guaranteFire)
 
 	log.Println("Handler end -------------------------------------------------")
+	policy.AddSystemNote(models.GetDeletePolicyNote)
 	return "{}", nil, nil
 }
 
