@@ -15,14 +15,14 @@ type PolicyNotes struct {
 }
 
 type PolicyNote struct {
-	Name         string    `json:"name" firestore:"name"`
-	Username     string    `json:"username" firestore:"username"`
-	CreateDate   time.Time `json:"createDate" firestore:"createDate"`
-	Type         string    `json:"type" firestore:"type"`
-	OnlyProducer bool      `json:"onlyProducer" firestore:"onlyProducer"`
-	CreatedBy    string    `json:"createdBy" firestore:"createdBy"`
-	PolicyUid    string    `json:"policyUid" firestore:"policyUid"`
-	Text         string    `json:"text" firestore:"text"`
+	Name               string    `json:"name" firestore:"name"`
+	Username           string    `json:"username" firestore:"username"`
+	CreateDate         time.Time `json:"createDate" firestore:"createDate"`
+	Type               string    `json:"type" firestore:"type"`
+	ReadableByProducer bool      `json:"readableByProducer" firestore:"readableByProducer"`
+	CreatedBy          string    `json:"createdBy" firestore:"createdBy"`
+	PolicyUid          string    `json:"policyUid" firestore:"policyUid"`
+	Text               string    `json:"text" firestore:"text"`
 }
 
 func AddNoteToPolicy(policyUid string, note PolicyNote) error {
@@ -80,46 +80,46 @@ func (p *Policy) AddSystemNote(getterNote func(p *Policy) PolicyNote) error {
 
 func GetEmitNote(_ *Policy) PolicyNote {
 	return PolicyNote{
-		Text:         "La polizza é stata emessa",
-		Type:         "System",
-		OnlyProducer: false,
+		Text:               "La polizza é stata emessa",
+		Type:               "System",
+		ReadableByProducer: false,
 	}
 }
 
 func GetSignNote(_ *Policy) PolicyNote {
 	return PolicyNote{
-		Text:         "La polizza é stata firmata",
-		Type:         "System",
-		OnlyProducer: false,
+		Text:               "La polizza é stata firmata",
+		Type:               "System",
+		ReadableByProducer: false,
 	}
 }
 
 func GetPayNote(_ *Policy) PolicyNote {
 	return PolicyNote{
-		Text:         "La polizza é stata pagata",
-		Type:         "System",
-		OnlyProducer: false,
+		Text:               "La polizza é stata pagata",
+		Type:               "System",
+		ReadableByProducer: false,
 	}
 }
 func GetRenewNote(_ *Policy) PolicyNote {
 	return PolicyNote{
-		Text:         "La polizza é stata rinnovata",
-		Type:         "System",
-		OnlyProducer: false,
+		Text:               "La polizza é stata rinnovata",
+		Type:               "System",
+		ReadableByProducer: false,
 	}
 }
 func GetManualRenewNote(_ *Policy) PolicyNote {
 	return PolicyNote{
-		Text:         "La polizza é stata rinnovata manualmente",
-		Type:         "System",
-		OnlyProducer: false,
+		Text:               "La polizza é stata rinnovata manualmente",
+		Type:               "System",
+		ReadableByProducer: false,
 	}
 }
 func GetChangePaymentProviderNote(_ *Policy) PolicyNote {
 	return PolicyNote{
-		Text:         "Cambio mandato",
-		Type:         "System",
-		OnlyProducer: false,
+		Text:               "Cambio mandato",
+		Type:               "System",
+		ReadableByProducer: false,
 	}
 }
 func GetProposalNote(p *Policy) PolicyNote {
@@ -132,22 +132,22 @@ func GetProposalNote(p *Policy) PolicyNote {
 	}
 
 	return PolicyNote{
-		Text:         text,
-		Type:         "System",
-		OnlyProducer: false,
+		Text:               text,
+		Type:               "System",
+		ReadableByProducer: false,
 	}
 }
 func GetChangeAppendiceNote(_ *Policy) PolicyNote {
 	return PolicyNote{
-		Text:         "Appendice modificata",
-		Type:         "System",
-		OnlyProducer: false,
+		Text:               "Appendice modificata",
+		Type:               "System",
+		ReadableByProducer: false,
 	}
 }
 func GetDeletePolicyNote(_ *Policy) PolicyNote {
 	return PolicyNote{
-		Text:         "Appendice modificata",
-		Type:         "System",
-		OnlyProducer: false,
+		Text:               "Appendice modificata",
+		Type:               "System",
+		ReadableByProducer: false,
 	}
 }
