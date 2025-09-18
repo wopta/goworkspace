@@ -96,7 +96,6 @@ func policyDto(p models.Policy, producer string) policy {
 		pa                  perAss
 		totale              totale
 		contractorBirthDate time.Time
-		err                 error
 	)
 
 	// Map contractor data
@@ -106,17 +105,20 @@ func policyDto(p models.Policy, producer string) policy {
 	}
 	an.Cf = p.Contractor.FiscalCode
 	an.Cognome = p.Contractor.Surname
-	if contractorBirthDate, err = time.Parse(time.RFC3339, p.Contractor.BirthDate); err != nil {
-		return policy{}
-	}
+	contractorBirthDate, _ = time.Parse(time.RFC3339, p.Contractor.BirthDate)
 	an.DataNascita = contractorBirthDate.Format(time.DateOnly)
-	an.Indirizzo = lib.TrimSpace(fmt.Sprintf("%s, %s", p.Contractor.Residence.StreetName, p.Contractor.Residence.StreetNumber))
+	if p.Contractor.Residence == nil {
+		an.Indirizzo = lib.TrimSpace(fmt.Sprintf("%s, %s", p.Contractor.CompanyAddress.StreetName, p.Contractor.CompanyAddress.StreetNumber))
+		an.Provincia = p.Contractor.CompanyAddress.CityCode
+	} else {
+		an.Indirizzo = lib.TrimSpace(fmt.Sprintf("%s, %s", p.Contractor.Residence.StreetName, p.Contractor.Residence.StreetNumber))
+		an.Provincia = p.Contractor.Residence.CityCode
+	}
 	an.LuogoNascita = p.Contractor.BirthCity
 	an.Nazione = "IT"
 	an.NazioneNascita = "IT" // for now we'll hardcode it. To enrich based on fiscalCode
 	an.Nome = p.Contractor.Name
 	an.Pfg = "F"
-	an.Provincia = p.Contractor.Residence.CityCode
 	an.ProvinciaNascita = p.Contractor.BirthProvince
 	an.Sesso = p.Contractor.Gender
 

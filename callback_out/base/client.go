@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
@@ -61,6 +62,9 @@ func (c *Client) baseRequest(policy models.Policy, action CallbackoutAction) (ca
 		Timeout: 30 * time.Second,
 	}
 	res, err := client.Do(req)
+	if err != nil {
+		log.Error(err)
+	}
 	//TODO: insert action
 	callbackInfo.FromRequestResponse(action, res, req)
 	return callbackInfo

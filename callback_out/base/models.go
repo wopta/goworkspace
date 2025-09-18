@@ -21,13 +21,9 @@ func (c *CallbackInfo) FromRequestResponse(action CallbackoutAction, resp *http.
 	if err != nil {
 		return err
 	}
-	reqBody, err := io.ReadAll(req.Body)
-	if err != nil {
-		return err
-	}
 	c.ReqMethod = req.Method
 	c.ReqPath = resp.Request.Host + resp.Request.URL.RequestURI()
-	c.ReqBody = reqBody
+	c.ReqBody = resBody
 
 	c.ResBody = resBody
 	c.ResStatusCode = resp.StatusCode

@@ -7,6 +7,7 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"gitlab.dev.wopta.it/goworkspace/lib"
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
 	"google.golang.org/api/iterator"
 )
 
@@ -71,6 +72,11 @@ func (p *Policy) AddSystemNote(getterNote func(p *Policy) PolicyNote) error {
 	note := getterNote(p)
 	note.CreateDate = time.Now()
 	note.PolicyUid = p.Uid
+	note.Type = "System"
+	note.ReadableByProducer = false
+	if lib.GetBoolEnv(env.Local) {
+		note.Text += "(Operazione eseguita in ambiente locale, non veritiera)"
+	}
 	err := lib.SetFirestoreErr(lib.PolicyNoteCollection, lib.NewDoc(lib.PolicyNoteCollection), note)
 	if err != nil {
 		return err
@@ -80,46 +86,34 @@ func (p *Policy) AddSystemNote(getterNote func(p *Policy) PolicyNote) error {
 
 func GetEmitNote(_ *Policy) PolicyNote {
 	return PolicyNote{
-		Text:               "La polizza é stata emessa",
-		Type:               "System",
-		ReadableByProducer: false,
+		Text: "La polizza é stata emessa",
 	}
 }
 
 func GetSignNote(_ *Policy) PolicyNote {
 	return PolicyNote{
-		Text:               "La polizza é stata firmata",
-		Type:               "System",
-		ReadableByProducer: false,
+		Text: "La polizza é stata firmata",
 	}
 }
 
 func GetPayNote(_ *Policy) PolicyNote {
 	return PolicyNote{
-		Text:               "La polizza é stata pagata",
-		Type:               "System",
-		ReadableByProducer: false,
+		Text: "La polizza é stata pagata",
 	}
 }
 func GetRenewNote(_ *Policy) PolicyNote {
 	return PolicyNote{
-		Text:               "La polizza é stata rinnovata",
-		Type:               "System",
-		ReadableByProducer: false,
+		Text: "La polizza é stata rinnovata",
 	}
 }
 func GetManualRenewNote(_ *Policy) PolicyNote {
 	return PolicyNote{
-		Text:               "La polizza é stata rinnovata manualmente",
-		Type:               "System",
-		ReadableByProducer: false,
+		Text: "La polizza é stata rinnovata manualmente",
 	}
 }
 func GetChangePaymentProviderNote(_ *Policy) PolicyNote {
 	return PolicyNote{
-		Text:               "Cambio mandato",
-		Type:               "System",
-		ReadableByProducer: false,
+		Text: "Cambio mandato",
 	}
 }
 func GetProposalNote(p *Policy) PolicyNote {
@@ -132,22 +126,16 @@ func GetProposalNote(p *Policy) PolicyNote {
 	}
 
 	return PolicyNote{
-		Text:               text,
-		Type:               "System",
-		ReadableByProducer: false,
+		Text: text,
 	}
 }
 func GetChangeAppendiceNote(_ *Policy) PolicyNote {
 	return PolicyNote{
-		Text:               "Appendice modificata",
-		Type:               "System",
-		ReadableByProducer: false,
+		Text: "Appendice modificata",
 	}
 }
 func GetDeletePolicyNote(_ *Policy) PolicyNote {
 	return PolicyNote{
-		Text:               "Appendice modificata",
-		Type:               "System",
-		ReadableByProducer: false,
+		Text: "Appendice modificata",
 	}
 }

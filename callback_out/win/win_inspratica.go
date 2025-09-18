@@ -3,6 +3,7 @@ package win
 import (
 	"encoding/json"
 
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
@@ -21,6 +22,7 @@ type inspraticaReq struct {
 
 func inspratica(policy models.Policy, state, producer string) ([]byte, error) {
 	winPolicy := policyDto(policy, producer)
+	log.PrintStruct("EmitBody", policy)
 	payload := inspraticaReq{
 		Anagrafica:   winPolicy.Anagrafica,
 		Garanzie:     winPolicy.Garanzie,

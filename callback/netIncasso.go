@@ -31,6 +31,14 @@ func incassoNetFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 			log.ErrorF("For policy %v there is the error %v", policies[i], e.Error())
 			errors = append(errors, "Errore incasso: "+policies[i].CodeCompany)
 			continue
+		} else {
+			policies[i].AddSystemNote(func(p *models.Policy) models.PolicyNote {
+				return models.PolicyNote{
+					Text:               "Incasso eseguito nei sistemi di net-insurance",
+					ReadableByProducer: false,
+				}
+
+			})
 		}
 	}
 	updateAllPolices(policies)

@@ -8,6 +8,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
@@ -166,6 +167,10 @@ type auditSchema struct {
 
 func SaveAudit(st *bpmnEngine.StorageBpnm) error {
 
+	policy, err := bpmnEngine.GetData[*flow.Policy]("policy", st)
+	if err != nil {
+		return err
+	}
 	node, err := bpmnEngine.GetData[*flow.Network]("networkNode", st)
 	if err != nil {
 		return err
@@ -175,9 +180,9 @@ func SaveAudit(st *bpmnEngine.StorageBpnm) error {
 		return err
 	}
 
-	return saveAudit(node.NetworkNode, res.CallbackInfo)
+	return saveAudit(node.NetworkNode, res.CallbackInfo, policy.Policy)
 }
-func saveAudit(node *models.NetworkNode, callbackInfo base.CallbackInfo) error {
+func saveAudit(node *models.NetworkNode, callbackInfo base.CallbackInfo, policy *models.Policy) error {
 	var audit auditSchema
 	audit.CreationDate = lib.GetBigQueryNullDateTime(time.Now().UTC())
 	audit.Client = node.CallbackConfig.Name
@@ -189,14 +194,21 @@ func saveAudit(node *models.NetworkNode, callbackInfo base.CallbackInfo) error {
 
 	audit.ResStatusCode = callbackInfo.ResStatusCode
 	audit.ResBody = string(callbackInfo.ResBody)
-
 	if callbackInfo.Error != nil {
 		audit.Error = callbackInfo.Error.Error()
 	}
 
+	log.PrintStruct("SaveAudit:", audit)
 	const CallbackOutTableId string = "callback-out"
 	if err := lib.InsertRowsBigQuery(lib.WoptaDataset, CallbackOutTableId, audit); err != nil {
 		return err
+	}
+	if callbackInfo.ResStatusCode == 200 {
+		policy.AddSystemNote(func(p *models.Policy) models.PolicyNote {
+			return models.PolicyNote{
+				Text: "Callback " + audit.Client + " eseguita correttamente",
+			}
+		})
 	}
 	return nil
 }
