@@ -218,6 +218,7 @@ const (
 	PayMethodTransfer   = "transfer"
 	PayMethodSdd        = "sdd"
 	PayMethodRemittance = "remittance"
+	PayMethodSCT        = "SCT" // bonifico automatico
 )
 
 func GetAvailableMethods(role string) []string {
