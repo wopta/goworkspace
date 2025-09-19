@@ -21,67 +21,67 @@ var userRoutes []lib.Route = []lib.Route{
 	},
 	{
 		Route:   "/mail/v1/{mail}",
-		Handler: lib.ResponseLoggerWrapper(GetUserByMailFx),
+		Handler: lib.ResponseLoggerWrapper(getUserByMailFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
 		Route:   "/authId/v1/{authId}",
-		Handler: lib.ResponseLoggerWrapper(GetUserByAuthIdFx),
+		Handler: lib.ResponseLoggerWrapper(getUserByAuthIdFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
 		Route:   "/onboarding/v1",
-		Handler: lib.ResponseLoggerWrapper(OnboardUserFx),
+		Handler: lib.ResponseLoggerWrapper(onboardUserFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
 		Route:   "/document/v1/{policyUid}",
-		Handler: lib.ResponseLoggerWrapper(UploadDocumentFx),
+		Handler: lib.ResponseLoggerWrapper(uploadDocumentFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
 		Route:   "/fiscalcode/v1/it/{operation}",
-		Handler: lib.ResponseLoggerWrapper(FiscalCodeFx),
+		Handler: lib.ResponseLoggerWrapper(fiscalCodeFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
 		Route:   "/fiscalcode/v2/check/{fiscalCode}",
-		Handler: lib.ResponseLoggerWrapper(FiscalCodeCheckFx),
+		Handler: lib.ResponseLoggerWrapper(fiscalCodeCheckFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
 		Route:   "/invite/v1/create",
-		Handler: lib.ResponseLoggerWrapper(CreateInviteFx),
+		Handler: lib.ResponseLoggerWrapper(createInviteFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAdmin},
 	},
 	{
 		Route:   "/invite/v1/consume",
-		Handler: lib.ResponseLoggerWrapper(ConsumeInviteFx),
+		Handler: lib.ResponseLoggerWrapper(consumeInviteFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
 		Route:   "/role/v1/{userUid}",
-		Handler: lib.ResponseLoggerWrapper(UpdateUserRoleFx),
+		Handler: lib.ResponseLoggerWrapper(updateUserRoleFx),
 		Method:  http.MethodPatch,
 		Roles:   []string{lib.UserRoleAdmin},
 	},
 	{
 		Route:   "/v1",
-		Handler: lib.ResponseLoggerWrapper(GetUsersFx),
+		Handler: lib.ResponseLoggerWrapper(getUsersFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAdmin},
 	},
 	{
 		Route:   "/v2",
-		Handler: lib.ResponseLoggerWrapper(GetUsersV2Fx),
+		Handler: lib.ResponseLoggerWrapper(getUsersV2Fx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAdmin},
 	},
@@ -89,10 +89,10 @@ var userRoutes []lib.Route = []lib.Route{
 
 func init() {
 	log.Println("INIT User")
-	functions.HTTP("User", User)
+	functions.HTTP("User", user)
 }
 
-func User(w http.ResponseWriter, r *http.Request) {
+func user(w http.ResponseWriter, r *http.Request) {
 
 	router := lib.GetRouter("user", userRoutes)
 	router.ServeHTTP(w, r)

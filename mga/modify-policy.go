@@ -20,7 +20,7 @@ import (
 	usr "gitlab.dev.wopta.it/goworkspace/user"
 )
 
-func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func modifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err                                     error
 		inputPolicy, modifiedPolicy, diffPolicy models.Policy
@@ -83,11 +83,15 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	if diffPolicy, hasDiff = generateDiffPolicy(originalPolicy, modifiedPolicy); hasDiff {
 		log.Println("generating addendum document for chages...")
 		if addendumResp, err := document.Addendum(&diffPolicy); err == nil {
+			res, err := addendumResp.Save()
+			if err != nil {
+				return "", nil, err
+			}
 			addendumAtt := models.Attachment{
 				Name:        "Appendice - Modifica dati di polizza",
-				FileName:    addendumResp.Filename,
+				FileName:    addendumResp.FileName,
 				ContentType: lib.GetContentType("pdf"),
-				Link:        addendumResp.LinkGcs,
+				Link:        res.LinkGcs,
 				IsPrivate:   false,
 				Section:     models.DocumentSectionContracts,
 				Note:        "",

@@ -25,7 +25,7 @@ type PutNetworkTransactionRequest struct {
 	DeletionDate     time.Time `json:"deletionDate"`
 }
 
-func PutNetworkTransactionFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
+func putNetworkTransactionFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		err     error
 		request PutNetworkTransactionRequest

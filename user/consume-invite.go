@@ -19,7 +19,7 @@ type ConsumeInviteReq struct {
 	Password  string `json:"password"`
 }
 
-func ConsumeInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func consumeInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var ConsumeInviteRequest ConsumeInviteReq
 
 	log.AddPrefix("ConsumeInviteFx")

@@ -27,7 +27,7 @@ type GetUsersResp struct {
 	Users []models.User `json:"users"`
 }
 
-func GetUsersFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func getUsersFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		req        GetUsersReq
 		response   GetUsersResp
@@ -87,7 +87,7 @@ func GetUsersFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	return string(jsonOut), response, err
 }
 
-func GetUserByAuthIdFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func getUserByAuthIdFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.AddPrefix("GetUserByAuthIdFx")
 	defer log.PopPrefix()
 
@@ -132,7 +132,7 @@ func GetUserByFiscalCode(fiscalCode string) (models.User, error) {
 	return models.FirestoreDocumentToUser(userFirebase)
 }
 
-func GetUserByMailFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func getUserByMailFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.AddPrefix("[GetUserByMailFx] ")
 	defer log.PopPrefix()
 
@@ -178,7 +178,7 @@ type userInfo struct {
 	FiscalCode string `json:"fiscalCode" bigquery:"fiscalCode"`
 }
 
-func GetUsersV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func getUsersV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var err error
 
 	log.AddPrefix("GetUsersV2Fx")

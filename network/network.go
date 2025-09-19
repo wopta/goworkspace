@@ -13,13 +13,13 @@ var networkRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/import/v1",
 		Method:  http.MethodPost,
-		Handler: lib.ResponseLoggerWrapper(ImportNodesFx),
+		Handler: lib.ResponseLoggerWrapper(importNodesFx),
 		Roles:   []string{lib.UserRoleAdmin},
 	},
 	{
 		Route:   "/subtree/v1/{nodeUid}",
 		Method:  http.MethodGet,
-		Handler: lib.ResponseLoggerWrapper(NodeSubTreeFx),
+		Handler: lib.ResponseLoggerWrapper(nodeSubTreeFx),
 		Roles: []string{
 			lib.UserRoleAdmin,
 			lib.UserRoleManager,
@@ -32,10 +32,10 @@ var networkRoutes []lib.Route = []lib.Route{
 
 func init() {
 	log.Println("INIT Network")
-	functions.HTTP("Network", Network)
+	functions.HTTP("Network", network)
 }
 
-func Network(w http.ResponseWriter, r *http.Request) {
+func network(w http.ResponseWriter, r *http.Request) {
 
 	router := lib.GetRouter("network", networkRoutes)
 	router.ServeHTTP(w, r)

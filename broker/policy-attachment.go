@@ -19,7 +19,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/wiseproxy"
 )
 
-func GetPolicyAttachmentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func getPolicyAttachmentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var response GetPolicyAttachmentsResponse
 
 	log.AddPrefix("GetPolicyAttachmentFx")

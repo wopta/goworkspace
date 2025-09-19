@@ -21,7 +21,7 @@ import (
 	trxRenew "gitlab.dev.wopta.it/goworkspace/transaction/renew"
 )
 
-func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func renewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err         error
 		payload     ManualPaymentPayload

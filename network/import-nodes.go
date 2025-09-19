@@ -115,7 +115,7 @@ const (
 	FacileBrokerNetwork = "FACILE-BROKER"
 )
 
-func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func importNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err           error
 		req           ImportNodesReq

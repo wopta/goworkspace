@@ -12,13 +12,13 @@ import (
 var partnershipRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/v1/life/{partnershipUid}",
-		Handler: lib.ResponseLoggerWrapper(NewLifePartnershipFx),
+		Handler: lib.ResponseLoggerWrapper(getLifePartnershipFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
 		Route:   "/v1/product/{partnershipUid}",
-		Handler: lib.ResponseLoggerWrapper(GetPartnershipNodeAndProductsFx),
+		Handler: lib.ResponseLoggerWrapper(getPartnershipNodeAndProductsFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
 	},
@@ -26,10 +26,10 @@ var partnershipRoutes []lib.Route = []lib.Route{
 
 func init() {
 	log.Println("INIT Partnership")
-	functions.HTTP("Partnership", Partnership)
+	functions.HTTP("Partnership", partnership)
 }
 
-func Partnership(w http.ResponseWriter, r *http.Request) {
+func partnership(w http.ResponseWriter, r *http.Request) {
 
 	router := lib.GetRouter("partnership", partnershipRoutes)
 	router.ServeHTTP(w, r)

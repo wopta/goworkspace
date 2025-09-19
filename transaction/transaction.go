@@ -1,7 +1,6 @@
 package transaction
 
 import (
-	"encoding/json"
 	"net/http"
 	"time"
 
@@ -15,7 +14,7 @@ import (
 var transactionRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/policy/v1/{policyUid}",
-		Handler: lib.ResponseLoggerWrapper(GetTransactionsByPolicyUidFx), // Broker.GetPolicyTransactions,
+		Handler: lib.ResponseLoggerWrapper(getTransactionsByPolicyUidFx), // Broker.GetPolicyTransactions,
 		Method:  http.MethodGet,
 		Roles: []string{
 			models.UserRoleAdmin,
@@ -26,7 +25,7 @@ var transactionRoutes []lib.Route = []lib.Route{
 	},
 	{
 		Route:   "/restore/v1/{transactionUid}",
-		Handler: lib.ResponseLoggerWrapper(RestoreTransactionFx),
+		Handler: lib.ResponseLoggerWrapper(restoreTransactionFx),
 		Method:  http.MethodPost,
 		Roles:   []string{models.UserRoleAdmin},
 	},
@@ -45,43 +44,13 @@ var transactionRoutes []lib.Route = []lib.Route{
 
 func init() {
 	log.Println("INIT Transaction")
-	functions.HTTP("Transaction", Transaction)
+	functions.HTTP("Transaction", transaction)
 }
 
-func Transaction(w http.ResponseWriter, r *http.Request) {
+func transaction(w http.ResponseWriter, r *http.Request) {
 
 	router := lib.GetRouter("transaction", transactionRoutes)
 	router.ServeHTTP(w, r)
-}
-
-func SetPolicyFirstTransactionPaid(policyUid string, scheduleDate string) {
-	q := lib.Firequeries{
-		Queries: []lib.Firequery{
-			{
-				Field:      "policyUid",
-				Operator:   "==",
-				QueryValue: policyUid,
-			},
-			{
-				Field:      "scheduleDate",
-				Operator:   "==",
-				QueryValue: scheduleDate,
-			},
-		},
-	}
-	fireTransactions := "transactions"
-	query, _ := q.FirestoreWherefields(fireTransactions)
-	transactions := models.TransactionToListData(query)
-	transaction := transactions[0]
-	tr, _ := json.Marshal(transaction)
-	log.Println("SetPolicyFirstTransactionPaid::payment "+policyUid+" ", string(tr))
-	transaction.IsPay = true
-	transaction.Status = models.TransactionStatusPay
-	transaction.StatusHistory = append(transaction.StatusHistory, models.TransactionStatusPay)
-	transaction.PayDate = time.Now().UTC()
-	transaction.TransactionDate = time.Now().UTC()
-	lib.SetFirestore(fireTransactions, transaction.Uid, transaction)
-	transaction.BigQuerySave()
 }
 
 func GetTransactionToBePaid(policyUid, providerId, scheduleDate, collection string) (models.Transaction, error) {

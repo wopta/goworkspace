@@ -10,7 +10,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models/catnat"
 )
 
-func CatnatAtecoFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func catnatAtecoFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.AddPrefix("CatnatAtecoFx")
 	defer log.PopPrefix()
 	fiscalCode := chi.URLParam(r, "fiscalCode")

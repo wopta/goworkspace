@@ -23,7 +23,7 @@ type GetPolicyMediaResp struct {
 	RawDoc string `json:"rawDoc"`
 }
 
-func GetPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func getPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err     error
 		rawResp string

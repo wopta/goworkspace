@@ -19,7 +19,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func FiscalCodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func fiscalCodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		user    models.User
 		outJson string
@@ -54,7 +54,7 @@ func FiscalCodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	return outJson, user, err
 }
 
-func FiscalCodeCheckFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func fiscalCodeCheckFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		user models.User
 	)

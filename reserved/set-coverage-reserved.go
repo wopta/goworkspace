@@ -16,7 +16,7 @@ type SetCoverageReservedResponse struct {
 	Policy *models.Policy `json:"policy"`
 }
 
-func SetCoverageReservedFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func setCoverageReservedFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		response SetCoverageReservedResponse
 		err      error

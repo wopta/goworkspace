@@ -13,7 +13,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/policy/utils"
 )
 
-func GetPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func getPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.AddPrefix("GetPolicyFx")
 	defer log.PopPrefix()
 

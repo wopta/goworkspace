@@ -10,7 +10,7 @@ import (
 	"io"
 	"net"
 	"net/http"
-	"net/mail"
+	m "net/mail"
 	"net/smtp"
 	"os"
 	"strings"
@@ -54,7 +54,7 @@ func (a *loginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
 	return nil, nil
 }
 
-func SendFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func sendFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var obj MailRequest
 
 	log.AddPrefix("SendFx")
@@ -146,7 +146,7 @@ func sendmail(obj MailRequest) error {
 		return err
 	}
 
-	emptyAddress := mail.Address{}
+	emptyAddress := m.Address{}
 	if obj.FromAddress.String() != emptyAddress.String() {
 		from = obj.FromAddress
 	} else if obj.From != "" {
@@ -159,7 +159,7 @@ func sendmail(obj MailRequest) error {
 	}
 
 	for _, _to := range obj.To {
-		to := mail.Address{Name: _to, Address: _to}
+		to := m.Address{Name: _to, Address: _to}
 		subj := obj.Subject
 		body := obj.Message
 

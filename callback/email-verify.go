@@ -10,7 +10,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/mail"
 )
 
-func EmailVerifyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func emailVerifyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.AddPrefix("EmailVerifyFx")
 	defer log.PopPrefix()
 

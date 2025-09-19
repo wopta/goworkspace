@@ -13,7 +13,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
-func AtecoFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func atecoFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		ricAteco   []byte
 		enrichByte []byte

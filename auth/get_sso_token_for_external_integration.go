@@ -16,7 +16,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
-func GetTokenForExternalIntegrationFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func getTokenForExternalIntegrationFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		e        error
 		b        []byte

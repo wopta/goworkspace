@@ -16,7 +16,7 @@ import (
 	trxRenew "gitlab.dev.wopta.it/goworkspace/transaction/renew"
 )
 
-func RestoreTransactionFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func restoreTransactionFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err                   error
 		isRenew               bool

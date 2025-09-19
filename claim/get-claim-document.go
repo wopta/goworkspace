@@ -23,7 +23,7 @@ type GetClaimDocumentResp struct {
 	Document string `json:"document"`
 }
 
-func GetClaimDocumentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func getClaimDocumentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		request  GetClaimDocumentReq
 		response GetClaimDocumentResp

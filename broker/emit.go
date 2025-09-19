@@ -156,7 +156,7 @@ func emitDraft(policy *models.Policy, request EmitRequest) (EmitResponse, error)
 	if err != nil {
 		return responseEmit, err
 	}
-	err = flow.Run("emit")
+	err = flow.Run(bpmnEngine.Emit)
 	if err != nil {
 		return responseEmit, err
 	}

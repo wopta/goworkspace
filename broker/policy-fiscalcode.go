@@ -16,7 +16,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/wiseproxy"
 )
 
-func PolicyFiscalcodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func policyFiscalcodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		policies           []models.Policy
 		wiseToken          *string = nil

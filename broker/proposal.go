@@ -105,7 +105,7 @@ func proposal(policy *models.Policy, sendEmail bool) error {
 	if err != nil {
 		return err
 	}
-	err = flow.Run("proposal")
+	err = flow.Run(bpmnEngine.Proposal)
 	if err != nil {
 		return err
 	}

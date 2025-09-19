@@ -18,7 +18,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/sellable"
 )
 
-func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func gapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		policy  *models.Policy
 		warrant *models.Warrant

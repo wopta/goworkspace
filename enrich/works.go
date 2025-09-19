@@ -9,7 +9,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
-func WorksFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func worksFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		works  []byte
 		result []Work

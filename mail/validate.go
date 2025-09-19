@@ -14,7 +14,7 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-func ValidateFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func validateFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var result map[string]string
 
 	log.AddPrefix("ValidateFx")

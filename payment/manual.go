@@ -29,7 +29,7 @@ type ManualPaymentPayload struct {
 	Note            string    `json:"note"`
 }
 
-func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func manualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err         error
 		payload     ManualPaymentPayload
@@ -177,7 +177,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	if err != nil {
 		return "", nil, err
 	}
-	err = flow.Run("pay")
+	err = flow.Run(bpmnEngine.Pay)
 	if err != nil {
 		return "", nil, err
 	}

@@ -12,7 +12,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 )
 
-func MunichVatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func munichVatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.AddPrefix("MunichVatFx")
 	defer log.PopPrefix()
 

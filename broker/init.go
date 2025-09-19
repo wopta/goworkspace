@@ -19,7 +19,7 @@ type InitReq struct {
 	ProductName string `json:"productName"`
 }
 
-func InitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func initFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err error
 		req InitReq

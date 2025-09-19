@@ -13,7 +13,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func NodeSubTreeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func nodeSubTreeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err  error
 		root models.NetworkTreeElement

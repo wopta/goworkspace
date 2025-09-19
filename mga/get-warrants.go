@@ -38,7 +38,7 @@ type getWarrantsResponse struct {
 	Warrants []warrant `json:"warrants"`
 }
 
-func GetWarrantsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func getWarrantsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err  error
 		resp getWarrantsResponse

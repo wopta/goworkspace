@@ -109,7 +109,7 @@ func requestApproval(policy *models.Policy) error {
 	if err != nil {
 		return err
 	}
-	err = flow.Run("requestApproval")
+	err = flow.Run(bpmnEngine.RequestApproval)
 
 	log.Println("Handler end -------------------------------------------------")
 

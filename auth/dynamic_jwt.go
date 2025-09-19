@@ -15,7 +15,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func DynamicJwtFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
+func dynamicJwtFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		tokenString    string
 		err            error

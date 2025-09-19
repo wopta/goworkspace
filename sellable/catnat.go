@@ -21,7 +21,7 @@ type SellableOutput struct {
 	Product *models.Product
 }
 
-func CatnatFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
+func catnatFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		policy *models.Policy
 		err    error

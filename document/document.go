@@ -19,7 +19,7 @@ type DocumentResp struct {
 var documentRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/generate/mup/{nodeUid}",
-		Handler: lib.ResponseLoggerWrapper(GenerateMupFx),
+		Handler: lib.ResponseLoggerWrapper(generateMupFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
@@ -27,10 +27,10 @@ var documentRoutes []lib.Route = []lib.Route{
 
 func init() {
 	log.Println("INIT Document")
-	functions.HTTP("Document", Document)
+	functions.HTTP("Document", document)
 }
 
-func Document(w http.ResponseWriter, r *http.Request) {
+func document(w http.ResponseWriter, r *http.Request) {
 	router := lib.GetRouter("document", documentRoutes)
 	router.ServeHTTP(w, r)
 }

@@ -14,7 +14,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func AddressValidationFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
+func addressValidationFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		err     error
 		address models.Address

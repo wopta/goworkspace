@@ -19,7 +19,7 @@ type GetPartnershipNodeAndProductsResp struct {
 	Products    []models.ProductInfo `json:"products"`
 }
 
-func GetPartnershipNodeAndProductsFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
+func getPartnershipNodeAndProductsFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		response GetPartnershipNodeAndProductsResp
 		node     *models.NetworkNode

@@ -15,7 +15,7 @@ type paymentHandler interface {
 	AnnuitySingleRateFx(http.ResponseWriter, *http.Request) (string, any, error)
 }
 
-func payment(w http.ResponseWriter, r *http.Request) (string, any, error) {
+func paymentFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 
 	log.AddPrefix("Payment")
 	defer func() {

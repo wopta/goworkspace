@@ -41,7 +41,7 @@ type policyInfo struct {
 	Total          float64        `json:"total" bigquery:"total"`
 }
 
-func GetPortfolioFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func getPortfolioFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var err error
 
 	log.AddPrefix("GetPortfolioFx")

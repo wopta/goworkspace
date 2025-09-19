@@ -20,7 +20,7 @@ type RenewReq struct {
 	DaysBeforeRenew string `json:"days_before_renew"`
 }
 
-func RenewMailFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func renewMailFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err             error
 		date            = time.Now().UTC()

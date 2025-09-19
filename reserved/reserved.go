@@ -11,7 +11,7 @@ import (
 var reservedRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/coverage/v1/{policyUid}",
-		Handler: lib.ResponseLoggerWrapper(SetCoverageReservedFx),
+		Handler: lib.ResponseLoggerWrapper(setCoverageReservedFx),
 		Method:  http.MethodPatch,
 		Roles:   []string{lib.UserRoleAll},
 	},
@@ -23,7 +23,6 @@ func init() {
 }
 
 func Reserved(w http.ResponseWriter, r *http.Request) {
-
 	router := lib.GetRouter("reserved", reservedRoutes)
 	router.ServeHTTP(w, r)
 }

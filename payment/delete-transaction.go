@@ -19,7 +19,7 @@ import (
 	trxRenew "gitlab.dev.wopta.it/goworkspace/transaction/renew"
 )
 
-func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func deleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err         error
 		isRenew     bool

@@ -16,7 +16,7 @@ import (
 	plc "gitlab.dev.wopta.it/goworkspace/policy"
 )
 
-func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func uploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	const pdfMimeType = "application/pdf"
 	var (
 		err    error

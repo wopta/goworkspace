@@ -17,7 +17,7 @@ type DraftResponse struct {
 	RawDoc string `json:"rawDoc"`
 }
 
-func GenerateDocumentFx(_ http.ResponseWriter, r *http.Request) (string, any, error) {
+func generateDocumentFx(_ http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		err           error
 		policy        models.Policy

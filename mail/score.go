@@ -14,7 +14,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
-func ScoreFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func scoreFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var result map[string]string
 
 	log.AddPrefix("ScoreFx")

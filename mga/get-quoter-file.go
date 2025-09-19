@@ -11,7 +11,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
-func GetQuoterFileFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func getQuoterFileFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	const (
 		filePath = "products/life/v2/wopta-per-te-vita-v42.xltx"
 		filename = "Wopta per te. Vita - V4.2.xltx"

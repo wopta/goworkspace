@@ -15,7 +15,7 @@ import (
 )
 
 // DEPRECATED
-func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func lifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		policy  *models.Policy
 		warrant *models.Warrant

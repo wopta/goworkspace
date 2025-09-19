@@ -19,7 +19,7 @@ type GetPolicyTransactionsResp struct {
 
 type Transactions []models.Transaction
 
-func GetTransactionsByPolicyUidFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func getTransactionsByPolicyUidFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.AddPrefix("GetTransactionsByPolicyUidFx")
 	defer log.PopPrefix()
 

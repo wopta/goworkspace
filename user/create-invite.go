@@ -55,7 +55,7 @@ type UserInvite struct {
 	Products        []models.Product `json:"products,omitempty" firestore:"products,omitempty"`
 }
 
-func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func createInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var createInviteRequest CreateInviteRequest
 
 	log.AddPrefix("[CreateInviteFx] ")

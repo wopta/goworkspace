@@ -85,7 +85,7 @@ func testFlow(t *testing.T, process string, expectedACtivities []string, store *
 	if e != nil {
 		t.Fatal(e)
 	}
-	if err := flow.Run(process); err != nil {
+	if err := flow.Run(bpmnEngine.BpmnFlow(process)); err != nil {
 		t.Fatal(err)
 	}
 	if len(expectedACtivities) != len(log.log) {

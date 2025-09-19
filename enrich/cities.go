@@ -9,7 +9,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 )
 
-func CitiesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func citiesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		cities []byte
 		result []City

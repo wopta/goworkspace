@@ -24,7 +24,7 @@ type UploadPolicyMediaReq struct {
 	Note      string
 }
 
-func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func uploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err    error
 		policy *models.Policy

@@ -29,7 +29,7 @@ type NetworkNodeInvite struct {
 	Expiration     time.Time `json:"expiration,omitempty" firestore:"expiration,omitempty"`
 }
 
-func CreateNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func createNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		req         CreateNetworkNodeInviteRequest
 		networkNode *models.NetworkNode

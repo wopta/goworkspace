@@ -16,7 +16,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func PutClaimFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func putClaimFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.AddPrefix("PutClaimFx")
 	defer log.PopPrefix()
 

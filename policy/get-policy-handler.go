@@ -2,6 +2,7 @@ package policy
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -12,7 +13,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func GetPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func getPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		result map[string]string
 	)
@@ -50,4 +51,25 @@ func GetPolicy(uid string) (models.Policy, error) {
 	}
 	err = docsnap.DataTo(&policy)
 	return policy, err
+}
+
+func GetPolicyByCodeCompany(codeCompany string) (res models.Policy, err error) {
+	policyQuery := lib.Firequeries{
+		Queries: []lib.Firequery{
+			{
+				Field:      "codeCompany",
+				Operator:   "==",
+				QueryValue: codeCompany,
+			},
+		},
+	}
+	docsnap, e := policyQuery.FirestoreWherefields(lib.PolicyCollection)
+	if e != nil {
+		return res, e
+	}
+	p := models.PolicyToListData(docsnap)
+	if len(p) == 0 {
+		return res, fmt.Errorf("Policy with codeCompany %v not found", codeCompany)
+	}
+	return p[0], nil
 }

@@ -11,39 +11,39 @@ import (
 var enrichRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/vat/munichre/{vat}",
-		Handler: lib.ResponseLoggerWrapper(MunichVatFx),
+		Handler: lib.ResponseLoggerWrapper(munichVatFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
 		Route:   "/ateco/{ateco}",
-		Handler: lib.ResponseLoggerWrapper(AtecoFx),
+		Handler: lib.ResponseLoggerWrapper(atecoFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
 		Route:   "/cat-nat/ateco/{fiscalCode}",
-		Handler: lib.ResponseLoggerWrapper(CatnatAtecoFx),
+		Handler: lib.ResponseLoggerWrapper(catnatAtecoFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
 	},
 
 	{
 		Route:   "/cities",
-		Handler: lib.ResponseLoggerWrapper(CitiesFx),
+		Handler: lib.ResponseLoggerWrapper(citiesFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
 	},
 
 	{
 		Route:   "/works",
-		Handler: lib.ResponseLoggerWrapper(WorksFx),
+		Handler: lib.ResponseLoggerWrapper(worksFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
 		Route:   "/naics",
-		Handler: lib.ResponseLoggerWrapper(NaicsFx),
+		Handler: lib.ResponseLoggerWrapper(naicsFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
 	},
@@ -51,10 +51,10 @@ var enrichRoutes []lib.Route = []lib.Route{
 
 func init() {
 	log.Println("INIT Enrich")
-	functions.HTTP("Enrich", Enrich)
+	functions.HTTP("Enrich", enrich)
 }
 
-func Enrich(w http.ResponseWriter, r *http.Request) {
+func enrich(w http.ResponseWriter, r *http.Request) {
 	router := lib.GetRouter("enrich", enrichRoutes)
 	router.ServeHTTP(w, r)
 }

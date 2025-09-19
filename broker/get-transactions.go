@@ -21,7 +21,7 @@ type GetPolicyTransactionsResp struct {
 
 type Transactions []models.Transaction
 
-func GetPolicyTransactionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func getPolicyTransactionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var response GetPolicyTransactionsResp
 
 	log.AddPrefix("GetPolicyTransactionsFx")

@@ -10,7 +10,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func getPolicyNotes(w http.ResponseWriter, r *http.Request) (string, any, error) {
+func getPolicyNotesFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	policyUid := chi.URLParam(r, "policyUid")
 	p, e := GetPolicy(policyUid)
 	if e != nil {

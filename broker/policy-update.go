@@ -19,7 +19,7 @@ type UpdatePolicyResponse struct {
 	Policy *models.Policy `json:"policy"`
 }
 
-func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func updatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err         error
 		inputPolicy models.Policy
@@ -132,7 +132,7 @@ func PatchPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	return `{"uid":"` + policyUID + `"}`, `{"uid":"` + policyUID + `"}`, err
 }
 
-func DeletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func deletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err       error
 		policy    models.Policy

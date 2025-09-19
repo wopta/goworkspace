@@ -12,7 +12,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
-func UpdateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func updateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err       error
 		body      []byte

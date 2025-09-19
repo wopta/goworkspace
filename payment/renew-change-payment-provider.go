@@ -23,7 +23,7 @@ import (
 This should be a temporary handler while the imported policies by an agent that works
 with an online warrant are not set to the correct provider at import time
 */
-func RenewChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func renewChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err                  error
 		rawResp              []byte

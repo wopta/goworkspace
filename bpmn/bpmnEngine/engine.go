@@ -9,20 +9,32 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 )
 
+type BpmnFlow string
+
+const (
+	Emit            BpmnFlow = "emit"
+	Lead            BpmnFlow = "lead"
+	Proposal        BpmnFlow = "proposal"
+	RequestApproval BpmnFlow = "requestApproval"
+	Acceptance      BpmnFlow = "acceptance"
+	Pay             BpmnFlow = "pay"
+	Sign            BpmnFlow = "sign"
+)
+
 // Run a process, it starts from defaultActivity defined in json
-func (f *FlowBpnm) Run(processName string) error {
-	process := f.process[processName]
+func (f *FlowBpnm) Run(flow BpmnFlow) error {
+	process := f.process[string(flow)]
 	if process == nil {
-		return fmt.Errorf("Process '%v' not found", processName)
+		return fmt.Errorf("Process '%v' not found", string(flow))
 	}
-	return f.RunAt(processName, process.defaultStart)
+	return f.RunAt(flow, process.defaultStart)
 }
 
-func (f *FlowBpnm) RunAt(processName, startingActivity string) error {
-	log.InfoF("Run %v", processName)
-	process := f.process[processName]
+func (f *FlowBpnm) RunAt(flow BpmnFlow, startingActivity string) error {
+	log.InfoF("Run %v", flow)
+	process := f.process[string(flow)]
 	if process == nil {
-		return fmt.Errorf("Process '%v' not found", processName)
+		return fmt.Errorf("Process '%v' not found", string(flow))
 	}
 
 	process.storageBpnm.AddGlobal("statusFlow", &StatusFlow{CurrentProcess: process.name})

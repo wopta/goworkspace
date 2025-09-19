@@ -19,7 +19,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/sellable"
 )
 
-func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func combinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err        error
 		reqPolicy  *models.Policy

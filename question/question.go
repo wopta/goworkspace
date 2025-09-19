@@ -23,7 +23,7 @@ const (
 var questionRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/v1/{questionType}",
-		Handler: lib.ResponseLoggerWrapper(GetQuestionsFx),
+		Handler: lib.ResponseLoggerWrapper(getQuestionsFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
@@ -31,16 +31,15 @@ var questionRoutes []lib.Route = []lib.Route{
 
 func init() {
 	log.Println("INIT Question")
-	functions.HTTP("Question", Question)
+	functions.HTTP("Question", question)
 }
 
-func Question(w http.ResponseWriter, r *http.Request) {
-
+func question(w http.ResponseWriter, r *http.Request) {
 	router := lib.GetRouter("question", questionRoutes)
 	router.ServeHTTP(w, r)
 }
 
-func GetQuestionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func getQuestionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		result interface{}
 		policy *models.Policy

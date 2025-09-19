@@ -10,12 +10,6 @@ import (
 )
 
 var callbackRoutes []lib.Route = []lib.Route{
-	//	{
-	//		Route:   "/v1/sign",
-	//		Handler: lib.ResponseLoggerWrapper(SignFx),
-	//		Method:  http.MethodGet,
-	//		Roles:   []string{},
-	//	},
 	{
 		Route:   "/v1/net/incasso",
 		Handler: lib.ResponseLoggerWrapper(incassoNetFx),
@@ -28,30 +22,15 @@ var callbackRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodGet,
 		Roles:   []string{},
 	},
-	//TODO: could be this eliminated?
-	//	{
-	//		Route:   "/v1/payment",
-	//		Handler: lib.ResponseLoggerWrapper(PaymentFx),
-	//		Method:  http.MethodPost,
-	//		Roles:   []string{},
-	//	},
 	{
 		Route:   "/v1/payment/{provider}/{rate}",
-		Handler: lib.ResponseLoggerWrapper(payment),
+		Handler: lib.ResponseLoggerWrapper(paymentFx),
 		Method:  http.MethodPost,
 		Roles:   []string{},
 	},
-	//	{
-	//		Route: "/v1/payment/{provider}/single-rate",
-	//		// TODO: create an extra handler wrapper that switches on provider.
-	//		// For now as fabrick is the single provider it is hardcoded.
-	//		Handler: lib.ResponseLoggerWrapper(fabrick.AnnuitySingleRateFx),
-	//		Method:  http.MethodPost,
-	//		Roles:   []string{},
-	//	},
 	{
 		Route:   "/v1/emailVerify",
-		Handler: lib.ResponseLoggerWrapper(EmailVerifyFx),
+		Handler: lib.ResponseLoggerWrapper(emailVerifyFx),
 		Method:  http.MethodGet,
 		Roles:   []string{},
 	},

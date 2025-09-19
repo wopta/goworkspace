@@ -89,7 +89,7 @@ func namirialStepFinished(policyUid string, sendEmail bool) error {
 	if err != nil {
 		return err
 	}
-	err = flow.Run("sign")
+	err = flow.Run(bpmnEngine.Sign)
 	if err != nil {
 		return err
 	}

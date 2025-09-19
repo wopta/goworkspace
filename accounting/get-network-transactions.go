@@ -16,7 +16,7 @@ type GetNetworkTransactionsResponse struct {
 	NetworkTransactions []models.NetworkTransaction `json:"networkTransactions"`
 }
 
-func GetNetworkTransactionsFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
+func getNetworkTransactionsFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var response GetNetworkTransactionsResponse
 
 	log.AddPrefix("GetNetworkTransactionsFx")

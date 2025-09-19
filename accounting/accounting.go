@@ -11,19 +11,19 @@ import (
 var accountingRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/network/transactions/v1/transaction/{transactionUid}",
-		Handler: lib.ResponseLoggerWrapper(GetNetworkTransactionsFx),
+		Handler: lib.ResponseLoggerWrapper(getNetworkTransactionsFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager},
 	},
 	{
 		Route:   "/network/transactions/v1/{uid}",
-		Handler: lib.ResponseLoggerWrapper(PutNetworkTransactionFx),
+		Handler: lib.ResponseLoggerWrapper(putNetworkTransactionFx),
 		Method:  http.MethodPut,
 		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager},
 	},
 	{
 		Route:   "/network/transactions/v1/transaction/{transactionUid}",
-		Handler: lib.ResponseLoggerWrapper(CreateNetworkTransactionFx),
+		Handler: lib.ResponseLoggerWrapper(createNetworkTransactionFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager},
 	},
@@ -31,10 +31,10 @@ var accountingRoutes []lib.Route = []lib.Route{
 
 func init() {
 	log.Println("INIT Accounting")
-	functions.HTTP("Accounting", Accounting)
+	functions.HTTP("Accounting", accounting)
 }
 
-func Accounting(w http.ResponseWriter, r *http.Request) {
+func accounting(w http.ResponseWriter, r *http.Request) {
 
 	router := lib.GetRouter("accounting", accountingRoutes)
 	router.ServeHTTP(w, r)

@@ -33,7 +33,7 @@ Now this function is used only to change payment provider to Fabrick (info hardc
 policies that have been imported. When we will have multi providers we should delete transactions schedule from
 old provider systems and only then send schedule new transactions to new provider systems.
 */
-func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func changePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err                  error
 		payUrl               string

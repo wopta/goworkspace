@@ -19,7 +19,7 @@ type OnboardUserDto struct {
 	Password   string `json:"password"`
 }
 
-func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func onboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		onboardUserRequest OnboardUserDto
 		user               *models.User

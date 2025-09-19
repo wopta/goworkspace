@@ -12,49 +12,49 @@ import (
 var quoteRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/pmi/munichre",
-		Handler: lib.ResponseLoggerWrapper(PmiMunichFx),
+		Handler: lib.ResponseLoggerWrapper(pmiMunichFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
 		Route:   "/incident",
-		Handler: lib.ResponseLoggerWrapper(PmiMunichFx),
+		Handler: lib.ResponseLoggerWrapper(pmiMunichFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
 		Route:   "/v1/life",
-		Handler: lib.ResponseLoggerWrapper(LifeFx),
+		Handler: lib.ResponseLoggerWrapper(lifeFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
 		Route:   "/v1/person",
-		Handler: lib.ResponseLoggerWrapper(PersonaFx),
+		Handler: lib.ResponseLoggerWrapper(personaFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
 		Route:   "/v1/gap",
-		Handler: lib.ResponseLoggerWrapper(GapFx),
+		Handler: lib.ResponseLoggerWrapper(gapFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
 		Route:   "/v1/commercial-combined",
-		Handler: lib.ResponseLoggerWrapper(CombinedQbeFx),
+		Handler: lib.ResponseLoggerWrapper(combinedQbeFx),
 		Method:  http.MethodPost,
 		Roles:   []string{},
 	},
 	{
 		Route:   "/v1/generate/document",
-		Handler: lib.ResponseLoggerWrapper(GenerateDocumentFx),
+		Handler: lib.ResponseLoggerWrapper(generateDocumentFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
 		Route:   "/v1/cat-nat",
-		Handler: lib.ResponseLoggerWrapper(CatNatFx),
+		Handler: lib.ResponseLoggerWrapper(catNatFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
@@ -62,11 +62,10 @@ var quoteRoutes []lib.Route = []lib.Route{
 
 func init() {
 	log.Println("INIT Quote")
-	functions.HTTP("Quote", Quote)
+	functions.HTTP("Quote", quote)
 }
 
-func Quote(w http.ResponseWriter, r *http.Request) {
-
+func quote(w http.ResponseWriter, r *http.Request) {
 	router := lib.GetRouter("quote", quoteRoutes)
 	router.ServeHTTP(w, r)
 }

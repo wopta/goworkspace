@@ -33,7 +33,7 @@ type NodeFlowRelation struct {
 	Flow string
 }
 
-func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func draftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err    error
 		dryRun = true

@@ -15,7 +15,7 @@ type GetAllNetworkNodesResponse struct {
 	NetworkNodes []models.NetworkNode `json:"networkNodes"`
 }
 
-func GetAllNetworkNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func getAllNetworkNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var response GetAllNetworkNodesResponse
 
 	log.AddPrefix("[GetAllNetworkNodesFx] ")

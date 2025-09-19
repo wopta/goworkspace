@@ -40,7 +40,7 @@ type paymentReceiptResp struct {
 	RawDoc   string `json:"rawDoc"`
 }
 
-func PaymentReceiptFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func paymentReceiptFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err     error
 		isRenew bool

@@ -109,5 +109,5 @@ func annuityFirstRate(policy *models.Policy, paymentInfo flow.PaymentInfoBpmn) e
 	if err != nil {
 		return err
 	}
-	return flow.Run("pay")
+	return flow.Run(bpmnEngine.Pay)
 }

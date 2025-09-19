@@ -20,7 +20,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/sellable"
 )
 
-func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func personaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		policy  models.Policy
 		warrant *models.Warrant

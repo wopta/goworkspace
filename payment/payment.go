@@ -19,39 +19,39 @@ var paymentRoutes []lib.Route = []lib.Route{
 	},
 	{
 		Route:   "/v1/cripto",
-		Handler: lib.ResponseLoggerWrapper(CriptoPay),
+		Handler: lib.ResponseLoggerWrapper(criptoPayFx),
 		Method:  http.MethodPost,
 		Roles:   []string{models.UserRoleAll},
 	},
 	{
 		Route:   "/v1/{uid}",
-		Handler: lib.ResponseLoggerWrapper(DeleteTransactionFx),
+		Handler: lib.ResponseLoggerWrapper(deleteTransactionFx),
 		Method:  http.MethodDelete,
 		Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 	},
 	{
 		Route:   "/manual/v1/{transactionUid}",
-		Handler: lib.ResponseLoggerWrapper(ManualPaymentFx),
+		Handler: lib.ResponseLoggerWrapper(manualPaymentFx),
 		Method:  http.MethodPost,
 		Roles: []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAreaManager,
 			models.UserRoleAgency, models.UserRoleAgent},
 	},
 	{
 		Route:   "/manual/v1/renew/{transactionUid}",
-		Handler: lib.ResponseLoggerWrapper(RenewManualPaymentFx),
+		Handler: lib.ResponseLoggerWrapper(renewManualPaymentFx),
 		Method:  http.MethodPost,
 		Roles: []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAreaManager,
 			models.UserRoleAgency, models.UserRoleAgent},
 	},
 	{
 		Route:   "/v1",
-		Handler: lib.ResponseLoggerWrapper(ChangePaymentProviderFx),
+		Handler: lib.ResponseLoggerWrapper(changePaymentProviderFx),
 		Method:  http.MethodPatch,
 		Roles:   []string{models.UserRoleAdmin},
 	},
 	{
 		Route:   "/v1/renew",
-		Handler: lib.ResponseLoggerWrapper(RenewChangePaymentProviderFx),
+		Handler: lib.ResponseLoggerWrapper(renewChangePaymentProviderFx),
 		Method:  http.MethodPatch,
 		Roles:   []string{lib.UserRoleAdmin},
 	},
@@ -65,14 +65,14 @@ var paymentRoutes []lib.Route = []lib.Route{
 
 func init() {
 	log.Println("INIT Payment")
-	functions.HTTP("Payment", Payment)
+	functions.HTTP("Payment", payment)
 }
 
-func Payment(w http.ResponseWriter, r *http.Request) {
+func payment(w http.ResponseWriter, r *http.Request) {
 	router := lib.GetRouter("payment", paymentRoutes)
 	router.ServeHTTP(w, r)
 }
 
-func CriptoPay(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func criptoPayFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	return "", nil, nil
 }

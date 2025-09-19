@@ -17,7 +17,7 @@ type requestGenerateMup struct {
 	ConsultancyPrice float64 `json:"consultancyPrice"`
 }
 
-func GenerateMupFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func generateMupFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		req  requestGenerateMup
 		resp struct {

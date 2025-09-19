@@ -14,7 +14,7 @@ import (
 	tr "gitlab.dev.wopta.it/goworkspace/transaction"
 )
 
-func CreateNetworkTransactionFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
+func createNetworkTransactionFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	log.AddPrefix("CreateNetworkTransactionFx")
 	defer log.PopPrefix()
 

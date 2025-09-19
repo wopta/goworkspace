@@ -19,7 +19,7 @@ type requestRefund struct {
 	Note string `json:"note"`
 }
 
-func refundPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func refundPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var req requestRefund
 	policyUid := chi.URLParam(r, "policyUid")
 	transactionUid := chi.URLParam(r, "transactionUid")

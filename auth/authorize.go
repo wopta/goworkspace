@@ -15,7 +15,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
-func AuthorizeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func authorizeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		serviceAccountReq  ServiceAccount
 		serviceAccountList []ServiceAccount
@@ -51,7 +51,7 @@ func AuthorizeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	return tokenString, nil, e
 }
 
-func TokenFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func tokenFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		e error
 	)

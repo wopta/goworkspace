@@ -17,7 +17,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func UploadDocumentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func uploadDocumentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var identityDocument models.IdentityDocument
 
 	log.AddPrefix("UploadDocumentFx")

@@ -30,7 +30,7 @@ func NewLifeAddendumGenerator(engine *engine.Fpdf, policy *models.Policy) *LifeA
 	}
 }
 
-func (lag *LifeAddendumGenerator) Generate() ([]byte, error) {
+func (lag *LifeAddendumGenerator) Generate() {
 	lag.mainHeader()
 
 	lag.engine.NewPage()
@@ -63,7 +63,6 @@ func (lag *LifeAddendumGenerator) Generate() ([]byte, error) {
 
 	lag.woptaFooter()
 
-	return lag.engine.RawDoc()
 }
 
 func (lag *LifeAddendumGenerator) mainHeader() {

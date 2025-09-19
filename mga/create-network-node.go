@@ -13,7 +13,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
-func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func createNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		inputNode *models.NetworkNode
 		err       error

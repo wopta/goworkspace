@@ -13,7 +13,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
-func PmiMunichFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func pmiMunichFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.AddPrefix("PmiMunichFx")
 	defer log.PopPrefix()
 

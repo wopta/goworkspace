@@ -20,7 +20,7 @@ type ConsumeNetworkNodeInviteReq struct {
 	Password  string `json:"password"`
 }
 
-func ConsumeNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func consumeNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		req ConsumeNetworkNodeInviteReq
 	)

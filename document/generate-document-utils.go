@@ -5,6 +5,8 @@ import (
 	"encoding/base64"
 	"fmt"
 	"os"
+	"strings"
+	"time"
 
 	"github.com/go-pdf/fpdf"
 	"gitlab.dev.wopta.it/goworkspace/lib"
@@ -92,6 +94,22 @@ func generateReservedDocument(pdf *fpdf.Fpdf, policy *models.Policy) (DocumentGe
 	}
 	res.FileName = fmt.Sprintf(models.RvmInstructionsDocumentFormat, policy.ProposalNumber)
 	res.ParentPath = fmt.Sprintf("temp/%s", policy.Uid)
+	res.Bytes = out.Bytes()
+	return res, nil
+}
+func generateAddendumDocument(pdf *fpdf.Fpdf, policy *models.Policy) (DocumentGenerated, error) {
+	var (
+		res DocumentGenerated
+		out bytes.Buffer
+	)
+	err := pdf.Output(&out)
+	if err != nil {
+		return res, err
+	}
+	res.FileName = strings.ReplaceAll(fmt.Sprintf(addendumDocumentFormat, policy.NameDesc,
+		policy.CodeCompany, time.Now().Format("2006-01-02_15:04:05")), " ", "_")
+	res.ParentPath = fmt.Sprintf("assets/users/%s/%s", policy.Contractor.Uid, res.FileName)
+
 	res.Bytes = out.Bytes()
 	return res, nil
 }

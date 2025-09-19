@@ -18,7 +18,7 @@ type PolicyDeleteRequest struct {
 	Code        string    `json:"code"`
 }
 
-func DeletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func deletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err     error
 		request PolicyDeleteRequest

@@ -102,7 +102,7 @@ func lead(authToken models.AuthToken, policy *models.Policy, origin string) erro
 	if e != nil {
 		return e
 	}
-	e = flowLead.Run("lead")
+	e = flowLead.Run(bpmnEngine.Lead)
 	if e != nil {
 		return e
 	}

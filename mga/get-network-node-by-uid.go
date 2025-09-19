@@ -11,7 +11,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
-func GetNetworkNodeByUidFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func getNetworkNodeByUidFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err error
 	)

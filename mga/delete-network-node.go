@@ -10,7 +10,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/network"
 )
 
-func DeleteNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func deleteNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err error
 	)

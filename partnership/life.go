@@ -21,7 +21,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/user"
 )
 
-func NewLifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
+func getLifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		response PartnershipResponse
 		request  struct {

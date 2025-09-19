@@ -17,7 +17,7 @@ type GetProductsListByEntitlementResponse struct {
 	Products []models.ProductInfo `json:"products"`
 }
 
-func GetProductsListByChannelFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func getProductsListByChannelFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err      error
 		response GetProductsListByEntitlementResponse

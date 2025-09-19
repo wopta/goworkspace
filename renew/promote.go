@@ -21,7 +21,7 @@ type PromoteReq struct {
 	CollectionPrefix string `json:"collectionPrefix"`
 }
 
-func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func promoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		dryRun     bool = true
 		err        error

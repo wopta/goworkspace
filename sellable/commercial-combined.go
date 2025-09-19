@@ -11,7 +11,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func CommercialCombinedFx(_ http.ResponseWriter, r *http.Request) (string, any, error) {
+func commercialCombinedFx(_ http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		policy *models.Policy
 		err    error

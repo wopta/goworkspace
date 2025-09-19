@@ -38,7 +38,7 @@ type PmiAllriskRequest struct {
 	IsHolder             bool    `json:"isHolder"`
 }
 
-func PmiAllriskHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func pmiAllriskHandlerFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	// Copied from lib.GetBoolEnv to avoid updating rules/go.mod
 	// since it will soon be deprecated as a module
 	getBoolEnv := func(key string) bool {

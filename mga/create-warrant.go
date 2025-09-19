@@ -12,7 +12,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-func CreateWarrantFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func createWarrantFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var warrant models.Warrant
 
 	log.AddPrefix("CreateWarrantFx")

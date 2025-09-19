@@ -29,7 +29,7 @@ const (
 	seriousIllGuarantee          = "serious-ill"
 )
 
-func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func lifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		data    models.Policy
 		warrant *models.Warrant

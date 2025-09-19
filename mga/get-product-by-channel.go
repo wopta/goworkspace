@@ -22,7 +22,7 @@ type GetProductReq struct {
 	PartnershipName string `json:"partnershipName"`
 }
 
-func GetProductByChannelFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func getProductByChannelFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		req         *GetProductReq
 		networkNode *models.NetworkNode

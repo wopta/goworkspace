@@ -20,7 +20,7 @@ type sellableCatnat = func(policy *models.Policy, product *models.Product, isVal
 
 type clientQuote = func(dto catnat.QuoteRequest, policy *models.Policy) (response catnat.QuoteResponse, err error)
 
-func CatNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func catNatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err       error
 		reqPolicy *models.Policy

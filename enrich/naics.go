@@ -9,7 +9,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/lib"
 )
 
-func NaicsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func naicsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		naics  []byte
 		result []Naics

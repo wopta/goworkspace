@@ -21,7 +21,7 @@ const (
 	statusDuplicated = "Duplicated"
 )
 
-func DuplicateFx(_ http.ResponseWriter, r *http.Request) (string, any, error) {
+func duplicateFx(_ http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		err           error
 		policy        models.Policy

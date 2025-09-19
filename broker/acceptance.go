@@ -98,7 +98,7 @@ func acceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	if err != nil {
 		return "", nil, err
 	}
-	err = flow.Run("acceptance")
+	err = flow.Run(bpmnEngine.Acceptance)
 	if err != nil {
 		return "", nil, err
 	}

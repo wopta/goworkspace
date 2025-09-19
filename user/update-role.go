@@ -18,7 +18,7 @@ type updateUserReq struct {
 	Role string `json:"role"`
 }
 
-func UpdateUserRoleFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func updateUserRoleFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err               error
 		userUid, userRole string

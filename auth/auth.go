@@ -12,25 +12,25 @@ import (
 var authRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/authorize/v1",
-		Handler: lib.ResponseLoggerWrapper(AuthorizeFx),
+		Handler: lib.ResponseLoggerWrapper(authorizeFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
 		Route:   "/token/v1",
-		Handler: lib.ResponseLoggerWrapper(TokenFx),
+		Handler: lib.ResponseLoggerWrapper(tokenFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
 		Route:   "/sso/jwt/{provider}/v1",
-		Handler: lib.ResponseLoggerWrapper(DynamicJwtFx),
+		Handler: lib.ResponseLoggerWrapper(dynamicJwtFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleInternal},
 	},
 	{
 		Route:   "/sso/external/v1/{productName}",
-		Handler: lib.ResponseLoggerWrapper(GetTokenForExternalIntegrationFx),
+		Handler: lib.ResponseLoggerWrapper(getTokenForExternalIntegrationFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAgent, lib.UserRoleAgency},
 	},
