@@ -21,7 +21,6 @@ type PolicyNote struct {
 	CreateDate         time.Time `json:"createDate" firestore:"createDate"`
 	Type               string    `json:"type" firestore:"type"`
 	ReadableByProducer bool      `json:"readableByProducer" firestore:"readableByProducer"`
-	CreatedBy          string    `json:"createdBy" firestore:"createdBy"`
 	PolicyUid          string    `json:"policyUid" firestore:"policyUid"`
 	Text               string    `json:"text" firestore:"text"`
 }
@@ -29,9 +28,6 @@ type PolicyNote struct {
 func AddNoteToPolicy(policyUid string, note PolicyNote) error {
 	note.CreateDate = time.Now()
 	note.PolicyUid = policyUid
-	if note.CreatedBy == "" {
-		return errors.New("Need to specify the creator")
-	}
 	if _, err := lib.GetFirestoreErr(PolicyCollection, policyUid); err != nil {
 		if strings.Contains(err.Error(), "NotFound") {
 			return errors.New("Policy not found")
