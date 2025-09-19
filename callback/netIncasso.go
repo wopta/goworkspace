@@ -28,7 +28,7 @@ func incassoNetFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var errors []string
 	for i := range policies {
 		if e := catnatClient.Incasso(policies[i]); e != nil {
-			log.ErrorF("For policy %v there is the error %v", policies[i], e.Error())
+			log.WarningF("For policy %v there is the error %v", policies[i], e.Error())
 			errors = append(errors, "Errore incasso: "+policies[i].CodeCompany)
 			continue
 		} else {
@@ -46,32 +46,31 @@ func incassoNetFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		log.Println("All policy incassate in net-insurance system")
 		return "{}", "", nil
 	}
-	log.Println("Policies with errors: ", len(errors))
 	sendEmailErrorIncasso(len(policies), errors)
-	return "{}", "", nil
+	return "{}", "", fmt.Errorf("Policies with errors: %v", len(errors))
 }
 
 func updateAllPolices(policies []models.Policy) {
 	log.Println("Setting CompanyEmitted=true")
 	wait := sync.WaitGroup{}
+	logString := ""
 	wait.Add(len(policies))
 	for i := range policies {
 		go func() {
 			policies[i].CompanyEmitted = true
 			policies[i].Updated = time.Now().UTC()
-			log.Println("saving to firestore...")
 			err := lib.SetFirestoreErr(lib.PolicyCollection, policies[i].Uid, &policies[i])
 			if err != nil {
 				log.Error(err)
 			}
-			log.Println("firestore saved!")
 
 			policies[i].BigquerySave()
-			log.Printf("Policy %v saved", policies[i].CodeCompany)
+			logString += fmt.Sprintf("Policy %v saved \n", policies[i].CodeCompany)
 			wait.Done()
 		}()
 	}
 	wait.Wait()
+	log.Println(logString)
 }
 
 func sendEmailErrorIncasso(nPolicy int, errors []string) {
