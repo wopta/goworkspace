@@ -204,7 +204,7 @@ func saveAudit(node *models.NetworkNode, callbackInfo base.CallbackInfo, policy 
 	if err := lib.InsertRowsBigQuery(lib.WoptaDataset, CallbackOutTableId, audit); err != nil {
 		return err
 	}
-	if callbackInfo.ResStatusCode == 200 {
+	if callbackInfo.ResStatusCode == 200 || callbackInfo.ResStatusCode == 201 {
 		policy.AddSystemNote(func(p *models.Policy) models.PolicyNote {
 			return models.PolicyNote{
 				Text: fmt.Sprintf("Callback %v per l'operazione '%v' eseguita correttamente", audit.Client, audit.Action)}
