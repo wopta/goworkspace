@@ -57,7 +57,7 @@ type FabrickBill struct {
 	ScheduleTransaction *FabrickScheduleTransaction `json:"scheduleTransaction,omitempty"`
 	MandateCreation     string                      `json:"mandateCreation,omitempty"`
 	Subjects            *[]FabrickSubject           `json:"subjects,omitempty"`
-	Transactions        []TransactionCallback       `json:"transactions,omitempty"`
+	Transactions        []TransactionRequest        `json:"transactions,omitempty"`
 }
 
 type FabrickItem struct {
@@ -107,20 +107,7 @@ type FabrickPaymentPageRedirectUrls struct {
 	OnInterruption string `json:"onInterruption,omitempty"`
 }
 
-// FABRICK MODELS START
-
-type ItemCallback struct {
-	ExternalID  *string     `json:"externalId,omitempty"`
-	ItemID      *string     `json:"itemId,omitempty"`
-	Amount      *float64    `json:"amount,omitempty"`
-	Currency    *string     `json:"currency,omitempty"`
-	Description *string     `json:"description,omitempty"`
-	XInfo       interface{} `json:"xInfo"`
-	Status      *string     `json:"status,omitempty"`
-	Xinfo       interface{} `json:"xinfo"`
-}
-
-type TransactionCallback struct {
+type TransactionRequest struct {
 	TransactionID       *string     `json:"transactionId,omitempty"`
 	TransactionDateTime interface{} `json:"transactionDateTime"`
 	Amount              *float64    `json:"amount,omitempty"`
@@ -130,26 +117,3 @@ type TransactionCallback struct {
 	Status              *string     `json:"status,omitempty"`
 	PaymentMethod       string      `json:"paymentMethod,omitempty"`
 }
-
-type BillCallback struct {
-	ExternalID     *string               `json:"externalId,omitempty"`
-	BillID         *string               `json:"billId,omitempty"`
-	Amount         *float64              `json:"amount,omitempty"`
-	Currency       *string               `json:"currency,omitempty"`
-	Description    *string               `json:"description,omitempty"`
-	ReservedAmount *float64              `json:"reservedAmount,omitempty"`
-	ResidualAmount *float64              `json:"residualAmount,omitempty"`
-	RefundedAmount *float64              `json:"refundedAmount,omitempty"`
-	PaidAmout      *float64              `json:"paidAmout,omitempty"`
-	Items          []Item                `json:"items,omitempty"`
-	Status         string                `json:"status,omitempty"`
-	Transactions   []TransactionCallback `json:"transactions,omitempty"`
-}
-
-type FabrickCallback struct {
-	ExternalID string        `json:"externalId,omitempty"`
-	PaymentID  *string       `json:"paymentId,omitempty"`
-	Bill       *BillCallback `json:"bill,omitempty"`
-}
-
-// FABRICK MODELS END

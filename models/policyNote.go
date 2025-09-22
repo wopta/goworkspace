@@ -70,7 +70,7 @@ func (p *Policy) AddSystemNote(getterNote func(p *Policy) PolicyNote) error {
 	note.CreateDate = time.Now()
 	note.PolicyUid = p.Uid
 	note.Type = "System"
-	if lib.IsEnv(env.Local) {
+	if env.IsLocal() {
 		note.Text += "(Operazione eseguita in ambiente locale, non veritiera)"
 	}
 	err := lib.SetFirestoreErr(lib.PolicyNoteCollection, lib.NewDoc(lib.PolicyNoteCollection), note)
