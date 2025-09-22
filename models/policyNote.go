@@ -151,7 +151,7 @@ func GetDeletePolicyNote(_ *Policy) PolicyNote {
 func GetEmailNote(emailDetail string) func(*Policy) PolicyNote {
 	return func(p *Policy) PolicyNote {
 		return PolicyNote{
-			Text: "Email con oggetto '%v' é stata inviata",
+			Text: fmt.Sprintf("Email con oggetto '%v' é stata inviata", emailDetail),
 		}
 	}
 }
