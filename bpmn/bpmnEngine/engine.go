@@ -37,7 +37,10 @@ func (f *FlowBpnm) RunAt(flow BpmnFlow, startingActivity string) error {
 		return fmt.Errorf("Process '%v' not found", string(flow))
 	}
 
-	process.storageBpnm.AddGlobal("statusFlow", &StatusFlow{CurrentProcess: process.name})
+	if err := process.storageBpnm.AddGlobal("statusFlow", &StatusFlow{CurrentProcess: BpmnFlow(process.name), CurrentActivity: "Starting process"}); err != nil {
+		return err
+	}
+
 	if err := checkGlobalResources(process.storageBpnm, process.requiredGlobalData); err != nil {
 		return err
 	}
@@ -63,13 +66,17 @@ func (f *FlowBpnm) RunAt(flow BpmnFlow, startingActivity string) error {
 func (p *processBpnm) loop(initialStorage *StorageBpnm, activities ...*activity) (err error) {
 	for i := range activities {
 		newStorage := NewStorageBpnm()
-		err := newStorage.setHigherStorage(initialStorage)
+		err = newStorage.setHigherStorage(initialStorage)
 		if err != nil {
 			return err
 		}
+		if err := newStorage.AddGlobal("statusFlow", &StatusFlow{CurrentProcess: BpmnFlow(p.name)}); err != nil {
+			return err
+		}
+
 		initialStorage = newStorage
 
-		if err = activities[i].runActivity(p.name, newStorage); err != nil {
+		if err = activities[i].runActivity(p, newStorage); err != nil {
 			return err
 		}
 
@@ -85,7 +92,7 @@ func (p *processBpnm) loop(initialStorage *StorageBpnm, activities ...*activity)
 				continue
 			}
 			if lastActivity != getNameEndActivity(p.name) {
-				if err = p.activities[getNameEndActivity(p.name)].runActivity(p.name, newStorage); err != nil {
+				if err = p.activities[getNameEndActivity(p.name)].runActivity(p, newStorage); err != nil {
 					return err
 				}
 			}
@@ -100,43 +107,17 @@ func (p *processBpnm) loop(initialStorage *StorageBpnm, activities ...*activity)
 	return err
 }
 
-func (act *activity) runActivity(nameProcess string, storage *StorageBpnm) (err error) {
-	if pre := act.preActivity; pre != nil {
-		err = pre.storageBpnm.setHigherStorage(storage)
-		if err != nil {
-			return err
-		}
-		if err := pre.loop(pre.storageBpnm, pre.activities[pre.defaultStart]); err != nil {
-			return err
-		}
-	}
-	if err = checkResources(storage, act.requiredInputData); err != nil {
-		return fmt.Errorf("Process '%v' with Activity  '%v' has an input error: %v", nameProcess, act.name, err.Error())
-	}
-
-	if err := callWithRecover(nameProcess, storage, act); err != nil {
-		return err
-	}
-
-	if post := act.postActivity; post != nil {
-		err = post.storageBpnm.setHigherStorage(storage)
-		if err != nil {
-			return err
-		}
-		if err := post.loop(post.storageBpnm, post.activities[post.defaultStart]); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func callWithRecover(nameProcess string, storage *StorageBpnm, act *activity) (err error) {
-	log.InfoF("Run process '%v', start activity '%v'", nameProcess, act.name)
+func (act *activity) runActivity(process *processBpnm, storage *StorageBpnm) (err error) {
 	defer func() {
-		if act.recover != nil {
+		if process.recover != nil {
 			if r := recover(); r != nil || (err != nil) {
-				log.InfoF("Run recorver process '%v', activity '%v'", nameProcess, act.name)
-				err = act.recover(storage)
+				log.InfoF("Run recorver process '%v', for activity '%v'", process.name, act.name)
+				for i := range process.recover {
+					err = errors.Join(err, process.recover[i](storage))
+				}
+				if r != nil {
+					err = errors.Join(err, errors.New(r.(string)))
+				}
 			}
 		}
 		status := ""
@@ -145,17 +126,54 @@ func callWithRecover(nameProcess string, storage *StorageBpnm, act *activity) (e
 		} else {
 			status = "Fail: " + err.Error()
 		}
-		log.InfoF("Run process '%v', finished activity '%v' with status: %v", nameProcess, act.name, status)
+		log.InfoF("Run process '%v', finished activity '%v' with status: %v", process.name, act.name, status)
 	}()
-	status, err := storage.GetGlobal("statusFlow")
+
+	if pre := act.preActivity; pre != nil {
+		err = pre.storageBpnm.setHigherStorage(storage)
+		if err != nil {
+			return err
+		}
+		if err = pre.loop(pre.storageBpnm, pre.activities[pre.defaultStart]); err != nil {
+			return err
+		}
+	}
+	if err = checkResources(storage, act.requiredInputData); err != nil {
+		return fmt.Errorf("Process '%v' with Activity  '%v' has an input error: %v", process.name, act.name, err.Error())
+	}
+
+	if err = callActivity(process, storage, act); err != nil {
+		return err
+	}
+
+	if post := act.postActivity; post != nil {
+		err = post.storageBpnm.setHigherStorage(storage)
+		if err != nil {
+			return err
+		}
+		if err = post.loop(post.storageBpnm, post.activities[post.defaultStart]); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func callActivity(process *processBpnm, storage *StorageBpnm, act *activity) (err error) {
+	log.InfoF("Run process '%v', start activity '%v'", process.name, act.name)
+	var status DataBpnm
+	status, err = storage.GetGlobal("statusFlow")
 	if err != nil {
-		return fmt.Errorf("Error setting status flow of Process '%v' with activity '%v'", nameProcess, act.name)
+		return fmt.Errorf("Error setting status flow of Process '%v' with activity '%v'", process.name, act.name)
 	}
 	status.(*StatusFlow).CurrentActivity = act.name
 	if act.handler == nil {
 		return nil
 	}
-	return act.handler(storage)
+	if act.handler == nil {
+		return
+	}
+	err = act.handler(storage)
+	return err
 }
 
 func (act *activity) evaluateDecisions(processName string, storage *StorageBpnm, date map[string]any) ([]*activity, error) {

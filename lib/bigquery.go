@@ -278,7 +278,6 @@ func DeleteRowBigQuery(datasetId, tableId, whereClause string) error {
 
 	b.WriteString(fmt.Sprintf("DELETE FROM `%s.%s` %s", datasetId, tableId, whereClause))
 	log.Printf("query: %s", b.String())
-
 	query := client.Query(b.String())
 	job, err := query.Run(ctx)
 	if err != nil {

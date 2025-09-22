@@ -17,6 +17,7 @@ type processBuilder struct {
 	Name               string            `json:"name"`
 	Activities         []activityBuilder `json:"activities"`
 	DefaultStart       string            `json:"defaultStart"`
+	Recover            []string          `json:"recover"`
 }
 
 type order struct {
@@ -29,7 +30,6 @@ type activityBuilder struct {
 	Name               string         `json:"name"`
 	Description        string         `json:"description"`
 	HandlerLess        bool           `json:"handlerless"`
-	Recover            string         `json:"recover"`
 	OutputDataRequired []typeData     `json:"outputData,omitempty"`
 	InputDataRequired  []typeData     `json:"inputData,omitempty"`
 	Gateways           []gatewayBlock `json:"gateways"`

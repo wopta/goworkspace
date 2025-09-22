@@ -116,8 +116,12 @@ func addDefaultHandlersForTest(g *BpnmBuilder, log *mockLog) error {
 			log.println("init D rec")
 			return nil
 		}),
-		g.AddHandler("DRec", func(st *StorageBpnm) error {
-			log.println("recover D")
+		g.AddHandler("DRec1", func(st *StorageBpnm) error {
+			log.println("recover D1")
+			return nil
+		}),
+		g.AddHandler("DRec2", func(st *StorageBpnm) error {
+			log.println("recover D2")
 			return nil
 		}),
 	)
@@ -454,6 +458,7 @@ func TestErrorWithoutRecover(t *testing.T) {
 	storage.AddGlobal("policyPr", &policyMock{Age: 2})
 	g.SetStorage(storage)
 	f, err := g.Build()
+	f.process["emit"].recover = nil
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -486,12 +491,13 @@ func TestRecoverWithFunction(t *testing.T) {
 		t.Fatal(err)
 	}
 	err = f.RunAt("emit", "DEventWithRec")
-	if err != nil {
-		t.Fatal(err)
+	if err == nil {
+		t.Fatal("Should have an error")
 	}
 	exps := []string{
 		"init D",
-		"recover D",
+		"recover D1",
+		"recover D2",
 	}
 	testLog(log, exps, t)
 }
@@ -516,12 +522,13 @@ func TestRecoverFromPanic(t *testing.T) {
 		t.Fatal(err)
 	}
 	err = f.RunAt("emit", "DEventWithRec")
-	if err != nil {
-		t.Fatal(err)
+	if err == nil {
+		t.Fatal("Should have an error")
 	}
 	exps := []string{
 		"init D rec",
-		"recover D",
+		"recover D1",
+		"recover D2",
 	}
 	testLog(log, exps, t)
 }

@@ -45,6 +45,7 @@ func SendMailLead(policy models.Policy, from, to, cc Address, flowName string, a
 		IsAttachment: len(at) > 0,
 		Attachments:  &at,
 	})
+	policy.AddSystemNote(models.GetEmailNote(subject))
 }
 
 func SendMailPay(policy models.Policy, from, to, cc Address, flowName string) {
@@ -65,6 +66,7 @@ func SendMailPay(policy models.Policy, from, to, cc Address, flowName string) {
 		Subject:     subject,
 		IsHtml:      true,
 	})
+	policy.AddSystemNote(models.GetEmailNote(subject))
 }
 
 func SendMailSign(policy models.Policy, from, to, cc Address, flowName string) {
@@ -85,6 +87,7 @@ func SendMailSign(policy models.Policy, from, to, cc Address, flowName string) {
 		Subject:     subject,
 		IsHtml:      true,
 	})
+	policy.AddSystemNote(models.GetEmailNote(subject))
 }
 
 func SendMailContract(policy models.Policy, at *[]models.Attachment, from, to, cc Address, flowName string) error {
@@ -142,6 +145,7 @@ func SendMailContract(policy models.Policy, at *[]models.Attachment, from, to, c
 		IsAttachment: true,
 		Attachments:  &attachmentToSend,
 	})
+	policy.AddSystemNote(models.GetEmailNote(subject))
 	return nil
 }
 
@@ -200,6 +204,7 @@ func SendMailReserved(policy models.Policy, from, to, cc Address, flowName strin
 		IsAttachment: true,
 		Attachments:  &at,
 	})
+	policy.AddSystemNote(models.GetEmailNote(subject))
 }
 
 func SendMailReservedResult(policy models.Policy, from, to, cc Address, flowName string) {
@@ -238,6 +243,7 @@ func SendMailReservedResult(policy models.Policy, from, to, cc Address, flowName
 		Subject:     subject,
 		IsHtml:      true,
 	})
+	policy.AddSystemNote(models.GetEmailNote(subject))
 }
 
 func SendMailProposal(policy models.Policy, from, to, cc Address, flowName string, attachmentNames []string) {
@@ -264,6 +270,7 @@ func SendMailProposal(policy models.Policy, from, to, cc Address, flowName strin
 		IsAttachment: true,
 		Attachments:  &at,
 	})
+	policy.AddSystemNote(models.GetEmailNote(subject))
 }
 
 func SendMailRenewDraft(policy models.Policy, from, to, cc Address, flowName string, hasMandate bool) {
@@ -294,4 +301,5 @@ func SendMailRenewDraft(policy models.Policy, from, to, cc Address, flowName str
 		IsApp:       true,
 		Policy:      policy.Uid,
 	})
+	policy.AddSystemNote(models.GetEmailNote(subject))
 }

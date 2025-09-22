@@ -10,6 +10,10 @@
 			],
 			"defaultStart": "init",
 			"description": "",
+			"recover": [
+				"DRec1",
+				"DRec2"
+			],
 			"activities": [
 				{
 					"name": "init",
@@ -105,8 +109,7 @@
 				},
 				{
 					"name": "DEventWithRec",
-					"description": "emit policy",
-					"recover": "DRec"
+					"description": "emit policy"
 				}
 			]
 		}

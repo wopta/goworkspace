@@ -101,6 +101,13 @@ func (b *BpnmBuilder) Build() (*FlowBpnm, error) {
 		}
 		newProcess.defaultStart = p.DefaultStart
 		flow.process[newProcess.name] = newProcess
+		for i := range p.Recover {
+			rec, exist := b.handlers[p.Recover[i]]
+			if !exist {
+				return nil, fmt.Errorf("No handler registered for recovery '%v' in activity: '%v'", p.Recover[i], p.Name)
+			}
+			newProcess.recover = append(newProcess.recover, rec)
+		}
 	}
 
 	for _, callback := range b.callbacks {
@@ -158,7 +165,6 @@ func (b *BpnmBuilder) Inject(bpnmToInject *BpnmBuilder) error {
 
 	return nil
 }
-
 func (b *BpnmBuilder) AddHandler(nameHandler string, handler activityHandler) error {
 	if b.handlers == nil {
 		b.handlers = make(map[string]activityHandler)
@@ -218,13 +224,6 @@ func (a *BpnmBuilder) buildActivities(processName string, activitiesToBuild ...a
 		}
 		newActivity.callEndIfStop = *activityToBuild.CallEndIfStop
 		//Check if a recover handler has been specified
-		if activityToBuild.Recover != "" {
-			rec, exist := a.handlers[activityToBuild.Recover]
-			if !exist {
-				return nil, fmt.Errorf("No handler registered for recovery '%v' in activity: '%v'", activityToBuild.Recover, activityToBuild.Name)
-			}
-			newActivity.recover = rec
-		}
 		newActivity.requiredInputData = activityToBuild.InputDataRequired
 		newActivity.requiredOutputData = activityToBuild.OutputDataRequired
 

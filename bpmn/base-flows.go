@@ -15,7 +15,7 @@ func GetFlow(policy *models.Policy, storage *bpmnEngine.StorageBpnm) (*bpmnEngin
 	if err != nil {
 		return nil, err
 	}
-	err = addHandlersDraft(builder)
+	err = addHandlers(builder)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func GetFlow(policy *models.Policy, storage *bpmnEngine.StorageBpnm) (*bpmnEngin
 	return builder.Build()
 }
 
-func addHandlersDraft(builder *bpmnEngine.BpnmBuilder) error {
+func addHandlers(builder *bpmnEngine.BpnmBuilder) error {
 	return bpmnEngine.IsError(
 		handlers.AddAcceptanceHandlers(builder),
 		handlers.AddEmitHandlers(builder),
@@ -72,5 +72,6 @@ func addHandlersDraft(builder *bpmnEngine.BpnmBuilder) error {
 		handlers.AddProposalHandlers(builder),
 		handlers.AddRequestApprovaHandlers(builder),
 		handlers.AddSignHandlers(builder),
+		handlers.AddRecoverHandlers(builder),
 	)
 }

@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -144,5 +145,21 @@ func GetChangeAppendiceNote(_ *Policy) PolicyNote {
 func GetDeletePolicyNote(_ *Policy) PolicyNote {
 	return PolicyNote{
 		Text: "Appendice modificata",
+	}
+}
+
+func GetEmailNote(emailDetail string) func(*Policy) PolicyNote {
+	return func(p *Policy) PolicyNote {
+		return PolicyNote{
+			Text: "Email con oggetto '%v' é stata inviata",
+		}
+	}
+}
+
+func GetErrorNote(processName string) func(*Policy) PolicyNote {
+	return func(p *Policy) PolicyNote {
+		return PolicyNote{
+			Text: fmt.Sprintf("Operazione di '%v' é andata in errore!", processName),
+		}
 	}
 }

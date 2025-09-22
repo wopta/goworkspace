@@ -65,6 +65,8 @@ func getBuilderFlowChannel(log *mockLog, store *bpmnEngine.StorageBpnm) (*bpmnEn
 		builder.AddHandler("promotePolicy", funcTest("promotePolicy", log)),
 		builder.AddHandler("saveTransactionAndPolicy", funcTest("saveTransactionAndPolicy", log)),
 		builder.AddHandler("createNetworkTransaction", funcTest("createNetworkTransaction", log)),
+		builder.AddHandler("addNoteError", funcTest("addNoteError", log)),
+		builder.AddHandler("sendEmailError", funcTest("sendEmailError", log)),
 	)
 	if e != nil {
 		return nil, e

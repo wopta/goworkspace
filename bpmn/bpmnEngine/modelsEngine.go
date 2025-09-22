@@ -11,6 +11,7 @@ type processBpnm struct {
 	description        string
 	activities         map[string]*activity
 	storageBpnm        *StorageBpnm
+	recover            []activityHandler
 }
 
 type activity struct {
@@ -19,7 +20,6 @@ type activity struct {
 	description        string
 	preActivity        *processBpnm
 	postActivity       *processBpnm
-	recover            activityHandler
 	requiredOutputData []typeData
 	requiredInputData  []typeData
 	gateway            []*gateway
@@ -33,7 +33,7 @@ type gateway struct {
 
 type StatusFlow struct {
 	Parent          *StatusFlow
-	CurrentProcess  string
+	CurrentProcess  BpmnFlow
 	CurrentActivity string
 }
 

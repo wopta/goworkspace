@@ -93,7 +93,7 @@ func GetStatusFlow(storage *StorageBpnm) (*StatusFlow, error) {
 			lastStatusFlowInserted.Parent = _statusFlow.(*StatusFlow)
 			lastStatusFlowInserted = lastStatusFlowInserted.Parent
 		} else {
-			return statusFlow, fmt.Errorf("Error getting status flow")
+			return statusFlow, fmt.Errorf("Error composing history status flow")
 		}
 	}
 	return statusFlow, nil

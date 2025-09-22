@@ -23,8 +23,8 @@ func GetDatasetByContractorName(name string, dataset string) string {
 func GetBoolEnv(key string) bool {
 	flag, err := strconv.ParseBool(os.Getenv(key))
 	if err != nil {
-		log.ErrorF("error loading %s environment variable", key)
-		return false
+		log.WarningF("error loading %s environment variable", key)
+		return key == "local"
 	}
 	return flag
 }

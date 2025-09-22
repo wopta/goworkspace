@@ -74,24 +74,22 @@ func updateAllPolices(policies []models.Policy) {
 }
 
 func sendEmailErrorIncasso(nPolicy int, errors []string) {
-	var mailRequest mail.MailRequest
-	mailRequest.IsHtml = true
-	mailRequest.FromAddress = mail.AddressAnna
-	mailRequest.To = []string{"processi@wopta.it"}
-	mailRequest.Subject = "Polizze net-insurance non incassate!"
+
+	subject := "Polizze net-insurance non incassate!"
 	lines := []string{
 		"Ciao,",
 		fmt.Sprintf("Nella data del %v sono state quietanzate %v polizze cat-nat, %v delle quali hanno avuto problemi, gli errori rilevati sono:<br><br>", time.Now().Format("2006-01-02"), nPolicy, len(errors)),
 		strings.Join(errors, "<br>"),
 	}
+	var body string
 	for _, line := range lines {
-		mailRequest.Message = mailRequest.Message + `<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px">` + line + `</p>`
+		body += body + `<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px">` + line + `</p>`
 	}
-	mailRequest.Message += "<br>Si prega di incassare manualemnte le polizze sopra riportate<br>"
-	mailRequest.Message = mailRequest.Message + ` 
+	body += "<br>Si prega di incassare manualemnte le polizze sopra riportate<br>"
+	body += ` 
 		<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px"><br></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px">A presto,</p>
 		<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#e50075;font-size:14px"><strong>Anna</strong> di Wopta Assicurazioni</p> `
-	mail.SendMail(mailRequest)
+	mail.SendBaseEmail(body, subject, lib.GetMailProcessi("cat-nat"))
 }
 
 func getPolicyToCallNetIncasso() ([]models.Policy, error) {
