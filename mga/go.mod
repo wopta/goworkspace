@@ -10,15 +10,15 @@ require (
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/gomarkdown/markdown v0.0.0-20241205020045-f7e15b2f3e62
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
-	gitlab.dev.wopta.it/goworkspace/document v1.1.315
+	gitlab.dev.wopta.it/goworkspace/document v1.1.316
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.211
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.276
-	gitlab.dev.wopta.it/goworkspace/models v1.2.152
-	gitlab.dev.wopta.it/goworkspace/network v1.0.220
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.359
-	gitlab.dev.wopta.it/goworkspace/product v1.1.151
-	gitlab.dev.wopta.it/goworkspace/transaction v1.0.352
-	gitlab.dev.wopta.it/goworkspace/user v1.0.260
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.277
+	gitlab.dev.wopta.it/goworkspace/models v1.2.153
+	gitlab.dev.wopta.it/goworkspace/network v1.0.221
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.360
+	gitlab.dev.wopta.it/goworkspace/product v1.1.152
+	gitlab.dev.wopta.it/goworkspace/transaction v1.0.353
+	gitlab.dev.wopta.it/goworkspace/user v1.0.261
 )
 
 require (

@@ -9,7 +9,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/go-gota/gota v0.12.0
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.211
-	gitlab.dev.wopta.it/goworkspace/models v1.2.152
+	gitlab.dev.wopta.it/goworkspace/models v1.2.153
 )
 
 require (
