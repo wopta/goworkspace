@@ -85,7 +85,7 @@ const (
 	PayTypeCc       PayType = "credit card"
 	PayTypeSdd      PayType = "sdd"
 	PayTypeTransfer PayType = "transfer"
-	PayTypeFBKR2P   PayType = "FBKR2P"
+	PayTypeFBKR2P   PayType = "fbkr2p"
 )
 
 const (
