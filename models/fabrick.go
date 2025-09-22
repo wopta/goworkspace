@@ -124,7 +124,7 @@ type TransactionCallback struct {
 	TransactionID       *string     `json:"transactionId,omitempty"`
 	TransactionDateTime interface{} `json:"transactionDateTime"`
 	Amount              *float64    `json:"amount,omitempty"`
-	Currency            *string     `json:"currency,omitempty"`
+	Currency            string      `json:"currency,omitempty"`
 	GatewayID           interface{} `json:"gatewayId"`
 	AcquirerID          interface{} `json:"acquirerId"`
 	Status              *string     `json:"status,omitempty"`

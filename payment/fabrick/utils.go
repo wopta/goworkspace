@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -141,6 +142,15 @@ func getFabrickRequestBody(
 				Name:       strings.Join([]string{policy.Contractor.Name, policy.Contractor.Surname}, " "),
 			}},
 		},
+	}
+
+	if slices.Contains(paymentMethods, string(models.PayTypeFBKR2P)) {
+		pay.Bill.Transactions = append(pay.Bill.Transactions,
+			models.TransactionCallback{
+				Amount:   &amount,
+				Currency: currency,
+			},
+		)
 	}
 
 	if scheduleDate != "" {
