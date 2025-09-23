@@ -27,8 +27,9 @@ const (
 type ParserMessage func(string, SeverityType, []string) ([]byte, error)
 
 type MessageInformation struct {
-	Message  string `json:"message"`
-	Severity string `json:"severity,omitempty"`
+	Message  string            `json:"message"`
+	Severity string            `json:"severity,omitempty"`
+	Labels   map[string]string `json:"labels"`
 }
 
 func formatDate(t time.Time) string {
@@ -43,6 +44,7 @@ type Logger interface {
 	Error(string)
 	SetLog(io.Writer)
 	SetParserMessage(ParserMessage)
+	SetInstanceUid(string)
 	customLog(string, SeverityType)
 }
 
@@ -50,6 +52,7 @@ type LoggerWopta struct {
 	prefix        []string
 	writer        io.Writer
 	parserMessage ParserMessage
+	executionId   string
 }
 
 // Create a new log, check if use the local parser or the google cloud one
@@ -95,6 +98,7 @@ func (l *LoggerWopta) popPrefix() {
 // Remove all prefixs, ex: [prefix1|prefix2] -> <None>
 func (l *LoggerWopta) resetPrefix() {
 	l.prefix = []string{}
+	l.executionId = ""
 }
 
 // Set the writer to use for logging
@@ -109,6 +113,10 @@ func (l *LoggerWopta) CustomLog(message string, severity SeverityType) {
 		return
 	}
 	l.writer.Write(str)
+}
+
+func (l *LoggerWopta) SetExecutionId(instanceUid string) {
+	l.executionId = instanceUid
 }
 
 // Log a formatted message with severity 'DEFAULT'
@@ -172,8 +180,11 @@ func parserMessageGoogleCloud(message string, severity SeverityType, prefix []st
 	}
 
 	entry := MessageInformation{
-		fmt.Sprint(conPrefix, message),
-		string(severity),
+		Message:  fmt.Sprint(conPrefix, message),
+		Severity: string(severity),
+		Labels: map[string]string{
+			"executionId": logger.executionId,
+		},
 	}
 	out, err := json.Marshal(entry)
 	if err != nil {

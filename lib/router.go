@@ -16,6 +16,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/google/uuid"
 	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 )
@@ -45,6 +46,7 @@ func ResponseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) 
 		if w.Header().Get("Content-type") == "application/json" {
 			log.Printf("Response: %s", str)
 		}
+
 		w.Write([]byte(str))
 	}
 }
@@ -90,6 +92,9 @@ func GetRouter(module string, routes []Route) *chi.Mux {
 func loggerConfig(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.ResetPrefix()
+		uuid := uuid.NewString()
+		log.Log().SetExecutionId(uuid)
+		r.Header.Set("ExecutionId", uuid)
 		next.ServeHTTP(w, r)
 	})
 }
