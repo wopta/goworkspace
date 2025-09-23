@@ -176,7 +176,7 @@ func parserMessageGoogleCloud(message string, severity SeverityType, prefix []st
 	entry := MessageInformation{
 		Message:      fmt.Sprint(conPrefix, message),
 		Severity:     string(severity),
-		ExecutiondId: os.Getenv("ExecutionId"),
+		ExecutiondId: os.Getenv("Execution-Id"),
 	}
 	out, err := json.Marshal(entry)
 	if err != nil {
