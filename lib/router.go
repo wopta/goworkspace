@@ -94,7 +94,7 @@ func loggerConfig(next http.Handler) http.Handler {
 		log.ResetPrefix()
 		uuid := uuid.NewString()
 		log.Log().SetExecutionId(uuid)
-		r.Header.Set("ExecutionId", uuid)
+		w.Header().Add("ExecutionId", uuid)
 		next.ServeHTTP(w, r)
 	})
 }
