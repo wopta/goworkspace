@@ -134,19 +134,20 @@ func getFabrickRequestBody(
 				Amount:     amount,
 				Currency:   currency,
 			}},
-			Subjects: &[]models.FabrickSubject{{
-				ExternalID: customerId,
-				Role:       "customer",
-				Email:      policy.Contractor.Mail,
-				Name:       strings.Join([]string{policy.Contractor.Name, policy.Contractor.Surname}, " "),
-			},
-			//		{
-			//			Role:       "debtor",
-			//			Email:      policy.Contractor.Mail,
-			//			Name:       policy.Contractor.Name,
-			//			Surname:    policy.Contractor.Surname,
-			//			ExternalID: customerId,
-			//		},
+			Subjects: &[]models.FabrickSubject{
+				{
+					ExternalID: customerId,
+					Role:       "customer",
+					Email:      policy.Contractor.Mail,
+					Name:       strings.Join([]string{policy.Contractor.Name, policy.Contractor.Surname}, " "),
+				},
+				{
+					Role:       "debtor",
+					Email:      policy.Contractor.Mail,
+					Name:       strings.Join([]string{policy.Contractor.Name, policy.Contractor.Surname}, " "),
+					Surname:    policy.Contractor.Surname,
+					ExternalID: customerId,
+				},
 			},
 		},
 	}
