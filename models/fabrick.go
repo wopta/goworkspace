@@ -79,6 +79,7 @@ type FabrickSubject struct {
 	ExternalID string  `json:"externalId,omitempty"`
 	Email      string  `json:"email,omitempty"`
 	Name       string  `json:"name,omitempty"`
+	Surname    string  `json:"surname,omitempty"`
 	XInfo      *string `json:"xInfo,omitempty"`
 }
 
