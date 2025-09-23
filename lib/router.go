@@ -32,13 +32,14 @@ type Route struct {
 func ResponseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) (string, any, error)) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		str, _, err := handler(w, r)
-		w.Header().Add("ExecutionId", os.Getenv("ExecutionId"))
+		w.Header().Set("Execution-Id", os.Getenv("Execution-Id"))
 		if err != nil {
+
 			log.Error(err)
 			resp := map[string]string{
 				"errorMessage": err.Error(),
 			}
-			w.WriteHeader(http.StatusInternalServerError)
+			//	w.WriteHeader(http.StatusInternalServerError)
 			if err = json.NewEncoder(w).Encode(resp); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
@@ -47,11 +48,9 @@ func ResponseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) 
 		if w.Header().Get("Content-type") == "application/json" {
 			log.Printf("Response: %s", str)
 		}
-
 		w.Write([]byte(str))
 	}
 }
-
 func GetRouter(module string, routes []Route) *chi.Mux {
 	var prefix string
 
@@ -60,7 +59,7 @@ func GetRouter(module string, routes []Route) *chi.Mux {
 	}
 
 	uuid := uuid.NewString()
-	os.Setenv("ExecutionId", uuid)
+	os.Setenv("Execution-Id", uuid)
 
 	mux := chi.NewRouter()
 	mux.Use(loggerConfig)
@@ -77,7 +76,7 @@ func GetRouter(module string, routes []Route) *chi.Mux {
 		mw = append(mw,
 			middleware.WithValue("roles", route.Roles),
 			appCheckMiddleware,
-			checkEntitlement,
+			//		checkEntitlement,
 		)
 
 		if slices.Contains(route.Roles, UserRoleAdmin) {
