@@ -129,6 +129,7 @@ func RefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, interfa
 		return "", nil, err
 	}
 
+	policy.AddSystemNote(models.GetChangePaymentProviderNote)
 	return "{}", nil, nil
 }
 

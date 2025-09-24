@@ -120,6 +120,5 @@ func changePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 
 	log.Println("Handler End -------------------------------------------------")
 
-	policy.AddSystemNote(models.GetChangePaymentProviderNote)
 	return string(rawResp), resp, err
 }
