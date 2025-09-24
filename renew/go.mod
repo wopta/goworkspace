@@ -9,7 +9,7 @@ require (
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.287
 	gitlab.dev.wopta.it/goworkspace/models v1.2.163
 	gitlab.dev.wopta.it/goworkspace/network v1.0.231
-	gitlab.dev.wopta.it/goworkspace/payment v1.0.523
+	gitlab.dev.wopta.it/goworkspace/payment v1.0.524
 	gitlab.dev.wopta.it/goworkspace/transaction v1.0.363
 	google.golang.org/api v0.181.0
 )
@@ -81,7 +81,7 @@ require (
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	gitlab.dev.wopta.it/goworkspace/accounting v1.0.191 // indirect
-	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.175 // indirect
+	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.176 // indirect
 	gitlab.dev.wopta.it/goworkspace/document v1.1.326 // indirect
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.370 // indirect
 	gitlab.dev.wopta.it/goworkspace/product v1.1.162 // indirect

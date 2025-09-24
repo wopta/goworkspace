@@ -12,14 +12,14 @@ require (
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/go-gota/gota v0.12.0
 	github.com/maja42/goval v1.4.0
-	gitlab.dev.wopta.it/goworkspace/bpmn v1.0.145
-	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.175
+	gitlab.dev.wopta.it/goworkspace/bpmn v1.0.146
+	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.176
 	gitlab.dev.wopta.it/goworkspace/document v1.1.326
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.220
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.287
 	gitlab.dev.wopta.it/goworkspace/models v1.2.163
 	gitlab.dev.wopta.it/goworkspace/network v1.0.231
-	gitlab.dev.wopta.it/goworkspace/payment v1.0.523
+	gitlab.dev.wopta.it/goworkspace/payment v1.0.524
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.370
 	gitlab.dev.wopta.it/goworkspace/product v1.1.162
 	gitlab.dev.wopta.it/goworkspace/question v1.0.217
