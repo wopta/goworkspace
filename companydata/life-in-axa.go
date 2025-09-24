@@ -272,7 +272,15 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 		var contractor *models.Contractor
 		contractors := new([]models.User)
-		if isLegalEntity {
+		if !isLegalEntity {
+			contractor = parseIndividualOrPhysicalContractor(codeCompany, row, codes)
+			if contractor == nil {
+				skippedPolicies = append(skippedPolicies, fmt.Sprintf("%07s", strings.TrimSpace(row[2])))
+				continue
+			}
+
+			contractor.Uid, writeContractorToDB = searchUserInDBByFiscalCode(contractor.FiscalCode)
+		} else {
 			// parsing contractor
 
 			contractor = parseEnterpriseContractor(row)
@@ -301,14 +309,6 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 				*contractors = append(*contractors, titolareEffettivo)
 			}
 			//*contractors = append(*contractors, titolariEffettivi...)
-		} else {
-			contractor = parseIndividualContractor(codeCompany, row, codes)
-			if contractor == nil {
-				skippedPolicies = append(skippedPolicies, fmt.Sprintf("%07s", strings.TrimSpace(row[2])))
-				continue
-			}
-
-			contractor.Uid, writeContractorToDB = searchUserInDBByFiscalCode(contractor.FiscalCode)
 		}
 
 		if !contractorEqualInsured {
@@ -750,14 +750,17 @@ func parsingTitolareEffettivo(row []string, offset int, i int) models.User {
 	return titolareEffettivo
 }
 
-func parseIndividualContractor(codeCompany string, row []string, codes map[string]map[string]string) *models.Contractor {
+func parseIndividualOrPhysicalContractor(codeCompany string, row []string, codes map[string]map[string]string) *models.Contractor {
 	phone := strings.TrimSpace(strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(row[33], " ", ""), " ", "")))
 	if phone != "" {
 		phone = fmt.Sprintf("+39%s", phone)
 	}
-
+	var typeContractor = models.UserIndividual
+	if row[22] == "PF" {
+		typeContractor = models.UserPhysical
+	}
 	contractor := &models.Contractor{
-		Type:          models.UserIndividual,
+		Type:          typeContractor,
 		Name:          strings.TrimSpace(lib.Capitalize(row[24])),
 		Surname:       strings.TrimSpace(lib.Capitalize(row[23])),
 		FiscalCode:    strings.TrimSpace(strings.ToUpper(row[27])),
