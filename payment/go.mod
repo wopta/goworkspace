@@ -9,7 +9,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/google/uuid v1.6.0
 	gitlab.dev.wopta.it/goworkspace/accounting v1.0.189
-	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.172
+	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.173
 	gitlab.dev.wopta.it/goworkspace/document v1.1.324
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.218
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.285

@@ -8,12 +8,12 @@ require (
 	cloud.google.com/go/firestore v1.15.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	gitlab.dev.wopta.it/goworkspace/bpmn v1.0.143
-	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.172
+	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.173
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.218
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.285
 	gitlab.dev.wopta.it/goworkspace/models v1.2.161
 	gitlab.dev.wopta.it/goworkspace/network v1.0.229
-	gitlab.dev.wopta.it/goworkspace/payment v1.0.520
+	gitlab.dev.wopta.it/goworkspace/payment v1.0.521
 	gitlab.dev.wopta.it/goworkspace/policy v1.0.368
 	gitlab.dev.wopta.it/goworkspace/product v1.1.160
 	gitlab.dev.wopta.it/goworkspace/transaction v1.0.361
