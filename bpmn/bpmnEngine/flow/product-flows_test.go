@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/callback_out"
 	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
@@ -39,7 +40,7 @@ func TestCatnatIntegrationWithNoCatnatPolicy(t *testing.T) {
 	store.AddGlobal("networkNode", &winNode)
 
 	exps := []string{}
-	store.AddLocal("config", &CallbackConfig{Emit: false})
+	store.AddLocal("config", &CallbackConfigBpmn{callback_out.CallbackConfig{Emit: true}})
 
 	testFlow(t, "catnatIntegration", exps, store, getBuilderFlowProduct)
 }
@@ -53,7 +54,7 @@ func TestCatnatIntegrationWithCatnatPolicy(t *testing.T) {
 		"catnatIntegration",
 		"catnatdownloadPolicy",
 	}
-	store.AddLocal("config", &CallbackConfig{Emit: false})
+	store.AddLocal("config", &CallbackConfigBpmn{callback_out.CallbackConfig{Emit: false}})
 
 	testFlow(t, "catnatIntegration", exps, store, getBuilderFlowProduct)
 }

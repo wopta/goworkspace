@@ -39,7 +39,7 @@ func ResponseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) 
 			resp := map[string]string{
 				"errorMessage": err.Error(),
 			}
-			//	w.WriteHeader(http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
 			if err = json.NewEncoder(w).Encode(resp); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}

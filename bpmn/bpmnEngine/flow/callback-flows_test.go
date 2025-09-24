@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/callback_out"
 	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
@@ -62,7 +63,7 @@ func TestEmitForWinNodeWithConfigTrue(t *testing.T) {
 	store.AddGlobal("product", &productEcommerce)
 	store.AddGlobal("clientCallback", &callbackClient)
 
-	store.AddLocal("config", &CallbackConfig{Emit: true})
+	store.AddLocal("config", &CallbackConfigBpmn{callback_out.CallbackConfig{Emit: true}})
 	exps := []string{
 		"Emit",
 		"saveAudit prova request Emit",
@@ -78,7 +79,7 @@ func TestEmitForWinNodeWithConfigFalse(t *testing.T) {
 	store.AddGlobal("clientCallback", &callbackClient)
 
 	exps := []string{}
-	store.AddLocal("config", &CallbackConfig{Emit: false})
+	store.AddLocal("config", &CallbackConfigBpmn{callback_out.CallbackConfig{Emit: false}})
 
 	testFlow(t, "emitCallBack", exps, store, getBuilderFlowNode)
 }
@@ -96,7 +97,7 @@ func TestEmitForWinWithProductFlowWinEmitRemittance(t *testing.T) {
 		"Pay",
 		"saveAudit prova request Pay",
 	}
-	store.AddLocal("config", &CallbackConfig{Emit: true})
+	store.AddLocal("config", &CallbackConfigBpmn{callback_out.CallbackConfig{Emit: true}})
 
 	testFlow(t, "emitCallBack", exps, store, getBuilderFlowNode)
 }
@@ -108,7 +109,7 @@ func TestCallbackProposalWithIsReservedTrue(t *testing.T) {
 	store.AddGlobal("product", &productEcommerce)
 	store.AddGlobal("clientCallback", &callbackClient)
 
-	store.AddLocal("config", &CallbackConfig{Proposal: true})
+	store.AddLocal("config", &CallbackConfigBpmn{callback_out.CallbackConfig{Proposal: true}})
 	exps := []string{}
 	testFlow(t, "proposalCallback", exps, store, getBuilderFlowNode)
 }
@@ -121,7 +122,7 @@ func TestCallbackProposalWithIsReservedFalse(t *testing.T) {
 	store.AddGlobal("product", &productEcommerce)
 	store.AddGlobal("clientCallback", &callbackClient)
 
-	store.AddLocal("config", &CallbackConfig{Proposal: true})
+	store.AddLocal("config", &CallbackConfigBpmn{callback_out.CallbackConfig{Proposal: true}})
 	exps := []string{
 		"Proposal",
 		"saveAudit prova request Proposal",

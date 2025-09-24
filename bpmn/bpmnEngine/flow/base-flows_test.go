@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
+	"gitlab.dev.wopta.it/goworkspace/callback_out"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
@@ -516,7 +517,7 @@ func TestSignForRemittanceMgaWithNodeFlow(t *testing.T) {
 	initBaseStorage(storeFlowChannel)
 
 	storeNode := bpmnEngine.NewStorageBpnm()
-	storeNode.AddLocal("config", &CallbackConfig{Sign: false})
+	storeNode.AddLocal("config", &CallbackConfigBpmn{callback_out.CallbackConfig{Sign: false}})
 
 	exps := []string{
 		"setSign",
@@ -548,7 +549,7 @@ func TestEmitForEcommerceWithNodeFlow(t *testing.T) {
 	initBaseStorage(storeFlowChannel)
 
 	storeNode := bpmnEngine.NewStorageBpnm()
-	storeNode.AddLocal("config", &CallbackConfig{Emit: true})
+	storeNode.AddLocal("config", &CallbackConfigBpmn{callback_out.CallbackConfig{Emit: true}})
 
 	exps := []string{
 		"setProposalData",
@@ -584,7 +585,7 @@ func TestEmitForWgaWithNodeFlow(t *testing.T) {
 	initBaseStorage(storeFlowChannel)
 
 	storeNode := bpmnEngine.NewStorageBpnm()
-	storeNode.AddLocal("config", &CallbackConfig{Emit: true})
+	storeNode.AddLocal("config", &CallbackConfigBpmn{callback_out.CallbackConfig{Emit: true}})
 
 	exps := []string{}
 	testFlow(t, "emit", exps, storeFlowChannel, func(log *mockLog, sd *bpmnEngine.StorageBpnm) (*bpmnEngine.BpnmBuilder, error) {
@@ -612,7 +613,7 @@ func TestEmitForEcommerceWithNodeFlowConfFalse(t *testing.T) {
 	initBaseStorage(storeFlowChannel)
 
 	storeNode := bpmnEngine.NewStorageBpnm()
-	storeNode.AddLocal("config", &CallbackConfig{Emit: false})
+	storeNode.AddLocal("config", &CallbackConfigBpmn{callback_out.CallbackConfig{Emit: false}})
 
 	storeProduct := bpmnEngine.NewStorageBpnm()
 	exps := []string{
@@ -654,7 +655,7 @@ func TestEmitForEcommerceCatnat(t *testing.T) {
 	initBaseStorage(storeFlowChannel)
 
 	storeNode := bpmnEngine.NewStorageBpnm()
-	storeNode.AddLocal("config", &CallbackConfig{Emit: false})
+	storeNode.AddLocal("config", &CallbackConfigBpmn{callback_out.CallbackConfig{Emit: false}})
 
 	storeProduct := bpmnEngine.NewStorageBpnm()
 	exps := []string{

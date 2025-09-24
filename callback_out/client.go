@@ -1,10 +1,13 @@
 package callback_out
 
 import (
+	"encoding/json"
 	"errors"
 
 	"gitlab.dev.wopta.it/goworkspace/callback_out/base"
 	"gitlab.dev.wopta.it/goworkspace/callback_out/win"
+	"gitlab.dev.wopta.it/goworkspace/lib"
+	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
@@ -21,15 +24,34 @@ type CallbackClient interface {
 	DecodeAction(base.CallbackoutAction) []base.CallbackoutAction
 }
 
+type CallbackConfig struct {
+	Proposal        bool `json:"proposal"`
+	RequestApproval bool `json:"requestApproval"`
+	Emit            bool `json:"emit"`
+	Pay             bool `json:"pay"`
+	Sign            bool `json:"sign"`
+	Approved        bool `json:"approved"`
+	Rejected        bool `json:"rejected"`
+}
+
 var ErrCallbackClientNotSet = errors.New("callback client not set")
 
-func newClient(node *models.NetworkNode) (CallbackClient, error) {
+func NewClient(node *models.NetworkNode) (client CallbackClient, conf CallbackConfig, err error) {
+	var bytes []byte
+	log.WarningF("The callbacks accept only policy with name life")
 	switch node.CallbackConfig.Name {
 	case "winClient":
-		return win.NewClient(node.ExternalNetworkCode), nil
+		client = win.NewClient(node.ExternalNetworkCode)
+		bytes, err = lib.GetFilesByEnvV2("flows/draft/callback/win.json")
 	case "facileBrokerClient":
-		return base.NewClient(node, "facile_broker"), nil
+		client = base.NewClient(node, "facile_broker")
+		bytes, err = lib.GetFilesByEnvV2("flows/draft/callback/base.json")
 	default:
-		return nil, ErrCallbackClientNotSet
+		err = ErrCallbackClientNotSet
 	}
+	if err != nil {
+		return client, conf, err
+	}
+	err = json.Unmarshal(bytes, &conf)
+	return client, conf, err
 }

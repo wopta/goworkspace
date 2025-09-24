@@ -26,20 +26,11 @@ func (*PaymentInfoBpmn) GetType() string {
 	return "paymentInfo"
 }
 
-type CallbackConfig struct {
-	Proposal        bool `json:"proposal"`
-	RequestApproval bool `json:"requestApproval"`
-	Emit            bool `json:"emit"`
-	Pay             bool `json:"pay"`
-	Sign            bool `json:"sign"`
-
-	//need to integrate inside channel_flow first
-	//need to define AcceptanceFx
-	Approved bool `json:"approved"`
-	Rejected bool `json:"rejected"`
+type CallbackConfigBpmn struct {
+	callback_out.CallbackConfig
 }
 
-func (*CallbackConfig) GetType() string {
+func (*CallbackConfigBpmn) GetType() string {
 	return "callbackConfig"
 }
 

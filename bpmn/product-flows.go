@@ -5,11 +5,11 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/bpmn/internal/handlers/productFlow"
 )
 
-func getProductFlow() (*bpmnEngine.BpnmBuilder, error) {
+func injectProductFlow(mainBuilder *bpmnEngine.BpnmBuilder) error {
 	store := bpmnEngine.NewStorageBpnm()
 	builder, e := bpmnEngine.NewBpnmBuilder("flows/draft/product-flows.json")
 	if e != nil {
-		return nil, e
+		return e
 	}
 	builder.SetStorage(store)
 	err := bpmnEngine.IsError(
@@ -17,7 +17,7 @@ func getProductFlow() (*bpmnEngine.BpnmBuilder, error) {
 		builder.AddHandler("catnatdownloadPolicy", productFlow.CatnatDownloadCertification),
 	)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return builder, nil
+	return mainBuilder.Inject(builder)
 }

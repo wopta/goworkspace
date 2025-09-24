@@ -4,7 +4,6 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
 	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/bpmn/internal/handlers"
-	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
 	"gitlab.dev.wopta.it/goworkspace/network"
 	prd "gitlab.dev.wopta.it/goworkspace/product"
@@ -40,23 +39,11 @@ func GetFlow(policy *models.Policy, storage *bpmnEngine.StorageBpnm) (*bpmnEngin
 	storage.AddGlobal("flowName", &flow.String{String: flowNameStr})
 	builder.SetStorage(storage)
 
-	if networkNode != nil && networkNode.CallbackConfig != nil {
-		injected, err := getNodeFlow(networkNode)
-		if err != nil {
-			return nil, err
-		}
-		err = builder.Inject(injected)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		log.InfoF("no node or callback config available, no callback")
-	}
-	injected, err := getProductFlow()
+	err = injectCallbackFlow(networkNode, builder)
 	if err != nil {
 		return nil, err
 	}
-	err = builder.Inject(injected)
+	err = injectProductFlow(builder)
 	if err != nil {
 		return nil, err
 	}
