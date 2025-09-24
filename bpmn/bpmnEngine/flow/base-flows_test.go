@@ -517,7 +517,7 @@ func TestSignForRemittanceMgaWithNodeFlow(t *testing.T) {
 	initBaseStorage(storeFlowChannel)
 
 	storeNode := bpmnEngine.NewStorageBpnm()
-	storeNode.AddLocal("config", &CallbackConfigBpmn{callback_out.CallbackConfig{Sign: false}})
+	storeNode.AddLocal("config", &CallbackConfigBpmn{callback_out.CallbackConfig{Signed: false}})
 
 	exps := []string{
 		"setSign",

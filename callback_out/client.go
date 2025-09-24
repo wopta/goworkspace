@@ -27,9 +27,10 @@ type CallbackClient interface {
 type CallbackConfig struct {
 	Proposal        bool `json:"proposal"`
 	RequestApproval bool `json:"requestApproval"`
+	Signed          bool `json:"signed"`
+	Paid            bool `json:"paid"`
 	Emit            bool `json:"emit"`
-	Pay             bool `json:"pay"`
-	Sign            bool `json:"sign"`
+	EmitRemittance  bool `json:"emitRemittance"`
 	Approved        bool `json:"approved"`
 	Rejected        bool `json:"rejected"`
 }

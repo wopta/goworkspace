@@ -97,7 +97,7 @@ func TestEmitForWinWithProductFlowWinEmitRemittance(t *testing.T) {
 		"Pay",
 		"saveAudit prova request Pay",
 	}
-	store.AddLocal("config", &CallbackConfigBpmn{callback_out.CallbackConfig{Emit: true}})
+	store.AddLocal("config", &CallbackConfigBpmn{callback_out.CallbackConfig{EmitRemittance: true}})
 
 	testFlow(t, "emitCallBack", exps, store, getBuilderFlowNode)
 }
