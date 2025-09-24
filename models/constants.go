@@ -287,9 +287,9 @@ const (
 // "enterprise": (($.contractor.type = 'legalEntity'  and .contractorFiscalcode = "”) or  $.contractor.type = 'enterprise'
 // "individualCompany": $.contractor.type = 'legalEntity' and .contractorFiscalcode != ”"
 const (
-	UserIndividual  = "individual"
-	UserEterprise   = "enterprise"
-	UserLegalEntity = "legalEntity"
+	UserPhysical    = "physical"    //PERSONA FISICA
+	UserIndividual  = "individual"  //DITAINDIVIDUALE
+	UserLegalEntity = "legalEntity" //PERSONA GIURIDICA
 )
 
 const (

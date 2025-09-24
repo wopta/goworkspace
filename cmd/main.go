@@ -38,8 +38,7 @@ func main() {
 	//	lines := strings.Split(fileStr, "\n")
 	//	datasetId := models.WoptaDataset
 	//	for i := range lines[:len(lines)-1] {
-	//		continue
-	//		lib.DeleteRowBigQuery(datasetId, lib.PolicyCollection, fmt.Sprintf("codeCompany==%s", lines[i]))
+	//		lib.DeleteRowBigQuery(datasetId, lib.PolicyCollection, fmt.Sprintf("where codeCompany=\"%s\"", (lines[i])))
 	//	}
 
 	port := "8080"

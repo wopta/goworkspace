@@ -1,5 +1,11 @@
 package renew
 
+import (
+	"fmt"
+
+	"gitlab.dev.wopta.it/goworkspace/models"
+)
+
 var (
 	paramsHierarchy = []map[string][]string{
 		{"codeCompany": []string{"codeCompany", "producerUid"}},
@@ -53,12 +59,9 @@ var (
 		"notRecurrent": "(**tableAlias**.hasMandate = false OR **tableAlias**.hasMandate IS NULL)",
 
 		// contractorType
-		"enterprise": "(JSON_VALUE(**tableAlias**.data, '$.contractor.type') = 'legalEntity' AND (**tableAlias**." +
-			"contractorFiscalcode IS NULL OR **tableAlias**.contractorFiscalcode = ''))",
-		"individualCompany": "(JSON_VALUE(**tableAlias**.data, " +
-			"'$.contractor.type') = 'legalEntity' AND **tableAlias**.contractorFiscalcode != '')",
-		"physical": "(JSON_VALUE(**tableAlias**.data, '$.contractor.type') = 'individual' OR (JSON_VALUE(**tableAlias**.data, " +
-			"'$.contractor.type') = '') OR (JSON_VALUE(**tableAlias**.data, '$.contractor.type') IS NULL))",
+		"legalEntity": fmt.Sprintf("((JSON_VALUE(**tableAlias**.data, '$.contractor.type') = 'legalEntity' AND (JSON_VALUE(**tableAlias**.data,'$.contractor.fiscalCode') IS NULL OR JSON_VALUE(**tableAlias**.data,'$.contractor.fiscalCode') = '')) OR JSON_VALUE(**tableAlias**.data, '$.contractor.type') = '%v')", models.UserLegalEntity),
+		"individual":  fmt.Sprintf("((JSON_VALUE(**tableAlias**.data, '$.contractor.type') = 'legalEntity' AND JSON_VALUE(**tableAlias**.data, '$.contractor.fiscalCode')!= '') OR JSON_VALUE(**tableAlias**.data, '$.contractor.type') = '%v')", models.UserIndividual),
+		"physical":    fmt.Sprintf("((JSON_VALUE(**tableAlias**.data, '$.contractor.type') = '' OR JSON_VALUE(**tableAlias**.data, '$.contractor.type') IS NULL) OR  JSON_VALUE(**tableAlias**.data, '$.contractor.type') = '%v')", models.UserPhysical),
 	}
 
 	toBeTranslatedKeys = []string{"status", "payment", "contractorType"}
