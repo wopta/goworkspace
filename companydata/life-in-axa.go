@@ -272,15 +272,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 		var contractor *models.Contractor
 		contractors := new([]models.User)
-		if !isLegalEntity {
-			contractor = parseIndividualOrPhysicalContractor(codeCompany, row, codes)
-			if contractor == nil {
-				skippedPolicies = append(skippedPolicies, fmt.Sprintf("%07s", strings.TrimSpace(row[2])))
-				continue
-			}
-
-			contractor.Uid, writeContractorToDB = searchUserInDBByFiscalCode(contractor.FiscalCode)
-		} else {
+		if isLegalEntity {
 			// parsing contractor
 
 			contractor = parseEnterpriseContractor(row)
@@ -309,6 +301,14 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 				*contractors = append(*contractors, titolareEffettivo)
 			}
 			//*contractors = append(*contractors, titolariEffettivi...)
+		} else {
+			contractor = parseIndividualOrPhysicalContractor(codeCompany, row, codes)
+			if contractor == nil {
+				skippedPolicies = append(skippedPolicies, fmt.Sprintf("%07s", strings.TrimSpace(row[2])))
+				continue
+			}
+
+			contractor.Uid, writeContractorToDB = searchUserInDBByFiscalCode(contractor.FiscalCode)
 		}
 
 		if !contractorEqualInsured {
