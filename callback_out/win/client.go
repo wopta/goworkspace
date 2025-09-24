@@ -45,8 +45,8 @@ func (c *Client) post(body io.Reader) (*http.Request, *http.Response, error) {
 	req, err := http.NewRequest(http.MethodPost, path, body)
 	if err != nil {
 		return nil, nil, err
-	}
 
+	}
 	req.SetBasicAuth(os.Getenv("WIN_CALLBACK_AUTH_USER"), os.Getenv("WIN_CALLBACK_AUTH_PASS"))
 	req.Header.Set("Content-Type", "application/json")
 
@@ -73,6 +73,10 @@ func (c *Client) Proposal(policy models.Policy) (callbackInfo base.CallbackInfo)
 	}
 
 	req, res, err := c.post(bytes.NewReader(body))
+	if err != nil {
+		callbackInfo.Error = err
+		return callbackInfo
+	}
 	callbackInfo.FromRequestResponse(base.Proposal, res, req)
 	return callbackInfo
 }
@@ -88,6 +92,10 @@ func (c *Client) Emit(policy models.Policy) (callbackInfo base.CallbackInfo) {
 	}
 
 	req, res, err := c.post(bytes.NewReader(body))
+	if err != nil {
+		callbackInfo.Error = err
+		return callbackInfo
+	}
 	callbackInfo.FromRequestResponse(base.Emit, res, req)
 	return callbackInfo
 }
@@ -103,6 +111,10 @@ func (c *Client) RequestApproval(policy models.Policy) (callbackInfo base.Callba
 	}
 
 	req, res, err := c.post(bytes.NewReader(body))
+	if err != nil {
+		callbackInfo.Error = err
+		return callbackInfo
+	}
 	callbackInfo.FromRequestResponse(base.RequestApproval, res, req)
 	return callbackInfo
 }
@@ -118,6 +130,10 @@ func (c *Client) Paid(policy models.Policy) (callbackInfo base.CallbackInfo) {
 	}
 
 	req, res, err := c.post(bytes.NewReader(body))
+	if err != nil {
+		callbackInfo.Error = err
+		return callbackInfo
+	}
 	callbackInfo.FromRequestResponse(base.Paid, res, req)
 	return callbackInfo
 }
