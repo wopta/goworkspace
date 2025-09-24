@@ -59,9 +59,9 @@ var (
 		"notRecurrent": "(**tableAlias**.hasMandate = false OR **tableAlias**.hasMandate IS NULL)",
 
 		// contractorType
-		"legalEntity": fmt.Sprintf("((JSON_VALUE(**tableAlias**.data, '$.contractor.type') = 'legalEntity' AND (JSON_VALUE(**tableAlias**.data,'$.contractor.fiscalCode') IS NULL OR JSON_VALUE(**tableAlias**.data,'$.contractor.fiscalCode') = '')) OR JSON_VALUE(**tableAlias**.data, '$.contractor.type') = '%v')", models.UserLegalEntity),
-		"individual":  fmt.Sprintf("((JSON_VALUE(**tableAlias**.data, '$.contractor.type') = 'legalEntity' AND JSON_VALUE(**tableAlias**.data, '$.contractor.fiscalCode')!= '') OR JSON_VALUE(**tableAlias**.data, '$.contractor.type') = '%v')", models.UserIndividual),
-		"physical":    fmt.Sprintf("((JSON_VALUE(**tableAlias**.data, '$.contractor.type') = '' OR JSON_VALUE(**tableAlias**.data, '$.contractor.type') IS NULL) OR  JSON_VALUE(**tableAlias**.data, '$.contractor.type') = '%v')", models.UserPhysical),
+		models.UserLegalEntity: fmt.Sprintf("((JSON_VALUE(**tableAlias**.data, '$.contractor.type') = 'legalEntity' AND (JSON_VALUE(**tableAlias**.data,'$.contractor.fiscalCode') IS NULL OR JSON_VALUE(**tableAlias**.data,'$.contractor.fiscalCode') = '')) OR JSON_VALUE(**tableAlias**.data, '$.contractor.type') = '%v')", models.UserLegalEntity),
+		models.UserIndividual:  fmt.Sprintf("((JSON_VALUE(**tableAlias**.data, '$.contractor.type') = 'legalEntity' AND JSON_VALUE(**tableAlias**.data, '$.contractor.fiscalCode')!= '') OR JSON_VALUE(**tableAlias**.data, '$.contractor.type') = '%v')", models.UserIndividual),
+		models.UserPhysical:    fmt.Sprintf("((JSON_VALUE(**tableAlias**.data, '$.contractor.type') = '' OR JSON_VALUE(**tableAlias**.data, '$.contractor.type') IS NULL) OR  JSON_VALUE(**tableAlias**.data, '$.contractor.type') = '%v')", models.UserPhysical),
 	}
 
 	toBeTranslatedKeys = []string{"status", "payment", "contractorType"}
