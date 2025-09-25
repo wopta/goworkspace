@@ -6,7 +6,7 @@ replace gitlab.dev.wopta.it/goworkspace/wiseproxy => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.221
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.222
 )
 
 require (
