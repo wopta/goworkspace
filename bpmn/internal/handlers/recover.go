@@ -2,12 +2,12 @@ package handlers
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
 	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine/flow"
 	"gitlab.dev.wopta.it/goworkspace/lib"
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
 	"gitlab.dev.wopta.it/goworkspace/mail"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
@@ -58,7 +58,7 @@ func sendEmailError(state *bpmnEngine.StorageBpnm) error {
 	}
 	var body string
 	body += fmt.Sprintf("Nella data del %v la polizza %v ha avuto problemi nel processo di %v<br><br>", time.Now().Format("2006-01-02"), policy.CodeCompany, processNameToIta[statusFlow.CurrentProcess])
-	body += fmt.Sprintf("Execution Id: %v", os.Getenv("Execution-Id"))
+	body += fmt.Sprintf("Execution Id: %v", env.GetExecutionId())
 	mail.SendBaseEmail(body, fmt.Sprint("Errore nel processo di ", processNameToIta[statusFlow.CurrentProcess]), lib.GetMailProcessi(processNameToIta[statusFlow.CurrentProcess]))
 	return nil
 }

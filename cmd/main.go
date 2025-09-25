@@ -33,13 +33,6 @@ func main() {
 	if err != nil {
 		log.ErrorF("Error loading .env file: %s", err)
 	}
-	//	file, _ := os.ReadFile("policies.txt")
-	//	fileStr := string(file)
-	//	lines := strings.Split(fileStr, "\n")
-	//	datasetId := models.WoptaDataset
-	//	for i := range lines[:len(lines)-1] {
-	//		lib.DeleteRowBigQuery(datasetId, lib.PolicyCollection, fmt.Sprintf("where codeCompany=\"%s\"", (lines[i])))
-	//	}
 
 	port := "8080"
 	if envPort := os.Getenv("PORT"); envPort != "" {

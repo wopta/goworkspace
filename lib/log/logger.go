@@ -8,6 +8,8 @@ import (
 	"slices"
 	"strings"
 	"time"
+
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
 )
 
 type SeverityType string
@@ -176,7 +178,7 @@ func parserMessageGoogleCloud(message string, severity SeverityType, prefix []st
 	entry := MessageInformation{
 		Message:      fmt.Sprint(conPrefix, message),
 		Severity:     string(severity),
-		ExecutiondId: os.Getenv("Execution-Id"),
+		ExecutiondId: env.GetExecutionId(),
 	}
 	out, err := json.Marshal(entry)
 	if err != nil {

@@ -27,3 +27,7 @@ func IsDevelopment() bool {
 func IsProduction() bool {
 	return os.Getenv("env") == Production
 }
+
+func GetExecutionId() string {
+	return os.Getenv("Execution-Id")
+}

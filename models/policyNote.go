@@ -24,6 +24,7 @@ type PolicyNote struct {
 	ReadableByProducer bool      `json:"readableByProducer" firestore:"readableByProducer"`
 	PolicyUid          string    `json:"policyUid" firestore:"policyUid"`
 	Text               string    `json:"text" firestore:"text"`
+	ExecutionId        string    `json:"executionId" firestore:"executionId"`
 }
 
 func AddNoteToPolicy(policyUid string, note PolicyNote) error {
@@ -70,6 +71,7 @@ func (p *Policy) AddSystemNote(getterNote func(p *Policy) PolicyNote) error {
 	note.CreateDate = time.Now()
 	note.PolicyUid = p.Uid
 	note.Type = "System"
+	note.ExecutionId = env.GetExecutionId()
 	if env.IsLocal() {
 		note.Text += "(Operazione eseguita in ambiente locale, non veritiera)"
 	}
