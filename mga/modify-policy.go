@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"reflect"
 	"strings"
 	"time"
@@ -87,6 +88,7 @@ func modifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 			if err != nil {
 				return "", nil, err
 			}
+			os.WriteFile("add.pdf", addendumResp.Bytes, 0777)
 			addendumAtt := models.Attachment{
 				Name:        "Appendice - Modifica dati di polizza",
 				FileName:    addendumResp.FileName,
@@ -104,6 +106,9 @@ func modifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 			log.ErrorF("error generating addendum for policy %s: %s", inputPolicy.Uid, err.Error())
 			return "", nil, err
 		}
+	} else {
+		log.Println("Nothing has changed")
+		return string(rawPolicy), originalPolicy, err
 	}
 
 	if err = writePolicyToDb(modifiedPolicy); err != nil {
@@ -127,8 +132,7 @@ func generateDiffPolicy(originalPolicy, inputPolicy models.Policy) (models.Polic
 		diffAssets      []models.Asset
 		hasPolicyVaried bool
 	)
-
-	if hasVaried := diffForUser(originalPolicy.Contractor.ToUser(), inputPolicy.Contractor.ToUser()); hasVaried {
+	if !reflect.DeepEqual(originalPolicy.Contractor, inputPolicy.Contractor) {
 		hasPolicyVaried = true
 		diffContractor = inputPolicy.Contractor
 	}
@@ -185,10 +189,25 @@ func generateDiffPolicy(originalPolicy, inputPolicy models.Policy) (models.Polic
 			diffAssets[idx] = modifiedAsset
 		}
 	}
+	var diffContractors []models.User
+	if inputPolicy.Contractors != nil {
+		if len(*inputPolicy.Contractors) != len(*originalPolicy.Contractors) {
+			hasPolicyVaried = true
+			diffContractors = *inputPolicy.Contractors
+		} else {
+			for idx, contr := range *inputPolicy.Contractors {
+				if diffForUser(&contr, &(*originalPolicy.Contractors)[idx]) {
+					diffContractors = append(diffContractors, contr)
+					hasPolicyVaried = true
+				}
+			}
+		}
+	}
 
 	if hasPolicyVaried {
 		diff = originalPolicy
 		diff.Contractor = diffContractor
+		diff.Contractors = &diffContractors
 		diff.Assets = diffAssets
 	}
 
@@ -275,36 +294,39 @@ func diffForBeneficiaries(orig, input *[]models.Beneficiary) bool {
 func modifyController(originalPolicy, inputPolicy models.Policy) (models.Policy, models.User, error) {
 	var (
 		err            error
-		modifiedPolicy models.Policy
+		policyToModify models.Policy
 		modifiedUser   models.User
 	)
 
-	modifiedPolicy = deepcopy.Copy(originalPolicy).(models.Policy)
+	policyToModify = deepcopy.Copy(originalPolicy).(models.Policy)
 
 	err = checkEmailUniqueness(originalPolicy.Contractor, inputPolicy.Contractor)
 	if err != nil {
 		return models.Policy{}, models.User{}, err
 	}
 
-	modifiedPolicy.Contractor, err = modifyContractorInfo(inputPolicy.Contractor, originalPolicy.Contractor)
+	policyToModify.Contractor, err = modifyContractorInfo(inputPolicy.Contractor, originalPolicy.Contractor)
 	if err != nil {
 		return models.Policy{}, models.User{}, err
 	}
 
-	if modifiedPolicy.Contractor.Uid != "" {
-		tmpUser := modifiedPolicy.Contractor.ToUser()
+	policyToModify.Assets, err = modifyAssets(policyToModify, inputPolicy)
+	if err != nil {
+		return models.Policy{}, models.User{}, err
+	}
+	policyToModify.Contractors, err = modifyContractorsInfo(inputPolicy, policyToModify)
+	if err != nil {
+		return models.Policy{}, models.User{}, err
+	}
+	if policyToModify.Contractor.Uid != "" {
+		tmpUser := policyToModify.Contractor.ToUser()
 		modifiedUser, err = modifyUserInfo(*tmpUser)
 		if err != nil {
 			return models.Policy{}, models.User{}, err
 		}
 	}
 
-	modifiedPolicy.Assets, err = modifyAssets(modifiedPolicy, inputPolicy)
-	if err != nil {
-		return models.Policy{}, models.User{}, err
-	}
-
-	return modifiedPolicy, modifiedUser, err
+	return policyToModify, modifiedUser, err
 }
 
 func checkEmailUniqueness(originalContractor, inputContractor models.Contractor) error {
@@ -322,6 +344,21 @@ func checkEmailUniqueness(originalContractor, inputContractor models.Contractor)
 	}
 
 	return nil
+}
+
+func modifyContractorsInfo(input, original models.Policy) (*[]models.User, error) {
+	var res []models.User
+	if original.Contractors == nil {
+		return nil, nil
+	}
+	for i := range *original.Contractors {
+		newContractor, err := modifyPersonInfo((*input.Contractors)[i], (*original.Contractors)[i])
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, *newContractor)
+	}
+	return &res, nil
 }
 
 func modifyContractorInfo(inputContractor, originalContractor models.Contractor) (models.Contractor, error) {
@@ -342,6 +379,11 @@ func modifyContractorInfo(inputContractor, originalContractor models.Contractor)
 	modifiedContractor.FiscalCode = inputContractor.FiscalCode
 	modifiedContractor.Mail = inputContractor.Mail
 	modifiedContractor.Residence = inputContractor.Residence
+	modifiedContractor.CompanyAddress = inputContractor.CompanyAddress
+	modifiedContractor.CompanyName = inputContractor.CompanyName
+	modifiedContractor.VatCode = inputContractor.VatCode
+	//TODO: check if it is correct
+	modifiedContractor.Ateco = inputContractor.Ateco
 	if inputContractor.Consens != nil {
 		if modifiedContractor.Consens == nil {
 			modifiedContractor.Consens = inputContractor.Consens
@@ -357,9 +399,11 @@ func modifyContractorInfo(inputContractor, originalContractor models.Contractor)
 	}
 
 	user := modifiedContractor.ToUser()
-	err = usr.CheckFiscalCode(*user)
-	if err != nil {
-		return models.Contractor{}, err
+	if user.FiscalCode != "" {
+		err = usr.CheckFiscalCode(*user)
+		if err != nil {
+			return models.Contractor{}, err
+		}
 	}
 
 	log.Printf("contractor %s modified", originalContractor.Uid)
@@ -382,7 +426,7 @@ func modifyAssets(modifiedPolicy models.Policy, inputPolicy models.Policy) ([]mo
 			if asset.Person.FiscalCode == modifiedPolicy.Contractor.FiscalCode {
 				modifiedAsset.Person = modifiedPolicy.Contractor.ToUser()
 			} else {
-				modifiedAsset.Person, err = modifyInsuredInfo(*inputPolicy.Assets[0].Person, *modifiedPolicy.Assets[0].Person)
+				modifiedAsset.Person, err = modifyPersonInfo(*inputPolicy.Assets[0].Person, *modifiedPolicy.Assets[0].Person)
 				if err != nil {
 					return nil, err
 				}
@@ -416,30 +460,30 @@ func modifyBeneficiaryInfo(inputGuarantees, originalGuarantees []models.Guarante
 	return *modifiedGuarantees, nil
 }
 
-func modifyInsuredInfo(inputInsured, originalInsured models.User) (*models.User, error) {
+func modifyPersonInfo(inputPerson, originalPerson models.User) (*models.User, error) {
 	var (
 		err             error
 		modifiedInsured = new(models.User)
 	)
 
 	log.Println("modifying insured info...")
-	*modifiedInsured = originalInsured
+	*modifiedInsured = originalPerson
 
-	modifiedInsured.Name = inputInsured.Name
-	modifiedInsured.Surname = inputInsured.Surname
-	modifiedInsured.BirthDate = inputInsured.BirthDate
-	modifiedInsured.BirthCity = inputInsured.BirthCity
-	modifiedInsured.BirthProvince = inputInsured.BirthProvince
-	modifiedInsured.Gender = inputInsured.Gender
-	modifiedInsured.FiscalCode = inputInsured.FiscalCode
-	modifiedInsured.Mail = inputInsured.Mail
-	modifiedInsured.Residence = inputInsured.Residence
-	if inputInsured.Consens != nil {
+	modifiedInsured.Name = inputPerson.Name
+	modifiedInsured.Surname = inputPerson.Surname
+	modifiedInsured.BirthDate = inputPerson.BirthDate
+	modifiedInsured.BirthCity = inputPerson.BirthCity
+	modifiedInsured.BirthProvince = inputPerson.BirthProvince
+	modifiedInsured.Gender = inputPerson.Gender
+	modifiedInsured.FiscalCode = inputPerson.FiscalCode
+	modifiedInsured.Mail = inputPerson.Mail
+	modifiedInsured.Residence = inputPerson.Residence
+	if inputPerson.Consens != nil {
 		if modifiedInsured.Consens == nil {
-			modifiedInsured.Consens = inputInsured.Consens
+			modifiedInsured.Consens = inputPerson.Consens
 		} else {
 			for index, consensus := range *modifiedInsured.Consens {
-				for _, inputConsensus := range *inputInsured.Consens {
+				for _, inputConsensus := range *inputPerson.Consens {
 					if inputConsensus.Key == consensus.Key {
 						(*modifiedInsured.Consens)[index].Answer = inputConsensus.Answer
 					}
@@ -453,9 +497,8 @@ func modifyInsuredInfo(inputInsured, originalInsured models.User) (*models.User,
 		return nil, err
 	}
 
-	log.Printf("insured %s modified", originalInsured.Uid)
+	log.Printf("person %s modified", originalPerson.Uid)
 
-	log.Println("insured modified successfully")
 	return modifiedInsured, err
 }
 
@@ -498,7 +541,6 @@ func modifyUserInfo(inputUser models.User) (models.User, error) {
 			}
 		}
 	}
-
 	if !strings.EqualFold(modifiedUser.Mail, dbUser.Mail) && dbUser.AuthId != "" {
 		log.Printf("modifying user %s email from %s to %s...", modifiedUser.Uid, modifiedUser.Mail, dbUser.Mail)
 		_, err = lib.UpdateUserEmail(modifiedUser.Uid, modifiedUser.Mail)

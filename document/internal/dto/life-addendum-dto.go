@@ -35,13 +35,15 @@ type addendumContractorDTO struct {
 	PostalCode      string
 }
 
-type addendumInsuredDTO struct {
+type addendumPersonDTO struct {
 	Name            string
 	Surname         string
 	FiscalCode      string
 	StreetName      string
 	StreetNumber    string
 	City            string
+	BirthCity       string
+	BirthProvice    string
 	PostalCode      string
 	Province        string
 	DomStreetName   string
@@ -52,6 +54,20 @@ type addendumInsuredDTO struct {
 	Mail            string
 	Phone           string
 	BirthDate       string
+	Gender          string
+}
+
+func (a addendumPersonDTO) GetResidenceAddress() string {
+	if a.StreetName == "" {
+		return ""
+	}
+	return a.StreetName + " " + a.StreetNumber + ", " + a.PostalCode + " " + a.City + " (" + a.Province + ")"
+}
+func (a addendumPersonDTO) GetBirthAddress() string {
+	if a.StreetName == "" {
+		return ""
+	}
+	return a.BirthCity + " " + a.BirthProvice
 }
 
 type addendumBeneficiaryDTO struct {
@@ -88,7 +104,7 @@ type addendumBeneficiaries []addendumBeneficiaryDTO
 type AddendumBeneficiariesDTO struct {
 	Contract             *addendumContractDTO
 	Contractor           *addendumContractorDTO
-	Insured              *addendumInsuredDTO
+	Insured              *addendumPersonDTO
 	Beneficiaries        *addendumBeneficiaries
 	BeneficiaryReference *addendumBeneficiaryReferenceDTO
 }
@@ -97,7 +113,7 @@ func NewBeneficiariesDto() *AddendumBeneficiariesDTO {
 	return &AddendumBeneficiariesDTO{
 		Contract:             newLifeContractDTO(),
 		Contractor:           newLifeContractorDTO(),
-		Insured:              newLifeInsuredDTO(),
+		Insured:              newAddendumPersonDTO(),
 		Beneficiaries:        newLifeBeneficiariesDTO(),
 		BeneficiaryReference: &addendumBeneficiaryReferenceDTO{},
 	}
@@ -152,8 +168,8 @@ func newLifeContractorDTO() *addendumContractorDTO {
 	}
 }
 
-func newLifeInsuredDTO() *addendumInsuredDTO {
-	return &addendumInsuredDTO{
+func newAddendumPersonDTO() *addendumPersonDTO {
+	return &addendumPersonDTO{
 		Name:            constants.EmptyField,
 		Surname:         constants.EmptyField,
 		FiscalCode:      constants.EmptyField,
@@ -267,35 +283,45 @@ func (lc *addendumContractorDTO) fromPolicy(contr models.Contractor) {
 	}
 }
 
-func (li *addendumInsuredDTO) fromPolicy(ins *models.User) {
-	if ins != nil {
-		if ins.FiscalCode != "" {
-			li.Name = ins.Name
-			li.Surname = ins.Surname
-			li.FiscalCode = ins.FiscalCode
-			li.BirthDate = parseBirthDate(ins.BirthDate)
-		}
-		if ins.Residence != nil {
-			li.StreetName = ins.Residence.StreetName
-			li.StreetNumber = ins.Residence.StreetNumber
-			li.City = ins.Residence.City
-			li.PostalCode = ins.Residence.PostalCode
-			li.Province = ins.Residence.CityCode
-		}
+var genderToIta = map[string]string{
+	"M": "Maschio",
+	"F": "Femmina",
+}
 
-		if ins.Domicile != nil {
-			li.DomStreetName = ins.Domicile.StreetName
-			li.DomStreetNumber = ins.Domicile.StreetNumber
-			li.DomCity = ins.Domicile.City
-			li.DomPostalCode = ins.Domicile.PostalCode
-			li.DomProvince = ins.Domicile.CityCode
-		}
-		if ins.Mail != "" {
-			li.Mail = ins.Mail
-		}
-		if ins.Phone != "" {
-			li.Phone = ins.Phone
-		}
+func (li *addendumPersonDTO) fromPolicy(ins *models.User) {
+	if ins == nil {
+		return
+	}
+	li.BirthCity = ins.BirthCity
+	li.BirthProvice = ins.BirthProvince
+	li.BirthDate = ins.BirthDate
+	li.Gender = genderToIta[ins.Gender]
+	if ins.FiscalCode != "" {
+		li.Name = ins.Name
+		li.Surname = ins.Surname
+		li.FiscalCode = ins.FiscalCode
+		li.BirthDate = parseBirthDate(ins.BirthDate)
+	}
+	if ins.Residence != nil {
+		li.StreetName = ins.Residence.StreetName
+		li.StreetNumber = ins.Residence.StreetNumber
+		li.City = ins.Residence.City
+		li.PostalCode = ins.Residence.PostalCode
+		li.Province = ins.Residence.CityCode
+	}
+
+	if ins.Domicile != nil {
+		li.DomStreetName = ins.Domicile.StreetName
+		li.DomStreetNumber = ins.Domicile.StreetNumber
+		li.DomCity = ins.Domicile.City
+		li.DomPostalCode = ins.Domicile.PostalCode
+		li.DomProvince = ins.Domicile.CityCode
+	}
+	if ins.Mail != "" {
+		li.Mail = ins.Mail
+	}
+	if ins.Phone != "" {
+		li.Phone = ins.Phone
 	}
 }
 

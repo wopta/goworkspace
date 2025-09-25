@@ -25,6 +25,11 @@ func Addendum(policy *models.Policy) (DocumentGenerated, error) {
 		generator := addendum.NewLifeAddendumGenerator(pdf, policy)
 		generator.Generate()
 		return generateAddendumDocument(pdf.GetPdf(), policy)
+	case models.CatNatProduct:
+		pdf := engine.NewFpdf()
+		generator := addendum.NewCatnatAddendumGenerator(pdf, policy)
+		generator.Generate()
+		return generateAddendumDocument(pdf.GetPdf(), policy)
 	}
 
 	log.Printf("addendum not implemented for product %s", policy.Name)

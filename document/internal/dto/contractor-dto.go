@@ -23,6 +23,8 @@ type contractorDTO struct {
 	Phone        string
 	BirthDate    string
 	Address      string
+	Type         string
+	Ateco        string
 }
 
 func newContractorDTO() *contractorDTO {
@@ -42,6 +44,12 @@ func newContractorDTO() *contractorDTO {
 	}
 }
 
+var contractorTypeToIta = map[string]string{
+	models.UserPhysical:    "Persona Fisica",
+	models.UserIndividual:  "Ditta Individuale",
+	models.UserLegalEntity: "Persona Giuridica",
+}
+
 func (c *contractorDTO) fromPolicy(contractor models.Contractor) {
 	if contractor.Name != "" {
 		c.Name = contractor.Name
@@ -58,7 +66,9 @@ func (c *contractorDTO) fromPolicy(contractor models.Contractor) {
 	if contractor.VatCode != "" {
 		c.VatCode = contractor.VatCode
 	}
-
+	c.Type = contractorTypeToIta[contractor.Type]
+	c.Ateco = contractor.Ateco
+	c.VatCode = contractor.VatCode
 	if contractor.Type == models.UserLegalEntity && contractor.CompanyAddress != nil {
 		if len(contractor.CompanyAddress.StreetName) != 0 {
 			c.StreetName = contractor.CompanyAddress.StreetName
@@ -91,16 +101,19 @@ func (c *contractorDTO) fromPolicy(contractor models.Contractor) {
 		if len(contractor.Residence.CityCode) != 0 {
 			c.CityCode = contractor.Residence.CityCode
 		}
-		if len(contractor.Mail) != 0 {
-			c.Mail = contractor.Mail
-		}
-		if len(contractor.Phone) != 0 {
-			c.Phone = contractor.Phone
-		}
 	}
-	c.Address = strings.ToUpper(c.StreetName + ", " + c.StreetNumber + " \n" + c.PostalCode + " " + c.City + " (" + c.CityCode + ")\n")
+	if len(contractor.Phone) != 0 {
+		c.Phone = contractor.Phone
+	}
+	if len(contractor.Mail) != 0 {
+		c.Mail = contractor.Mail
+	}
+	if c.StreetName != "" || c.PostalCode != "" {
+		c.Address = strings.ToUpper(c.StreetName + ", " + c.StreetNumber + " \n" + c.PostalCode + " " + c.City + " (" + c.CityCode + ")\n")
+	}
 
 }
+
 func (c *contractorDTO) GetFullNameContractor() (res string) {
 	nameSurname := lib.JoinNoEmptyStrings([]string{c.Name, c.Surname}, " ")
 	return lib.JoinNoEmptyStrings([]string{nameSurname, c.CompanyName}, ", ")
