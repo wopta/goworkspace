@@ -83,7 +83,7 @@ func promoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 			}
 
 			dataDelete := createPromoteProcessedBatch(p, trs)
-
+			p.AddSystemNote(models.GetQuietanzamentoPolicyNote)
 			return saveToDatabases(dataDelete)
 		}
 

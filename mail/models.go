@@ -2,6 +2,7 @@ package mail
 
 import (
 	m "net/mail"
+	"os"
 
 	"cloud.google.com/go/bigquery"
 	"gitlab.dev.wopta.it/goworkspace/models"
@@ -92,6 +93,6 @@ var (
 	}
 	AddressOperations = Address{
 		Name:    "Processi",
-		Address: "processi@wopta.it",
+		Address: os.Getenv("MAIL_PROCESSI"),
 	}
 )

@@ -106,11 +106,7 @@ func modifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 			log.ErrorF("error generating addendum for policy %s: %s", inputPolicy.Uid, err.Error())
 			return "", nil, err
 		}
-	} else {
-		log.Println("Nothing has changed")
-		return string(rawPolicy), originalPolicy, err
 	}
-
 	if err = writePolicyToDb(modifiedPolicy); err != nil {
 		return "", nil, err
 	}
@@ -352,6 +348,17 @@ func modifyContractorsInfo(input, original models.Policy) (*[]models.User, error
 		return nil, nil
 	}
 	for i := range *original.Contractors {
+		//if contractor is ditta individuale the signer is the same person
+		if input.Contractor.Type == models.UserIndividual && (*input.Contractors)[i].IsSignatory {
+			newContractor, err := modifyContractorInfo(input.Contractor, original.Contractor)
+			if err != nil {
+				return nil, err
+			}
+			user := *newContractor.ToUser()
+			user.IsSignatory = true
+			res = append(res, user)
+			continue
+		}
 		newContractor, err := modifyPersonInfo((*input.Contractors)[i], (*original.Contractors)[i])
 		if err != nil {
 			return nil, err
@@ -399,6 +406,9 @@ func modifyContractorInfo(inputContractor, originalContractor models.Contractor)
 	}
 
 	user := modifiedContractor.ToUser()
+	if originalContractor.Type == models.UserIndividual {
+		return *modifiedContractor, err
+	}
 	if user.FiscalCode != "" {
 		err = usr.CheckFiscalCode(*user)
 		if err != nil {
@@ -466,7 +476,6 @@ func modifyPersonInfo(inputPerson, originalPerson models.User) (*models.User, er
 		modifiedInsured = new(models.User)
 	)
 
-	log.Println("modifying insured info...")
 	*modifiedInsured = originalPerson
 
 	modifiedInsured.Name = inputPerson.Name
@@ -491,7 +500,6 @@ func modifyPersonInfo(inputPerson, originalPerson models.User) (*models.User, er
 			}
 		}
 	}
-
 	err = usr.CheckFiscalCode(*modifiedInsured)
 	if err != nil {
 		return nil, err

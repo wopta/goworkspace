@@ -165,3 +165,8 @@ func GetErrorNote(processName string) func(*Policy) PolicyNote {
 		}
 	}
 }
+func GetQuietanzamentoPolicyNote(_ *Policy) PolicyNote {
+	return PolicyNote{
+		Text: "Quietanzamento eseguito",
+	}
+}
