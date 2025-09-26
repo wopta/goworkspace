@@ -32,7 +32,7 @@ type Route struct {
 func ResponseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) (string, any, error)) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		str, _, err := handler(w, r)
-		w.Header().Set("Execution-Id", env.GetExecutionId())
+		w.Header().Set("x-execution-id", env.GetExecutionId())
 		if err != nil {
 
 			log.Error(err)
