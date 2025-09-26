@@ -299,9 +299,9 @@ func (lag *CatnatAddendumGenerator) signer() {
 		checked = "X"
 	}
 	rows1 = [][]string{
-		{"Cognome e Nome:", iDTO.Surname + " " + iDTO.Name, "Cod. Fisc:", iDTO.FiscalCode + " "},
-		{"Luogo di Nascita:", iDTO.GetBirthAddress(), "Data nascita:", iDTO.BirthDate},
-		{"Indirizzo Residenza:", iDTO.GetResidenceAddress(), "Sesso:", iDTO.Gender},
+		{"Cognome e Nome:", iDTO.Surname + " " + iDTO.Name, "Data nascita:", iDTO.BirthDate},
+		{"Luogo di Nascita:", iDTO.GetBirthAddress(), "Sesso:", iDTO.Gender},
+		{"Indirizzo Residenza:", iDTO.GetResidenceAddress(), "Cod. Fisc:", iDTO.FiscalCode + " "},
 		{"Mail:", iDTO.Mail, "Telefono:", iDTO.Phone},
 	}
 

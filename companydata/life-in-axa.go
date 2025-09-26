@@ -694,6 +694,7 @@ func searchUserInDBByFiscalCode(fiscalCode string) (string, bool) {
 	return retrievedUser.Uid, false
 }
 
+// you need one titotale == signer to have IsSignatory == true, it doent add the Esecutore
 func parsingTitolareEffettivo(row []string, offset int, i int) models.User {
 	isExecutor := strings.TrimSpace(strings.ToUpper(row[224])) == strings.TrimSpace(strings.ToUpper(row[121+(offset*i)]))
 

@@ -62,10 +62,11 @@ func uploadFiles(files ...string) (fileIds []string, err error) {
 		if err != nil {
 			return fileIds, err
 		}
-		if file == nil || len(file) == 0 {
+		if len(file) == 0 {
 			return fileIds, fmt.Errorf("Error getting the file %v", files[i])
 		}
 		w := multipart.NewWriter(&buffer)
+		defer w.Close()
 		fw, err := w.CreateFormFile("file", name+".pdf")
 		if err != nil {
 			return fileIds, err
@@ -74,7 +75,6 @@ func uploadFiles(files ...string) (fileIds []string, err error) {
 		if err != nil || nWrite == 0 {
 			return fileIds, err
 		}
-		w.Close()
 		req, err := http.NewRequest(http.MethodPost, url, &buffer)
 		if err != nil {
 			return fileIds, err
