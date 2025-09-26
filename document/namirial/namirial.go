@@ -174,7 +174,6 @@ func buildBodyToSend(prepareteResponse prepareResponse, idFiles []string, callba
 
 	body.Activities = prepareteResponse.Activities
 	for i := range body.Activities {
-		body.Activities[i].Action.Sign.RecipientConfiguration.AuthenticationConfiguration.SmsOneTimePassword.PhoneNumber = policy.Contractor.Phone
 		if !env.IsProduction() {
 			body.Activities[i].Action.Sign.RecipientConfiguration.AuthenticationConfiguration.AccessCode = &accessCode{Code: "test"}
 		}
@@ -232,6 +231,7 @@ func setContractorDataInSendBody(bodySend *sendNamirialRequest, policy models.Po
 		contactInfo.GivenName = signer.Name
 		contactInfo.Email = signer.Mail
 		contactInfo.PhoneNumber = signer.Phone
+		bodySend.Activities[i].Action.Sign.RecipientConfiguration.AuthenticationConfiguration.SmsOneTimePassword.PhoneNumber = signer.Phone
 	}
 	return nil
 }
