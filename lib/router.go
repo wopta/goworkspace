@@ -33,6 +33,9 @@ func ResponseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) 
 	return func(w http.ResponseWriter, r *http.Request) {
 		str, _, err := handler(w, r)
 		w.Header().Set("Run-Id", env.GetExecutionId())
+		w.Header().Set("App-Run-Id", env.GetExecutionId())
+		w.Header().Set("RunId", env.GetExecutionId())
+		w.Header().Set("Trace-Id", env.GetExecutionId())
 		if err != nil {
 
 			log.Error(err)
