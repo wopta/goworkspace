@@ -10,7 +10,6 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"google.golang.org/api/iterator"
-	"google.golang.org/genproto/googleapis/type/latlng"
 )
 
 type Contractor struct {
@@ -25,7 +24,6 @@ type Contractor struct {
 	PictureUrl               string                 `firestore:"pictureUrl"                  json:"pictureUrl,omitempty"        bigquery:"-"`
 	Location                 Location               `firestore:"location"                    json:"location,omitempty"          bigquery:"-"`
 	BigLocation              bigquery.NullGeography `firestore:"-"                           json:"-"                           bigquery:"location"`
-	Geo                      latlng.LatLng          `firestore:"geo"                         json:"-"                           bigquery:"-"`
 	Name                     string                 `firestore:"name"                        json:"name,omitempty"              bigquery:"name"`
 	Gender                   string                 `firestore:"gender"                      json:"gender,omitempty"            bigquery:"gender"`
 	Type                     string                 `firestore:"type"                        json:"type,omitempty"              bigquery:"-"`
