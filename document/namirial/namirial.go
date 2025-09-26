@@ -214,14 +214,12 @@ func buildBodyToSend(prepareteResponse prepareResponse, idFiles []string, callba
 func setContractorDataInSendBody(bodySend *sendNamirialRequest, policy models.Policy) error {
 	var signer *models.User = policy.Contractor.ToUser()
 
-	if policy.Contractor.Type == models.UserLegalEntity { // i need to use only the phone of the signer
-		for _, contractor := range *policy.Contractors {
-			if contractor.IsSignatory {
-				signer.Phone = contractor.Phone
-				signer.Surname = contractor.Surname
-				signer.Name = contractor.Name
-				break
-			}
+	for _, contractor := range *policy.Contractors {
+		if contractor.IsSignatory {
+			signer.Phone = contractor.Phone
+			signer.Surname = contractor.Surname
+			signer.Name = contractor.Name
+			break
 		}
 	}
 	if signer == nil {

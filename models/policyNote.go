@@ -30,6 +30,7 @@ type PolicyNote struct {
 func AddNoteToPolicy(policyUid string, note PolicyNote) error {
 	note.CreateDate = time.Now()
 	note.PolicyUid = policyUid
+	note.ExecutionId = env.GetExecutionId()
 	if _, err := lib.GetFirestoreErr(PolicyCollection, policyUid); err != nil {
 		if strings.Contains(err.Error(), "NotFound") {
 			return errors.New("Policy not found")
