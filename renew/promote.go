@@ -137,6 +137,7 @@ func Promote(policies []models.Policy, saveFn func(models.Policy, []models.Trans
 
 	for res := range promoteChannel {
 		if res.Error != "" {
+			res.Policy.AddSystemNote(models.GetErrorNote("Quietanzamento"))
 			response.Failure = append(response.Failure, res)
 		} else {
 			response.Success = append(response.Success, res)
