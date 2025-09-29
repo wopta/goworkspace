@@ -94,7 +94,6 @@ func proposal(policy *models.Policy, sendEmail bool) error {
 	defer log.PopPrefix()
 	log.Println("starting bpmn flow...")
 	storage := bpmnEngine.NewStorageBpnm()
-	storage.AddGlobal("is_PROPOSAL_V2", &flow.BoolBpmn{Bool: lib.GetBoolEnv("PROPOSAL_V2")})
 	storage.AddGlobal("addresses", &flow.Addresses{
 		FromAddress: mail.AddressAnna,
 	})

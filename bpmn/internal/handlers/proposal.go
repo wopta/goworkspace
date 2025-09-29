@@ -25,7 +25,6 @@ func endProposal(state *bpmnEngine.StorageBpnm) error {
 	var mgaProduct *flow.Product
 	err := bpmnEngine.IsError(
 		bpmnEngine.GetDataRef("policy", &policy, state),
-		bpmnEngine.GetDataRef("is_PROPOSAL_V2", &isProposal, state),
 		bpmnEngine.GetDataRef("networkNode", &networkNode, state),
 		bpmnEngine.GetDataRef("mgaProduct", &mgaProduct, state),
 	)
