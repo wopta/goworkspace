@@ -190,31 +190,19 @@ func (lag *LifeAddendumGenerator) insured() {
 	var rows1 [][]string
 	var rows2 [][]string
 	var domTxt [][]string
-	if iDTO.FiscalCode != constants.EmptyField {
+	if iDTO.FiscalCode != "" {
 		checked = "X"
-		rows1 = [][]string{
-			{"Cognome e Nome ", iDTO.Surname + " " + iDTO.Name, "Cod. Fisc: ", iDTO.FiscalCode},
-			{"Residente in ", iDTO.StreetName + " " + iDTO.StreetNumber + ", " + iDTO.PostalCode + " " + iDTO.City + " (" + iDTO.Province + ")", "Data nascita: ", iDTO.BirthDate},
-		}
-		rows2 = [][]string{
-			{"Mail ", iDTO.Mail, "Telefono: ", iDTO.Phone},
-		}
-		domTxt = [][]string{
-			{"Domicilio ", iDTO.DomStreetName + " " + iDTO.DomStreetNumber + ", " + iDTO.DomPostalCode + " " + iDTO.DomCity + " (" + iDTO.DomProvince + ")"},
-		}
-	} else {
-		rows1 = [][]string{
-			{"Cognome e Nome ", " ", "Cod. Fisc: ", " "},
-			{"Residente in ", " ", "Data nascita: ", " "},
-		}
-		rows2 = [][]string{
-			{"Mail ", " ", "Telefono: ", " "},
-		}
-		domTxt = [][]string{
-			{"Domicilio ", " "},
-		}
 	}
-
+	rows1 = [][]string{
+		{"Cognome e Nome ", iDTO.Surname + " " + iDTO.Name, "Cod. Fisc: ", iDTO.FiscalCode},
+		{"Residente in ", iDTO.StreetName + " " + iDTO.StreetNumber + ", " + iDTO.PostalCode + " " + iDTO.City + " (" + iDTO.Province + ")", "Data nascita: ", iDTO.BirthDate},
+	}
+	rows2 = [][]string{
+		{"Mail ", iDTO.Mail, "Telefono: ", iDTO.Phone},
+	}
+	domTxt = [][]string{
+		{"Domicilio ", iDTO.DomStreetName + " " + iDTO.DomStreetNumber + ", " + iDTO.DomPostalCode + " " + iDTO.DomCity + " (" + iDTO.DomProvince + ")"},
+	}
 	titleT := []domain.TableCell{
 		{
 			Text:      checked,
@@ -371,7 +359,7 @@ func (lag *LifeAddendumGenerator) beneficiaries() {
 	var relTxt [][]string
 	if bDTO != nil && len(*bDTO) != 0 {
 		for _, v := range *bDTO {
-			if v.FiscalCode != constants.EmptyField {
+			if v.FiscalCode != "" {
 				checked = "X"
 			}
 		}
@@ -515,25 +503,16 @@ func (lag *LifeAddendumGenerator) beneficiaries() {
 	lag.engine.NewLine(2)
 	lag.engine.DrawLine(10, lag.engine.GetY(), 200, lag.engine.GetY(), 0.25, constants.BlackColor)
 	lag.engine.NewLine(2)
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		if checked == "X" {
 			rows = [][]string{
 				{"Cognome e Nome ", (*bDTO)[i].Surname + " " + (*bDTO)[i].Name, "Cod. Fisc: ", (*bDTO)[i].FiscalCode},
-				{"Residente in ", (*bDTO)[i].StreetName + " " + (*bDTO)[i].StreetNumber + ", " + (*bDTO)[i].PostalCode + " " + (*bDTO)[i].City + " (" + (*bDTO)[i].Province + ")", "Data nascita: ", (*bDTO)[i].BirthDate},
+				{"Residente in ", (*bDTO)[i].GetResidenceAddress(), "Data nascita: ", (*bDTO)[i].BirthDate},
 				{"Mail ", (*bDTO)[i].Mail, "Telefono ", (*bDTO)[i].Phone},
 				{"Relazione con Assicurato ", (*bDTO)[i].Relation, "Quota indennizzo", " "},
 			}
 			relTxt = [][]string{}
-		} else {
-			rows = [][]string{
-				{"Cognome e Nome ", " ", "Cod. Fisc: ", " "},
-				{"Residente in ", " ", "Data nascita: ", " "},
-				{"Mail ", " ", "Telefono ", " "},
-				{"Relazione con Assicurato ", " ", "Quota indennizzo", " "},
-			}
-			relTxt = [][]string{}
 		}
-
 		table := parser(rows)
 		rel := relParser(relTxt)
 		lag.engine.DrawTable(table)
@@ -571,20 +550,13 @@ func (lag *LifeAddendumGenerator) beneficiaryReference() {
 	brDTO := lag.dto.BeneficiaryReference
 	checked := " "
 	var rows [][]string
-	if brDTO.FiscalCode != constants.EmptyField {
+	if brDTO.FiscalCode == "" {
 		checked = "X"
-		rows = [][]string{
-			{"Cognome e Nome ", brDTO.Surname + " " + brDTO.Name, "Cod. Fisc: ", brDTO.FiscalCode},
-			{"Residente in ", brDTO.StreetName + " " + brDTO.StreetNumber + ", " + brDTO.PostalCode + " " + brDTO.City + " (" + brDTO.Province + ")", "Data nascita: ", brDTO.BirthDate},
-			{"Mail ", brDTO.Mail, "Telefono: ", brDTO.Phone},
-		}
-	} else {
-		checked = "X"
-		rows = [][]string{
-			{"Cognome e Nome ", constants.EmptyField, "Cod. Fisc: ", constants.EmptyField},
-			{"Residente in ", constants.EmptyField, "Data nascita: ", constants.EmptyField},
-			{"Mail ", constants.EmptyField, "Telefono: ", constants.EmptyField},
-		}
+	}
+	rows = [][]string{
+		{"Cognome e Nome ", brDTO.Surname + " " + brDTO.Name, "Cod. Fisc: ", brDTO.FiscalCode},
+		{"Residente in ", brDTO.StreetName + " " + brDTO.StreetNumber + ", " + brDTO.PostalCode + " " + brDTO.City + " (" + brDTO.Province + ")", "Data nascita: ", brDTO.BirthDate},
+		{"Mail ", brDTO.Mail, "Telefono: ", brDTO.Phone},
 	}
 	if brDTO.Name == "" {
 		checked = " "

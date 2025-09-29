@@ -67,6 +67,14 @@ type addendumBeneficiaryDTO struct {
 	BirthDate    string
 	Phone        string
 }
+
+func (a addendumBeneficiaryDTO) GetResidenceAddress() string {
+	if a.StreetName == "" {
+		return ""
+	}
+	return a.StreetName + " " + a.StreetNumber + ", " + a.PostalCode + " " + a.City + " (" + a.Province + ")"
+}
+
 type addendumBeneficiaryReferenceDTO struct {
 	Name         string
 	Surname      string
@@ -117,41 +125,6 @@ func (b *AddendumLifeDTO) FromPolicy(policy *models.Policy, now time.Time) {
 				b.BeneficiaryReference.fromPolicy(g.BeneficiaryReference)
 			}
 		}
-	}
-}
-
-func newAddendumPersonDTO() *addendumPersonDTO {
-	return &addendumPersonDTO{
-		Name:            constants.EmptyField,
-		Surname:         constants.EmptyField,
-		FiscalCode:      constants.EmptyField,
-		StreetName:      constants.EmptyField,
-		StreetNumber:    constants.EmptyField,
-		City:            constants.EmptyField,
-		PostalCode:      constants.EmptyField,
-		Province:        constants.EmptyField,
-		DomStreetName:   constants.EmptyField,
-		DomStreetNumber: constants.EmptyField,
-		DomCity:         constants.EmptyField,
-		DomProvince:     constants.EmptyField,
-		DomPostalCode:   constants.EmptyField,
-		Mail:            constants.EmptyField,
-		Phone:           constants.EmptyField,
-	}
-}
-
-func newBeneficiaryReferenceDTO() *addendumBeneficiaryReferenceDTO {
-	return &addendumBeneficiaryReferenceDTO{
-		Name:         constants.EmptyField,
-		Surname:      constants.EmptyField,
-		FiscalCode:   constants.EmptyField,
-		StreetName:   constants.EmptyField,
-		StreetNumber: constants.EmptyField,
-		City:         constants.EmptyField,
-		Province:     constants.EmptyField,
-		Mail:         constants.EmptyField,
-		Phone:        constants.EmptyField,
-		BirthDate:    constants.EmptyField,
 	}
 }
 
@@ -237,20 +210,7 @@ func (b *addendumBeneficiaries) fromPolicy(bens *[]models.Beneficiary, opt map[s
 		}
 
 		// TODO: improve me - shouldnt be needed
-		ben := addendumBeneficiaryDTO{
-			Name:         constants.EmptyField,
-			Surname:      constants.EmptyField,
-			FiscalCode:   constants.EmptyField,
-			StreetName:   constants.EmptyField,
-			StreetNumber: constants.EmptyField,
-			City:         constants.EmptyField,
-			PostalCode:   constants.EmptyField,
-			Province:     constants.EmptyField,
-			Mail:         constants.EmptyField,
-			Relation:     " \n" + constants.EmptyField,
-			BirthDate:    constants.EmptyField,
-			Phone:        constants.EmptyField,
-		}
+		ben := addendumBeneficiaryDTO{}
 		ben.Relation = " \n" + opt[v.BeneficiaryType]
 
 		if v.BeneficiaryType == models.BeneficiaryChosenBeneficiary {
@@ -286,7 +246,7 @@ func (b *addendumBeneficiaries) fromPolicy(bens *[]models.Beneficiary, opt map[s
 }
 
 func (br *addendumBeneficiaryReferenceDTO) fromPolicy(benRef *models.User) {
-	*br = *newBeneficiaryReferenceDTO()
+	*br = addendumBeneficiaryReferenceDTO{}
 	if benRef.FiscalCode != "" {
 		br.Name = benRef.Name
 		br.Surname = benRef.Surname
