@@ -104,8 +104,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		return "", nil, err
 	}
 
-	//	data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/in/"+req.Filename, "")
-	data, _ := os.ReadFile("track_in_life_in_policies-219-244-dev (2).csv")
+	data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/in/"+req.Filename, "")
 	df := lib.CsvToDataframe(data)
 	log.Println("LifeInFx  row", df.Nrow())
 	log.Println("LifeInFx  col", df.Ncol())
