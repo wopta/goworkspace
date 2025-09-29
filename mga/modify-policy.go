@@ -348,6 +348,16 @@ func modifyContractorsInfo(input, original models.Policy) (*[]models.User, error
 		return nil, nil
 	}
 	for i := range *original.Contractors {
+		//If i change the phone when the policy has been emitted and it has not been signed I can not change it
+		if (*input.Contractors)[i].IsSignatory {
+			if (*input.Contractors)[i].Phone != (*original.Contractors)[i].Phone {
+				if original.Status == models.PolicyStatusToSign || original.Status == models.PolicyStatusToPay {
+					res = append(res, (*original.Contractors)[i])
+					log.WarningF("Can not change phone number signer")
+					continue
+				}
+			}
+		}
 		//if contractor is ditta individuale the signer is the same person
 		if input.Contractor.Type == models.UserIndividual && (*input.Contractors)[i].IsSignatory {
 			newContractor, err := modifyContractorInfo(input.Contractor, original.Contractor)
@@ -487,6 +497,7 @@ func modifyPersonInfo(inputPerson, originalPerson models.User) (*models.User, er
 	modifiedInsured.FiscalCode = inputPerson.FiscalCode
 	modifiedInsured.Mail = inputPerson.Mail
 	modifiedInsured.Residence = inputPerson.Residence
+	modifiedInsured.Phone = inputPerson.Phone
 	if inputPerson.Consens != nil {
 		if modifiedInsured.Consens == nil {
 			modifiedInsured.Consens = inputPerson.Consens
