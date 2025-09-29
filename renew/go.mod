@@ -9,8 +9,8 @@ require (
 	gitlab.dev.wopta.it/goworkspace/mail v1.0.297
 	gitlab.dev.wopta.it/goworkspace/models v1.2.173
 	gitlab.dev.wopta.it/goworkspace/network v1.0.241
-	gitlab.dev.wopta.it/goworkspace/payment v1.0.537
-	gitlab.dev.wopta.it/goworkspace/transaction v1.0.375
+	gitlab.dev.wopta.it/goworkspace/payment v1.0.538
+	gitlab.dev.wopta.it/goworkspace/transaction v1.0.376
 	google.golang.org/api v0.181.0
 )
 
@@ -80,10 +80,10 @@ require (
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
-	gitlab.dev.wopta.it/goworkspace/accounting v1.0.203 // indirect
+	gitlab.dev.wopta.it/goworkspace/accounting v1.0.204 // indirect
 	gitlab.dev.wopta.it/goworkspace/callback_out v1.0.186 // indirect
-	gitlab.dev.wopta.it/goworkspace/document v1.1.338 // indirect
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.382 // indirect
+	gitlab.dev.wopta.it/goworkspace/document v1.1.339 // indirect
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.383 // indirect
 	gitlab.dev.wopta.it/goworkspace/product v1.1.172 // indirect
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.72 // indirect
 	go.opencensus.io v0.24.0 // indirect

@@ -10,7 +10,7 @@ require (
 	github.com/go-gota/gota v0.12.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	gitlab.dev.wopta.it/goworkspace/lib v1.0.230
-	gitlab.dev.wopta.it/goworkspace/quote v1.0.367
+	gitlab.dev.wopta.it/goworkspace/quote v1.0.368
 )
 
 require (
@@ -77,10 +77,10 @@ require (
 	github.com/xuri/excelize/v2 v2.8.1 // indirect
 	github.com/xuri/nfp v0.0.0-20230919160717-d98342af3f05 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
-	gitlab.dev.wopta.it/goworkspace/document v1.1.338 // indirect
+	gitlab.dev.wopta.it/goworkspace/document v1.1.339 // indirect
 	gitlab.dev.wopta.it/goworkspace/models v1.2.173 // indirect
 	gitlab.dev.wopta.it/goworkspace/network v1.0.241 // indirect
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.382 // indirect
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.383 // indirect
 	gitlab.dev.wopta.it/goworkspace/product v1.1.172 // indirect
 	gitlab.dev.wopta.it/goworkspace/sellable v1.0.286 // indirect
 	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.72 // indirect
