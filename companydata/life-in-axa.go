@@ -617,24 +617,6 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 				userBigQuerySave(*policy.Contractor.ToUser(), collectionPrefix)
 			}
-			if policy.Contractors != nil {
-				for index, usr := range *policy.Contractors {
-					if !writeContractorsToDB[index] {
-						continue
-					}
-					// save user firestore
-
-					err = lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, lib.UserCollection), usr.Uid, usr)
-					if err != nil {
-						log.ErrorF("error saving contractor firestore: %s", err.Error())
-						continue
-					}
-
-					// save user bigquery
-
-					userBigQuerySave(usr, collectionPrefix)
-				}
-			}
 
 			// save network node firestore
 
