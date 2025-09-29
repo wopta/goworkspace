@@ -104,7 +104,8 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		return "", nil, err
 	}
 
-	data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/in/"+req.Filename, "")
+	//	data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/in/"+req.Filename, "")
+	data, _ := os.ReadFile("track_in_life_in_policies-219-244-dev (2).csv")
 	df := lib.CsvToDataframe(data)
 	log.Println("LifeInFx  row", df.Nrow())
 	log.Println("LifeInFx  col", df.Ncol())
@@ -308,8 +309,8 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 				continue
 			}
 
-			contractor.Uid, writeContractorToDB = searchUserInDBByFiscalCode(contractor.FiscalCode)
 		}
+		contractor.Uid, writeContractorToDB = searchUserInDBByFiscalCode(contractor.FiscalCode)
 
 		if !contractorEqualInsured {
 			// create insured
@@ -604,7 +605,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 				}
 			}
 
-			if !isLegalEntity && writeContractorToDB {
+			if writeContractorToDB {
 				// save user firestore
 
 				err = lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, lib.UserCollection), policy.Contractor.Uid, policy.Contractor.ToUser())
@@ -616,24 +617,23 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 				// save user bigquery
 
 				userBigQuerySave(*policy.Contractor.ToUser(), collectionPrefix)
-			} else {
-				if policy.Contractors != nil {
-					for index, usr := range *policy.Contractors {
-						if !writeContractorsToDB[index] {
-							continue
-						}
-						// save user firestore
-
-						err = lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, lib.UserCollection), usr.Uid, usr)
-						if err != nil {
-							log.ErrorF("error saving contractor firestore: %s", err.Error())
-							continue
-						}
-
-						// save user bigquery
-
-						userBigQuerySave(usr, collectionPrefix)
+			}
+			if policy.Contractors != nil {
+				for index, usr := range *policy.Contractors {
+					if !writeContractorsToDB[index] {
+						continue
 					}
+					// save user firestore
+
+					err = lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, lib.UserCollection), usr.Uid, usr)
+					if err != nil {
+						log.ErrorF("error saving contractor firestore: %s", err.Error())
+						continue
+					}
+
+					// save user bigquery
+
+					userBigQuerySave(usr, collectionPrefix)
 				}
 			}
 
