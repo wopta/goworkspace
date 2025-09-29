@@ -1,6 +1,7 @@
 package addendum
 
 import (
+	"strings"
 	"time"
 
 	"gitlab.dev.wopta.it/goworkspace/document/internal/constants"
@@ -175,8 +176,8 @@ func (lag *CatnatAddendumGenerator) contractor() {
 		{"Tipo Soggetto:", cDTO.Type + " ", " ", " "},
 		{"Cognome e Nome:", cDTO.Surname + " " + cDTO.Name, "Cod. Fisc: ", cDTO.FiscalCode + " "},
 		{"Denominazione sociale:", cDTO.CompanyName, "Partita Iva:", cDTO.VatCode},
-		{"Indirizzo Sede Legale:", cDTO.Address, "Codice Ateco:", cDTO.Ateco},
-		{"Mail:", cDTO.Mail, "Telefono: ", cDTO.Phone},
+		{"Indirizzo Sede Legale:", strings.ReplaceAll(cDTO.Address, "\n", ""), "Codice Ateco:", cDTO.Ateco},
+		{"Mail:", cDTO.Mail, "Telefono:", cDTO.Phone},
 	}
 
 	titleT := []domain.TableCell{
@@ -210,9 +211,9 @@ func (lag *CatnatAddendumGenerator) contractor() {
 
 	const (
 		firstColumnWidth  = 35
-		secondColumnWidth = 95
+		secondColumnWidth = 85
 		thirdColumnWidth  = 25
-		fourthColumnWidth = 35
+		fourthColumnWidth = 45
 	)
 	parser := func(rows [][]string) [][]domain.TableCell {
 		result := make([][]domain.TableCell, 0, len(rows))
@@ -336,9 +337,9 @@ func (lag *CatnatAddendumGenerator) signer() {
 
 	const (
 		firstColumnWidth  = 35
-		secondColumnWidth = 95
+		secondColumnWidth = 85
 		thirdColumnWidth  = 25
-		fourthColumnWidth = 35
+		fourthColumnWidth = 45
 	)
 	parser := func(rows [][]string) [][]domain.TableCell {
 		result := make([][]domain.TableCell, 0, len(rows))

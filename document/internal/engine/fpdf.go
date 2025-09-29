@@ -219,6 +219,9 @@ func (f *Fpdf) DrawTable(table [][]domain.TableCell) {
 		}
 
 		for index, cell := range row {
+			if cell.Text == "" {
+				cell.Text = " "
+			}
 			numLines := len(f.pdf.SplitText(cell.Text, cell.Width))
 			currentX, currentY := f.pdf.GetXY()
 
