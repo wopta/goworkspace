@@ -9,7 +9,7 @@ import (
 
 type CatnatDTO struct {
 	SedeDaAssicurare BuildingCatnatDto
-	Contractor       contractorDTO
+	Contractor       ContractorDTO
 	ValidityDate     *validityDateDTO
 	Questions        QuestionsCatnatDto
 	Guarantee        CatnatGuaranteeDTO
@@ -30,7 +30,7 @@ func (c *CatnatGuaranteeDTO) fromPolicy(policy *models.Policy) {
 func (dto *CatnatDTO) FromPolicy(policy *models.Policy) {
 	dto.SedeDaAssicurare = BuildingCatnatDto{}
 	dto.SedeDaAssicurare.fromPolicy(policy)
-	dto.Contractor = contractorDTO{}
+	dto.Contractor = ContractorDTO{}
 	dto.Contractor.fromPolicy(policy.Contractor)
 	dto.ValidityDate = &validityDateDTO{}
 	dto.ValidityDate.fromPolicy(policy)

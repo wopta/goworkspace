@@ -8,14 +8,14 @@ import (
 
 type AddendumCatnatDTO struct {
 	Contract   *addendumContractDTO
-	Contractor *contractorDTO
+	Contractor *ContractorDTO
 	Signer     *addendumPersonDTO
 }
 
 func NewCatnatAddendumDto() *AddendumCatnatDTO {
 	return &AddendumCatnatDTO{
 		Contract:   &addendumContractDTO{},
-		Contractor: &contractorDTO{},
+		Contractor: &ContractorDTO{},
 		Signer:     &addendumPersonDTO{},
 	}
 }

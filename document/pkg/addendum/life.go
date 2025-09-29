@@ -7,18 +7,19 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/document/internal/domain"
 	"gitlab.dev.wopta.it/goworkspace/document/internal/dto"
 	"gitlab.dev.wopta.it/goworkspace/document/internal/engine"
+	"gitlab.dev.wopta.it/goworkspace/document/pkg/addendum/utils"
 	"gitlab.dev.wopta.it/goworkspace/lib"
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
 type LifeAddendumGenerator struct {
 	*baseGenerator
-	dto *dto.AddendumBeneficiariesDTO
+	dto *dto.AddendumLifeDTO
 }
 
 func NewLifeAddendumGenerator(engine *engine.Fpdf, policy *models.Policy) *LifeAddendumGenerator {
 	now := time.Now()
-	LifeAddendumDTO := dto.NewBeneficiariesDto()
+	LifeAddendumDTO := dto.NewLifeAddendumDto()
 	LifeAddendumDTO.FromPolicy(policy, now)
 	return &LifeAddendumGenerator{
 		baseGenerator: &baseGenerator{
@@ -43,7 +44,7 @@ func (lag *LifeAddendumGenerator) Generate() {
 
 	lag.engine.NewLine(6)
 
-	lag.contractor()
+	utils.AddContractor(*lag.dto.Contractor, lag.engine)
 
 	lag.engine.NewLine(6)
 
@@ -180,184 +181,6 @@ func (lag *LifeAddendumGenerator) declarations() {
 		Width:     constants.FullPageWidth,
 		FontStyle: constants.BoldFontStyle,
 	})
-}
-
-func (lag *LifeAddendumGenerator) contractor() {
-	cDTO := lag.dto.Contractor
-	checked := " "
-	var rows1 [][]string
-	var rows2 [][]string
-	var domTxt [][]string
-	if cDTO.FiscalCode != constants.EmptyField {
-		checked = "X"
-		rows1 = [][]string{
-			{"Cognome e Nome ", cDTO.Surname + " " + cDTO.Name, "Cod. Fisc: ", cDTO.FiscalCode},
-			{"Residente in ", cDTO.StreetName + " " + cDTO.StreetNumber + ", " + cDTO.PostalCode + " " + cDTO.City + " (" + cDTO.Province + ")", "Data nascita: ", cDTO.BirthDate},
-		}
-		rows2 = [][]string{
-			{"Mail ", cDTO.Mail, "Telefono: ", cDTO.Phone},
-		}
-		domTxt = [][]string{
-			{"Domicilio ", cDTO.DomStreetName + " " + cDTO.DomStreetNumber + ", " + cDTO.DomPostalCode + " " + cDTO.DomCity + " (" + cDTO.DomProvince + ")"},
-		}
-	} else {
-		rows1 = [][]string{
-			{"Cognome e Nome ", " ", "Cod. Fisc: ", " "},
-			{"Residente in ", " ", "Data nascita: ", " "},
-		}
-		rows2 = [][]string{
-			{"Mail ", " ", "Telefono: ", " "},
-		}
-		domTxt = [][]string{
-			{"Domicilio ", " "},
-		}
-	}
-
-	titleT := []domain.TableCell{
-		{
-			Text:      checked,
-			Height:    4.5,
-			Width:     4.5,
-			FontSize:  constants.LargeFontSize,
-			FontStyle: constants.BoldFontStyle,
-			FontColor: constants.BlackColor,
-			Fill:      false,
-			FillColor: domain.Color{},
-			Align:     constants.CenterAlign,
-			Border:    "1",
-		},
-		{
-			Text:      "  Dati Contraente",
-			Height:    4.5,
-			Width:     190,
-			FontStyle: constants.BoldFontStyle,
-			FontColor: constants.PinkColor,
-			FontSize:  constants.RegularFontSize,
-			Fill:      false,
-			FillColor: domain.Color{},
-			Align:     constants.LeftAlign,
-			Border:    "",
-		},
-	}
-	title := make([][]domain.TableCell, 0)
-	title = append(title, titleT)
-
-	const (
-		firstColumnWidth  = 35
-		secondColumnWidth = 95
-		thirdColumnWidth  = 25
-		fourthColumnWidth = 35
-	)
-	parser := func(rows [][]string) [][]domain.TableCell {
-		result := make([][]domain.TableCell, 0, len(rows))
-
-		for _, row := range rows {
-
-			result = append(result, []domain.TableCell{
-				{
-					Text:      row[0],
-					Height:    constants.CellHeight,
-					Width:     firstColumnWidth,
-					FontStyle: constants.BoldFontStyle,
-					FontColor: constants.BlackColor,
-					FontSize:  constants.RegularFontSize,
-					Fill:      false,
-					FillColor: domain.Color{},
-					Align:     constants.LeftAlign,
-					Border:    "",
-				},
-				{
-					Text:      row[1],
-					Height:    constants.CellHeight,
-					Width:     secondColumnWidth,
-					FontStyle: constants.RegularFontStyle,
-					FontColor: constants.BlackColor,
-					FontSize:  constants.RegularFontSize,
-					Fill:      false,
-					FillColor: domain.Color{},
-					Align:     constants.LeftAlign,
-					Border:    "B",
-				},
-				{
-					Text:      row[2],
-					Height:    constants.CellHeight,
-					Width:     thirdColumnWidth,
-					FontStyle: constants.BoldFontStyle,
-					FontColor: constants.BlackColor,
-					FontSize:  constants.RegularFontSize,
-					Fill:      false,
-					FillColor: domain.Color{},
-					Align:     constants.LeftAlign,
-					Border:    "",
-				},
-				{
-					Text:      row[3],
-					Height:    constants.CellHeight,
-					Width:     fourthColumnWidth,
-					FontStyle: constants.RegularFontStyle,
-					FontColor: constants.BlackColor,
-					FontSize:  constants.RegularFontSize,
-					Fill:      false,
-					FillColor: domain.Color{},
-					Align:     constants.LeftAlign,
-					Border:    "B",
-				},
-			})
-		}
-		return result
-	}
-
-	table1 := parser(rows1)
-	table2 := parser(rows2)
-
-	const (
-		domFirstColumnWidth  = 35
-		domSecondColumnWidth = 155
-	)
-	domParser := func(rows [][]string) [][]domain.TableCell {
-		result := make([][]domain.TableCell, 0, len(rows))
-
-		for _, row := range rows {
-
-			result = append(result, []domain.TableCell{
-				{
-					Text:      row[0],
-					Height:    constants.CellHeight,
-					Width:     domFirstColumnWidth,
-					FontStyle: constants.BoldFontStyle,
-					FontColor: constants.BlackColor,
-					FontSize:  constants.RegularFontSize,
-					Fill:      false,
-					FillColor: domain.Color{},
-					Align:     constants.LeftAlign,
-					Border:    "",
-				},
-				{
-					Text:      row[1],
-					Height:    constants.CellHeight,
-					Width:     domSecondColumnWidth,
-					FontStyle: constants.RegularFontStyle,
-					FontColor: constants.BlackColor,
-					FontSize:  constants.RegularFontSize,
-					Fill:      false,
-					FillColor: domain.Color{},
-					Align:     constants.LeftAlign,
-					Border:    "B",
-				},
-			})
-		}
-		return result
-	}
-
-	dom := domParser(domTxt)
-
-	lag.engine.DrawTable(title)
-	lag.engine.NewLine(2)
-	lag.engine.DrawLine(10, lag.engine.GetY(), 200, lag.engine.GetY(), 0.25, constants.BlackColor)
-	lag.engine.NewLine(2)
-	lag.engine.DrawTable(table1)
-	lag.engine.DrawTable(dom)
-	lag.engine.DrawTable(table2)
 }
 
 func (lag *LifeAddendumGenerator) insured() {

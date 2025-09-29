@@ -9,7 +9,7 @@ import (
 
 type CommercialCombinedDTO struct {
 	Contract           *contractDTO
-	Contractor         *contractorDTO
+	Contractor         *ContractorDTO
 	Enterprise         *enterpriseDTO
 	Buildings          []*buildingDTO
 	Claims             map[string]*claimDTO

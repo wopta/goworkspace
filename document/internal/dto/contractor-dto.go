@@ -8,7 +8,7 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models"
 )
 
-type contractorDTO struct {
+type ContractorDTO struct {
 	Name         string
 	Surname      string
 	CompanyName  string
@@ -27,8 +27,8 @@ type contractorDTO struct {
 	Ateco        string
 }
 
-func newContractorDTO() *contractorDTO {
-	return &contractorDTO{
+func newContractorDTO() *ContractorDTO {
+	return &ContractorDTO{
 		Name:         constants.EmptyField,
 		Surname:      "",
 		FiscalCode:   constants.EmptyField,
@@ -50,7 +50,7 @@ var contractorTypeToIta = map[string]string{
 	models.UserLegalEntity: "Persona Giuridica",
 }
 
-func (c *contractorDTO) fromPolicy(contractor models.Contractor) {
+func (c *ContractorDTO) fromPolicy(contractor models.Contractor) {
 	if contractor.Name != "" {
 		c.Name = contractor.Name
 	}
@@ -114,11 +114,11 @@ func (c *contractorDTO) fromPolicy(contractor models.Contractor) {
 
 }
 
-func (c *contractorDTO) GetFullNameContractor() (res string) {
+func (c *ContractorDTO) GetFullNameContractor() (res string) {
 	nameSurname := lib.JoinNoEmptyStrings([]string{c.Name, c.Surname}, " ")
 	return lib.JoinNoEmptyStrings([]string{nameSurname, c.CompanyName}, ", ")
 }
 
-func (c *contractorDTO) GetFiscalCodeVatCode() string {
+func (c *ContractorDTO) GetFiscalCodeVatCode() string {
 	return lib.JoinNoEmptyStrings([]string{c.FiscalCode, c.VatCode}, "/")
 }

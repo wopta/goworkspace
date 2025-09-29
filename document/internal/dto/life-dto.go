@@ -10,7 +10,7 @@ import (
 )
 
 type LifeDTO struct {
-	Contractor       *contractorDTO
+	Contractor       *ContractorDTO
 	Channel          string
 	Prizes           *priceDTO
 	PriceAnnuity     string

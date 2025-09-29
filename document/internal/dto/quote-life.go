@@ -15,7 +15,7 @@ type QuoteBaseDTO struct {
 
 type QuoteLifeDTO struct {
 	*QuoteBaseDTO
-	Contractor contractorDTO
+	Contractor ContractorDTO
 	Guarantees map[string]*quoteGuaranteeDTO
 }
 

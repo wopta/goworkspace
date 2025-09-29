@@ -16,24 +16,6 @@ type addendumContractDTO struct {
 	Producer    string
 	IssueDate   string
 }
-type addendumContractorDTO struct {
-	Name            string
-	Surname         string
-	FiscalCode      string
-	StreetName      string
-	StreetNumber    string
-	City            string
-	Province        string
-	DomStreetName   string
-	DomStreetNumber string
-	DomCity         string
-	DomPostalCode   string
-	DomProvince     string
-	Mail            string
-	Phone           string
-	BirthDate       string
-	PostalCode      string
-}
 
 type addendumPersonDTO struct {
 	Name            string
@@ -101,25 +83,26 @@ type addendumBeneficiaryReferenceDTO struct {
 
 type addendumBeneficiaries []addendumBeneficiaryDTO
 
-type AddendumBeneficiariesDTO struct {
+type AddendumLifeDTO struct {
 	Contract             *addendumContractDTO
-	Contractor           *addendumContractorDTO
+	Contractor           *ContractorDTO
 	Insured              *addendumPersonDTO
 	Beneficiaries        *addendumBeneficiaries
 	BeneficiaryReference *addendumBeneficiaryReferenceDTO
 }
 
-func NewBeneficiariesDto() *AddendumBeneficiariesDTO {
-	return &AddendumBeneficiariesDTO{
-		Contract:             newLifeContractDTO(),
-		Contractor:           newLifeContractorDTO(),
-		Insured:              newAddendumPersonDTO(),
-		Beneficiaries:        newLifeBeneficiariesDTO(),
+func NewLifeAddendumDto() *AddendumLifeDTO {
+	l := make(addendumBeneficiaries, 2)
+	return &AddendumLifeDTO{
+		Contract:             &addendumContractDTO{},
+		Contractor:           &ContractorDTO{},
+		Insured:              &addendumPersonDTO{},
+		Beneficiaries:        &l,
 		BeneficiaryReference: &addendumBeneficiaryReferenceDTO{},
 	}
 }
 
-func (b *AddendumBeneficiariesDTO) FromPolicy(policy *models.Policy, now time.Time) {
+func (b *AddendumLifeDTO) FromPolicy(policy *models.Policy, now time.Time) {
 	b.Contract.fromPolicy(policy, now)
 	b.Contractor.fromPolicy(policy.Contractor)
 	for _, a := range policy.Assets {
@@ -134,37 +117,6 @@ func (b *AddendumBeneficiariesDTO) FromPolicy(policy *models.Policy, now time.Ti
 				b.BeneficiaryReference.fromPolicy(g.BeneficiaryReference)
 			}
 		}
-	}
-}
-
-func newLifeContractDTO() *addendumContractDTO {
-	return &addendumContractDTO{
-		CodeHeading: constants.EmptyField,
-		Code:        constants.EmptyField,
-		StartDate:   constants.EmptyField,
-		EndDate:     constants.EmptyField,
-		Producer:    constants.EmptyField,
-	}
-
-}
-
-func newLifeContractorDTO() *addendumContractorDTO {
-	return &addendumContractorDTO{
-		Name:            constants.EmptyField,
-		Surname:         constants.EmptyField,
-		FiscalCode:      constants.EmptyField,
-		StreetName:      constants.EmptyField,
-		StreetNumber:    constants.EmptyField,
-		City:            constants.EmptyField,
-		PostalCode:      constants.EmptyField,
-		Province:        constants.EmptyField,
-		DomStreetName:   constants.EmptyField,
-		DomStreetNumber: constants.EmptyField,
-		DomCity:         constants.EmptyField,
-		DomPostalCode:   constants.EmptyField,
-		DomProvince:     constants.EmptyField,
-		Mail:            constants.EmptyField,
-		Phone:           constants.EmptyField,
 	}
 }
 
@@ -186,27 +138,6 @@ func newAddendumPersonDTO() *addendumPersonDTO {
 		Mail:            constants.EmptyField,
 		Phone:           constants.EmptyField,
 	}
-}
-
-func newLifeBeneficiariesDTO() *addendumBeneficiaries {
-	lb := make(addendumBeneficiaries, 0)
-	l := addendumBeneficiaryDTO{
-		Name:         constants.EmptyField,
-		Surname:      constants.EmptyField,
-		FiscalCode:   constants.EmptyField,
-		StreetName:   constants.EmptyField,
-		StreetNumber: constants.EmptyField,
-		City:         constants.EmptyField,
-		PostalCode:   constants.EmptyField,
-		Province:     constants.EmptyField,
-		Mail:         constants.EmptyField,
-		Relation:     constants.EmptyField,
-		BirthDate:    constants.EmptyField,
-		Phone:        constants.EmptyField,
-	}
-	lb = append(lb, l)
-	lb = append(lb, l)
-	return &lb
 }
 
 func newBeneficiaryReferenceDTO() *addendumBeneficiaryReferenceDTO {
@@ -252,35 +183,6 @@ func parseBirthDate(dateString string) string {
 		return ""
 	}
 	return date.Format("01/02/2006")
-}
-
-func (lc *addendumContractorDTO) fromPolicy(contr models.Contractor) {
-	if contr.FiscalCode != "" {
-		lc.Name = contr.Name
-		lc.Surname = contr.Surname
-		lc.FiscalCode = contr.FiscalCode
-		lc.BirthDate = parseBirthDate(contr.BirthDate)
-	}
-	if contr.Residence != nil {
-		lc.StreetName = contr.Residence.StreetName
-		lc.StreetNumber = contr.Residence.StreetNumber
-		lc.City = contr.Residence.City
-		lc.Province = contr.Residence.CityCode
-		lc.PostalCode = contr.Residence.PostalCode
-	}
-	if contr.Domicile != nil {
-		lc.DomStreetName = contr.Domicile.StreetName
-		lc.DomStreetNumber = contr.Domicile.StreetNumber
-		lc.DomCity = contr.Domicile.City
-		lc.DomProvince = contr.Domicile.CityCode
-		lc.DomPostalCode = contr.Domicile.PostalCode
-	}
-	if contr.Mail != "" {
-		lc.Mail = contr.Mail
-	}
-	if contr.Phone != "" {
-		lc.Phone = contr.Phone
-	}
 }
 
 var genderToIta = map[string]string{
