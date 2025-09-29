@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"gitlab.dev.wopta.it/goworkspace/lib"
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/mail"
 	"gitlab.dev.wopta.it/goworkspace/models"
@@ -86,9 +87,11 @@ func sendEmailErrorIncasso(nPolicy int, errors []string) {
 		body += body + `<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px">` + line + `</p>`
 	}
 	body += "<br>Si prega di incassare manualemnte le polizze sopra riportate<br>"
+	body += fmt.Sprintf("<h6>Execution Id: %v </h6>", env.GetExecutionId())
 	body += ` 
 		<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px"><br></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px">A presto,</p>
 		<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#e50075;font-size:14px"><strong>Anna</strong> di Wopta Assicurazioni</p> `
+
 	mail.SendBaseEmail(body, subject, lib.GetMailProcessi("cat-nat"))
 }
 
