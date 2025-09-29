@@ -39,6 +39,13 @@ type addendumPersonDTO struct {
 	Gender          string
 }
 
+func (a addendumPersonDTO) GetDomicilioAddress() string {
+	if a.DomStreetName == "" {
+		return ""
+	}
+	return a.DomStreetName + " " + a.DomStreetNumber + ", " + a.DomPostalCode + " " + a.DomCity + " (" + a.DomProvince + ")"
+}
+
 func (a addendumPersonDTO) GetResidenceAddress() string {
 	if a.StreetName == "" {
 		return ""

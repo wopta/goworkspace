@@ -201,7 +201,7 @@ func (lag *LifeAddendumGenerator) insured() {
 		{"Mail ", iDTO.Mail, "Telefono: ", iDTO.Phone},
 	}
 	domTxt = [][]string{
-		{"Domicilio ", iDTO.DomStreetName + " " + iDTO.DomStreetNumber + ", " + iDTO.DomPostalCode + " " + iDTO.DomCity + " (" + iDTO.DomProvince + ")"},
+		{"Domicilio ", iDTO.GetDomicilioAddress()},
 	}
 	titleT := []domain.TableCell{
 		{
