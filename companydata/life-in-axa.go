@@ -809,7 +809,7 @@ func parseEnterpriseContractor(row []string) *models.Contractor {
 	contractor := &models.Contractor{
 		Uid:          vatCode,
 		Type:         models.UserLegalEntity,
-		Name:         strings.TrimSpace(lib.Capitalize(row[23])),
+		CompanyName:  strings.TrimSpace(lib.Capitalize(row[23])),
 		VatCode:      vatCode,
 		Mail:         strings.TrimSpace(strings.ToLower(row[32])),
 		Phone:        phone,
