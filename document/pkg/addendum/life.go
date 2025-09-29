@@ -195,7 +195,7 @@ func (lag *LifeAddendumGenerator) insured() {
 	}
 	rows1 = [][]string{
 		{"Cognome e Nome ", iDTO.Surname + " " + iDTO.Name, "Cod. Fisc: ", iDTO.FiscalCode},
-		{"Residente in ", iDTO.StreetName + " " + iDTO.StreetNumber + ", " + iDTO.PostalCode + " " + iDTO.City + " (" + iDTO.Province + ")", "Data nascita: ", iDTO.BirthDate},
+		{"Residente in ", iDTO.GetResidenceAddress(), "Data nascita: ", iDTO.BirthDate},
 	}
 	rows2 = [][]string{
 		{"Mail ", iDTO.Mail, "Telefono: ", iDTO.Phone},
