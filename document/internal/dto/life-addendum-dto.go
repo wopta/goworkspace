@@ -284,8 +284,8 @@ func (lc *addendumContractorDTO) fromPolicy(contr models.Contractor) {
 }
 
 var genderToIta = map[string]string{
-	"M": "Maschio",
-	"F": "Femmina",
+	"M": "Uomo",
+	"F": "Donna",
 }
 
 func (li *addendumPersonDTO) fromPolicy(ins *models.User) {
