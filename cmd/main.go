@@ -1,10 +1,6 @@
 package main
 
 import (
-	"os"
-
-	"github.com/GoogleCloudPlatform/functions-framework-go/funcframework"
-	"github.com/joho/godotenv"
 	_ "gitlab.dev.wopta.it/goworkspace/auth"
 	_ "gitlab.dev.wopta.it/goworkspace/broker"
 	_ "gitlab.dev.wopta.it/goworkspace/callback"
@@ -13,7 +9,7 @@ import (
 	_ "gitlab.dev.wopta.it/goworkspace/document"
 	_ "gitlab.dev.wopta.it/goworkspace/enrich"
 	_ "gitlab.dev.wopta.it/goworkspace/form"
-	"gitlab.dev.wopta.it/goworkspace/lib/log"
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
 	_ "gitlab.dev.wopta.it/goworkspace/mail"
 	_ "gitlab.dev.wopta.it/goworkspace/mga"
 	_ "gitlab.dev.wopta.it/goworkspace/partnership"
@@ -29,18 +25,5 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.ErrorF("Error loading .env file: %s", err)
-	}
-
-	port := "8080"
-	if envPort := os.Getenv("PORT"); envPort != "" {
-		port = envPort
-	}
-	log.Println(port)
-
-	if err := funcframework.Start(port); err != nil {
-		log.ErrorF("funcframework.Start: %v\n", err)
-	}
+	defer env.Start()
 }
