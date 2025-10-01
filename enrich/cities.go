@@ -27,8 +27,6 @@ func citiesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 	for k, v := range df.Records() {
 		if k != 0 {
-			log.Println(fmt.Sprint(v))
-			log.Println(fmt.Sprint(k))
 			sub := City{
 				Istat:        v[0],
 				Municipality: v[1],
