@@ -35,7 +35,7 @@ func lifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		warrant *models.Warrant
 	)
 
-	log.AddPrefix("")
+	log.AddPrefix("LifeFx")
 	defer log.PopPrefix()
 
 	log.Println("Handler start -----------------------------------------------")
