@@ -15,7 +15,7 @@ func injectCallbackFlow(networkNode *models.NetworkNode, mainBuilder *bpmnEngine
 		return nil
 	}
 	store := bpmnEngine.NewStorageBpnm()
-	builder, err := bpmnEngine.NewBpnmBuilder("flows/draft/callback-flows.json")
+	builder, err := bpmnEngine.NewBpnmBuilder("flows/callback-flows.json")
 	if err != nil {
 		return err
 	}

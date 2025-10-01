@@ -10,7 +10,7 @@ import (
 )
 
 func GetFlow(policy *models.Policy, storage *bpmnEngine.StorageBpnm) (*bpmnEngine.FlowBpnm, error) {
-	builder, err := bpmnEngine.NewBpnmBuilder("flows/draft/base-flows.json")
+	builder, err := bpmnEngine.NewBpnmBuilder("flows/base-flows.json")
 	if err != nil {
 		return nil, err
 	}

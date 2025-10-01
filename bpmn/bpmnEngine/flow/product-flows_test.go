@@ -20,7 +20,7 @@ func mock_catnatIntegration(log *mockLog) func(*bpmnEngine.StorageBpnm) error {
 
 func getBuilderFlowProduct(log *mockLog, store *bpmnEngine.StorageBpnm) (*bpmnEngine.BpnmBuilder, error) {
 	os.Setenv("env", env.LocalTest)
-	builder, e := bpmnEngine.NewBpnmBuilderRawPath("../../../../function-data/dev/flows/draft/product-flows.json")
+	builder, e := bpmnEngine.NewBpnmBuilderRawPath("../../../../function-data/dev/flows/product-flows.json")
 	if e != nil {
 		return nil, e
 	}

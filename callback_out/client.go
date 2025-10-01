@@ -43,10 +43,10 @@ func NewClient(node *models.NetworkNode) (client CallbackClient, conf CallbackCo
 	switch node.CallbackConfig.Name {
 	case "winClient":
 		client = win.NewClient(node.ExternalNetworkCode)
-		bytes, err = lib.GetFilesByEnvV2("flows/draft/callback/win.json")
+		bytes, err = lib.GetFilesByEnvV2("flows/callback/win.json")
 	case "facileBrokerClient":
 		client = base.NewClient(node, "facile_broker")
-		bytes, err = lib.GetFilesByEnvV2("flows/draft/callback/base.json")
+		bytes, err = lib.GetFilesByEnvV2("flows/callback/base.json")
 	default:
 		err = ErrCallbackClientNotSet
 	}

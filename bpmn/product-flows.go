@@ -7,7 +7,7 @@ import (
 
 func injectProductFlow(mainBuilder *bpmnEngine.BpnmBuilder) error {
 	store := bpmnEngine.NewStorageBpnm()
-	builder, e := bpmnEngine.NewBpnmBuilder("flows/draft/product-flows.json")
+	builder, e := bpmnEngine.NewBpnmBuilder("flows/product-flows.json")
 	if e != nil {
 		return e
 	}

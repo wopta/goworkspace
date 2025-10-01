@@ -21,7 +21,7 @@ func funcTestWithInfo(message string, log *mockLog) func(*bpmnEngine.StorageBpnm
 
 func getBuilderFlowNode(log *mockLog, store *bpmnEngine.StorageBpnm) (*bpmnEngine.BpnmBuilder, error) {
 	os.Setenv("env", env.LocalTest)
-	builder, e := bpmnEngine.NewBpnmBuilderRawPath("../../../../function-data/dev//flows/draft/callback-flows.json")
+	builder, e := bpmnEngine.NewBpnmBuilderRawPath("../../../../function-data/dev/flows/callback-flows.json")
 	if e != nil {
 		return nil, e
 	}
