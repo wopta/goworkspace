@@ -175,6 +175,6 @@ func GetQuietanzamentoPolicyNote(_ *Policy) PolicyNote {
 
 func GetAddendumPolicyNote(_ *Policy) PolicyNote {
 	return PolicyNote{
-		Text: "Dati polizza sono stati modificati",
+		Text: "Dati polizza modificati",
 	}
 }
