@@ -44,7 +44,7 @@ func getWarrantsFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		resp getWarrantsResponse
 	)
 
-	log.AddPrefix("[GetWarrantsFx] ")
+	log.AddPrefix("GetWarrantsFx")
 	log.Println("Handler start -----------------------------------------------")
 
 	defer func() {
