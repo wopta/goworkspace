@@ -14,8 +14,6 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/product"
 )
 
-const quoteStep = "quote"
-
 type SellableOutput struct {
 	Msg     string
 	Product *models.Product

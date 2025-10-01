@@ -34,8 +34,12 @@ func ResponseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) 
 		uuid := uuid.NewString()
 		os.Setenv("Execution-Id", uuid)
 		idToken := r.Header.Get("Authorization")
-		authToken, _ := GetAuthTokenFromIdToken(idToken)
-		os.Setenv("User", fmt.Sprintf("email:%v,role:%v,id:%v", authToken.Email, authToken.Role, authToken.UserID))
+		if idToken != "" {
+			authToken, _ := GetAuthTokenFromIdToken(idToken)
+			os.Setenv("User", fmt.Sprintf("email:%v,role:%v,id:%v", authToken.Email, authToken.Role, authToken.UserID))
+		} else {
+			os.Setenv("User", "Web")
+		}
 		w.Header().Set("Execution-Id", uuid)
 
 		str, _, err := handler(w, r)

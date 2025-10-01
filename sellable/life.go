@@ -14,7 +14,6 @@ import (
 	prd "gitlab.dev.wopta.it/goworkspace/product"
 )
 
-// DEPRECATED
 func lifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		policy  *models.Policy
@@ -66,7 +65,7 @@ func Life(policy *models.Policy, channel string, networkNode *models.NetworkNode
 		err     error
 		product *models.Product
 	)
-	log.AddPrefix("Life")
+	log.AddPrefix("LifeSellable")
 	defer log.PopPrefix()
 
 	log.Println("function start -----------")

@@ -12,7 +12,6 @@ import (
 	prd "gitlab.dev.wopta.it/goworkspace/product"
 )
 
-// DEPRECATED
 func personaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		policy  *models.Policy
@@ -57,7 +56,7 @@ func personaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 }
 
 func Persona(policy models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant) *models.Product {
-	log.AddPrefix("Persona")
+	log.AddPrefix("PersonaSellable")
 	defer log.PopPrefix()
 
 	log.Println("function start -------------------------------------")

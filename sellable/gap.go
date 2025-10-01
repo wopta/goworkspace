@@ -26,7 +26,7 @@ const (
 //   - the product or parts of it depending on the sellability rules
 //   - and an eventual error
 func Gap(policy *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant) (*models.Product, error) {
-	log.AddPrefix("Gap")
+	log.AddPrefix("GapFx")
 	defer log.PopPrefix()
 	log.Println("function start ---------------")
 
