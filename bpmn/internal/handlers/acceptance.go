@@ -22,9 +22,11 @@ func AddAcceptanceHandlers(builder *bpmnEngine.BpnmBuilder) error {
 func rejectPolicy(storage *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var action *flow.String
+	var reason *flow.String
 	err := bpmnEngine.IsError(
 		bpmnEngine.GetDataRef("policy", &policy, storage),
 		bpmnEngine.GetDataRef("action", &action, storage),
+		bpmnEngine.GetDataRef("reason", &reason, storage),
 	)
 	if err != nil {
 		return err
@@ -33,6 +35,7 @@ func rejectPolicy(storage *bpmnEngine.StorageBpnm) error {
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 	policy.ReservedInfo.AcceptanceNote = action.String
 	policy.ReservedInfo.AcceptanceDate = time.Now().UTC()
+	policy.ReservedInfo.Reasons = append(policy.ReservedInfo.Reasons, reason.String)
 	log.Printf("Policy Uid %s REJECTED", policy.Uid)
 	policy.Updated = time.Now().UTC()
 	return nil
@@ -41,9 +44,11 @@ func rejectPolicy(storage *bpmnEngine.StorageBpnm) error {
 func approvePolicy(storage *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var action *flow.String
+	var reason *flow.String
 	err := bpmnEngine.IsError(
 		bpmnEngine.GetDataRef("policy", &policy, storage),
 		bpmnEngine.GetDataRef("action", &action, storage),
+		bpmnEngine.GetDataRef("reason", &reason, storage),
 	)
 	if err != nil {
 		return err
@@ -55,6 +60,7 @@ func approvePolicy(storage *bpmnEngine.StorageBpnm) error {
 	}
 	policy.ReservedInfo.AcceptanceNote = action.String
 	policy.ReservedInfo.AcceptanceDate = time.Now().UTC()
+	policy.ReservedInfo.Reasons = append(policy.ReservedInfo.Reasons, reason.String)
 	log.Printf("Policy Uid %s APPROVED", policy.Uid)
 	policy.Updated = time.Now().UTC()
 	return nil
@@ -79,7 +85,7 @@ func sendAcceptanceMail(state *bpmnEngine.StorageBpnm) error {
 	if node.NetworkNode != nil {
 		warrant = node.GetWarrant()
 	}
-	flowName, _ := policy.GetFlow(node.NetworkNode, warrant)
+	flowName := policy.GetFlow(node.NetworkNode, warrant)
 	mail.SendMailReservedResult(
 		*policy.Policy,
 		mail.AddressAssunzione,

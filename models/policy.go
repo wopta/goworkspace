@@ -348,13 +348,10 @@ func PolicyToListData(query *firestore.DocumentIterator) []Policy {
 	return result
 }
 
-func (policy *Policy) GetFlow(networkNode *NetworkNode, warrant *Warrant) (string, *NodeSetting) {
+func (policy *Policy) GetFlow(networkNode *NetworkNode, warrant *Warrant) string {
 	var (
 		channel  = policy.Channel
-		flowByte []byte
 		flowName string
-		flowFile NodeSetting
-		err      error
 	)
 	log.AddPrefix("Policy.GetFlow")
 	defer log.PopPrefix()
@@ -369,27 +366,18 @@ func (policy *Policy) GetFlow(networkNode *NetworkNode, warrant *Warrant) (strin
 
 	switch channel {
 	case NetworkChannel:
-		flowName, flowByte = networkNode.GetNetworkNodeFlow(policy.Name, warrant)
+		product := warrant.GetProduct(policy.Name)
+		if product == nil {
+			log.ErrorF("error product not set for warrant %s", warrant.Name)
+			return ""
+		}
+		flowName = product.Flow
 	case ECommerceChannel, MgaChannel:
 		flowName = channel
-		flowByte = lib.GetFilesByEnv(fmt.Sprintf(FlowFileFormat, channel))
 	default:
 		log.ErrorF("error unavailable channel: '%s'", channel)
-		return flowName, nil
 	}
-
-	if len(flowByte) == 0 {
-		log.ErrorF("error flowFile '%s' empty", flowName)
-		return flowName, nil
-	}
-
-	err = json.Unmarshal(flowByte, &flowFile)
-	if err != nil {
-		log.ErrorF("error unmarshaling flow '%s' file: %s", flowName, err.Error())
-		return flowName, nil
-	}
-
-	return flowName, &flowFile
+	return flowName
 }
 
 func (policy *Policy) GetDurationInYears() int {

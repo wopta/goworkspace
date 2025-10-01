@@ -103,7 +103,7 @@ func manualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 			return "", nil, err
 		}
 		warrant = networkNode.GetWarrant()
-		flowName, _ = policy.GetFlow(networkNode, warrant)
+		flowName = policy.GetFlow(networkNode, warrant)
 		log.Printf("flowName '%s'", flowName)
 	}
 

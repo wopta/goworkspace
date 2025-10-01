@@ -93,6 +93,7 @@ func acceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	storage := bpmnEngine.NewStorageBpnm()
 	storage.AddGlobal("addresses", addresses)
 	storage.AddGlobal("action", &flow.String{String: payload.Action})
+	storage.AddGlobal("reason", &flow.String{String: payload.Reasons})
 
 	flow, err := bpmn.GetFlow(&policy, storage)
 	if err != nil {

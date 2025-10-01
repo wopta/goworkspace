@@ -25,7 +25,7 @@ func GetFlow(policy *models.Policy, storage *bpmnEngine.StorageBpnm) (*bpmnEngin
 		warrant = networkNode.GetWarrant()
 	}
 	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode, warrant)
-	flowNameStr, _ := policy.GetFlow(networkNode, warrant)
+	flowNameStr := policy.GetFlow(networkNode, warrant)
 
 	mgaProduct := flow.Product{Product: prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)}
 	if product.Flow == "" {
