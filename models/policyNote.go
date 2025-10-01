@@ -3,6 +3,7 @@ package models
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -18,7 +19,7 @@ type PolicyNotes struct {
 
 type PolicyNote struct {
 	Name               string    `json:"name" firestore:"name"`
-	Username           string    `json:"surname" firestore:"surname"`
+	Surname            string    `json:"surname" firestore:"surname"`
 	CreateDate         time.Time `json:"createDate" firestore:"createDate"`
 	Type               string    `json:"type" firestore:"type"`
 	ReadableByProducer bool      `json:"readableByProducer" firestore:"readableByProducer"`
@@ -73,6 +74,22 @@ func (p *Policy) AddSystemNote(getterNote func(p *Policy) PolicyNote) error {
 	note.PolicyUid = p.Uid
 	note.Type = "System"
 	note.ExecutionId = env.GetExecutionId()
+	name, surname := os.Getenv("NameUser"), os.Getenv("SurnameUser")
+	if name == "" || surname == "" {
+		splitAuth := strings.SplitAfter(os.Getenv("User"), "id:")
+		if len(splitAuth) != 2 {
+			os.Setenv("NameUser", "Web")
+			note.Name = "Web"
+		} else {
+			authId := splitAuth[1]
+			userFirebase := lib.WhereLimitFirestore(UserCollection, "authId", "==", authId, 1)
+			u, _ := FirestoreDocumentToUser(userFirebase)
+			note.Name = u.Name
+			note.Surname = u.Surname
+			os.Setenv("NameUser", u.Name)
+			os.Setenv("SurnameUser", u.Name)
+		}
+	}
 	if env.IsLocal() {
 		note.Text += "(Operazione eseguita in ambiente locale, non veritiera)"
 	}
