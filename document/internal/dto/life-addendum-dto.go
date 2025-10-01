@@ -166,8 +166,8 @@ func parseBirthDate(dateString string) string {
 }
 
 var genderToIta = map[string]string{
-	"M": "Uomo",
-	"F": "Donna",
+	"M": "Maschile",
+	"F": "Femminile",
 }
 
 func (li *addendumPersonDTO) fromPolicy(ins *models.User) {
