@@ -140,14 +140,10 @@ func GetProposalNote(p *Policy) PolicyNote {
 		Text: text,
 	}
 }
-func GetChangeAppendiceNote(_ *Policy) PolicyNote {
-	return PolicyNote{
-		Text: "Appendice modificata",
-	}
-}
+
 func GetDeletePolicyNote(_ *Policy) PolicyNote {
 	return PolicyNote{
-		Text: "Appendice modificata",
+		Text: "Polizza cancellata",
 	}
 }
 
