@@ -29,19 +29,21 @@ type Route struct {
 	Roles       []string
 }
 
+func setupEnv(w http.ResponseWriter, r *http.Request) {
+	uuid := uuid.NewString()
+	w.Header().Set("Execution-Id", uuid)
+	os.Setenv("Execution-Id", uuid)
+	idToken := r.Header.Get("Authorization")
+	if idToken != "" {
+		authToken, _ := GetAuthTokenFromIdToken(idToken)
+		os.Setenv("User", fmt.Sprintf("email:%v,role:%v,id:%v", authToken.Email, authToken.Role, authToken.UserID))
+	} else {
+		os.Setenv("User", "Web")
+	}
+}
 func ResponseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) (string, any, error)) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		uuid := uuid.NewString()
-		os.Setenv("Execution-Id", uuid)
-		idToken := r.Header.Get("Authorization")
-		if idToken != "" {
-			authToken, _ := GetAuthTokenFromIdToken(idToken)
-			os.Setenv("User", fmt.Sprintf("email:%v,role:%v,id:%v", authToken.Email, authToken.Role, authToken.UserID))
-		} else {
-			os.Setenv("User", "Web")
-		}
-		w.Header().Set("Execution-Id", uuid)
-
+		setupEnv(w, r)
 		str, _, err := handler(w, r)
 
 		if err != nil {
