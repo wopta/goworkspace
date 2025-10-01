@@ -1,4 +1,27 @@
 steps:
+  - name: gcr.io/cloud-builders/gcloud
+    args:
+      - '-c'
+      - |
+        mkdir -p /tmp/src/    
+        cp -r /workspace/* /tmp/src/
+        mkdir -p /workspace/goworkspace/ 
+        cp -r /tmp/src/* /workspace/goworkspace/
+
+        mkdir -p /workspace/function-data/
+
+        gcloud artifacts generic download\
+          --destination=/workspace/function-data \
+          --package=function-data \
+          --version=function-data \
+          --project=${PROJECT_ID} \
+          --repository=function-data \
+          --location=${_REGION}
+
+        cd function-data/
+        tar -xzf function-data.tar.gz 
+    id: download function-data
+    entrypoint: bash
   - name: 'gcr.io/cloud-builders/gcloud:latest'
     args:
       - '-c'
@@ -26,29 +49,6 @@ steps:
           --repository=cache \
           --location=${_REGION}  || true
     id: download cached modules
-    entrypoint: bash
-  - name: gcr.io/cloud-builders/gcloud
-    args:
-      - '-c'
-      - |
-        mkdir -p /tmp/src/    
-        cp -r /workspace/* /tmp/src/
-        mkdir -p /workspace/goworkspace/ 
-        cp -r /tmp/src/* /workspace/goworkspace/
-
-        mkdir -p /workspace/function-data/
-
-        gcloud artifacts generic download\
-          --destination=/workspace/function-data \
-          --package=function-data \
-          --version=function-data \
-          --project=${PROJECT_ID} \
-          --repository=function-data \
-          --location=${_REGION}
-
-        cd function-data/
-        tar -xzf function-data.tar.gz 
-    id: download function-data
     entrypoint: bash
   - name: 'golang:1.23'
     args:
