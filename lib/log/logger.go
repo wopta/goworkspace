@@ -32,6 +32,7 @@ type MessageInformation struct {
 	Message      string `json:"message"`
 	Severity     string `json:"severity,omitempty"`
 	ExecutiondId string `json:"executiondId"`
+	User         string `json:"user"`
 }
 
 func formatDate(t time.Time) string {
@@ -60,10 +61,10 @@ type LoggerWopta struct {
 func newLog() *LoggerWopta {
 	var parser ParserMessage
 	if !isLocal() {
-		parser = parserMessageGoogleCloud
 	} else {
 		parser = parserMessageLocal
 	}
+	parser = parserMessageGoogleCloud
 	return &LoggerWopta{
 		prefix:        []string{},
 		writer:        os.Stdout,
@@ -179,6 +180,7 @@ func parserMessageGoogleCloud(message string, severity SeverityType, prefix []st
 		Message:      fmt.Sprint(conPrefix, message),
 		Severity:     string(severity),
 		ExecutiondId: env.GetExecutionId(),
+		User:         os.Getenv("User"),
 	}
 	out, err := json.Marshal(entry)
 	if err != nil {

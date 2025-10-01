@@ -31,8 +31,15 @@ type Route struct {
 
 func ResponseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) (string, any, error)) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
+		uuid := uuid.NewString()
+		os.Setenv("Execution-Id", uuid)
+		idToken := r.Header.Get("Authorization")
+		authToken, _ := GetAuthTokenFromIdToken(idToken)
+		os.Setenv("User", fmt.Sprintf("id_:%v,email_:%v", authToken.UserID, strings.ToUpper(authToken.Email)))
+		w.Header().Set("Execution-Id", uuid)
+
 		str, _, err := handler(w, r)
-		w.Header().Set("Execution-Id", env.GetExecutionId())
+
 		if err != nil {
 
 			log.Error(err)
@@ -57,9 +64,6 @@ func GetRouter(module string, routes []Route) *chi.Mux {
 	if env.IsLocal() {
 		prefix = "/" + module
 	}
-
-	uuid := uuid.NewString()
-	os.Setenv("Execution-Id", uuid)
 
 	mux := chi.NewRouter()
 	mux.Use(loggerConfig)
