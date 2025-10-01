@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
 	"reflect"
 	"strings"
 	"time"
@@ -84,11 +83,11 @@ func modifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	if diffPolicy, hasDiff = generateDiffPolicy(originalPolicy, modifiedPolicy); hasDiff {
 		log.Println("generating addendum document for chages...")
 		if addendumResp, err := document.Addendum(&diffPolicy); err == nil {
+			originalPolicy.AddSystemNote(models.GetAddendumPolicyNote)
 			res, err := addendumResp.Save()
 			if err != nil {
 				return "", nil, err
 			}
-			os.WriteFile("add.pdf", addendumResp.Bytes, 0777)
 			addendumAtt := models.Attachment{
 				Name:        "Appendice - Modifica dati di polizza",
 				FileName:    addendumResp.FileName,

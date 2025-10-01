@@ -154,7 +154,7 @@ func GetDeletePolicyNote(_ *Policy) PolicyNote {
 func GetEmailNote(emailDetail string) func(*Policy) PolicyNote {
 	return func(p *Policy) PolicyNote {
 		return PolicyNote{
-			Text: fmt.Sprintf("Email con oggetto '%v' é stata inviata", emailDetail),
+			Text: fmt.Sprintf("Email con oggetto '%v' inviata", emailDetail),
 		}
 	}
 }
@@ -166,8 +166,15 @@ func GetErrorNote(processName string) func(*Policy) PolicyNote {
 		}
 	}
 }
+
 func GetQuietanzamentoPolicyNote(_ *Policy) PolicyNote {
 	return PolicyNote{
 		Text: "Quietanzamento eseguito",
+	}
+}
+
+func GetAddendumPolicyNote(_ *Policy) PolicyNote {
+	return PolicyNote{
+		Text: "Dati polizza sono stati modificati",
 	}
 }
