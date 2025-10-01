@@ -61,10 +61,10 @@ type LoggerWopta struct {
 func newLog() *LoggerWopta {
 	var parser ParserMessage
 	if !isLocal() {
+		parser = parserMessageGoogleCloud
 	} else {
 		parser = parserMessageLocal
 	}
-	parser = parserMessageGoogleCloud
 	return &LoggerWopta{
 		prefix:        []string{},
 		writer:        os.Stdout,
