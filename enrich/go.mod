@@ -8,8 +8,8 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/go-gota/gota v0.12.0
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.232
-	gitlab.dev.wopta.it/goworkspace/models v1.2.175
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.233
+	gitlab.dev.wopta.it/goworkspace/models v1.2.176
 )
 
 require (

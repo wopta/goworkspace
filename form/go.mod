@@ -8,8 +8,8 @@ require (
 	cloud.google.com/go/bigquery v1.61.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/xuri/excelize/v2 v2.7.1
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.232
-	gitlab.dev.wopta.it/goworkspace/mail v1.0.299
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.233
+	gitlab.dev.wopta.it/goworkspace/mail v1.0.300
 	google.golang.org/api v0.181.0
 )
 
@@ -70,8 +70,8 @@ require (
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
-	gitlab.dev.wopta.it/goworkspace/models v1.2.175 // indirect
-	gitlab.dev.wopta.it/goworkspace/network v1.0.243 // indirect
+	gitlab.dev.wopta.it/goworkspace/models v1.2.176 // indirect
+	gitlab.dev.wopta.it/goworkspace/network v1.0.244 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.49.0 // indirect
