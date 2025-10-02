@@ -401,6 +401,7 @@ func modifyContractorInfo(inputContractor, originalContractor models.Contractor)
 	modifiedContractor.CompanyAddress = inputContractor.CompanyAddress
 	modifiedContractor.CompanyName = inputContractor.CompanyName
 	modifiedContractor.VatCode = inputContractor.VatCode
+	modifiedContractor.Phone = inputContractor.Phone
 	//TODO: check if it is correct
 	modifiedContractor.Ateco = inputContractor.Ateco
 	if inputContractor.Consens != nil {
