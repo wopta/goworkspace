@@ -87,7 +87,6 @@ func modifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 			if err != nil {
 				return "", nil, err
 			}
-			originalPolicy.AddSystemNote(models.GetAddendumPolicyNote)
 			addendumAtt := models.Attachment{
 				Name:        "Appendice - Modifica dati di polizza",
 				FileName:    addendumResp.FileName,
@@ -109,6 +108,7 @@ func modifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		log.WarningF("Policy not changed")
 		return string(rawPolicy), originalPolicy, nil
 	}
+	originalPolicy.AddSystemNote(models.GetAddendumPolicyNote)
 	if err = writePolicyToDb(modifiedPolicy); err != nil {
 		return "", nil, err
 	}

@@ -32,6 +32,6 @@ func Addendum(policy *models.Policy) (DocumentGenerated, error) {
 		return generateAddendumDocument(pdf.GetPdf(), policy)
 	}
 
-	log.Printf("addendum not implemented for product %s", policy.Name)
+	log.WarningF("addendum not implemented for product %s", policy.Name)
 	return DocumentGenerated{}, ErrNotImplemented
 }
