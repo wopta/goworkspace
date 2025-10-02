@@ -107,7 +107,7 @@ func modifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		}
 	} else {
 		log.WarningF("Policy not changed")
-		return "{}", nil, nil
+		return string(rawPolicy), originalPolicy, nil
 	}
 	if err = writePolicyToDb(modifiedPolicy); err != nil {
 		return "", nil, err
