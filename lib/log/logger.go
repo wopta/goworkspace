@@ -24,6 +24,7 @@ const (
 	CRITICAL               = "CRITICAL"
 	ALERT                  = "ALERT"
 	EMERGENCY              = "EMERGENCY"
+	PANIC                  = "PANIC"
 )
 
 type ParserMessage func(string, SeverityType, []string) ([]byte, error)
@@ -169,6 +170,9 @@ func parserMessageLocal(message string, severity SeverityType, prefix []string) 
 
 // Compose the final message using the given parameters to send to Google Cloud
 func parserMessageGoogleCloud(message string, severity SeverityType, prefix []string) ([]byte, error) {
+	if severity == PANIC {
+		severity = EMERGENCY
+	}
 	conPrefix := strings.Join(prefix, "|")
 
 	conPrefix = fmt.Sprintf(" [%v] ", conPrefix)

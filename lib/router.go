@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"runtime/debug"
 	"slices"
 	"strings"
 	"time"
@@ -73,14 +74,13 @@ func GetRouter(module string, routes []Route) *chi.Mux {
 
 	mux := chi.NewRouter()
 	mux.Use(loggerConfig)
+	mux.Use(recoverLogger)
 	mux.Use(middleware.RequestID)
 	mux.Use(middleware.RealIP)
 	mux.Use(middleware.Logger)
-	mux.Use(middleware.Recoverer)
-	mux.Use(middleware.SetHeader("Content-type", "application/json"))
 	mux.Use(corsMiddleware)
+	mux.Use(middleware.SetHeader("Content-type", "application/json"))
 	mux.Use(logRequestMiddleware)
-
 	for _, route := range routes {
 		mw := make([]func(http.Handler) http.Handler, 0)
 		mw = append(mw,
@@ -102,6 +102,39 @@ func GetRouter(module string, routes []Route) *chi.Mux {
 
 // MIDDLEWARES
 
+func recoverLogger(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if rvr := recover(); rvr != nil {
+				if rvr == http.ErrAbortHandler {
+					// we don't recover http.ErrAbortHandler so the response
+					// to the client is aborted, this should not be logged
+					panic(rvr)
+				}
+				log.ErrorF("Panic %v", rvr)
+				stackByte := debug.Stack()
+				stack := strings.Split(string(stackByte), "\n")
+
+				lines := []string{}
+
+				for i := len(stack) - 1; i > 0; i-- {
+					lines = append(lines, stack[i])
+					if strings.HasPrefix(stack[i], "panic(") {
+						lines = lines[0 : len(lines)-2] // remove boilerplate
+						break
+					}
+				}
+				slices.Reverse(lines)
+				log.Log().CustomLog(strings.Join(lines, "\n"), log.PANIC)
+				if r.Header.Get("Connection") != "Upgrade" {
+					w.WriteHeader(http.StatusInternalServerError)
+				}
+			}
+
+		}()
+		next.ServeHTTP(w, r)
+	})
+}
 func loggerConfig(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.ResetPrefix()
