@@ -231,6 +231,7 @@ func (c *NetClient) EnrichAteco(fiscalCode string) (response enrichEtecoCatnat, 
 		}
 	}
 	url := os.Getenv("NET_BASEURL") + "/OperationsGateway/InformazioniCompagnia/" + fiscalCode
+	log.Println(url)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return response, err
@@ -253,9 +254,10 @@ func (c *NetClient) EnrichAteco(fiscalCode string) (response enrichEtecoCatnat, 
 		return response, err
 	}
 
-	if respDecoded.Result != "OK" {
+	if respDecoded.Result != "OK" && respDecoded.Result != "True" {
 		response.AtecoCode = ""
 		response.Message = "Codice ateco non trovato, inseriscilo manualmente"
+		log.ErrorF("Response catnat", respDecoded.Errors)
 		return response, nil
 	}
 	//Formatting ateco code
