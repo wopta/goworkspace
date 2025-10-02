@@ -79,17 +79,19 @@ func (p *Policy) AddSystemNote(getterNote func(p *Policy) PolicyNote) error {
 		splitAuth := strings.SplitAfter(os.Getenv("User"), "id:")
 		if len(splitAuth) != 2 {
 			os.Setenv("NameUser", "Web")
-			note.Name = "Web"
+			name = "Web"
 		} else {
 			authId := splitAuth[1]
 			userFirebase := lib.WhereLimitFirestore(UserCollection, "authId", "==", authId, 1)
 			u, _ := FirestoreDocumentToUser(userFirebase)
-			note.Name = u.Name
-			note.Surname = u.Surname
 			os.Setenv("NameUser", u.Name)
 			os.Setenv("SurnameUser", u.Name)
+			name = u.Name
+			surname = u.Surname
 		}
 	}
+	note.Name = name
+	note.Surname = surname
 	if env.IsLocal() {
 		note.Text += "(Operazione eseguita in ambiente locale, non veritiera)"
 	}
