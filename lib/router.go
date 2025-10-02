@@ -38,8 +38,6 @@ func setupEnv(w http.ResponseWriter, r *http.Request) {
 	if idToken != "" {
 		authToken, _ := GetAuthTokenFromIdToken(idToken)
 		os.Setenv("User", fmt.Sprintf("email:%v,role:%v,id:%v", authToken.Email, authToken.Role, authToken.UserID))
-	} else {
-		os.Setenv("User", "Web")
 	}
 }
 func ResponseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) (string, any, error)) func(w http.ResponseWriter, r *http.Request) {

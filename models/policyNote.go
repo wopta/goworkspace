@@ -77,10 +77,7 @@ func (p *Policy) AddSystemNote(getterNote func(p *Policy) PolicyNote) error {
 	name, surname := os.Getenv("NameUser"), os.Getenv("SurnameUser")
 	if name == "" || surname == "" {
 		splitAuth := strings.SplitAfter(os.Getenv("User"), "id:")
-		if len(splitAuth) != 2 {
-			os.Setenv("NameUser", "Web")
-			name = "Web"
-		} else {
+		if len(splitAuth) == 2 {
 			authId := splitAuth[1]
 			userFirebase := lib.WhereLimitFirestore(UserCollection, "authId", "==", authId, 1)
 			u, _ := FirestoreDocumentToUser(userFirebase)

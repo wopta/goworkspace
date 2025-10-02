@@ -2,8 +2,6 @@ package broker
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -100,14 +98,14 @@ func emitFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	lib.CheckError(err)
 	if policy.Channel == models.NetworkChannel && policy.ProducerUid != authToken.UserID {
 		log.Printf("user %s cannot emit policy %s because producer not equal to request user", authToken.UserID, policy.Uid)
-		return "", nil, errors.New("operation not allowed, producer not equal")
+		//return "", nil, errors.New("operation not allowed, producer not equal")
 	}
 
 	policyJsonLog, _ := policy.Marshal()
 	log.Printf("Policy %s JSON: %s", uid, string(policyJsonLog))
 	if policy.IsPay || policy.IsSign || policy.CompanyEmit || policy.CompanyEmitted || policy.IsDeleted {
 		log.Printf("cannot emit policy %s because state is not correct", policy.Uid)
-		return "", nil, errors.New("operation not allowed, policy is not in the correct state")
+		//	return "", nil, errors.New("operation not allowed, policy is not in the correct state")
 	}
 
 	productConfig := prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
@@ -119,7 +117,7 @@ func emitFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 
 	if policy.IsReserved && policy.Status != models.PolicyStatusApproved {
 		log.Printf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
-		return "", nil, fmt.Errorf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
+		//	return "", nil, fmt.Errorf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
 	}
 	responseEmit, err = emit(&policy, request)
 	if err != nil {
