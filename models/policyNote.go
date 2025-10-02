@@ -67,11 +67,10 @@ func policyNotesToListData(query *firestore.DocumentIterator) (PolicyNotes, erro
 	}
 	return result, nil
 }
-func enrichNote(policyNote *PolicyNote) {
+func enrichNote(policyNote *PolicyNote, user string) {
 	name, surname := os.Getenv("NameUser"), os.Getenv("SurnameUser")
 	if name == "" || surname == "" {
-		env := os.Getenv("User")
-		splitAuth := strings.SplitAfter(env, "id:")
+		splitAuth := strings.SplitAfter(user, "id:")
 		if len(splitAuth) == 2 {
 			authId := splitAuth[1]
 			userFirebase := lib.WhereLimitFirestore(UserCollection, "authId", "==", authId, 1)
@@ -95,7 +94,7 @@ func (p *Policy) AddSystemNote(getterNote func(p *Policy) PolicyNote) error {
 	note.ExecutionId = env.GetExecutionId()
 	user := os.Getenv("User")
 	if user != "" {
-		enrichNote(&note)
+		enrichNote(&note, user)
 	}
 	if env.IsLocal() {
 		note.Text += "(Operazione eseguita in ambiente locale, non veritiera)"
