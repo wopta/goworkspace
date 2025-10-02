@@ -10,9 +10,9 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/dustin/go-humanize v1.0.1
 	github.com/google/uuid v1.6.0
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.237
-	gitlab.dev.wopta.it/goworkspace/models v1.2.182
-	gitlab.dev.wopta.it/goworkspace/network v1.0.250
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.238
+	gitlab.dev.wopta.it/goworkspace/models v1.2.183
+	gitlab.dev.wopta.it/goworkspace/network v1.0.251
 	google.golang.org/api v0.181.0
 )
 
