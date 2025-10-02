@@ -40,9 +40,11 @@ func setupEnv(w http.ResponseWriter, r *http.Request) {
 		os.Setenv("User", fmt.Sprintf("email:%v,role:%v,id:%v", authToken.Email, authToken.Role, authToken.UserID))
 	}
 }
+
 func ResponseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) (string, any, error)) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setupEnv(w, r)
+		logRequestMiddleware(w, r)
 		str, _, err := handler(w, r)
 
 		if err != nil {
@@ -78,7 +80,6 @@ func GetRouter(module string, routes []Route) *chi.Mux {
 	mux.Use(middleware.Logger)
 	mux.Use(corsMiddleware)
 	mux.Use(middleware.SetHeader("Content-type", "application/json"))
-	mux.Use(logRequestMiddleware)
 	for _, route := range routes {
 		mw := make([]func(http.Handler) http.Handler, 0)
 		mw = append(mw,
@@ -339,18 +340,15 @@ func checkEntitlement(next http.Handler) http.Handler {
 	})
 }
 
-func logRequestMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		body, _ := io.ReadAll(r.Body)
-		defer r.Body.Close()
+func logRequestMiddleware(w http.ResponseWriter, r *http.Request) {
+	body, _ := io.ReadAll(r.Body)
+	defer r.Body.Close()
 
-		obfuscatedBody := obfuscateFields(body)
-		if len(obfuscatedBody) > 0 {
-			log.Printf("Request: %s", string(obfuscatedBody))
-		}
+	obfuscatedBody := obfuscateFields(body)
+	if len(obfuscatedBody) > 0 {
+		log.Printf("Request: %s", string(obfuscatedBody))
+	}
 
-		// rewrite body to request since it is a stream
-		r.Body = io.NopCloser(bytes.NewReader(body))
-		next.ServeHTTP(w, r)
-	})
+	// rewrite body to request since it is a stream
+	r.Body = io.NopCloser(bytes.NewReader(body))
 }
