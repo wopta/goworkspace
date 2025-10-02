@@ -344,6 +344,7 @@ func logRequestMiddleware(w http.ResponseWriter, r *http.Request) {
 	body, _ := io.ReadAll(r.Body)
 	defer r.Body.Close()
 
+	log.Printf("Url: %s", r.URL.String())
 	obfuscatedBody := obfuscateFields(body)
 	if len(obfuscatedBody) > 0 {
 		log.Printf("Request: %s", string(obfuscatedBody))
