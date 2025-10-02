@@ -35,31 +35,27 @@ type BankAccountAxaInclusiveReq struct {
 }
 
 func BankAccountInclusive(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var (
-		now    time.Time
-		upload bool
-	)
 
 	log.AddPrefix("BankAccountInclusive ")
 	defer log.PopPrefix()
-	req := lib.ErrorByte(io.ReadAll(r.Body))
+	body := lib.ErrorByte(io.ReadAll(r.Body))
 	log.Println(r.Header)
-	log.Println(string(req))
-	var obj BankAccountAxaInclusiveReq
+	log.Println(string(body))
+
 	defer r.Body.Close()
-	json.Unmarshal([]byte(req), &obj)
-	now, upload = getRequestData(req)
-	setPolicy("180623", now, upload)
-	setPolicy("191123", now, upload)
-	setScalapayPolicy("51114", now, upload)
+	now, upload, req := getCompanyDataReq(body)
+
+	setPolicy("180623", now, upload, req)
+	setPolicy("191123", now, upload, req)
+	setScalapayPolicy("51114", now, upload, req)
 	log.Println("---------------------end------------------------------")
 	return "", nil, e
 }
 
-func setPolicy(code string, now time.Time, upload bool) {
+func setPolicy(code string, now time.Time, upload bool, req DataReq) {
 	var (
 		result [][]string
-
+		query  string
 		refDay time.Time
 	)
 
@@ -69,7 +65,13 @@ func setPolicy(code string, now time.Time, upload bool) {
 	log.Println("  refMontly: ", refDay)
 	//from, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 1))
 	//query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME >'" + from.Format(layoutQuery) + " 00:00:00" + "' and _PARTITIONTIME <'" + to.Format(layoutQuery) + " 23:59:00" + "'"
-	query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME ='" + refDay.Format(layoutQuery) + "' and policyNumber='" + code + "'"
+	if req.From != "" && req.To != "" {
+		from, _ := time.Parse(layoutQuery, req.From)
+		to, _ := time.Parse(layoutQuery, req.To)
+		query = "select * from `wopta." + dataMovement + "` where startDate>'" + from.Format(layoutQuery) + "' and startDate<'" + to.Format(layoutQuery) + "' and policyNumber='" + code + "'"
+	} else {
+		query = "select * from `wopta." + dataMovement + "` where _PARTITIONTIME ='" + refDay.Format(layoutQuery) + "' and policyNumber='" + code + "'"
+	}
 	log.Println("  bigquery query: ", query)
 	bankaccountlist, e := QueryRowsBigQuery[inclusive.BankAccountMovement](query)
 	log.Println("  bigquery error: ", e)
@@ -88,7 +90,7 @@ func setPolicy(code string, now time.Time, upload bool) {
 	}
 
 	filepath := code + "_" + strconv.Itoa(refDay.Year()) + fmt.Sprintf("%02d", int(refDay.Month())) + fmt.Sprintf("%02d", refDay.Day())
-	CreateExcel(result, "../tmp/"+filepath+".xlsx", "Sheet1")
+	//CreateExcel(result, "../tmp/"+filepath+".xlsx", "Sheet1")
 	lib.WriteCsv("../tmp/"+filepath+".csv", result, ';')
 	source, _ := os.ReadFile("../tmp/" + filepath + ".xlsx")
 	sourceCsv, _ := os.ReadFile("../tmp/" + filepath + ".csv")
@@ -224,10 +226,11 @@ func QueryRowsBigQuery[T any](query string) ([]T, error) {
 	}
 
 }
-func setScalapayPolicy(code string, now time.Time, upload bool) {
+func setScalapayPolicy(code string, now time.Time, upload bool, req DataReq) {
 	var (
 		result [][]string
 		refDay time.Time
+		query  string
 	)
 
 	log.AddPrefix("BankAccountInclusive setScalapayPolicy " + code)
@@ -258,7 +261,13 @@ func setScalapayPolicy(code string, now time.Time, upload bool) {
 	log.Println("  refMontly: ", refDay)
 	//from, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 1))
 	//query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME >'" + from.Format(layoutQuery) + " 00:00:00" + "' and _PARTITIONTIME <'" + to.Format(layoutQuery) + " 23:59:00" + "'"
-	query := "select * from `wopta_inclusive." + usersTableScalapay + "` where daystart ='" + strconv.Itoa(refDay.Day()) + "' and policyNumber='" + code + "' and status='active'"
+	if req.From != "" && req.To != "" {
+		from, _ := time.Parse(layoutQuery, req.From)
+		to, _ := time.Parse(layoutQuery, req.To)
+		query = "select * from `wopta." + dataMovement + "` where startDate>'" + from.Format(layoutQuery) + "' and startDate<'" + to.Format(layoutQuery) + "' and policyNumber='" + code + "' and status='active'"
+	} else {
+		query = "select * from `wopta_inclusive." + usersTableScalapay + "` where daystart ='" + strconv.Itoa(refDay.Day()) + "' and policyNumber='" + code + "' and status='active'"
+	}
 	log.Println("  bigquery query: ", query)
 	bankaccountlist, e := QueryRowsBigQuery[inclusive.BankAccountMovement](query)
 	log.Println("  bigquery error: ", e)

@@ -60,7 +60,7 @@ func GapSogessurEmit(w http.ResponseWriter, r *http.Request) (string, interface{
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
-	now, upload := getRequestData(req)
+	now, upload, _ := getCompanyDataReq(req)
 	prevMonth := lib.GetPreviousMonth(now)
 	from := lib.GetFirstDay(prevMonth)
 	to := lib.GetFirstDay(now)

@@ -5,6 +5,8 @@ import "time"
 // TODO: from to , create a query to use them
 type DataReq struct {
 	Day    string   `firestore:"-" json:"day,omitempty" bigquery:"-"`
+	From   string   `firestore:"-" json:"from,omitempty" bigquery:"-"`
+	To     string   `firestore:"-" json:"to,omitempty" bigquery:"-"`
 	Upload bool     `firestore:"-" json:"upload,omitempty" bigquery:"-"`
 	Name   string   `firestore:"name,omitempty" json:"name,omitempty"`
 	Event  []string `firestore:"event,omitempty" json:"event,omitempty"`

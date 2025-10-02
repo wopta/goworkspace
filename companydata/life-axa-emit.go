@@ -38,7 +38,7 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	defer r.Body.Close()
 	log.Println("LifeAxalEmit: ", r.Header)
 	log.Println("LifeAxalEmit: ", string(req))
-	now, upload := getRequestData(req)
+	now, upload, _ := getCompanyDataReq(req)
 	from, to, refMontly, filenamesplit = AxaPartnersSchedule(now)
 	cabCsv = lib.GetFilesByEnv("data/cab-cap-istat.csv")
 	log.Println("LifeAxalEmit now: " + now.String())
