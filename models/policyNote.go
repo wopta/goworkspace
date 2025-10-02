@@ -67,28 +67,36 @@ func policyNotesToListData(query *firestore.DocumentIterator) (PolicyNotes, erro
 	}
 	return result, nil
 }
-
+func enrichNote(policyNote *PolicyNote) {
+	name, surname := os.Getenv("NameUser"), os.Getenv("SurnameUser")
+	if name == "" || surname == "" {
+		env := os.Getenv("User")
+		splitAuth := strings.SplitAfter(env, "id:")
+		if len(splitAuth) == 2 {
+			authId := splitAuth[1]
+			userFirebase := lib.WhereLimitFirestore(UserCollection, "authId", "==", authId, 1)
+			u, _ := FirestoreDocumentToUser(userFirebase)
+			name = u.Name
+			surname = u.Surname
+		} else {
+			return
+		}
+	}
+	os.Setenv("NameUser", name)
+	os.Setenv("SurnameUser", surname)
+	policyNote.Name = name
+	policyNote.Surname = surname
+}
 func (p *Policy) AddSystemNote(getterNote func(p *Policy) PolicyNote) error {
 	note := getterNote(p)
 	note.CreateDate = time.Now()
 	note.PolicyUid = p.Uid
 	note.Type = "System"
 	note.ExecutionId = env.GetExecutionId()
-	name, surname := os.Getenv("NameUser"), os.Getenv("SurnameUser")
-	if name == "" || surname == "" {
-		splitAuth := strings.SplitAfter(os.Getenv("User"), "id:")
-		if len(splitAuth) == 2 {
-			authId := splitAuth[1]
-			userFirebase := lib.WhereLimitFirestore(UserCollection, "authId", "==", authId, 1)
-			u, _ := FirestoreDocumentToUser(userFirebase)
-			os.Setenv("NameUser", u.Name)
-			os.Setenv("SurnameUser", u.Surname)
-			name = u.Name
-			surname = u.Surname
-		}
+	user := os.Getenv("User")
+	if user != "" {
+		enrichNote(&note)
 	}
-	note.Name = name
-	note.Surname = surname
 	if env.IsLocal() {
 		note.Text += "(Operazione eseguita in ambiente locale, non veritiera)"
 	}
