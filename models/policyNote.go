@@ -85,7 +85,7 @@ func (p *Policy) AddSystemNote(getterNote func(p *Policy) PolicyNote) error {
 			userFirebase := lib.WhereLimitFirestore(UserCollection, "authId", "==", authId, 1)
 			u, _ := FirestoreDocumentToUser(userFirebase)
 			os.Setenv("NameUser", u.Name)
-			os.Setenv("SurnameUser", u.Name)
+			os.Setenv("SurnameUser", u.Surname)
 			name = u.Name
 			surname = u.Surname
 		}
