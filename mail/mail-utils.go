@@ -7,6 +7,7 @@ import (
 	"strings"
 	"text/template"
 
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 
 	"github.com/dustin/go-humanize"
@@ -241,6 +242,7 @@ func getTemplateEmail(flowName, templateType string, policy models.Policy) (stri
 	bodyData := getBodyData(policy)
 
 	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, templateType))
-
-	return fillTemplate(templateFile, &bodyData), nil
+	template := fillTemplate(templateFile, &bodyData)
+	template += fmt.Sprintf("<h6 style='opacity:0;Margin:0;font-size:3'>Execution-Id: %v</h6>", env.GetExecutionId())
+	return template, nil
 }

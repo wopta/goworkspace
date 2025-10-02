@@ -213,6 +213,9 @@ func (p *Policy) Normalize() {
 	for index := range p.Assets {
 		p.Assets[index].Normalize()
 	}
+	if p.Contractors == nil {
+		return
+	}
 	for index := range *p.Contractors {
 		(*p.Contractors)[index].Normalize()
 	}
