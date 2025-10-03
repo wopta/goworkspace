@@ -69,23 +69,7 @@ func (c *ContractorDTO) fromPolicy(contractor models.Contractor) {
 	c.Type = contractorTypeToIta[contractor.Type]
 	c.Ateco = contractor.Ateco
 	c.VatCode = contractor.VatCode
-	if contractor.Type == models.UserLegalEntity && contractor.CompanyAddress != nil {
-		if len(contractor.CompanyAddress.StreetName) != 0 {
-			c.StreetName = contractor.CompanyAddress.StreetName
-		}
-		if len(contractor.CompanyAddress.StreetNumber) != 0 {
-			c.StreetNumber = contractor.CompanyAddress.StreetNumber
-		}
-		if len(contractor.CompanyAddress.PostalCode) != 0 {
-			c.PostalCode = contractor.CompanyAddress.PostalCode
-		}
-		if len(contractor.CompanyAddress.City) != 0 {
-			c.City = contractor.CompanyAddress.City
-		}
-		if len(contractor.CompanyAddress.CityCode) != 0 {
-			c.CityCode = contractor.CompanyAddress.CityCode
-		}
-	} else if contractor.Residence != nil {
+	if contractor.Residence != nil {
 		if len(contractor.Residence.StreetName) != 0 {
 			c.StreetName = contractor.Residence.StreetName
 		}
@@ -100,6 +84,22 @@ func (c *ContractorDTO) fromPolicy(contractor models.Contractor) {
 		}
 		if len(contractor.Residence.CityCode) != 0 {
 			c.CityCode = contractor.Residence.CityCode
+		}
+	} else if contractor.CompanyAddress != nil {
+		if len(contractor.CompanyAddress.StreetName) != 0 {
+			c.StreetName = contractor.CompanyAddress.StreetName
+		}
+		if len(contractor.CompanyAddress.StreetNumber) != 0 {
+			c.StreetNumber = contractor.CompanyAddress.StreetNumber
+		}
+		if len(contractor.CompanyAddress.PostalCode) != 0 {
+			c.PostalCode = contractor.CompanyAddress.PostalCode
+		}
+		if len(contractor.CompanyAddress.City) != 0 {
+			c.City = contractor.CompanyAddress.City
+		}
+		if len(contractor.CompanyAddress.CityCode) != 0 {
+			c.CityCode = contractor.CompanyAddress.CityCode
 		}
 	}
 	if len(contractor.Phone) != 0 {

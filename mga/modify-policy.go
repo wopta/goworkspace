@@ -368,6 +368,15 @@ func modifyContractorsInfo(input, original models.Policy) (*[]models.User, error
 			}
 			user := *newContractor.ToUser()
 			user.IsSignatory = true
+			user.Gender = (*original.Contractors)[i].Gender
+			user.BirthCity = (*original.Contractors)[i].BirthCity
+			user.BirthProvince = (*original.Contractors)[i].BirthProvince
+			user.BirthDate = (*original.Contractors)[i].BirthDate
+			user.Residence = original.Contractor.Residence
+			user.VatCode = ""
+			if user.Residence == nil {
+				user.Residence = original.Contractor.CompanyAddress
+			}
 			res = append(res, user)
 			continue
 		}

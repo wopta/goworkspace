@@ -182,7 +182,10 @@ func (li *addendumPersonDTO) fromPolicy(ins *models.User) {
 		li.Name = ins.Name
 		li.Surname = ins.Surname
 		li.FiscalCode = ins.FiscalCode
-		li.BirthDate = parseBirthDate(ins.BirthDate)
+		birth := parseBirthDate(ins.BirthDate)
+		if birth != "" {
+			li.BirthDate = birth
+		}
 	}
 	if ins.Residence != nil {
 		li.StreetName = ins.Residence.StreetName

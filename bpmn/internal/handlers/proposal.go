@@ -20,7 +20,6 @@ func AddProposalHandlers(builder *bpmnEngine.BpnmBuilder) error {
 
 func endProposal(state *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
-	var isProposal *flow.BoolBpmn
 	var networkNode *flow.Network
 	var mgaProduct *flow.Product
 	err := bpmnEngine.IsError(
@@ -31,10 +30,8 @@ func endProposal(state *bpmnEngine.StorageBpnm) error {
 	if err != nil {
 		return err
 	}
-	if !isProposal.Bool {
-		utility.SetProposalNumber(policy.Policy)
-		policy.RenewDate = policy.CreationDate.AddDate(1, 0, 0)
-	}
+	utility.SetProposalNumber(policy.Policy)
+	policy.RenewDate = policy.CreationDate.AddDate(1, 0, 0)
 	return nil
 }
 
