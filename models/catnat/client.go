@@ -257,7 +257,7 @@ func (c *NetClient) EnrichAteco(fiscalCode string) (response enrichEtecoCatnat, 
 	if respDecoded.Result != "OK" && respDecoded.Result != "True" {
 		response.AtecoCode = ""
 		response.Message = "Codice ateco non trovato, inseriscilo manualmente"
-		log.ErrorF("Response catnat", respDecoded.Errors)
+		log.ErrorF("Response catnat %v", respDecoded.Errors)
 		return response, nil
 	}
 	//Formatting ateco code
