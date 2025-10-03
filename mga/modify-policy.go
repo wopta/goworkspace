@@ -372,7 +372,8 @@ func modifyContractorsInfo(input, original models.Policy) (*[]models.User, error
 			user.BirthCity = (*original.Contractors)[i].BirthCity
 			user.BirthProvince = (*original.Contractors)[i].BirthProvince
 			user.BirthDate = (*original.Contractors)[i].BirthDate
-			user.Residence = original.Contractor.Residence
+			user.Residence = (*original.Contractors)[i].Residence
+			user.Role = (*original.Contractors)[i].Role
 			user.VatCode = ""
 			if user.Residence == nil {
 				user.Residence = original.Contractor.CompanyAddress
