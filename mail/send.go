@@ -17,6 +17,7 @@ import (
 	"text/template"
 	"time"
 
+	env "gitlab.dev.wopta.it/goworkspace/lib/environment"
 	"gitlab.dev.wopta.it/goworkspace/lib/log"
 	"gitlab.dev.wopta.it/goworkspace/models"
 
@@ -309,7 +310,7 @@ func SendMail(obj MailRequest) {
 		reportError = ""
 		reportRecip = strings.Join(obj.To, ",")
 	)
-
+	obj.Message += fmt.Sprintf("<h6 style='opacity:0;Margin:0;font-size:3'>Execution-Id: %v</h6>", env.GetExecutionId())
 	err := sendmail(obj)
 
 	if err != nil {

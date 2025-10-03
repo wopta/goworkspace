@@ -29,7 +29,7 @@ func incassoNetFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var errors []string
 	for i := range policies {
 		if e := catnatClient.Incasso(policies[i]); e != nil {
-			log.WarningF("For policy %v there is the error %v", policies[i], e.Error())
+			log.WarningF("For policy %v there is the error %v", policies[i].Uid, e.Error())
 			errors = append(errors, "Errore incasso: "+policies[i].CodeCompany)
 			continue
 		} else {

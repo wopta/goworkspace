@@ -300,7 +300,7 @@ func (c *NetClient) Incasso(policy models.Policy) error {
 	resp, err := c.Client.Do(req)
 	if err != nil {
 		log.Error(err)
-		return fmt.Errorf("Errore policy: %v", policy.CodeCompany)
+		return fmt.Errorf("error request policy: %v", policy.CodeCompany)
 	}
 	strResponse, _ := io.ReadAll(resp.Body)
 	if resp.StatusCode != http.StatusOK {
