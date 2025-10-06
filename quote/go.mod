@@ -10,13 +10,13 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/go-gota/gota v0.12.0
 	github.com/xuri/excelize/v2 v2.8.1
-	gitlab.dev.wopta.it/goworkspace/document v1.1.360
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.244
-	gitlab.dev.wopta.it/goworkspace/models v1.2.190
-	gitlab.dev.wopta.it/goworkspace/network v1.0.258
-	gitlab.dev.wopta.it/goworkspace/policy v1.0.404
-	gitlab.dev.wopta.it/goworkspace/product v1.1.189
-	gitlab.dev.wopta.it/goworkspace/sellable v1.0.303
+	gitlab.dev.wopta.it/goworkspace/document v1.1.361
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.245
+	gitlab.dev.wopta.it/goworkspace/models v1.2.191
+	gitlab.dev.wopta.it/goworkspace/network v1.0.259
+	gitlab.dev.wopta.it/goworkspace/policy v1.0.405
+	gitlab.dev.wopta.it/goworkspace/product v1.1.190
+	gitlab.dev.wopta.it/goworkspace/sellable v1.0.304
 	google.golang.org/api v0.209.0
 	modernc.org/mathutil v1.5.0
 )
@@ -84,7 +84,7 @@ require (
 	github.com/xuri/efp v0.0.0-20231025114914-d1ff6096ae53 // indirect
 	github.com/xuri/nfp v0.0.0-20230919160717-d98342af3f05 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
-	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.86 // indirect
+	gitlab.dev.wopta.it/goworkspace/wiseproxy v1.0.87 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.54.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.54.0 // indirect

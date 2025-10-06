@@ -5,8 +5,8 @@ go 1.23
 replace gitlab.dev.wopta.it/goworkspace/product => ./
 
 require (
-	gitlab.dev.wopta.it/goworkspace/lib v1.0.244
-	gitlab.dev.wopta.it/goworkspace/models v1.2.190
+	gitlab.dev.wopta.it/goworkspace/lib v1.0.245
+	gitlab.dev.wopta.it/goworkspace/models v1.2.191
 )
 
 require (
