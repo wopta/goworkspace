@@ -60,12 +60,20 @@ func (f *FlowBpnm) RunAt(flow BpmnFlow, startingActivity string) error {
 	if err = process.loop(process.storageBpnm, firstActivities...); err != nil {
 		return err
 	}
+	if process.lastActivity != nil && !process.lastActivity.callEndIfStop {
+		return nil
+	}
+	if err = process.activities[getNameEndActivity(process.name)].runActivity(process, process.storageBpnm); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (p *processBpnm) loop(initialStorage *StorageBpnm, activities ...*activity) (err error) {
+	var newStorage *StorageBpnm
 	for i := range activities {
-		newStorage := NewStorageBpnm()
+		newStorage = NewStorageBpnm()
 		err = newStorage.setHigherStorage(initialStorage)
 		if err != nil {
 			return err
@@ -79,24 +87,14 @@ func (p *processBpnm) loop(initialStorage *StorageBpnm, activities ...*activity)
 		if err = activities[i].runActivity(p, newStorage); err != nil {
 			return err
 		}
+		p.lastActivity = activities[i]
 
 		mapsMerged := newStorage.GetMap()
 		listNewActivities, err := activities[i].evaluateDecisions(p.name, newStorage, mapsMerged)
-		lastActivity := activities[i].name
 		if err != nil {
 			return err
 		}
 		if len(listNewActivities) == 0 {
-			if !activities[i].callEndIfStop {
-				log.InfoF("Finished %v", p.name)
-				continue
-			}
-			if lastActivity != getNameEndActivity(p.name) {
-				if err = p.activities[getNameEndActivity(p.name)].runActivity(p, newStorage); err != nil {
-					return err
-				}
-			}
-			log.InfoF("Finished %v", p.name)
 			continue
 		}
 		newStorage.cleanNoMarkedResources()
@@ -128,14 +126,15 @@ func (act *activity) runActivity(process *processBpnm, storage *StorageBpnm) (er
 		}
 		log.InfoF("Run process '%v', finished activity '%v' with status: %v", process.name, act.name, status)
 	}()
-
-	if pre := act.preActivity; pre != nil {
-		err = pre.storageBpnm.setHigherStorage(storage)
-		if err != nil {
-			return err
-		}
-		if err = pre.loop(pre.storageBpnm, pre.activities[pre.defaultStart]); err != nil {
-			return err
+	for i := range act.preActivity {
+		if pre := act.preActivity[i]; pre != nil {
+			err = pre.storageBpnm.setHigherStorage(storage)
+			if err != nil {
+				return err
+			}
+			if err = pre.loop(pre.storageBpnm, pre.activities[pre.defaultStart]); err != nil {
+				return err
+			}
 		}
 	}
 	if err = checkResources(storage, act.requiredInputData); err != nil {
@@ -145,14 +144,15 @@ func (act *activity) runActivity(process *processBpnm, storage *StorageBpnm) (er
 	if err = callActivity(process, storage, act); err != nil {
 		return err
 	}
-
-	if post := act.postActivity; post != nil {
-		err = post.storageBpnm.setHigherStorage(storage)
-		if err != nil {
-			return err
-		}
-		if err = post.loop(post.storageBpnm, post.activities[post.defaultStart]); err != nil {
-			return err
+	for i := range act.postActivity {
+		if post := act.postActivity[i]; post != nil {
+			err = post.storageBpnm.setHigherStorage(storage)
+			if err != nil {
+				return err
+			}
+			if err = post.loop(post.storageBpnm, post.activities[post.defaultStart]); err != nil {
+				return err
+			}
 		}
 	}
 	return nil

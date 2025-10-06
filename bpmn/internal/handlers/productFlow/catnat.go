@@ -2,6 +2,7 @@ package productFlow
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"os"
 
@@ -11,7 +12,40 @@ import (
 	"gitlab.dev.wopta.it/goworkspace/models/catnat"
 )
 
-func CatnatIntegration(store *bpmnEngine.StorageBpnm) error {
+const nameCatnatDocument = "Contratto NetInsurance"
+
+func AddCatnatHandlers(builder *bpmnEngine.BpnmBuilder) error {
+	return bpmnEngine.IsError(
+		builder.AddHandler("catnatIntegration", catnatIntegration),
+		builder.AddHandler("catnatdownloadPolicy", catnatDownloadCertification),
+		builder.AddHandler("catnatUploadDocument", catnatUpload),
+	)
+}
+
+func catnatUpload(store *bpmnEngine.StorageBpnm) error {
+	policy, err := bpmnEngine.GetData[*flow.Policy]("policy", store)
+	if err != nil {
+		return err
+	}
+	client := catnat.NewNetClient()
+	attachmentName := fmt.Sprint(nameCatnatDocument)
+	var document string
+	for i := range *policy.Attachments {
+		if (*policy.Attachments)[i].FileName == attachmentName {
+			bytes, err := lib.ReadFileFromGoogleStorageEitherGsOrNot((*policy.Attachments)[i].Link)
+			if err != nil {
+				return err
+			}
+			document = base64.StdEncoding.EncodeToString(bytes)
+			break
+		}
+	}
+	if document == "" {
+		return errors.New("Document not found")
+	}
+	return client.UploadDocument(*policy.Policy, document)
+}
+func catnatIntegration(store *bpmnEngine.StorageBpnm) error {
 	policy, err := bpmnEngine.GetData[*flow.Policy]("policy", store)
 	if err != nil {
 		return err
@@ -31,7 +65,7 @@ func CatnatIntegration(store *bpmnEngine.StorageBpnm) error {
 	return nil
 }
 
-func CatnatDownloadCertification(store *bpmnEngine.StorageBpnm) error {
+func catnatDownloadCertification(store *bpmnEngine.StorageBpnm) error {
 	var policy *flow.Policy
 	var numeroPoliza *flow.String
 	err := bpmnEngine.IsError(
@@ -50,7 +84,7 @@ func CatnatDownloadCertification(store *bpmnEngine.StorageBpnm) error {
 	if err != nil {
 		return err
 	}
-	filePath := fmt.Sprint("temp/", policy.Uid, "/namirial/", policy.NameDesc, " Contratto NetInsurance ", policy.CodeCompany)
+	filePath := fmt.Sprint("temp/", policy.Uid, "/namirial/", policy.NameDesc, " ", nameCatnatDocument, " ", policy.CodeCompany)
 	_, err = lib.PutToStorageErr(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, bytes)
 	if err != nil {
 		return err

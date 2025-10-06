@@ -268,7 +268,6 @@ func TestBpnmInjection(t *testing.T) {
 		"init B",
 		"init A",
 		"init post",
-		"end injected process",
 		"init A",
 		"init post",
 		"end injected process",
@@ -294,8 +293,8 @@ func TestBpnmWithMultipleInjection(t *testing.T) {
 		t.Fatalf("Should have an error")
 	}
 
-	if err.Error() != "Injection's been already done for: target process: 'emit', process: injected 'provaPost' with order 'Post'" {
-		t.Fatalf("Injection's been already done for: target process: 'emit', process: injected 'provaPost' with order Post, got: %v'", err)
+	if err.Error() != "The building of injected process went bad: Double event with same name 'end_provaPost'" {
+		t.Fatalf("The building of injected process went bad: Double event with same name 'end_provaPost', got: %v'", err)
 	}
 }
 

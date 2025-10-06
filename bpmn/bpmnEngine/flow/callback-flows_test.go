@@ -19,7 +19,7 @@ func funcTestWithInfo(message string, log *mockLog) func(*bpmnEngine.StorageBpnm
 	}
 }
 
-func getBuilderFlowNode(log *mockLog, store *bpmnEngine.StorageBpnm) (*bpmnEngine.BpnmBuilder, error) {
+func getBuilderFlowCallback(log *mockLog, store *bpmnEngine.StorageBpnm) (*bpmnEngine.BpnmBuilder, error) {
 	os.Setenv("env", env.LocalTest)
 	builder, e := bpmnEngine.NewBpnmBuilderRawPath("../../../../function-data/dev/flows/callback-flows.json")
 	if e != nil {
@@ -68,7 +68,7 @@ func TestEmitForWinNodeWithConfigTrue(t *testing.T) {
 		"Emit",
 		"saveAudit prova request Emit",
 	}
-	testFlow(t, "emitCallBack", exps, store, getBuilderFlowNode)
+	testFlow(t, "emitCallBack", exps, store, getBuilderFlowCallback)
 }
 
 func TestEmitForWinNodeWithConfigFalse(t *testing.T) {
@@ -81,7 +81,7 @@ func TestEmitForWinNodeWithConfigFalse(t *testing.T) {
 	exps := []string{}
 	store.AddLocal("config", &CallbackConfigBpmn{callback_out.CallbackConfig{Emit: false}})
 
-	testFlow(t, "emitCallBack", exps, store, getBuilderFlowNode)
+	testFlow(t, "emitCallBack", exps, store, getBuilderFlowCallback)
 }
 
 func TestEmitForWinWithProductFlowWinEmitRemittance(t *testing.T) {
@@ -99,7 +99,7 @@ func TestEmitForWinWithProductFlowWinEmitRemittance(t *testing.T) {
 	}
 	store.AddLocal("config", &CallbackConfigBpmn{callback_out.CallbackConfig{EmitRemittance: true}})
 
-	testFlow(t, "emitCallBack", exps, store, getBuilderFlowNode)
+	testFlow(t, "emitCallBack", exps, store, getBuilderFlowCallback)
 }
 func TestCallbackProposalWithIsReservedTrue(t *testing.T) {
 	store := bpmnEngine.NewStorageBpnm()
@@ -111,7 +111,7 @@ func TestCallbackProposalWithIsReservedTrue(t *testing.T) {
 
 	store.AddLocal("config", &CallbackConfigBpmn{callback_out.CallbackConfig{Proposal: true}})
 	exps := []string{}
-	testFlow(t, "proposalCallback", exps, store, getBuilderFlowNode)
+	testFlow(t, "proposalCallback", exps, store, getBuilderFlowCallback)
 }
 
 func TestCallbackProposalWithIsReservedFalse(t *testing.T) {
@@ -127,5 +127,5 @@ func TestCallbackProposalWithIsReservedFalse(t *testing.T) {
 		"Proposal",
 		"saveAudit prova request Proposal",
 	}
-	testFlow(t, "proposalCallback", exps, store, getBuilderFlowNode)
+	testFlow(t, "proposalCallback", exps, store, getBuilderFlowCallback)
 }

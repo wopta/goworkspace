@@ -2,7 +2,7 @@ package bpmn
 
 import (
 	"gitlab.dev.wopta.it/goworkspace/bpmn/bpmnEngine"
-	"gitlab.dev.wopta.it/goworkspace/bpmn/internal/handlers/productFlow"
+	"gitlab.dev.wopta.it/goworkspace/bpmn/internal/handlers"
 )
 
 func injectProductFlow(mainBuilder *bpmnEngine.BpnmBuilder) error {
@@ -13,8 +13,7 @@ func injectProductFlow(mainBuilder *bpmnEngine.BpnmBuilder) error {
 	}
 	builder.SetStorage(store)
 	err := bpmnEngine.IsError(
-		builder.AddHandler("catnatIntegration", productFlow.CatnatIntegration),
-		builder.AddHandler("catnatdownloadPolicy", productFlow.CatnatDownloadCertification),
+		handlers.AddProductsHandlers(builder),
 	)
 	if err != nil {
 		return err

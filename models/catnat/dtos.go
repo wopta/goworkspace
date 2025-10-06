@@ -150,6 +150,18 @@ type IncassoNetRequest struct {
 	IdProgressivo   int    `json:"idProgressivo"`
 }
 
+type UploadNetRequest struct {
+	CodiceCompagnia string             `json:"codiceCompagnia"`
+	PolicyNumber    string             `json:"numeroPolizza"`
+	Attachment      AllegatoNetRequest `json:"allegato"`
+}
+type AllegatoNetRequest struct {
+	AttachmentBase64    string `json:"allegatoBase64"`
+	AttachmentMacroType string `json:"macroTipologiaAllegato"`
+	AttachmentMicroType string `json:"microTipologiaAllegato"`
+	NameAttachment      string `json:"nomeAllegato"`
+}
+
 const earthquakeSlug = "earthquake"
 const floodSlug = "flood"
 const landlideSlug = "landslide"

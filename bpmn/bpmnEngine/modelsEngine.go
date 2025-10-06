@@ -10,6 +10,7 @@ type processBpnm struct {
 	requiredGlobalData []typeData
 	description        string
 	activities         map[string]*activity
+	lastActivity       *activity
 	storageBpnm        *StorageBpnm
 	recover            []activityHandler
 }
@@ -18,8 +19,8 @@ type activity struct {
 	name               string
 	handler            activityHandler
 	description        string
-	preActivity        *processBpnm
-	postActivity       *processBpnm
+	preActivity        []*processBpnm
+	postActivity       []*processBpnm
 	requiredOutputData []typeData
 	requiredInputData  []typeData
 	gateway            []*gateway

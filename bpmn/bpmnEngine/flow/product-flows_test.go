@@ -28,6 +28,7 @@ func getBuilderFlowProduct(log *mockLog, store *bpmnEngine.StorageBpnm) (*bpmnEn
 	e = bpmnEngine.IsError(
 		builder.AddHandler("catnatIntegration", mock_catnatIntegration(log)),
 		builder.AddHandler("catnatdownloadPolicy", funcTest("catnatdownloadPolicy", log)),
+		builder.AddHandler("catnatUploadDocument", funcTest("catnatUploadDocument", log)),
 	)
 	if e != nil {
 		return nil, e

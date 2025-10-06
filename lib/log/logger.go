@@ -193,7 +193,7 @@ func parserMessageGoogleCloud(message string, severity SeverityType, prefix []st
 	return append(out, '\n'), nil
 }
 func isLocal() bool {
-	return slices.Contains([]string{"local", ""}, os.Getenv("env"))
+	return slices.Contains([]string{"local", "", "local-test"}, os.Getenv("env"))
 }
 
 var logger *LoggerWopta

@@ -190,7 +190,7 @@ func (c *NetClient) Download(numeroPolizza string) (response DownloadResponse, e
 	}
 	return response, nil
 }
-func CalculateControlNumberFromVatCode(vatCode string) string {
+func getControlNumberFromVatCode(vatCode string) string {
 	x := 0
 	y := 0
 	i := 0
@@ -225,7 +225,7 @@ func (c *NetClient) EnrichAteco(fiscalCode string) (response enrichEtecoCatnat, 
 		return response, errors.New("Inserire partita iva o codice fiscale")
 	}
 	if len(fiscalCode) == 11 { //partita iva
-		checkDigit := CalculateControlNumberFromVatCode(fiscalCode)
+		checkDigit := getControlNumberFromVatCode(fiscalCode)
 		if checkDigit != string(fiscalCode[10]) {
 			return response, errors.New("Partita iva non corretta, verificare il codice di controllo")
 		}
@@ -315,6 +315,51 @@ func (c *NetClient) Incasso(policy models.Policy) error {
 	}
 	if response.Esito != "OK" {
 		return fmt.Errorf("error incasso for policy %v con stato %v response %v", policy.CodeCompany, resp.StatusCode, string(strResponse))
+	}
+	return nil
+}
+
+func (c *NetClient) UploadDocument(policy models.Policy, document string) error {
+	if document == "" {
+		return errors.New("Document has to be specified")
+	}
+	url := os.Getenv("NET_BASEURL") + "/OperationsGateway/AllegaDocumento/InserisciAllegatoPolizza"
+	dto := UploadNetRequest{
+		CodiceCompagnia: "441",
+		PolicyNumber:    policy.CodeCompany,
+		Attachment: AllegatoNetRequest{
+			AttachmentBase64:    document,
+			AttachmentMacroType: "01",
+			AttachmentMicroType: "0101",
+			NameAttachment:      "Contratto",
+		},
+	}
+	rBuff := new(bytes.Buffer)
+	err := json.NewEncoder(rBuff).Encode(dto)
+
+	if err != nil {
+		return err
+	}
+	req, _ := http.NewRequest(http.MethodPost, url, rBuff)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := c.Client.Do(req)
+	if err != nil {
+		log.Error(err)
+		return fmt.Errorf("error upload document: %v", policy.CodeCompany)
+	}
+	strResponse, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("error upload document policy %v con stato %v response %v", policy.CodeCompany, resp.StatusCode, string(strResponse))
+	}
+	var response struct {
+		Esito  string   `json:"esito"`
+		Errori []string `json:"errori"`
+	}
+	if err = json.Unmarshal(strResponse, &response); err != nil {
+		return fmt.Errorf("error decoding catnat body: %v", string(strResponse))
+	}
+	if response.Esito != "OK" {
+		return fmt.Errorf("error upload document policy %v con stato %v response %v", policy.CodeCompany, resp.StatusCode, string(strResponse))
 	}
 	return nil
 }

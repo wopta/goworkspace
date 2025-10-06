@@ -263,6 +263,41 @@ func TestPayAnnuityNoFirstRateNoFirstPayment(t *testing.T) {
 	}
 	testFlow(t, "pay", exps, store, getBuilderFlowChannel)
 }
+func TestPayCatnat(t *testing.T) {
+	store := bpmnEngine.NewStorageBpnm()
+	initBaseStorage(store)
+	storeProduct := bpmnEngine.NewStorageBpnm()
+	store.AddGlobal("policy", &policyCatnat)
+	store.AddGlobal("product", &productEcommerce)
+	store.AddGlobal("networkNode", &winNode)
+	store.AddGlobal("paymentInfo", &paymentInfo)
+	store.AddGlobal("transaction", &transaction)
+	store.AddGlobal("sendEmail", &BoolBpmn{false})
+	store.AddGlobal("skipInvoice", &BoolBpmn{false})
+
+	exps := []string{
+		"payTransaction",
+		"promotePolicy",
+		"updatePolicyAsPaid",
+		"generateInvoice",
+		"createNetworkTransaction",
+		"saveTransactionAndPolicy",
+		"catnatUploadDocument",
+	}
+	testFlow(t, "pay", exps, store, func(log *mockLog, sd *bpmnEngine.StorageBpnm) (*bpmnEngine.BpnmBuilder, error) {
+		build, e := getBuilderFlowChannel(log, store)
+		if e != nil {
+			return nil, e
+		}
+		buildToInject, e := getBuilderFlowProduct(log, storeProduct)
+		if e != nil {
+			return nil, e
+		}
+		build.Inject(buildToInject)
+
+		return build, nil
+	})
+}
 func TestSignForEcommerce(t *testing.T) {
 	store := bpmnEngine.NewStorageBpnm()
 	store.AddGlobal("policy", &policyEcommerce)
@@ -512,7 +547,7 @@ func TestSignForRemittanceMgaWithNodeFlow(t *testing.T) {
 		if e != nil {
 			return nil, e
 		}
-		nodeBuild, e := getBuilderFlowNode(log, storeNode)
+		nodeBuild, e := getBuilderFlowCallback(log, storeNode)
 		if e != nil {
 			return nil, e
 		}
@@ -533,7 +568,6 @@ func TestEmitForEcommerceWithNodeFlow(t *testing.T) {
 
 	storeNode := bpmnEngine.NewStorageBpnm()
 	storeNode.AddLocal("config", &CallbackConfigBpmn{callback_out.CallbackConfig{Emit: true}})
-
 	exps := []string{
 		"setProposalData",
 		"emitWithSequence",
@@ -549,7 +583,7 @@ func TestEmitForEcommerceWithNodeFlow(t *testing.T) {
 		if e != nil {
 			return nil, e
 		}
-		nodeBuild, e := getBuilderFlowNode(log, storeNode)
+		nodeBuild, e := getBuilderFlowCallback(log, storeNode)
 		if e != nil {
 			return nil, e
 		}
@@ -576,7 +610,7 @@ func TestEmitForWgaWithNodeFlow(t *testing.T) {
 		if e != nil {
 			return nil, e
 		}
-		nodeBuild, e := getBuilderFlowNode(log, storeNode)
+		nodeBuild, e := getBuilderFlowCallback(log, storeNode)
 
 		if e != nil {
 			return nil, e
@@ -612,7 +646,7 @@ func TestEmitForEcommerceWithNodeFlowConfFalse(t *testing.T) {
 		if e != nil {
 			return nil, e
 		}
-		nodeBuild, e := getBuilderFlowNode(log, storeNode)
+		nodeBuild, e := getBuilderFlowCallback(log, storeNode)
 		if e != nil {
 			return nil, e
 		}
@@ -656,7 +690,7 @@ func TestEmitForEcommerceCatnat(t *testing.T) {
 		if e != nil {
 			return nil, e
 		}
-		nodeBuild, e := getBuilderFlowNode(log, storeNode)
+		nodeBuild, e := getBuilderFlowCallback(log, storeNode)
 		if e != nil {
 			return nil, e
 		}
