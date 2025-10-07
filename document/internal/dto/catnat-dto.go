@@ -78,22 +78,22 @@ func newQuestionCatnatDto(p *models.Policy) (res QuestionsCatnatDto) {
 	var alreadyFlood any
 	var wantEarthquake any
 	var wantFlood any
-	//TODO to change with  v2
-	//if p.Assets[0].Building.UseType == "tenant" {
-	alreadyEarthquake = p.QuoteQuestions["alreadyEarthquake"]
-	alreadyFlood = p.QuoteQuestions["alreadyFlood"]
-	wantEarthquake = p.QuoteQuestions["wantEarthquake"]
-	wantFlood = p.QuoteQuestions["wantFlood"]
 
-	res.AlreadyEarthquake = quoteQuestionMap[alreadyEarthquake.(bool)]
-	res.AlreadyFlood = quoteQuestionMap[alreadyFlood.(bool)]
-	if wantEarthquake != nil {
-		res.WantEarthquake = quoteQuestionMap[wantEarthquake.(bool)]
+	if p.Assets[0].Building.UseType == "tenant" {
+		alreadyEarthquake = p.QuoteQuestions["alreadyEarthquake"]
+		alreadyFlood = p.QuoteQuestions["alreadyFlood"]
+		wantEarthquake = p.QuoteQuestions["wantEarthquake"]
+		wantFlood = p.QuoteQuestions["wantFlood"]
+
+		res.AlreadyEarthquake = quoteQuestionMap[alreadyEarthquake.(bool)]
+		res.AlreadyFlood = quoteQuestionMap[alreadyFlood.(bool)]
+		if wantEarthquake != nil {
+			res.WantEarthquake = quoteQuestionMap[wantEarthquake.(bool)]
+		}
+		if wantFlood != nil {
+			res.WantFlood = quoteQuestionMap[wantFlood.(bool)]
+		}
 	}
-	if wantFlood != nil {
-		res.WantFlood = quoteQuestionMap[wantFlood.(bool)]
-	}
-	//}
 
 	return res
 
