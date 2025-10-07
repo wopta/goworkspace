@@ -47,7 +47,9 @@ func BankAccountInclusive(w http.ResponseWriter, r *http.Request) (string, inter
 
 	setPolicy("180623", now, upload, req)
 	setPolicy("191123", now, upload, req)
+	setPolicy("270125", now, upload, req)
 	setScalapayPolicy("51114", now, upload, req)
+	setScalapayPolicy("051124", now, upload, req)
 	log.Println("---------------------end------------------------------")
 	return "", nil, e
 }
@@ -255,7 +257,7 @@ func setScalapayPolicy(code string, now time.Time, upload bool, req DataReq) {
 		"TIPO MOVIMENTO",
 	}
 	if code == "51114" {
-		code = "051114"
+		code = "051124"
 	}
 	refDay = now.AddDate(0, 0, -1)
 	log.Println("  refMontly: ", refDay)

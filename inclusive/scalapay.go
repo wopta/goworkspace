@@ -154,7 +154,7 @@ func SetScalapayData(obj BankAccountMovement) BankAccountMovement {
 	obj.BigStartDate = civil.DateTimeOf(obj.StartDate)
 	obj.BigEndDate = civil.DateTimeOf(obj.EndDate)
 	if obj.GuaranteesCode == "base" {
-		obj.PolicyNumber = "051114"
+		obj.PolicyNumber = "051124"
 		obj.Uid = uuid.New().String()
 		obj.Customer = "Scalapay"
 		obj.Company = "axa"
