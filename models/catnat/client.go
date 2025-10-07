@@ -328,12 +328,13 @@ func (c *NetClient) UploadDocument(policy models.Policy, document string) error 
 		CodiceCompagnia: "441",
 		PolicyNumber:    policy.CodeCompany,
 		Attachment: AllegatoNetRequest{
-			AttachmentBase64:    document,
 			AttachmentMacroType: "01",
 			AttachmentMicroType: "0101",
 			NameAttachment:      "Contratto",
 		},
 	}
+	log.PrintStruct("request", dto)
+	dto.Attachment.AttachmentBase64 = document
 	rBuff := new(bytes.Buffer)
 	err := json.NewEncoder(rBuff).Encode(dto)
 

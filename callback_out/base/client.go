@@ -98,18 +98,6 @@ func (c *Client) Rejected(policy models.Policy) CallbackInfo {
 	return c.baseRequest(policy, Rejected)
 }
 
-func (c *Client) DecodeAction(rawAction CallbackoutAction) []CallbackoutAction {
-	actionEnabled, ok := c.externalConfig.Events[rawAction]
-	if !actionEnabled || !ok {
-		return nil
-	}
-
-	availableActions := GetAvailableActions()
-	decodedActions := availableActions[rawAction]
-
-	return decodedActions
-}
-
 func (c *Client) setAuth(req *http.Request) {
 	network := lib.ToUpper(c.network)
 	switch c.externalConfig.AuthType {

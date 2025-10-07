@@ -31,7 +31,7 @@ func catnatUpload(store *bpmnEngine.StorageBpnm) error {
 	attachmentName := fmt.Sprint(nameCatnatDocument)
 	var document string
 	for i := range *policy.Attachments {
-		if (*policy.Attachments)[i].FileName == attachmentName {
+		if (*policy.Attachments)[i].Name == attachmentName {
 			bytes, err := lib.ReadFileFromGoogleStorageEitherGsOrNot((*policy.Attachments)[i].Link)
 			if err != nil {
 				return err

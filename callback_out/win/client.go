@@ -149,15 +149,3 @@ func (c *Client) Approved(models.Policy) base.CallbackInfo {
 func (c *Client) Rejected(models.Policy) base.CallbackInfo {
 	return base.CallbackInfo{ResAction: base.Rejected}
 }
-
-func (c *Client) DecodeAction(rawAction base.CallbackoutAction) []base.CallbackoutAction {
-	actionEnabled, ok := c.externalConfig.Events[rawAction]
-	if !actionEnabled || !ok {
-		return nil
-	}
-
-	availableActions := base.GetAvailableActions()
-	decodedActions := availableActions[rawAction]
-
-	return decodedActions
-}

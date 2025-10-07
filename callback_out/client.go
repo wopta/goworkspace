@@ -19,9 +19,6 @@ type CallbackClient interface {
 	RequestApproval(models.Policy) base.CallbackInfo
 	Approved(models.Policy) base.CallbackInfo
 	Rejected(models.Policy) base.CallbackInfo
-
-	// This method is temporary while we do not settle on the config for the node
-	DecodeAction(base.CallbackoutAction) []base.CallbackoutAction
 }
 
 type CallbackConfig struct {
