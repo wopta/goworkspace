@@ -21,7 +21,8 @@ func injectCallbackFlow(networkNode *models.NetworkNode, mainBuilder *bpmnEngine
 	}
 	client, conf, err := callback_out.NewClient(networkNode)
 	if err != nil {
-		return err
+		log.WarningF("Callback isn't right: %s", err)
+		return nil
 	}
 	if err = store.AddGlobal("config", &flow.CallbackConfigBpmn{CallbackConfig: conf}); err != nil {
 		return err

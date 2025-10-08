@@ -45,6 +45,7 @@ func NewClient(node *models.NetworkNode) (client CallbackClient, conf CallbackCo
 		client = base.NewClient(node, "facile_broker")
 		bytes, err = lib.GetFilesByEnvV2("flows/callback/base.json")
 	default:
+		log.WarningF("Callback client isn't correct %s", node.CallbackConfig.Name)
 		err = ErrCallbackClientNotSet
 	}
 	if err != nil {
