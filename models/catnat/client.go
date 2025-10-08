@@ -329,8 +329,8 @@ func (c *NetClient) UploadDocument(policy models.Policy, document string) error 
 		PolicyNumber:    policy.CodeCompany,
 		Attachment: AllegatoNetRequest{
 			AttachmentMacroType: "01",
-			AttachmentMicroType: "0101",
-			NameAttachment:      "Contratto",
+			AttachmentMicroType: "0107",
+			NameAttachment:      "Contratto.pdf",
 		},
 	}
 	log.PrintStruct("request", dto)

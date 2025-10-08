@@ -58,7 +58,7 @@ func GetPolicyAttachments(policyUid string) ([]models.Attachment, error) {
 			wiseResponseData   []byte
 		)
 		wiseAttachmentId := strings.Split(policyUid, ":")[1]
-		request := []byte(fmt.Sprintf(`{"idPolizza": "%s", "cdLingua": "it"}`, wiseAttachmentId))
+		request := fmt.Appendf(nil, `{"idPolizza": "%s", "cdLingua": "it"}`, wiseAttachmentId)
 		ioReader := wiseproxy.WiseProxyObj("WebApiProduct/Api/GetPolizzaCompleta", request, http.MethodPost)
 
 		defer ioReader.Close()
@@ -72,7 +72,7 @@ func GetPolicyAttachments(policyUid string) ([]models.Attachment, error) {
 		for _, wiseAttachment := range wisePolicy.Policy.Attachments {
 			var attachment models.Attachment
 
-			request := []byte(fmt.Sprintf(`{"txRifAllegato": "%s", "cdLingua": "it"}`, wiseAttachment.Id))
+			request := fmt.Appendf(nil, `{"txRifAllegato": "%s", "cdLingua": "it"}`, wiseAttachment.Id)
 			ioReader, wiseToken = wiseproxy.WiseBatch("WebApiProduct/Api/recuperaAllegato", request, http.MethodPost, wiseToken)
 
 			defer ioReader.Close()
