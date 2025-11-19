@@ -156,7 +156,7 @@ func SetHypeData(obj BankAccountMovement) BankAccountMovement {
 
 	}
 	//TODO:CHANGE NUMBER
-	if obj.GuaranteesCode == "QUICK2CASH" {
+	if obj.GuaranteesCode == "lottomatica" {
 		obj.PolicyNumber = "270125"
 		obj.PolicyName = "Hype QUICK2CASH"
 	}
