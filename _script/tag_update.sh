@@ -15,3 +15,4 @@ git push google master
 git push wopta master 
 git tag -a $1/$2 -m "$3"
 git push wopta $1/$2
+git push work $1/$2
