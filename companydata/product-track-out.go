@@ -46,6 +46,11 @@ func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	lib.CheckError(err)
 	log.Println("Product track json: ", procuctTrack)
 	from, to = procuctTrack.setFrequency(now)
+	if reqData.From != "" && reqData.To != "" {
+		from, _ = time.Parse(layoutQuery, reqData.From)
+		to, _ = time.Parse(layoutQuery, reqData.To)
+
+	}
 	for _, ev := range reqData.Event {
 		var result [][]string
 		log.Println("start len(result): ", len(result))
@@ -302,7 +307,7 @@ func (track *Track) setFrequency(now time.Time) (time.Time, time.Time) {
 		from = lib.GetFirstDay(prevMonth)
 		to = lib.GetFirstDay(now)
 	case "daily":
-		prevDay := now.AddDate(0, 0, -2)
+		prevDay := now.AddDate(0, 0, -1)
 		from = time.Date(prevDay.Year(), prevDay.Month(), prevDay.Day(), 0, 0, 0, 0, location)
 		to = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, location)
 	}
