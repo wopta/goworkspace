@@ -145,19 +145,19 @@ func SetHypeData(obj BankAccountMovement) BankAccountMovement {
 	obj.Tenant = "hype"
 	obj.City = ""
 	if obj.GuaranteesCode == "next" {
-		obj.PolicyNumber = "180623"
+		obj.PolicyNumber = "190326"
 		obj.Uid = uuid.New().String()
 		obj.Customer = "hype"
 		obj.PolicyName = "Hype Next"
 	}
 	if obj.GuaranteesCode == "premium" {
-		obj.PolicyNumber = "191123"
+		obj.PolicyNumber = "200326"
 		obj.PolicyName = "Hype Premium"
 
 	}
 	//TODO:CHANGE NUMBER
 	if obj.GuaranteesCode == "lottomatica" {
-		obj.PolicyNumber = "270125"
+		obj.PolicyNumber = "210326"
 		obj.PolicyName = "Hype QUICK2CASH"
 	}
 	obj.CustomerId = obj.HypeId
