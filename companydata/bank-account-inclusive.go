@@ -45,9 +45,9 @@ func BankAccountInclusive(w http.ResponseWriter, r *http.Request) (string, inter
 	defer r.Body.Close()
 	now, upload, req := getCompanyDataReq(body)
 
-	setPolicy("180623", now, upload, req)
-	setPolicy("191123", now, upload, req)
-	setPolicy("270125", now, upload, req)
+	setPolicy("190326", now, upload, req)
+	setPolicy("200326", now, upload, req)
+	setPolicy("210326", now, upload, req)
 	setScalapayPolicy("51114", now, upload, req)
 	setScalapayPolicy("051124", now, upload, req)
 	log.Println("---------------------end------------------------------")
@@ -108,10 +108,20 @@ func setInclusiveRow(mov inclusive.BankAccountMovement, codes map[string]map[str
 	var (
 		result [][]string
 		user   models.User
+		configCode string
 	)
 
 	if mov.FiscalCode != "" {
 		_, user, _ = ExtractUserDataFromFiscalCode(mov.FiscalCode, codes)
+	}
+		if mov.PolicyNumber== "200326" {
+		configCode="0582701"
+	}
+		if mov.PolicyNumber== "190326" {
+		configCode="0582700"
+	}
+			if mov.PolicyNumber== "210326" {
+		configCode="00001"
 	}
 	birthDate, _ := time.Parse("2006-01-02T15:04:05Z07:00", user.BirthDate)
 	startDate, _ := time.Parse("2006-01-02", mov.BigStartDate.Date.String())
@@ -119,7 +129,7 @@ func setInclusiveRow(mov inclusive.BankAccountMovement, codes map[string]map[str
 		mov.PolicyNumber,         // NUMERO POLIZZA
 		"T",                      //    LOB
 		"C",                      //    TIPOLOGIA POLIZZA
-		"0548100",                //    CODICE CONFIGURAZIONE
+		configCode,                //    CODICE CONFIGURAZIONE
 		"1",                      //    TIPO OGGETTO ASSICURATO
 		mov.HypeId,               //    IDENTIFICATIVO UNIVOCO APPLICAZIONE
 		mov.FiscalCode,           //    CODICE FISCALE / P.IVA ASSICURATO
